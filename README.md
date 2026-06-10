@@ -2,7 +2,7 @@
 
 这个仓库包含两个并列的 Sarasa Ui SC 派生字体系列：
 
-- **Sarasa Ui VF PropDigits SC**：可变字体版本，包含正体和 Italic，`wght` 轴范围为 `250..900`。
+- **Sarasa Ui VF PropDigits SC**：可变字体版本，包含正体和 Italic，`wght` 轴范围为 `250` 至 `900`。
 - **Sarasa Ui ProDigits SC**：静态 TTF 版本，包含 5 个字重及对应 Italic。
 
 两个系列都把 ASCII 数字 `U+0030..U+0039` 设为默认变宽数字，并保留 OpenType `tnum`/`pnum` 特性。支持字体特性的应用可以继续在变宽数字和等宽数字之间切换。
@@ -38,7 +38,7 @@ checksums/
 属性：
 
 - 字体家族名：`Sarasa Ui VF PropDigits SC`
-- 字重轴：`wght 250..900`，默认 `400`
+- 字重轴：`wght` 为 `250` 至 `900`，默认 `400`
 - 字重级别名：`ExtraLight`、`Light`、`Normal`、`Regular`、`Medium`、`Bold`、`Heavy`
 - 默认数字：变宽数字
 - 数字特性：`tnum`、`pnum`
@@ -49,7 +49,7 @@ checksums/
 - CJK 部分来自 `SourceHanSansSC-VF.ttf`。
 - 拉丁、西文和默认数字来自 Inter Variable。
 - Source Han Sans SC VF 按 Sarasa 原版处理 glyph 限额的思路裁掉西文字形，由拉丁源补齐西文部分。
-- Inter Variable 固定 `opsz 14`，并保留 `wght 250..900`。
+- Inter Variable 固定 `opsz 14`，并保留 `wght` 为 `250` 至 `900`。
 - Inter 字形以带前缀的内部 glyph 名追加到 Source Han 子集后，最终字形数保持在 TrueType `65535` 限额内。
 - Italic 版本使用 Inter Variable Italic；CJK 部分做 9.4 度倾斜处理。
 
