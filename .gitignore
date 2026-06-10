@@ -1,0 +1,6 @@
+*.7z
+*.zip
+*.log
+*.tmp
+.DS_Store
+Thumbs.db

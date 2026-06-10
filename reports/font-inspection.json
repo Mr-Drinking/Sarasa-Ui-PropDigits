@@ -1,0 +1,482 @@
+{
+  "title": "Sarasa Ui VF PropDigits SC 与 Sarasa Ui ProDigits SC 字体检查报告",
+  "note": "本报告由 fontTools 读取仓库内 TTF 生成。",
+  "fonts": [
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-Bold.ttf",
+      "size": 23895976,
+      "sha256": "0D70097900DF3D8D8F4530A8CACC11345C0E2E6EDEEBBB3F244EB31E3B11F8B8",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC",
+        "subfamily": "Bold",
+        "full": "Sarasa Ui ProDigits SC Bold",
+        "postscript": "Sarasa-Ui-ProDigits-SC-Bold",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "Bold"
+      },
+      "glyph_count": 48756,
+      "digit_widths_u0030_to_u0039": [
+        674,
+        431,
+        630,
+        646,
+        676,
+        622,
+        649,
+        582,
+        651,
+        649
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-BoldItalic.ttf",
+      "size": 24686512,
+      "sha256": "67D32AF862FDDDD666DA7FF67047183605F068F67227D0044422F734593CD78E",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC",
+        "subfamily": "Bold Italic",
+        "full": "Sarasa Ui ProDigits SC Bold Italic",
+        "postscript": "Sarasa-Ui-ProDigits-SC-Bold-Italic",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "Bold Italic"
+      },
+      "glyph_count": 48717,
+      "digit_widths_u0030_to_u0039": [
+        674,
+        432,
+        630,
+        646,
+        677,
+        622,
+        649,
+        582,
+        650,
+        649
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-ExtraLight.ttf",
+      "size": 24074868,
+      "sha256": "3F084303FEE4106065A83ED0303DEB0795C05A496A95CE5BDF56CEB76B2483F0",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC XLight",
+        "subfamily": "Regular",
+        "full": "Sarasa Ui ProDigits SC XLight",
+        "postscript": "Sarasa-Ui-ProDigits-SC-ExtraLight",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "ExtraLight"
+      },
+      "glyph_count": 48756,
+      "digit_widths_u0030_to_u0039": [
+        604,
+        380,
+        617,
+        594,
+        612,
+        565,
+        583,
+        553,
+        604,
+        583
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-ExtraLightItalic.ttf",
+      "size": 24871304,
+      "sha256": "EFB1CB9CA3614BD8A4039A12D6EB7C88CA32ACDC0E6017C75D0BACA7E1CDF33F",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC XLight",
+        "subfamily": "Italic",
+        "full": "Sarasa Ui ProDigits SC XLight Italic",
+        "postscript": "Sarasa-Ui-ProDigits-SC-ExtraLight-Italic",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "ExtraLight Italic"
+      },
+      "glyph_count": 48717,
+      "digit_widths_u0030_to_u0039": [
+        604,
+        381,
+        618,
+        604,
+        612,
+        564,
+        582,
+        554,
+        603,
+        582
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-Italic.ttf",
+      "size": 24840676,
+      "sha256": "871353C10B2762E83D41590B1E5EB389DD773870BD74F4EF16F27A34EE274C76",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC",
+        "subfamily": "Italic",
+        "full": "Sarasa Ui ProDigits SC Italic",
+        "postscript": "Sarasa-Ui-ProDigits-SC-Italic",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "Italic"
+      },
+      "glyph_count": 48717,
+      "digit_widths_u0030_to_u0039": [
+        630,
+        407,
+        610,
+        617,
+        647,
+        592,
+        619,
+        567,
+        617,
+        619
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-Light.ttf",
+      "size": 24155592,
+      "sha256": "564B293F8CC993083276A7E63973166047FCE8BD978CEEF294D7A24AB810314B",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC Light",
+        "subfamily": "Regular",
+        "full": "Sarasa Ui ProDigits SC Light",
+        "postscript": "Sarasa-Ui-ProDigits-SC-Light",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "Light"
+      },
+      "glyph_count": 48756,
+      "digit_widths_u0030_to_u0039": [
+        618,
+        394,
+        614,
+        606,
+        629,
+        580,
+        602,
+        560,
+        611,
+        602
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-LightItalic.ttf",
+      "size": 24952052,
+      "sha256": "64DC825D04D7F109726D493F204C85BFC16DD07CE342AB12C7D9998C717C529E",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC Light",
+        "subfamily": "Italic",
+        "full": "Sarasa Ui ProDigits SC Light Italic",
+        "postscript": "Sarasa-Ui-ProDigits-SC-Light-Italic",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "Light Italic"
+      },
+      "glyph_count": 48717,
+      "digit_widths_u0030_to_u0039": [
+        617,
+        394,
+        614,
+        610,
+        629,
+        578,
+        600,
+        561,
+        610,
+        601
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-Regular.ttf",
+      "size": 24049716,
+      "sha256": "3278271625C98ED28001E1B6D00BCACEA0E4A416C2329E2FBF242B37CD5FB82D",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC",
+        "subfamily": "Regular",
+        "full": "Sarasa Ui ProDigits SC",
+        "postscript": "Sarasa-Ui-ProDigits-SC-Regular",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "Regular"
+      },
+      "glyph_count": 48756,
+      "digit_widths_u0030_to_u0039": [
+        631,
+        407,
+        610,
+        618,
+        646,
+        593,
+        620,
+        566,
+        619,
+        620
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-SemiBold.ttf",
+      "size": 23978096,
+      "sha256": "7C7BEFD30988F5E0937E7A4831C23068198AF44DBCFEEDF16C59035CE6F77815",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC SemiBold",
+        "subfamily": "Regular",
+        "full": "Sarasa Ui ProDigits SC SemiBold",
+        "postscript": "Sarasa-Ui-ProDigits-SC-SemiBold",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "SemiBold"
+      },
+      "glyph_count": 48756,
+      "digit_widths_u0030_to_u0039": [
+        660,
+        423,
+        623,
+        636,
+        666,
+        612,
+        640,
+        576,
+        640,
+        640
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/static/SarasaUiProDigitsSC-TTF-1.0.39/SarasaUiProDigitsSC-SemiBoldItalic.ttf",
+      "size": 24771024,
+      "sha256": "68B0BD3BD15F97D4A36753CC1E373176D5BE363D7081025510CF14D5D6F4407D",
+      "names": {
+        "family": "Sarasa Ui ProDigits SC SemiBold",
+        "subfamily": "Italic",
+        "full": "Sarasa Ui ProDigits SC SemiBold Italic",
+        "postscript": "Sarasa-Ui-ProDigits-SC-SemiBold-Italic",
+        "typographic_family": "Sarasa Ui ProDigits SC",
+        "typographic_subfamily": "SemiBold Italic"
+      },
+      "glyph_count": 48717,
+      "digit_widths_u0030_to_u0039": [
+        659,
+        423,
+        623,
+        636,
+        667,
+        612,
+        639,
+        577,
+        639,
+        639
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [],
+      "fvar_instances": []
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "size": 49427332,
+      "sha256": "EC47D02956545467AD79273D6072B95A399A1DA9CA6E94200C0A9A621BC2237F",
+      "names": {
+        "family": "Sarasa Ui VF PropDigits SC",
+        "subfamily": "Italic",
+        "full": "Sarasa Ui VF PropDigits SC Italic",
+        "postscript": "Sarasa-Ui-VF-PropDigits-SC-Italic",
+        "typographic_family": "Sarasa Ui VF PropDigits SC",
+        "typographic_subfamily": "Italic",
+        "variations_postscript_prefix": "Sarasa-Ui-VF-PropDigits-SC-Italic"
+      },
+      "glyph_count": 65446,
+      "digit_widths_u0030_to_u0039": [
+        630,
+        407,
+        610,
+        617,
+        647,
+        592,
+        619,
+        567,
+        617,
+        619
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [
+        {
+          "tag": "wght",
+          "min": 250.0,
+          "default": 400.0,
+          "max": 900.0
+        }
+      ],
+      "fvar_instances": [
+        {
+          "name": "ExtraLight",
+          "coordinates": {
+            "wght": 250.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-ExtraLightItalic"
+        },
+        {
+          "name": "Light",
+          "coordinates": {
+            "wght": 300.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-LightItalic"
+        },
+        {
+          "name": "Normal",
+          "coordinates": {
+            "wght": 350.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-NormalItalic"
+        },
+        {
+          "name": "Regular",
+          "coordinates": {
+            "wght": 400.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-RegularItalic"
+        },
+        {
+          "name": "Medium",
+          "coordinates": {
+            "wght": 500.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-MediumItalic"
+        },
+        {
+          "name": "Bold",
+          "coordinates": {
+            "wght": 700.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-BoldItalic"
+        },
+        {
+          "name": "Heavy",
+          "coordinates": {
+            "wght": 900.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-HeavyItalic"
+        }
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "size": 48326820,
+      "sha256": "7DFB09C37C83033F5A573B2999835D5F0EBB2E3FEF0A5DBDE1BD168ED227BB45",
+      "names": {
+        "family": "Sarasa Ui VF PropDigits SC",
+        "subfamily": "Regular",
+        "full": "Sarasa Ui VF PropDigits SC",
+        "postscript": "Sarasa-Ui-VF-PropDigits-SC",
+        "typographic_family": "Sarasa Ui VF PropDigits SC",
+        "typographic_subfamily": "Regular",
+        "variations_postscript_prefix": "Sarasa-Ui-VF-PropDigits-SC"
+      },
+      "glyph_count": 65482,
+      "digit_widths_u0030_to_u0039": [
+        631,
+        407,
+        610,
+        618,
+        646,
+        593,
+        620,
+        566,
+        619,
+        620
+      ],
+      "has_tnum": true,
+      "has_pnum": true,
+      "fvar_axes": [
+        {
+          "tag": "wght",
+          "min": 250.0,
+          "default": 400.0,
+          "max": 900.0
+        }
+      ],
+      "fvar_instances": [
+        {
+          "name": "ExtraLight",
+          "coordinates": {
+            "wght": 250.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-ExtraLight"
+        },
+        {
+          "name": "Light",
+          "coordinates": {
+            "wght": 300.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-Light"
+        },
+        {
+          "name": "Normal",
+          "coordinates": {
+            "wght": 350.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-Normal"
+        },
+        {
+          "name": "Regular",
+          "coordinates": {
+            "wght": 400.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-Regular"
+        },
+        {
+          "name": "Medium",
+          "coordinates": {
+            "wght": 500.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-Medium"
+        },
+        {
+          "name": "Bold",
+          "coordinates": {
+            "wght": 700.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-Bold"
+        },
+        {
+          "name": "Heavy",
+          "coordinates": {
+            "wght": 900.0
+          },
+          "postscript": "Sarasa-Ui-VF-PropDigits-SC-Heavy"
+        }
+      ]
+    }
+  ]
+}

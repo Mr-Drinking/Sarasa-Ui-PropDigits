@@ -1,0 +1,65 @@
+{
+  "family": "Sarasa Ui VF PropDigits SC",
+  "source_base": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\work\\vf-sources\\SourceHanSansSC-VF.ttf",
+  "source_latin_upright": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\work\\vf-sources\\InterVariable.ttf",
+  "source_latin_italic": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\work\\vf-sources\\InterVariable-Italic.woff2",
+  "method": "Source Han Sans SC VF 按 Sarasa 原版处理 glyph 限额的思路裁掉西文字形，再追加缩放后的 Inter Variable 字形，并使用带前缀的内部 glyph 名。这样由拉丁源提供西文部分，最终字形数保持在 TrueType 65535 限额内。",
+  "outputs": [
+    {
+      "file": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\outputs\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "axes": [
+        [
+          "wght",
+          250,
+          400,
+          900
+        ]
+      ],
+      "glyph_count": 65482,
+      "default_digit_widths": {
+        "0": 631,
+        "1": 407,
+        "2": 610,
+        "3": 618,
+        "4": 646,
+        "5": 593,
+        "6": 620,
+        "7": 566,
+        "8": 619,
+        "9": 620
+      },
+      "digit_features_added": true,
+      "base_subset_glyphs_before_inter": 62546,
+      "appended_inter_glyphs": 2936,
+      "remapped_inter_cmap_entries": 8358
+    },
+    {
+      "file": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\outputs\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "axes": [
+        [
+          "wght",
+          250,
+          400,
+          900
+        ]
+      ],
+      "glyph_count": 65446,
+      "default_digit_widths": {
+        "0": 630,
+        "1": 407,
+        "2": 610,
+        "3": 617,
+        "4": 647,
+        "5": 592,
+        "6": 619,
+        "7": 567,
+        "8": 617,
+        "9": 619
+      },
+      "digit_features_added": true,
+      "base_subset_glyphs_before_inter": 62546,
+      "appended_inter_glyphs": 2900,
+      "remapped_inter_cmap_entries": 8358
+    }
+  ]
+}
