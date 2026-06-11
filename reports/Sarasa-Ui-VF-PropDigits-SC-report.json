@@ -1,12 +1,19 @@
 {
   "family": "Sarasa Ui VF PropDigits SC",
-  "source_base": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\work\\vf-sources\\SourceHanSansSC-VF.ttf",
-  "source_latin_upright": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\work\\vf-sources\\InterVariable.ttf",
-  "source_latin_italic": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\work\\vf-sources\\InterVariable-Italic.woff2",
-  "method": "Source Han Sans SC VF 按 Sarasa 原版处理 glyph 限额的思路裁掉西文字形，再追加缩放后的 Inter Variable 字形，并使用带前缀的内部 glyph 名。这样由拉丁源提供西文部分，最终字形数保持在 TrueType 65535 限额内。",
-  "outputs": [
+  "version": "1.0.39-propdigits.2",
+  "source_base": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-11\\mr-drinking-sarasa-ui-propdigits-sc\\work\\vf-sources\\SourceHanSansSC-VF.ttf",
+  "source_latin_upright": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-11\\mr-drinking-sarasa-ui-propdigits-sc\\work\\vf-sources\\InterVariable.ttf",
+  "source_latin_italic": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-11\\mr-drinking-sarasa-ui-propdigits-sc\\work\\vf-sources\\InterVariable-Italic.woff2",
+  "reference_unicode_set": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-11\\mr-drinking-sarasa-ui-propdigits-sc\\work\\sarasa-original-unhinted\\SarasaUiSC-Regular.ttf",
+  "method": "Source Han Sans SC VF is kept for Sarasa Ui punctuation, symbols, CJK, and Korean codepoints; Inter VF is baked with Sarasa's Inter settings (ss03 and cv10) and used only for Sarasa's Latin-owned codepoints. Source Han pwid/symbol sanitization and Hangul full-width normalization are applied before Inter glyphs are appended. The final GSUB set keeps locl, Hangul Jamo features, vert/vrt2, tnum/pnum, and the digit-colon calt rule; Source Han's original ccmp is omitted to stay below the TrueType glyph limit.",
+  "intentional_differences_from_upstream_sarasa_ui": [
+    "Default ASCII digits are proportional; tnum restores tabular digits.",
+    "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
+    "A contextual calt rule raises colon only between digits."
+  ],
+  "variable_outputs": [
     {
-      "file": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\outputs\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
       "axes": [
         [
           "wght",
@@ -15,26 +22,66 @@
           900
         ]
       ],
-      "glyph_count": 65482,
+      "instances": [
+        "ExtraLight",
+        "Light",
+        "Normal",
+        "Regular",
+        "Medium",
+        "Bold",
+        "Heavy"
+      ],
+      "glyph_count": 65435,
       "default_digit_widths": {
-        "0": 631,
-        "1": 407,
-        "2": 610,
-        "3": 618,
-        "4": 646,
-        "5": 593,
-        "6": 620,
-        "7": 566,
-        "8": 619,
-        "9": 620
+        "U+0030": 631,
+        "U+0031": 407,
+        "U+0032": 610,
+        "U+0033": 618,
+        "U+0034": 646,
+        "U+0035": 593,
+        "U+0036": 620,
+        "U+0037": 566,
+        "U+0038": 619,
+        "U+0039": 620
       },
-      "digit_features_added": true,
-      "base_subset_glyphs_before_inter": 62546,
+      "key_symbol_widths": {
+        "U+00B7": 500,
+        "U+2018": 279,
+        "U+2019": 279,
+        "U+201C": 475,
+        "U+201D": 475,
+        "U+2010": 500,
+        "U+2011": 347,
+        "U+2012": 536,
+        "U+2013": 536,
+        "U+2014": 894,
+        "U+2025": 1000,
+        "U+2026": 1059,
+        "U+2E3A": 2000,
+        "U+2E3B": 3000,
+        "U+31B4": 500,
+        "U+3131": 1000,
+        "U+AC00": 1000,
+        "U+1100": 1000
+      },
+      "source_han_pwid_baked": 5,
+      "source_han_symbols_sanitized": 15,
+      "hangul_widths_normalized": 11685,
+      "base_subset_glyphs_before_inter": 64270,
       "appended_inter_glyphs": 2936,
-      "remapped_inter_cmap_entries": 8358
+      "remapped_inter_cmap_entries": 7332,
+      "tnum_feature_added": true,
+      "pnum_feature_added": true,
+      "tnum_mappings": 61,
+      "pnum_mappings": 61,
+      "gsub_width_features_dropped": 4,
+      "gpos_width_features_dropped": 0,
+      "nonfinal_gsub_features_dropped": 4,
+      "digit_colon_feature_added": true,
+      "digit_colon_raise": 108
     },
     {
-      "file": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-09\\goal-sarasa-gothic-ui\\outputs\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
       "axes": [
         [
           "wght",
@@ -43,23 +90,177 @@
           900
         ]
       ],
-      "glyph_count": 65446,
+      "instances": [
+        "ExtraLight",
+        "Light",
+        "Normal",
+        "Regular",
+        "Medium",
+        "Bold",
+        "Heavy"
+      ],
+      "glyph_count": 65432,
       "default_digit_widths": {
-        "0": 630,
-        "1": 407,
-        "2": 610,
-        "3": 617,
-        "4": 647,
-        "5": 592,
-        "6": 619,
-        "7": 567,
-        "8": 617,
-        "9": 619
+        "U+0030": 630,
+        "U+0031": 407,
+        "U+0032": 610,
+        "U+0033": 617,
+        "U+0034": 647,
+        "U+0035": 592,
+        "U+0036": 619,
+        "U+0037": 567,
+        "U+0038": 617,
+        "U+0039": 619
       },
-      "digit_features_added": true,
-      "base_subset_glyphs_before_inter": 62546,
+      "key_symbol_widths": {
+        "U+00B7": 500,
+        "U+2018": 279,
+        "U+2019": 279,
+        "U+201C": 475,
+        "U+201D": 475,
+        "U+2010": 500,
+        "U+2011": 347,
+        "U+2012": 536,
+        "U+2013": 536,
+        "U+2014": 894,
+        "U+2025": 1000,
+        "U+2026": 1059,
+        "U+2E3A": 2000,
+        "U+2E3B": 3000,
+        "U+31B4": 500,
+        "U+3131": 1000,
+        "U+AC00": 1000,
+        "U+1100": 1000
+      },
+      "source_han_pwid_baked": 5,
+      "source_han_symbols_sanitized": 15,
+      "hangul_widths_normalized": 11685,
+      "base_subset_glyphs_before_inter": 64270,
       "appended_inter_glyphs": 2900,
-      "remapped_inter_cmap_entries": 8358
+      "remapped_inter_cmap_entries": 7332,
+      "tnum_feature_added": true,
+      "pnum_feature_added": true,
+      "tnum_mappings": 61,
+      "pnum_mappings": 61,
+      "gsub_width_features_dropped": 4,
+      "gpos_width_features_dropped": 0,
+      "nonfinal_gsub_features_dropped": 4,
+      "digit_colon_feature_added": true,
+      "digit_colon_raise": 108
+    }
+  ],
+  "static_outputs": [
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-ExtraLight.ttf",
+      "weight": "ExtraLight",
+      "wght": 250,
+      "italic": false,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-Light.ttf",
+      "weight": "Light",
+      "wght": 300,
+      "italic": false,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-Normal.ttf",
+      "weight": "Normal",
+      "wght": 350,
+      "italic": false,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-Regular.ttf",
+      "weight": "Regular",
+      "wght": 400,
+      "italic": false,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-Medium.ttf",
+      "weight": "Medium",
+      "wght": 500,
+      "italic": false,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-Bold.ttf",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": false,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-Heavy.ttf",
+      "weight": "Heavy",
+      "wght": 900,
+      "italic": false,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-ExtraLightItalic.ttf",
+      "weight": "ExtraLight",
+      "wght": 250,
+      "italic": true,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-LightItalic.ttf",
+      "weight": "Light",
+      "wght": 300,
+      "italic": true,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-NormalItalic.ttf",
+      "weight": "Normal",
+      "wght": 350,
+      "italic": true,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-Italic.ttf",
+      "weight": "Regular",
+      "wght": 400,
+      "italic": true,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-MediumItalic.ttf",
+      "weight": "Medium",
+      "wght": 500,
+      "italic": true,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-BoldItalic.ttf",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": true,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
+    },
+    {
+      "file": "fonts\\static\\SarasaUiProDigitsSC-TTF-1.0.39\\SarasaUiProDigitsSC-HeavyItalic.ttf",
+      "weight": "Heavy",
+      "wght": 900,
+      "italic": true,
+      "hinted": true,
+      "hint_tool": "ttfautohint-py"
     }
   ]
 }
