@@ -1,25 +1,23 @@
 Sarasa Ui ProDigits SC TTF 1.0.39
 
-这是基于 Sarasa Gothic 1.0.39 中 Sarasa Ui SC 修改得到的静态 TTF 字体系列。
+This directory contains static TrueType instances generated from the corrected
+Sarasa Ui VF PropDigits SC build.
 
-改动：
+Weights:
 
-- 字体家族名统一为 `Sarasa Ui ProDigits SC`。
-- ASCII 数字 `U+0030..U+0039` 默认映射到原字体已有的变宽数字字形。
-- 保留原等宽数字字形与 OpenType `tnum` 特性，支持字体特性的应用仍可请求等宽数字。
+- ExtraLight 250
+- Light 300
+- Normal 350
+- Regular 400
+- Medium 500
+- Bold 700
+- Heavy 900
 
-来源：
+Each weight has an upright and Italic file. ASCII digits are proportional by
+default; OpenType tnum restores tabular digits, and pnum maps tabular digits
+back to proportional digits. The contextual digit-colon rule raises ':' only
+when it appears between digits.
 
-https://github.com/be5invis/Sarasa-Gothic/releases/tag/v1.0.39
-
-原包：
-
-`SarasaUiSC-TTF-1.0.39.7z`
-
-SHA-256:
-
-`65AEF5A88764A4A90E70B8525BD8C5BCA25121946506C52C2ABE8B5B8DAFE70D`
-
-许可证：
-
-本字体按 SIL Open Font License 1.1 分发。详见本目录中的 `LICENSE-Sarasa-Gothic.txt`。
+Static instances are passed through ttfautohint when the tool is available.
+These fonts are modified derivatives and are not official Sarasa Gothic,
+Source Han Sans, or Inter releases.
