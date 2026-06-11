@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 import copy
-import hashlib
 import json
 import math
 import os
@@ -41,22 +40,21 @@ REFERENCE_SARASA = Path(
         "REFERENCE_SARASA",
         first_existing(
             WORK_ROOT / "sarasa-original-unhinted" / "SarasaUiSC-Regular.ttf",
-            ROOT / "fonts" / "static" / "SarasaUiProDigitsSC-TTF-1.0.39" / "SarasaUiProDigitsSC-Regular.ttf",
+            ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-1.0.39" / "SarasaUiPropDigitsSC-Regular.ttf",
         ),
     )
 )
 
 VARIABLE_DIR = ROOT / "fonts" / "variable"
-STATIC_DIR = ROOT / "fonts" / "static" / "SarasaUiProDigitsSC-TTF-1.0.39"
+STATIC_DIR = ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-1.0.39"
 REPORT_DIR = ROOT / "reports"
-CHECKSUM_DIR = ROOT / "checksums"
 
 AXIS_LIMIT = {"wght": (250, 400, 900)}
 INTER_AXIS_LIMIT = {"opsz": 14, "wght": (250, 400, 900)}
 VF_FAMILY = "Sarasa Ui VF PropDigits SC"
 VF_PS_FAMILY = "Sarasa-Ui-VF-PropDigits-SC"
-STATIC_FAMILY = "Sarasa Ui ProDigits SC"
-STATIC_PS_FAMILY = "Sarasa-Ui-ProDigits-SC"
+STATIC_FAMILY = "Sarasa Ui PropDigits SC"
+STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
 VERSION = "1.0.39-propdigits.2"
 INTER_PREFIX = "inter."
 
@@ -73,7 +71,7 @@ SOURCE_HAN_WEIGHT_STOPS = [
 DIGITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 DIGITS_TF = [f"{name}.tf" for name in DIGITS]
 WIDTH_FEATURES = {"aalt", "pwid", "fwid", "hwid", "twid", "qwid"}
-FINAL_GSUB_FEATURES = {"locl", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "tnum", "pnum", "calt"}
+FINAL_GSUB_FEATURES = {"locl", "ccmp", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "tnum", "pnum", "calt"}
 
 # Sarasa make/punct/sanitize-symbols.mjs, in Ui/pwid mode.
 SANITIZER_TYPES_PWID = {
@@ -353,6 +351,86 @@ def get_single_substitution_mapping(font: TTFont, tag: str) -> dict[str, str]:
                 if hasattr(subtable, "mapping"):
                     mapping.update(subtable.mapping)
     return mapping
+
+
+def glyph_to_unicodes(font: TTFont) -> dict[str, set[int]]:
+    result: dict[str, set[int]] = {}
+    for codepoint, glyph_name in font.getBestCmap().items():
+        result.setdefault(glyph_name, set()).add(codepoint)
+    return result
+
+
+def reference_locl_source_unicodes() -> set[int]:
+    font = TTFont(REFERENCE_SARASA)
+    try:
+        reverse = glyph_to_unicodes(font)
+        unicodes: set[int] = set()
+        for source_name in get_single_substitution_mapping(font, "locl"):
+            unicodes.update(reverse.get(source_name, set()))
+        return unicodes
+    finally:
+        font.close()
+
+
+def prune_locl_like_reference(font: TTFont) -> dict[str, int]:
+    allowed_unicodes = reference_locl_source_unicodes()
+    reverse = glyph_to_unicodes(font)
+    before = 0
+    after = 0
+    emptied_lookups = 0
+
+    if "GSUB" not in font:
+        return {
+            "reference_locl_codepoints": len(allowed_unicodes),
+            "locl_mappings_before_prune": 0,
+            "locl_mappings_after_prune": 0,
+            "locl_lookups_emptied": 0,
+        }
+
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return {
+            "reference_locl_codepoints": len(allowed_unicodes),
+            "locl_mappings_before_prune": 0,
+            "locl_mappings_after_prune": 0,
+            "locl_lookups_emptied": 0,
+        }
+
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag != "locl":
+            continue
+        kept_indices = []
+        for lookup_index in record.Feature.LookupListIndex:
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            lookup_has_mappings = False
+            if lookup.LookupType == 1:
+                for subtable in lookup.SubTable:
+                    if not hasattr(subtable, "mapping"):
+                        continue
+                    before += len(subtable.mapping)
+                    subtable.mapping = {
+                        source: target
+                        for source, target in subtable.mapping.items()
+                        if reverse.get(source, set()) & allowed_unicodes
+                    }
+                    after += len(subtable.mapping)
+                    if subtable.mapping:
+                        lookup_has_mappings = True
+            else:
+                lookup_has_mappings = True
+            if lookup_has_mappings:
+                kept_indices.append(lookup_index)
+            else:
+                emptied_lookups += 1
+        record.Feature.LookupListIndex = kept_indices
+        record.Feature.LookupCount = len(kept_indices)
+
+    return {
+        "reference_locl_codepoints": len(allowed_unicodes),
+        "locl_mappings_before_prune": before,
+        "locl_mappings_after_prune": after,
+        "locl_lookups_emptied": emptied_lookups,
+    }
 
 
 def copy_glyph_data(font: TTFont, source_name: str, target_name: str) -> None:
@@ -904,6 +982,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
 
     remove_metric_variation_maps(base)
     feature_drop_report = drop_sarasa_width_features(base)
+    locl_report = prune_locl_like_reference(base)
     nonfinal_features_dropped = drop_nonfinal_gsub_features(base)
     subset_to_current_cmap(base)
     colon_report = add_digit_colon_feature(base)
@@ -944,6 +1023,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **merge_report,
         **digit_report,
         **feature_drop_report,
+        **locl_report,
         "nonfinal_gsub_features_dropped": nonfinal_features_dropped,
         **colon_report,
     }
@@ -979,13 +1059,14 @@ def hint_static_font(in_path: Path, out_path: Path) -> dict[str, Any]:
 
 def static_output_name(weight_name: str, italic: bool) -> str:
     if weight_name == "Regular":
-        return "SarasaUiProDigitsSC-Italic.ttf" if italic else "SarasaUiProDigitsSC-Regular.ttf"
-    return f"SarasaUiProDigitsSC-{weight_name}{'Italic' if italic else ''}.ttf"
+        return "SarasaUiPropDigitsSC-Italic.ttf" if italic else "SarasaUiPropDigitsSC-Regular.ttf"
+    return f"SarasaUiPropDigitsSC-{weight_name}{'Italic' if italic else ''}.ttf"
 
 
 def build_static_fonts() -> list[dict[str, Any]]:
     STATIC_DIR.mkdir(parents=True, exist_ok=True)
-    for path in STATIC_DIR.glob("SarasaUiProDigitsSC-*.ttf"):
+    shutil.copy2(ROOT / "LICENSE", STATIC_DIR / "LICENSE-Sarasa-Gothic.txt")
+    for path in STATIC_DIR.glob("SarasaUiPropDigitsSC-*.ttf"):
         path.unlink()
 
     outputs: list[dict[str, Any]] = []
@@ -1061,7 +1142,6 @@ def inspect_font(path: Path) -> dict[str, Any]:
         return {
             "file": str(path.relative_to(ROOT)),
             "size": path.stat().st_size,
-            "sha256": hashlib.sha256(path.read_bytes()).hexdigest().upper(),
             "names": {
                 "family": font_name(font, 1),
                 "subfamily": font_name(font, 2),
@@ -1089,7 +1169,7 @@ def inspect_font(path: Path) -> dict[str, Any]:
 
 
 def write_static_readme() -> None:
-    text = """Sarasa Ui ProDigits SC TTF 1.0.39
+    text = """Sarasa Ui PropDigits SC TTF 1.0.39
 
 This directory contains static TrueType instances generated from the corrected
 Sarasa Ui VF PropDigits SC build.
@@ -1121,30 +1201,13 @@ def write_reports(build_report: dict[str, Any]) -> None:
     build_text = json.dumps(build_report, ensure_ascii=False, indent=2)
     (REPORT_DIR / "Sarasa-Ui-VF-PropDigits-SC-report.json").write_text(build_text, encoding="utf-8")
 
-    font_paths = sorted(VARIABLE_DIR.glob("*.ttf")) + sorted(STATIC_DIR.glob("SarasaUiProDigitsSC-*.ttf"))
+    font_paths = sorted(VARIABLE_DIR.glob("*.ttf")) + sorted(STATIC_DIR.glob("SarasaUiPropDigitsSC-*.ttf"))
     inspection = {
-        "title": "Sarasa Ui VF PropDigits SC / Sarasa Ui ProDigits SC font inspection",
+        "title": "Sarasa Ui VF PropDigits SC / Sarasa Ui PropDigits SC font inspection",
         "note": "Generated by tools/build_sarasa_ui_sc_true_vf.py using fontTools.",
         "fonts": [inspect_font(path) for path in font_paths],
     }
     (REPORT_DIR / "font-inspection.json").write_text(json.dumps(inspection, ensure_ascii=False, indent=2), encoding="utf-8")
-
-
-def write_checksums() -> None:
-    CHECKSUM_DIR.mkdir(parents=True, exist_ok=True)
-    include_roots = [ROOT / "README.md", ROOT / "NOTICE.md", ROOT / "LICENSE", VARIABLE_DIR, STATIC_DIR, REPORT_DIR]
-    paths: list[Path] = []
-    for entry in include_roots:
-        if entry.is_file():
-            paths.append(entry)
-        elif entry.is_dir():
-            paths.extend(path for path in entry.rglob("*") if path.is_file())
-    lines = []
-    for path in sorted(paths, key=lambda p: str(p.relative_to(ROOT)).replace("\\", "/")):
-        digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        rel = str(path.relative_to(ROOT)).replace("\\", "/")
-        lines.append(f"{digest}  {rel}")
-    (CHECKSUM_DIR / "SHA256SUMS.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
 def build_all() -> dict[str, Any]:
@@ -1167,30 +1230,25 @@ def build_all() -> dict[str, Any]:
             "(ss03 and cv10) and used only for Sarasa's Latin-owned codepoints. "
             "Source Han pwid/symbol sanitization and Hangul full-width normalization "
             "are applied before Inter glyphs are appended. The final GSUB set keeps "
-            "locl, Hangul Jamo features, vert/vrt2, tnum/pnum, and the digit-colon "
-            "calt rule; Source Han's original ccmp is omitted to stay below the "
-            "TrueType glyph limit."
+            "ccmp, locl pruned to upstream Sarasa Ui coverage, Hangul Jamo features, "
+            "vert/vrt2, tnum/pnum, and the digit-colon calt rule."
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
             "Default ASCII digits are proportional; tnum restores tabular digits.",
             "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
             "A contextual calt rule raises colon only between digits.",
         ],
+        "final_gsub_features": sorted(FINAL_GSUB_FEATURES),
         "variable_outputs": variable_outputs,
         "static_outputs": static_outputs,
     }
     write_reports(report)
-    write_checksums()
     return report
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--checksums-only", action="store_true")
-    args = parser.parse_args()
-    if args.checksums_only:
-        write_checksums()
-        return
+    parser.parse_args()
     report = build_all()
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
