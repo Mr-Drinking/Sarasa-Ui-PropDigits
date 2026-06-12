@@ -73,7 +73,31 @@ SOURCE_HAN_WEIGHT_STOPS = [
 DIGITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 DIGITS_TF = [f"{name}.tf" for name in DIGITS]
 WIDTH_FEATURES = {"aalt", "pwid", "fwid", "hwid", "twid", "qwid"}
-FINAL_GSUB_FEATURES = {"locl", "ccmp", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "tnum", "pnum", "calt"}
+SOURCE_HAN_FINAL_GSUB_FEATURES = {"locl", "ccmp", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "calt", "hist"}
+INTER_EMPTY_GSUB_FEATURES = {f"cv{i:02d}" for i in range(1, 14)} | {f"ss{i:02d}" for i in range(1, 9)}
+INTER_GSUB_FEATURES = {
+    "aalt",
+    "calt",
+    "case",
+    "ccmp",
+    "dlig",
+    "dnom",
+    "frac",
+    "hist",
+    "locl",
+    "numr",
+    "ordn",
+    "pnum",
+    "salt",
+    "sinf",
+    "subs",
+    "sups",
+    "tnum",
+    "zero",
+    "cv14",
+}
+FINAL_GSUB_FEATURES = SOURCE_HAN_FINAL_GSUB_FEATURES | INTER_GSUB_FEATURES | INTER_EMPTY_GSUB_FEATURES | {"pnum", "tnum"}
+INTER_GPOS_FEATURES = {"cpsp", "kern", "mark", "mkmk"}
 
 # Sarasa make/punct/sanitize-symbols.mjs, in Ui/pwid mode.
 SANITIZER_TYPES_PWID = {
@@ -388,12 +412,22 @@ def get_single_substitution_mapping(font: TTFont, tag: str) -> dict[str, str]:
     for record in feature_records:
         for lookup_index in record.Feature.LookupListIndex:
             lookup = gsub.LookupList.Lookup[lookup_index]
-            if lookup.LookupType != 1:
-                continue
-            for subtable in lookup.SubTable:
+            for subtable in single_substitution_subtables(lookup):
                 if hasattr(subtable, "mapping"):
                     mapping.update(subtable.mapping)
     return mapping
+
+
+def single_substitution_subtables(lookup: ot.Lookup) -> list[Any]:
+    if lookup.LookupType == 1:
+        return list(lookup.SubTable)
+    if lookup.LookupType == 7:
+        subtables = []
+        for subtable in lookup.SubTable:
+            if getattr(subtable, "ExtensionLookupType", None) == 1 and getattr(subtable, "ExtSubTable", None):
+                subtables.append(subtable.ExtSubTable)
+        return subtables
+    return []
 
 
 def glyph_to_unicodes(font: TTFont) -> dict[str, set[int]]:
@@ -446,10 +480,9 @@ def prune_locl_like_reference(font: TTFont) -> dict[str, int]:
         for lookup_index in record.Feature.LookupListIndex:
             lookup = gsub.LookupList.Lookup[lookup_index]
             lookup_has_mappings = False
-            if lookup.LookupType == 1:
-                for subtable in lookup.SubTable:
-                    if not hasattr(subtable, "mapping"):
-                        continue
+            single_subtables = single_substitution_subtables(lookup)
+            if single_subtables:
+                for subtable in single_subtables:
                     before += len(subtable.mapping)
                     subtable.mapping = {
                         source: target
@@ -459,7 +492,7 @@ def prune_locl_like_reference(font: TTFont) -> dict[str, int]:
                     after += len(subtable.mapping)
                     if subtable.mapping:
                         lookup_has_mappings = True
-            else:
+            elif lookup.LookupType != 7:
                 lookup_has_mappings = True
             if lookup_has_mappings:
                 kept_indices.append(lookup_index)
@@ -486,6 +519,128 @@ def copy_glyph_data(font: TTFont, source_name: str, target_name: str) -> None:
         font["vmtx"].metrics[target_name] = copy.deepcopy(font["vmtx"].metrics[source_name])
     if "gvar" in font:
         font["gvar"].variations[target_name] = copy.deepcopy(font["gvar"].variations.get(source_name, []))
+
+
+def clone_cmap_glyph_for_codepoint(font: TTFont, codepoint: int) -> str | None:
+    cmap = font.getBestCmap()
+    glyph_name = cmap.get(codepoint)
+    if not glyph_name:
+        return None
+    if sum(1 for glyph in cmap.values() if glyph == glyph_name) <= 1:
+        return glyph_name
+
+    order = font.getGlyphOrder()
+    new_name = f"{glyph_name}.u{codepoint:04X}"
+    suffix = 1
+    while new_name in font.getGlyphSet():
+        suffix += 1
+        new_name = f"{glyph_name}.u{codepoint:04X}.{suffix}"
+
+    font["glyf"].glyphs[new_name] = copy.deepcopy(font["glyf"][glyph_name])
+    font["hmtx"].metrics[new_name] = copy.deepcopy(font["hmtx"].metrics[glyph_name])
+    if "vmtx" in font and glyph_name in font["vmtx"].metrics:
+        font["vmtx"].metrics[new_name] = copy.deepcopy(font["vmtx"].metrics[glyph_name])
+    if "gvar" in font:
+        font["gvar"].variations[new_name] = copy.deepcopy(font["gvar"].variations.get(glyph_name, []))
+    order.append(new_name)
+    font.setGlyphOrder(order)
+    if "maxp" in font:
+        font["maxp"].numGlyphs = len(order)
+    for cmap_table in font["cmap"].tables:
+        if cmap_table.isUnicode() and cmap_table.cmap.get(codepoint) == glyph_name:
+            cmap_table.cmap[codepoint] = new_name
+    return new_name
+
+
+def clone_cmap_glyph_for_codepoints(font: TTFont, codepoints: set[int]) -> str | None:
+    if not codepoints:
+        return None
+    cmap = font.getBestCmap()
+    first = min(codepoints)
+    old_name = cmap.get(first)
+    if not old_name:
+        return None
+    new_name = clone_cmap_glyph_for_codepoint(font, first)
+    if not new_name or new_name == old_name:
+        return new_name
+    for cmap_table in font["cmap"].tables:
+        if not cmap_table.isUnicode():
+            continue
+        for codepoint in codepoints:
+            if cmap_table.cmap.get(codepoint) == old_name:
+                cmap_table.cmap[codepoint] = new_name
+    return new_name
+
+
+def split_reference_cmap_aliases(font: TTFont, reference: TTFont) -> dict[str, int]:
+    reference_cmap = reference.getBestCmap()
+    split_groups = 0
+    cloned_glyphs = 0
+    for glyph_name, codepoints in list(glyph_to_unicodes(font).items()):
+        if len(codepoints) <= 1:
+            continue
+        ref_groups: dict[str, set[int]] = {}
+        for codepoint in codepoints:
+            ref_glyph = reference_cmap.get(codepoint)
+            if ref_glyph:
+                ref_groups.setdefault(ref_glyph, set()).add(codepoint)
+        if len(ref_groups) <= 1:
+            continue
+
+        current_width = font["hmtx"].metrics.get(glyph_name, (None, None))[0]
+
+        def group_score(item: tuple[str, set[int]]) -> tuple[int, int, int]:
+            _ref_glyph, cps = item
+            widths = {
+                reference["hmtx"].metrics[reference_cmap[cp]][0]
+                for cp in cps
+                if cp in reference_cmap and reference_cmap[cp] in reference["hmtx"].metrics
+            }
+            return (1 if current_width in widths else 0, len(cps), -min(cps))
+
+        keep_ref_glyph, _keep_codepoints = max(ref_groups.items(), key=group_score)
+        for ref_glyph, cps in ref_groups.items():
+            if ref_glyph == keep_ref_glyph:
+                continue
+            if clone_cmap_glyph_for_codepoints(font, cps):
+                cloned_glyphs += 1
+        split_groups += 1
+    return {"reference_alias_groups_split": split_groups, "reference_alias_glyphs_cloned": cloned_glyphs}
+
+
+def align_reference_advances(font: TTFont, reference: TTFont, skip_codepoints: set[int]) -> dict[str, int]:
+    reference_cmap = reference.getBestCmap()
+    touched = 0
+    cloned = 0
+    for codepoint in sorted(set(font.getBestCmap()) & set(reference_cmap)):
+        if codepoint in skip_codepoints:
+            continue
+        cmap = font.getBestCmap()
+        glyph_name = cmap.get(codepoint)
+        ref_glyph = reference_cmap.get(codepoint)
+        if not glyph_name or not ref_glyph:
+            continue
+        ref_width = reference["hmtx"].metrics[ref_glyph][0]
+        current_width = font["hmtx"].metrics.get(glyph_name, (ref_width, 0))[0]
+        if current_width == ref_width:
+            continue
+
+        shared_codepoints = glyph_to_unicodes(font).get(glyph_name, set())
+        if len(shared_codepoints) > 1:
+            shared_widths = {
+                reference["hmtx"].metrics[reference_cmap[cp]][0]
+                for cp in shared_codepoints
+                if cp not in skip_codepoints and cp in reference_cmap and reference_cmap[cp] in reference["hmtx"].metrics
+            }
+            if (shared_codepoints & skip_codepoints) or any(width != ref_width for width in shared_widths):
+                new_name = clone_cmap_glyph_for_codepoint(font, codepoint)
+                if new_name and new_name != glyph_name:
+                    glyph_name = new_name
+                    cloned += 1
+        set_advance_width(font, glyph_name, ref_width)
+        freeze_advance_variation(font, glyph_name)
+        touched += 1
+    return {"reference_advances_aligned": touched, "reference_advance_glyphs_cloned": cloned}
 
 
 def bake_single_substitution_feature(
@@ -588,6 +743,9 @@ def bake_source_han_pwid_and_sanitize(font: TTFont) -> dict[str, int]:
     pwid_count = bake_single_substitution_feature(font, "pwid", lambda cp: cp in SANITIZER_TYPES_PWID)
     cmap = font.getBestCmap()
     touched = 0
+    for codepoint, sanitizer in SANITIZER_TYPES_PWID.items():
+        clone_cmap_glyph_for_codepoint(font, codepoint)
+    cmap = font.getBestCmap()
     for codepoint, sanitizer in SANITIZER_TYPES_PWID.items():
         glyph_name = cmap.get(codepoint)
         if not glyph_name:
@@ -706,7 +864,27 @@ def load_inter(italic: bool) -> TTFont:
     scale_upem(inter, 1000)
     bake_single_substitution_feature(inter, "ss03")
     bake_single_substitution_feature(inter, "cv10")
+    bake_inter_ui_tnum_defaults(inter)
     return inter
+
+
+def bake_inter_ui_tnum_defaults(font: TTFont) -> int:
+    mapping = get_single_substitution_mapping(font, "tnum")
+    if not mapping:
+        return 0
+    touched = 0
+    skip = set(range(0x30, 0x3A)) | {0x2D, 0x3A}
+    for cmap_table in font["cmap"].tables:
+        if not cmap_table.isUnicode():
+            continue
+        for codepoint, glyph_name in list(cmap_table.cmap.items()):
+            if codepoint in skip:
+                continue
+            target = mapping.get(glyph_name)
+            if target and target in font.getGlyphSet():
+                cmap_table.cmap[codepoint] = target
+                touched += 1
+    return touched
 
 
 def append_inter_glyphs(base: TTFont, inter: TTFont, allowed_unicodes: set[int]) -> dict[str, Any]:
@@ -763,6 +941,150 @@ def append_inter_glyphs(base: TTFont, inter: TTFont, allowed_unicodes: set[int])
     }
 
 
+def rename_ot_glyph_references(obj: Any, rename: dict[str, str], seen: set[int] | None = None) -> None:
+    if seen is None:
+        seen = set()
+    if isinstance(obj, str) or obj is None or isinstance(obj, (int, float, bool, bytes)):
+        return
+    obj_id = id(obj)
+    if obj_id in seen:
+        return
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        for key, value in list(obj.items()):
+            new_key = rename.get(key, key) if isinstance(key, str) else key
+            if new_key != key:
+                del obj[key]
+                obj[new_key] = value
+            if isinstance(value, str) and value in rename:
+                obj[new_key] = rename[value]
+            else:
+                rename_ot_glyph_references(obj[new_key], rename, seen)
+        return
+    if isinstance(obj, list):
+        for index, value in enumerate(obj):
+            if isinstance(value, str) and value in rename:
+                obj[index] = rename[value]
+            else:
+                rename_ot_glyph_references(value, rename, seen)
+        return
+    if isinstance(obj, tuple):
+        return
+    if hasattr(obj, "__dict__"):
+        for key, value in vars(obj).items():
+            if isinstance(value, str) and value in rename:
+                setattr(obj, key, rename[value])
+            else:
+                rename_ot_glyph_references(value, rename, seen)
+
+
+def strip_ot_variation_devices(obj: Any, seen: set[int] | None = None) -> None:
+    if seen is None:
+        seen = set()
+    if obj is None or isinstance(obj, (str, int, float, bool, bytes)):
+        return
+    obj_id = id(obj)
+    if obj_id in seen:
+        return
+    seen.add(obj_id)
+    if isinstance(obj, dict):
+        for key, value in list(obj.items()):
+            if isinstance(value, ot.Device) and getattr(value, "DeltaFormat", None) == 0x8000:
+                obj[key] = None
+            else:
+                strip_ot_variation_devices(value, seen)
+        return
+    if isinstance(obj, list):
+        for index, value in enumerate(obj):
+            if isinstance(value, ot.Device) and getattr(value, "DeltaFormat", None) == 0x8000:
+                obj[index] = None
+            else:
+                strip_ot_variation_devices(value, seen)
+        return
+    if isinstance(obj, tuple):
+        for value in obj:
+            strip_ot_variation_devices(value, seen)
+        return
+    if hasattr(obj, "__dict__"):
+        for key, value in vars(obj).items():
+            if isinstance(value, ot.Device) and getattr(value, "DeltaFormat", None) == 0x8000:
+                setattr(obj, key, None)
+            else:
+                strip_ot_variation_devices(value, seen)
+
+
+def append_layout_features(
+    base: TTFont,
+    inter: TTFont,
+    table_tag: str,
+    feature_tags: set[str],
+) -> dict[str, int]:
+    if table_tag not in inter:
+        return {f"inter_{table_tag.lower()}_features_imported": 0, f"inter_{table_tag.lower()}_lookups_imported": 0}
+    if table_tag not in base:
+        base[table_tag] = copy.deepcopy(inter[table_tag])
+        rename = {name: prefixed(name) for name in inter.getGlyphOrder() if name != ".notdef"}
+        rename_ot_glyph_references(base[table_tag].table, rename)
+        return {
+            f"inter_{table_tag.lower()}_features_imported": len(base[table_tag].table.FeatureList.FeatureRecord)
+            if base[table_tag].table.FeatureList
+            else 0,
+            f"inter_{table_tag.lower()}_lookups_imported": len(base[table_tag].table.LookupList.Lookup)
+            if base[table_tag].table.LookupList
+            else 0,
+        }
+
+    source = inter[table_tag].table
+    target = base[table_tag].table
+    if not source.FeatureList or not source.LookupList:
+        return {f"inter_{table_tag.lower()}_features_imported": 0, f"inter_{table_tag.lower()}_lookups_imported": 0}
+    if target.LookupList is None:
+        target.LookupList = ot.LookupList()
+        target.LookupList.Lookup = []
+        target.LookupList.LookupCount = 0
+    if target.FeatureList is None:
+        target.FeatureList = ot.FeatureList()
+        target.FeatureList.FeatureRecord = []
+        target.FeatureList.FeatureCount = 0
+
+    rename = {name: prefixed(name) for name in inter.getGlyphOrder() if name != ".notdef"}
+    feature_records = [record for record in source.FeatureList.FeatureRecord if record.FeatureTag in feature_tags]
+    lookup_indices = sorted({index for record in feature_records for index in record.Feature.LookupListIndex})
+    lookup_index_map: dict[int, int] = {}
+    for old_index in lookup_indices:
+        lookup = copy.deepcopy(source.LookupList.Lookup[old_index])
+        rename_ot_glyph_references(lookup, rename)
+        if table_tag == "GPOS":
+            strip_ot_variation_devices(lookup)
+        new_index = len(target.LookupList.Lookup)
+        target.LookupList.Lookup.append(lookup)
+        lookup_index_map[old_index] = new_index
+    target.LookupList.LookupCount = len(target.LookupList.Lookup)
+
+    imported_tags: set[str] = set()
+    for source_record in feature_records:
+        record = copy.deepcopy(source_record)
+        record.Feature.LookupListIndex = [lookup_index_map[index] for index in source_record.Feature.LookupListIndex if index in lookup_index_map]
+        record.Feature.LookupCount = len(record.Feature.LookupListIndex)
+        if not record.Feature.LookupListIndex:
+            continue
+        target.FeatureList.FeatureRecord.append(record)
+        imported_tags.add(record.FeatureTag)
+    target.FeatureList.FeatureCount = len(target.FeatureList.FeatureRecord)
+    enable_features_for_all_scripts(base, imported_tags, table_tag)
+    return {
+        f"inter_{table_tag.lower()}_features_imported": len(imported_tags),
+        f"inter_{table_tag.lower()}_lookups_imported": len(lookup_index_map),
+    }
+
+
+def import_inter_layout_features(base: TTFont, inter: TTFont) -> dict[str, int]:
+    report: dict[str, int] = {}
+    report.update(append_layout_features(base, inter, "GSUB", INTER_GSUB_FEATURES))
+    report.update(append_layout_features(base, inter, "GPOS", INTER_GPOS_FEATURES))
+    return report
+
+
 def remove_metric_variation_maps(font: TTFont) -> None:
     for tag in ("HVAR", "VVAR"):
         if tag in font:
@@ -805,11 +1127,11 @@ def drop_sarasa_width_features(font: TTFont) -> dict[str, int]:
     }
 
 
-def drop_nonfinal_gsub_features(font: TTFont) -> int:
+def drop_nonfinal_gsub_features(font: TTFont, allowed_features: set[str] = FINAL_GSUB_FEATURES) -> int:
     if "GSUB" not in font or not font["GSUB"].table.FeatureList:
         return 0
     tags = {record.FeatureTag for record in font["GSUB"].table.FeatureList.FeatureRecord}
-    return drop_feature_records(font["GSUB"], tags - FINAL_GSUB_FEATURES)
+    return drop_feature_records(font["GSUB"], tags - allowed_features)
 
 
 def append_single_sub_feature(font: TTFont, tag: str, mapping: dict[str, str]) -> bool:
@@ -895,16 +1217,16 @@ def append_gsub_feature(font: TTFont, tag: str, lookup_indices: list[int]) -> in
     return feature_index
 
 
-def enable_features_for_all_scripts(font: TTFont, tags: set[str]) -> None:
-    if "GSUB" not in font:
+def enable_features_for_all_scripts(font: TTFont, tags: set[str], table_tag: str = "GSUB") -> None:
+    if table_tag not in font:
         return
-    gsub = font["GSUB"].table
-    if not gsub.FeatureList or not gsub.ScriptList:
+    table = font[table_tag].table
+    if not table.FeatureList or not table.ScriptList:
         return
-    indices = [i for i, record in enumerate(gsub.FeatureList.FeatureRecord) if record.FeatureTag in tags]
+    indices = [i for i, record in enumerate(table.FeatureList.FeatureRecord) if record.FeatureTag in tags]
     if not indices:
         return
-    for script_record in gsub.ScriptList.ScriptRecord:
+    for script_record in table.ScriptList.ScriptRecord:
         langsys_list = []
         if script_record.Script.DefaultLangSys:
             langsys_list.append(script_record.Script.DefaultLangSys)
@@ -918,6 +1240,16 @@ def enable_features_for_all_scripts(font: TTFont, tags: set[str]) -> None:
             langsys.FeatureCount = len(feature_indices)
 
 
+def ensure_empty_gsub_features(font: TTFont, tags: set[str]) -> dict[str, int]:
+    added = 0
+    for tag in sorted(tags):
+        if not has_feature(font, tag):
+            append_gsub_feature(font, tag, [])
+            added += 1
+    enable_features_for_all_scripts(font, tags)
+    return {"empty_gsub_features_added": added}
+
+
 def collect_prefixed_inter_feature_mapping(inter: TTFont, tag: str) -> dict[str, str]:
     return {prefixed(src): prefixed(dst) for src, dst in get_single_substitution_mapping(inter, tag).items()}
 
@@ -927,12 +1259,10 @@ def add_digit_width_features(font: TTFont, inter: TTFont) -> dict[str, Any]:
     pnum = collect_prefixed_inter_feature_mapping(inter, "pnum")
     if not pnum:
         pnum = {dst: src for src, dst in tnum.items()}
-    added_tnum = append_single_sub_feature(font, "tnum", tnum)
-    added_pnum = append_single_sub_feature(font, "pnum", pnum)
     enable_features_for_all_scripts(font, {"tnum", "pnum"})
     return {
-        "tnum_feature_added": added_tnum,
-        "pnum_feature_added": added_pnum,
+        "tnum_feature_added": has_feature(font, "tnum"),
+        "pnum_feature_added": has_feature(font, "pnum"),
         "tnum_mappings": len(tnum),
         "pnum_mappings": len(pnum),
     }
@@ -1195,18 +1525,26 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     base, sarasa_report = load_base(italic, set(inter.getBestCmap().keys()))
     try:
         merge_report = append_inter_glyphs(base, inter, unicodes)
+        remove_metric_variation_maps(base)
+        feature_drop_report = drop_sarasa_width_features(base)
+        locl_report = prune_locl_like_reference(base)
+        em_dash_report = add_continuous_em_dash_feature(base)
+        source_nonfinal_features_dropped = drop_nonfinal_gsub_features(base, SOURCE_HAN_FINAL_GSUB_FEATURES)
+        inter_layout_report = import_inter_layout_features(base, inter)
         digit_report = add_digit_width_features(base, inter)
     finally:
         inter.close()
 
-    remove_metric_variation_maps(base)
-    feature_drop_report = drop_sarasa_width_features(base)
-    locl_report = prune_locl_like_reference(base)
-    em_dash_report = add_continuous_em_dash_feature(base)
-    nonfinal_features_dropped = drop_nonfinal_gsub_features(base)
     subset_to_current_cmap(base)
     colon_report = add_digit_colon_feature(base)
+    reference = TTFont(REFERENCE_SARASA)
+    try:
+        alias_report = split_reference_cmap_aliases(base, reference)
+        advance_report = align_reference_advances(base, reference, set(range(0x30, 0x3A)) | {0x3A})
+    finally:
+        reference.close()
     subset_to_current_cmap(base)
+    empty_feature_report = ensure_empty_gsub_features(base, INTER_EMPTY_GSUB_FEATURES)
     update_vf_names(base, italic)
     update_fvar_instances(base, italic)
     update_style_flags(base, italic)
@@ -1245,7 +1583,11 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **feature_drop_report,
         **locl_report,
         **em_dash_report,
-        "nonfinal_gsub_features_dropped": nonfinal_features_dropped,
+        "nonfinal_gsub_features_dropped": source_nonfinal_features_dropped,
+        **inter_layout_report,
+        **alias_report,
+        **advance_report,
+        **empty_feature_report,
         **colon_report,
     }
 
@@ -1453,9 +1795,12 @@ def build_all() -> dict[str, Any]:
             "Jamo, and localized Sarasa Ui punctuation when that VF source covers the "
             "codepoint. Source Han pwid/symbol sanitization and Hangul full-width "
             "normalization are applied before Inter glyphs are appended. The final "
-            "GSUB set keeps ccmp, locl pruned to upstream Sarasa Ui coverage, Hangul "
-            "Jamo features, vert/vrt2, tnum/pnum, continuous em dash, and the "
-            "digit-colon calt rule."
+            "layout imports the Inter VF GSUB/GPOS features that Sarasa UI SC exposes, "
+            "keeps Sarasa's empty cv01-cv13/ss01-ss08 tags, preserves cv14, ccmp, "
+            "locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, "
+            "vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. "
+            "Reference Sarasa UI SC cmap alias splits and non-digit advances are "
+            "aligned after the merge."
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
             "Default ASCII digits are proportional; tnum restores tabular digits.",
