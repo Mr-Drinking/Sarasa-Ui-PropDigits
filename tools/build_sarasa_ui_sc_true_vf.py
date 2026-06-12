@@ -917,6 +917,31 @@ def split_reference_cmap_aliases(font: TTFont, reference: TTFont) -> dict[str, i
     return {"reference_alias_groups_split": split_groups, "reference_alias_glyphs_cloned": cloned_glyphs}
 
 
+def align_reference_cmap_alias_mappings(font: TTFont, reference: TTFont, skip_codepoints: set[int]) -> dict[str, int]:
+    reference_groups: dict[str, set[int]] = {}
+    for codepoint, glyph_name in reference.getBestCmap().items():
+        if codepoint not in skip_codepoints:
+            reference_groups.setdefault(glyph_name, set()).add(codepoint)
+
+    remapped = 0
+    current_cmap = font.getBestCmap()
+    for ref_glyph, codepoints in reference_groups.items():
+        shared = sorted(cp for cp in codepoints if cp in current_cmap)
+        if len(shared) <= 1:
+            continue
+        canonical_cp = next((cp for cp in shared if current_cmap[cp] == ref_glyph), shared[0])
+        canonical_glyph = current_cmap[canonical_cp]
+        for codepoint in shared:
+            old_glyph = current_cmap.get(codepoint)
+            if old_glyph == canonical_glyph:
+                continue
+            for cmap_table in font["cmap"].tables:
+                if cmap_table.isUnicode() and cmap_table.cmap.get(codepoint) == old_glyph:
+                    cmap_table.cmap[codepoint] = canonical_glyph
+                    remapped += 1
+    return {"reference_cmap_alias_mappings_aligned": remapped}
+
+
 def align_reference_advances(font: TTFont, reference: TTFont, skip_codepoints: set[int]) -> dict[str, int]:
     reference_cmap = reference.getBestCmap()
     touched = 0
@@ -1618,6 +1643,99 @@ def drop_nonfinal_gsub_features(font: TTFont, allowed_features: set[str] = FINAL
     return drop_feature_records(font["GSUB"], tags - allowed_features)
 
 
+def align_layout_feature_template(font: TTFont, reference: TTFont, table_tag: str) -> dict[str, int]:
+    key = table_tag.lower()
+    if table_tag not in font or table_tag not in reference:
+        return {
+            f"{key}_feature_records_before_template": 0,
+            f"{key}_feature_records_after_template": 0,
+            f"{key}_langsys_after_template": 0,
+        }
+    table = font[table_tag].table
+    ref_table = reference[table_tag].table
+    if not table.FeatureList or not ref_table.FeatureList or not ref_table.ScriptList:
+        return {
+            f"{key}_feature_records_before_template": 0,
+            f"{key}_feature_records_after_template": 0,
+            f"{key}_langsys_after_template": 0,
+        }
+
+    current_by_tag: dict[str, list[Any]] = {}
+    for record in table.FeatureList.FeatureRecord:
+        current_by_tag.setdefault(record.FeatureTag, []).append(record)
+
+    old_count = len(table.FeatureList.FeatureRecord)
+    ref_to_new: dict[int, int] = {}
+    used_by_tag: dict[str, int] = {}
+    new_records = []
+    for ref_index, ref_record in enumerate(ref_table.FeatureList.FeatureRecord):
+        candidates = current_by_tag.get(ref_record.FeatureTag)
+        if not candidates:
+            continue
+        use_index = min(used_by_tag.get(ref_record.FeatureTag, 0), len(candidates) - 1)
+        used_by_tag[ref_record.FeatureTag] = used_by_tag.get(ref_record.FeatureTag, 0) + 1
+        record = copy.deepcopy(candidates[use_index])
+        record.FeatureTag = ref_record.FeatureTag
+        ref_to_new[ref_index] = len(new_records)
+        new_records.append(record)
+
+    if not new_records:
+        return {
+            f"{key}_feature_records_before_template": old_count,
+            f"{key}_feature_records_after_template": old_count,
+            f"{key}_langsys_after_template": 0,
+        }
+
+    def remap_langsys(langsys: Any) -> Any | None:
+        new_langsys = copy.deepcopy(langsys)
+        indices = [ref_to_new[index] for index in list(langsys.FeatureIndex or []) if index in ref_to_new]
+        if not indices:
+            return None
+        new_langsys.FeatureIndex = indices
+        new_langsys.FeatureCount = len(indices)
+        if getattr(new_langsys, "ReqFeatureIndex", 0xFFFF) != 0xFFFF:
+            new_langsys.ReqFeatureIndex = ref_to_new.get(new_langsys.ReqFeatureIndex, 0xFFFF)
+        return new_langsys
+
+    new_script_list = ot.ScriptList()
+    new_script_list.ScriptRecord = []
+    langsys_count = 0
+    for ref_script_record in ref_table.ScriptList.ScriptRecord:
+        script = ot.Script()
+        script.DefaultLangSys = None
+        script.LangSysRecord = []
+        if ref_script_record.Script.DefaultLangSys:
+            script.DefaultLangSys = remap_langsys(ref_script_record.Script.DefaultLangSys)
+            if script.DefaultLangSys:
+                langsys_count += 1
+        for ref_lang_record in ref_script_record.Script.LangSysRecord:
+            langsys = remap_langsys(ref_lang_record.LangSys)
+            if not langsys:
+                continue
+            lang_record = ot.LangSysRecord()
+            lang_record.LangSysTag = ref_lang_record.LangSysTag
+            lang_record.LangSys = langsys
+            script.LangSysRecord.append(lang_record)
+            langsys_count += 1
+        if not script.DefaultLangSys and not script.LangSysRecord:
+            continue
+        script.LangSysCount = len(script.LangSysRecord)
+        script_record = ot.ScriptRecord()
+        script_record.ScriptTag = ref_script_record.ScriptTag
+        script_record.Script = script
+        new_script_list.ScriptRecord.append(script_record)
+
+    new_script_list.ScriptCount = len(new_script_list.ScriptRecord)
+    table.FeatureList.FeatureRecord = new_records
+    table.FeatureList.FeatureCount = len(new_records)
+    table.ScriptList = new_script_list
+    return {
+        f"{key}_feature_records_before_template": old_count,
+        f"{key}_feature_records_after_template": len(new_records),
+        f"{key}_langsys_after_template": langsys_count,
+    }
+
+
 def append_single_sub_feature(font: TTFont, tag: str, mapping: dict[str, str]) -> bool:
     mapping = {src: dst for src, dst in mapping.items() if src in font.getGlyphSet() and dst in font.getGlyphSet()}
     if not mapping or "GSUB" not in font:
@@ -2026,16 +2144,18 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     subset_to_current_cmap(base)
     colon_report = add_digit_colon_feature(base)
     reference = reference_fonts[400]
+    skip_metric_codepoints = set(range(0x30, 0x3A)) | {0x3A}
     try:
         alias_report = split_reference_cmap_aliases(base, reference)
-        profile_report = split_reference_advance_profiles(base, reference_fonts, set(range(0x30, 0x3A)) | {0x3A})
-        advance_report = align_reference_advances(base, reference, set(range(0x30, 0x3A)) | {0x3A})
-        advance_variation_report = align_reference_advance_variations(
-            base, reference_fonts, set(range(0x30, 0x3A)) | {0x3A}
-        )
-        vmtx_report = align_reference_vmtx(base, reference, set(range(0x30, 0x3A)) | {0x3A})
+        alias_mapping_report = align_reference_cmap_alias_mappings(base, reference, skip_metric_codepoints)
+        profile_report = split_reference_advance_profiles(base, reference_fonts, skip_metric_codepoints)
+        advance_report = align_reference_advances(base, reference, skip_metric_codepoints)
+        advance_variation_report = align_reference_advance_variations(base, reference_fonts, skip_metric_codepoints)
+        vmtx_report = align_reference_vmtx(base, reference, skip_metric_codepoints)
         subset_to_current_cmap(base)
         empty_feature_report = ensure_empty_gsub_features(base, empty_gsub_features_for_style(italic))
+        gsub_template_report = align_layout_feature_template(base, reference, "GSUB")
+        gpos_template_report = align_layout_feature_template(base, reference, "GPOS")
         gdef_report = rebuild_gdef_from_reference(base, reference)
         vorg_report = rebuild_vorg_from_reference(base, reference)
         metadata_report = sync_sarasa_metadata_from_reference(base, reference)
@@ -2086,11 +2206,14 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         "nonfinal_gsub_features_dropped": source_nonfinal_features_dropped,
         **inter_layout_report,
         **alias_report,
+        **alias_mapping_report,
         **profile_report,
         **advance_report,
         **advance_variation_report,
         **vmtx_report,
         **empty_feature_report,
+        **gsub_template_report,
+        **gpos_template_report,
         **gdef_report,
         **vorg_report,
         **metadata_report,
@@ -2217,6 +2340,49 @@ def has_feature(font: TTFont, tag: str) -> bool:
     )
 
 
+def layout_table_summary(font: TTFont, table_tag: str) -> dict[str, Any]:
+    if table_tag not in font:
+        return {"present": False}
+    table = font[table_tag].table
+    feature_records = table.FeatureList.FeatureRecord if table.FeatureList else []
+    lookup_count = len(table.LookupList.Lookup) if table.LookupList else 0
+    scripts = []
+    langsys_count = 0
+    if table.ScriptList:
+        for script_record in table.ScriptList.ScriptRecord:
+            langs = [record.LangSysTag for record in script_record.Script.LangSysRecord]
+            langsys_count += len(langs)
+            if script_record.Script.DefaultLangSys:
+                langsys_count += 1
+            scripts.append(
+                {
+                    "tag": script_record.ScriptTag,
+                    "has_default": script_record.Script.DefaultLangSys is not None,
+                    "langs": langs,
+                }
+            )
+    return {
+        "present": True,
+        "feature_records": len(feature_records),
+        "unique_features": sorted({record.FeatureTag for record in feature_records}),
+        "lookups": lookup_count,
+        "scripts": scripts,
+        "langsys": langsys_count,
+    }
+
+
+def lsb_mismatch_count(font: TTFont) -> int | None:
+    if "hmtx" not in font or "glyf" not in font:
+        return None
+    mismatches = 0
+    for glyph_name, (_advance_width, lsb) in font["hmtx"].metrics.items():
+        if glyph_name not in font["glyf"].glyphs:
+            continue
+        if glyph_x_min(font, glyph_name, lsb) != lsb:
+            mismatches += 1
+    return mismatches
+
+
 def inspect_font(path: Path) -> dict[str, Any]:
     font = TTFont(path)
     try:
@@ -2259,6 +2425,19 @@ def inspect_font(path: Path) -> dict[str, Any]:
             "has_pnum": has_feature(font, "pnum"),
             "has_digit_colon_calt": has_feature(font, "calt"),
             "has_hints": any(tag in font for tag in ("fpgm", "prep", "cvt ")),
+            "tables": {
+                "BASE": "BASE" in font,
+                "GDEF": "GDEF" in font,
+                "STAT": "STAT" in font,
+                "VORG": "VORG" in font,
+                "fvar": "fvar" in font,
+                "gvar": "gvar" in font,
+            },
+            "layout": {
+                "GSUB": layout_table_summary(font, "GSUB"),
+                "GPOS": layout_table_summary(font, "GPOS"),
+            },
+            "hmtx_lsb_xmin_mismatches": lsb_mismatch_count(font),
             "fvar_axes": axes,
             "fvar_instances": instances,
             "fsSelection": font["OS/2"].fsSelection,
@@ -2294,6 +2473,8 @@ when it appears between digits.
 Static instances are passed through ttfautohint when the tool is available.
 They keep a static STAT table for modern weight/italic style recognition; this
 does not make the static TTFs variable fonts.
+GSUB/GPOS FeatureRecord order and Script/LangSys coverage are templated from
+the corresponding upstream Sarasa Ui SC static font for each style.
 Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
 unencoded glyphs are preserved, while unreachable glyph count differences are
 left as build artifacts.
@@ -2343,9 +2524,11 @@ def build_all() -> dict[str, Any]:
             "keeps Sarasa's empty cv01-cv13/ss01-ss08 tags, preserves cv14, ccmp, "
             "locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, "
             "vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. "
-            "Reference Sarasa UI SC cmap alias splits, non-digit advances across the "
-            "weight axis, horizontal side bearings, vertical metrics, vmtx, GDEF, VORG, "
-            "and Sarasa-compatible head/OS/2 metadata are aligned after the merge. "
+            "Reference Sarasa UI SC cmap alias splits and alias mappings, GSUB/GPOS "
+            "FeatureRecord order and Script/LangSys coverage, non-digit advances "
+            "across the weight axis, horizontal side bearings, vertical metrics, "
+            "vmtx, GDEF, VORG, and Sarasa-compatible head/OS/2 metadata are aligned "
+            "after the merge. "
             "VF and static outputs both include STAT; static STAT only describes the "
             "single instance's style and does not preserve variable fvar/gvar tables. "
             "Glyph counts are not padded to match upstream: cmap glyphs and "

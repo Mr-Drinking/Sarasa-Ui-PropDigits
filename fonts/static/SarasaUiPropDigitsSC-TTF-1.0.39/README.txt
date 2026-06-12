@@ -21,6 +21,8 @@ when it appears between digits.
 Static instances are passed through ttfautohint when the tool is available.
 They keep a static STAT table for modern weight/italic style recognition; this
 does not make the static TTFs variable fonts.
+GSUB/GPOS FeatureRecord order and Script/LangSys coverage are templated from
+the corresponding upstream Sarasa Ui SC static font for each style.
 Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
 unencoded glyphs are preserved, while unreachable glyph count differences are
 left as build artifacts.
