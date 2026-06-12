@@ -14,10 +14,12 @@ from typing import Any
 from fontTools import subset
 from fontTools.misc.fixedTools import otRound
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib import TTFont
+from fontTools.ttLib import TTFont, newTable
 from fontTools.ttLib.scaleUpem import scale_upem
+from fontTools.ttLib.tables.TupleVariation import TupleVariation
 from fontTools.ttLib.tables import otTables as ot
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance
+from fontTools.varLib.models import piecewiseLinearMap
 from fontTools.varLib.instancer import instantiateVariableFont
 
 
@@ -46,6 +48,7 @@ REFERENCE_SARASA = Path(
         ),
     )
 )
+REFERENCE_SARASA_DIR = REFERENCE_SARASA.parent
 
 VARIABLE_DIR = ROOT / "fonts" / "variable"
 STATIC_DIR = ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-1.0.39"
@@ -74,7 +77,8 @@ DIGITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight"
 DIGITS_TF = [f"{name}.tf" for name in DIGITS]
 WIDTH_FEATURES = {"aalt", "pwid", "fwid", "hwid", "twid", "qwid"}
 SOURCE_HAN_FINAL_GSUB_FEATURES = {"locl", "ccmp", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "calt", "hist"}
-INTER_EMPTY_GSUB_FEATURES = {f"cv{i:02d}" for i in range(1, 14)} | {f"ss{i:02d}" for i in range(1, 9)}
+UPRIGHT_EMPTY_GSUB_FEATURES = {f"cv{i:02d}" for i in range(1, 14)} | {f"ss{i:02d}" for i in range(1, 9)}
+ITALIC_EMPTY_GSUB_FEATURES = UPRIGHT_EMPTY_GSUB_FEATURES - {"cv11"}
 INTER_GSUB_FEATURES = {
     "aalt",
     "calt",
@@ -96,8 +100,25 @@ INTER_GSUB_FEATURES = {
     "zero",
     "cv14",
 }
-FINAL_GSUB_FEATURES = SOURCE_HAN_FINAL_GSUB_FEATURES | INTER_GSUB_FEATURES | INTER_EMPTY_GSUB_FEATURES | {"pnum", "tnum"}
+FINAL_GSUB_FEATURES = SOURCE_HAN_FINAL_GSUB_FEATURES | INTER_GSUB_FEATURES | UPRIGHT_EMPTY_GSUB_FEATURES | {"pnum", "tnum"}
 INTER_GPOS_FEATURES = {"cpsp", "kern", "mark", "mkmk"}
+REFERENCE_ADVANCE_STOPS = [
+    ("ExtraLight", 250),
+    ("Light", 300),
+    ("Regular", 400),
+    ("SemiBold", 600),
+    ("Bold", 700),
+]
+SARASA_VERTICAL_METRICS = {
+    "hhea_ascent": 969,
+    "hhea_descent": -241,
+    "hhea_line_gap": 0,
+    "typo_ascent": 968,
+    "typo_descent": -241,
+    "typo_line_gap": 0,
+    "win_ascent": 968,
+    "win_descent": 241,
+}
 
 # Sarasa make/punct/sanitize-symbols.mjs, in Ui/pwid mode.
 SANITIZER_TYPES_PWID = {
@@ -121,6 +142,27 @@ SANITIZER_TYPES_PWID = {
 
 def prefixed(name: str) -> str:
     return INTER_PREFIX + name
+
+
+def empty_gsub_features_for_style(italic: bool) -> set[str]:
+    return ITALIC_EMPTY_GSUB_FEATURES if italic else UPRIGHT_EMPTY_GSUB_FEATURES
+
+
+def reference_style_name(weight_name: str, italic: bool) -> str:
+    if italic:
+        return "Italic" if weight_name == "Regular" else f"{weight_name}Italic"
+    return weight_name
+
+
+def reference_font_path(weight_name: str, italic: bool) -> Path:
+    return REFERENCE_SARASA_DIR / f"SarasaUiSC-{reference_style_name(weight_name, italic)}.ttf"
+
+
+def open_reference_font(weight_name: str, italic: bool) -> TTFont:
+    path = reference_font_path(weight_name, italic)
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return TTFont(path)
 
 
 def is_ideograph(c: int) -> bool:
@@ -305,6 +347,86 @@ def update_os2_sarasa_metadata(font: TTFont) -> None:
     os2.achVendID = "????"
     os2.ulCodePageRange1 = 2147746207
     os2.ulCodePageRange2 = 0
+    apply_sarasa_vertical_metrics(font)
+
+
+def apply_sarasa_vertical_metrics(font: TTFont) -> None:
+    hhea = font["hhea"]
+    os2 = font["OS/2"]
+    hhea.ascent = SARASA_VERTICAL_METRICS["hhea_ascent"]
+    hhea.descent = SARASA_VERTICAL_METRICS["hhea_descent"]
+    hhea.lineGap = SARASA_VERTICAL_METRICS["hhea_line_gap"]
+    os2.sTypoAscender = SARASA_VERTICAL_METRICS["typo_ascent"]
+    os2.sTypoDescender = SARASA_VERTICAL_METRICS["typo_descent"]
+    os2.sTypoLineGap = SARASA_VERTICAL_METRICS["typo_line_gap"]
+    os2.usWinAscent = SARASA_VERTICAL_METRICS["win_ascent"]
+    os2.usWinDescent = SARASA_VERTICAL_METRICS["win_descent"]
+
+
+def rebuild_gdef_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
+    reference_gdef = reference.get("GDEF")
+    if not reference_gdef or not getattr(reference_gdef.table, "GlyphClassDef", None):
+        return {"gdef_classdefs": 0}
+    reference_cmap = reference.getBestCmap()
+    current_cmap = font.getBestCmap()
+    reference_classes = reference_gdef.table.GlyphClassDef.classDefs
+    class_defs: dict[str, int] = {}
+    for codepoint, glyph_name in current_cmap.items():
+        ref_glyph = reference_cmap.get(codepoint)
+        glyph_class = reference_classes.get(ref_glyph) if ref_glyph else None
+        if glyph_class is not None:
+            class_defs[glyph_name] = glyph_class
+    for glyph_name in font.getGlyphOrder():
+        if glyph_name in class_defs or glyph_name == ".notdef":
+            continue
+        if glyph_name in reference_classes:
+            class_defs[glyph_name] = reference_classes[glyph_name]
+
+    gdef = newTable("GDEF")
+    gdef.table = ot.GDEF()
+    gdef.table.Version = 0x00010000
+    gdef.table.GlyphClassDef = ot.GlyphClassDef()
+    gdef.table.GlyphClassDef.classDefs = class_defs
+    gdef.table.AttachList = None
+    gdef.table.LigCaretList = None
+    gdef.table.MarkAttachClassDef = None
+    font["GDEF"] = gdef
+    return {"gdef_classdefs": len(class_defs)}
+
+
+def rebuild_vorg_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
+    if "VORG" not in reference:
+        return {"vorg_records": 0}
+    reference_vorg = reference["VORG"]
+    reference_cmap = reference.getBestCmap()
+    current_cmap = font.getBestCmap()
+    records: dict[str, int] = {}
+    for codepoint, glyph_name in current_cmap.items():
+        ref_glyph = reference_cmap.get(codepoint)
+        if ref_glyph in reference_vorg.VOriginRecords:
+            records[glyph_name] = reference_vorg.VOriginRecords[ref_glyph]
+    for glyph_name in font.getGlyphOrder():
+        if glyph_name not in records and glyph_name in reference_vorg.VOriginRecords:
+            records[glyph_name] = reference_vorg.VOriginRecords[glyph_name]
+    vorg = newTable("VORG")
+    vorg.majorVersion = 1
+    vorg.minorVersion = 0
+    vorg.defaultVertOriginY = reference_vorg.defaultVertOriginY
+    vorg.VOriginRecords = records
+    font["VORG"] = vorg
+    return {"vorg_records": len(records)}
+
+
+def drop_generated_extra_tables(font: TTFont, keep_stat: bool) -> dict[str, int]:
+    dropped = 0
+    for tag in ("BASE",):
+        if tag in font:
+            del font[tag]
+            dropped += 1
+    if not keep_stat and "STAT" in font:
+        del font["STAT"]
+        dropped += 1
+    return {"extra_tables_dropped": dropped}
 
 
 def rebuild_stat(font: TTFont, italic: bool) -> None:
@@ -641,6 +763,155 @@ def align_reference_advances(font: TTFont, reference: TTFont, skip_codepoints: s
         freeze_advance_variation(font, glyph_name)
         touched += 1
     return {"reference_advances_aligned": touched, "reference_advance_glyphs_cloned": cloned}
+
+
+def normalized_wght(font: TTFont, value: int) -> float:
+    axis = next(axis for axis in font["fvar"].axes if axis.axisTag == "wght")
+    if value == axis.defaultValue:
+        normalized = 0.0
+    if value < axis.defaultValue:
+        normalized = (value - axis.defaultValue) / (axis.defaultValue - axis.minValue)
+    elif value > axis.defaultValue:
+        normalized = (value - axis.defaultValue) / (axis.maxValue - axis.defaultValue)
+    if "avar" in font and "wght" in font["avar"].segments:
+        normalized = piecewiseLinearMap(normalized, font["avar"].segments["wght"])
+    return normalized
+
+
+def reference_width_profiles(
+    reference_fonts: dict[int, TTFont],
+    codepoints: set[int],
+) -> dict[int, tuple[tuple[int, int], ...]]:
+    profiles: dict[int, tuple[tuple[int, int], ...]] = {}
+    for codepoint in codepoints:
+        widths = []
+        for weight_value, reference in sorted(reference_fonts.items()):
+            cmap = reference.getBestCmap()
+            glyph_name = cmap.get(codepoint)
+            if glyph_name and glyph_name in reference["hmtx"].metrics:
+                widths.append((weight_value, reference["hmtx"].metrics[glyph_name][0]))
+        if widths:
+            profiles[codepoint] = tuple(widths)
+    return profiles
+
+
+def split_reference_advance_profiles(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+    skip_codepoints: set[int],
+) -> dict[str, int]:
+    profiles = reference_width_profiles(reference_fonts, set(font.getBestCmap()) - skip_codepoints)
+    split_groups = 0
+    cloned_glyphs = 0
+    for glyph_name, codepoints in list(glyph_to_unicodes(font).items()):
+        relevant = {codepoint for codepoint in codepoints if codepoint in profiles}
+        if len(relevant) <= 1:
+            continue
+        by_profile: dict[tuple[tuple[int, int], ...], set[int]] = {}
+        for codepoint in relevant:
+            by_profile.setdefault(profiles[codepoint], set()).add(codepoint)
+        if len(by_profile) <= 1:
+            continue
+        keep_profile, _keep_codepoints = max(by_profile.items(), key=lambda item: (len(item[1]), -min(item[1])))
+        for profile, cps in by_profile.items():
+            if profile == keep_profile:
+                continue
+            if clone_cmap_glyph_for_codepoints(font, cps):
+                cloned_glyphs += 1
+        split_groups += 1
+    return {"reference_advance_profile_groups_split": split_groups, "reference_advance_profile_glyphs_cloned": cloned_glyphs}
+
+
+def gvar_coordinate_count(font: TTFont, glyph_name: str) -> int:
+    variations = font["gvar"].variations.get(glyph_name, [])
+    if variations:
+        return len(variations[0].coordinates)
+    return len(font["glyf"][glyph_name].getCoordinates(font["glyf"])[0]) + 4
+
+
+def add_advance_tuple_variation(font: TTFont, glyph_name: str, support: tuple[float, float, float], delta: int) -> None:
+    if "gvar" not in font or not delta:
+        return
+    coordinates: list[Any] = [None] * gvar_coordinate_count(font, glyph_name)
+    coordinates[-4:] = [(0, 0), (otRound(delta), 0), (0, 0), (0, 0)]
+    font["gvar"].variations.setdefault(glyph_name, []).append(TupleVariation({"wght": support}, coordinates))
+
+
+def advance_supports(font: TTFont, weights: list[int]) -> dict[int, tuple[float, float, float]]:
+    normalized = {weight: normalized_wght(font, weight) for weight in weights}
+    supports: dict[int, tuple[float, float, float]] = {}
+    negative = sorted((weight, value) for weight, value in normalized.items() if value < 0)
+    positive = sorted((weight, value) for weight, value in normalized.items() if value > 0)
+    for index, (weight, value) in enumerate(negative):
+        start = -1.0 if index == 0 else negative[index - 1][1]
+        end = 0.0 if index == len(negative) - 1 else negative[index + 1][1]
+        supports[weight] = (start, value, end)
+    for index, (weight, value) in enumerate(positive):
+        start = 0.0 if index == 0 else positive[index - 1][1]
+        end = 1.0 if index == len(positive) - 1 else positive[index + 1][1]
+        supports[weight] = (start, value, end)
+    return supports
+
+
+def cmap_widths_at_weight(font: TTFont, weight_value: int) -> dict[int, int]:
+    instance = instantiateVariableFont(font, {"wght": weight_value}, inplace=False, optimize=True)
+    try:
+        cmap = instance.getBestCmap()
+        return {
+            codepoint: instance["hmtx"].metrics[glyph_name][0]
+            for codepoint, glyph_name in cmap.items()
+            if glyph_name in instance["hmtx"].metrics
+        }
+    finally:
+        instance.close()
+
+
+def align_reference_advance_variations(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+    skip_codepoints: set[int],
+) -> dict[str, int]:
+    if "gvar" not in font or "fvar" not in font:
+        return {"reference_advance_variations_added": 0, "reference_advance_variation_corrections": 0}
+    correction_weights = [weight for weight in sorted(reference_fonts) if weight != 400]
+    supports = advance_supports(font, correction_weights)
+    variations_added = 0
+    corrections = 0
+    for weight_value in correction_weights:
+        reference = reference_fonts[weight_value]
+        reference_cmap = reference.getBestCmap()
+        current_widths = cmap_widths_at_weight(font, weight_value)
+        glyph_deltas: dict[str, int] = {}
+        cmap = font.getBestCmap()
+        for codepoint in sorted(set(cmap) & set(reference_cmap)):
+            if codepoint in skip_codepoints:
+                continue
+            glyph_name = cmap[codepoint]
+            ref_glyph = reference_cmap[codepoint]
+            if ref_glyph not in reference["hmtx"].metrics:
+                continue
+            target_width = reference["hmtx"].metrics[ref_glyph][0]
+            current_width = current_widths.get(codepoint)
+            if current_width is None:
+                continue
+            delta = target_width - current_width
+            if not delta:
+                continue
+            existing_delta = glyph_deltas.get(glyph_name)
+            if existing_delta is not None and existing_delta != delta:
+                new_name = clone_cmap_glyph_for_codepoint(font, codepoint)
+                if new_name and new_name != glyph_name:
+                    glyph_name = new_name
+            glyph_deltas[glyph_name] = delta
+            corrections += 1
+        support = supports[weight_value]
+        for glyph_name, delta in glyph_deltas.items():
+            add_advance_tuple_variation(font, glyph_name, support, delta)
+            variations_added += 1
+    return {
+        "reference_advance_variations_added": variations_added,
+        "reference_advance_variation_corrections": corrections,
+    }
 
 
 def bake_single_substitution_feature(
@@ -1523,7 +1794,10 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     unicodes = reference_unicodes()
     inter = load_inter(italic)
     base, sarasa_report = load_base(italic, set(inter.getBestCmap().keys()))
+    reference_fonts: dict[int, TTFont] = {}
     try:
+        for weight_name, weight_value in REFERENCE_ADVANCE_STOPS:
+            reference_fonts[weight_value] = open_reference_font(weight_name, italic)
         merge_report = append_inter_glyphs(base, inter, unicodes)
         remove_metric_variation_maps(base)
         feature_drop_report = drop_sarasa_width_features(base)
@@ -1537,19 +1811,27 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
 
     subset_to_current_cmap(base)
     colon_report = add_digit_colon_feature(base)
-    reference = TTFont(REFERENCE_SARASA)
+    reference = reference_fonts[400]
     try:
         alias_report = split_reference_cmap_aliases(base, reference)
+        profile_report = split_reference_advance_profiles(base, reference_fonts, set(range(0x30, 0x3A)) | {0x3A})
         advance_report = align_reference_advances(base, reference, set(range(0x30, 0x3A)) | {0x3A})
+        advance_variation_report = align_reference_advance_variations(
+            base, reference_fonts, set(range(0x30, 0x3A)) | {0x3A}
+        )
+        subset_to_current_cmap(base)
+        empty_feature_report = ensure_empty_gsub_features(base, empty_gsub_features_for_style(italic))
+        gdef_report = rebuild_gdef_from_reference(base, reference)
+        vorg_report = rebuild_vorg_from_reference(base, reference)
     finally:
-        reference.close()
-    subset_to_current_cmap(base)
-    empty_feature_report = ensure_empty_gsub_features(base, INTER_EMPTY_GSUB_FEATURES)
+        for reference_font in reference_fonts.values():
+            reference_font.close()
     update_vf_names(base, italic)
     update_fvar_instances(base, italic)
     update_style_flags(base, italic)
     update_os2_sarasa_metadata(base)
     rebuild_stat(base, italic)
+    extra_table_report = drop_generated_extra_tables(base, keep_stat=True)
     if "DSIG" in base:
         del base["DSIG"]
 
@@ -1586,14 +1868,19 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         "nonfinal_gsub_features_dropped": source_nonfinal_features_dropped,
         **inter_layout_report,
         **alias_report,
+        **profile_report,
         **advance_report,
+        **advance_variation_report,
         **empty_feature_report,
+        **gdef_report,
+        **vorg_report,
+        **extra_table_report,
         **colon_report,
     }
 
 
 def remove_variable_tables(font: TTFont) -> None:
-    for tag in ("fvar", "gvar", "avar", "HVAR", "VVAR", "MVAR"):
+    for tag in ("fvar", "gvar", "avar", "HVAR", "VVAR", "MVAR", "STAT", "BASE"):
         if tag in font:
             del font[tag]
 
@@ -1604,14 +1891,14 @@ def hint_static_font(in_path: Path, out_path: Path) -> dict[str, Any]:
         return {"hinted": False, "hint_tool": "skipped"}
     exe = os.environ.get("TTFAUTOHINT")
     if exe:
-        result = subprocess.run([exe, "--no-info", str(in_path), str(out_path)], capture_output=True)
+        result = subprocess.run([exe, str(in_path), str(out_path)], capture_output=True)
         if result.returncode != 0:
             raise RuntimeError(result.stderr.decode("utf-8", "replace"))
         return {"hinted": True, "hint_tool": exe}
     try:
         import ttfautohint
 
-        result = ttfautohint.run(["--no-info", str(in_path), str(out_path)], capture_output=True)
+        result = ttfautohint.run([str(in_path), str(out_path)], capture_output=True)
         if result.returncode != 0:
             raise RuntimeError(result.stderr.decode("utf-8", "replace"))
         return {"hinted": True, "hint_tool": "ttfautohint-py"}
@@ -1799,8 +2086,10 @@ def build_all() -> dict[str, Any]:
             "keeps Sarasa's empty cv01-cv13/ss01-ss08 tags, preserves cv14, ccmp, "
             "locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, "
             "vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. "
-            "Reference Sarasa UI SC cmap alias splits and non-digit advances are "
-            "aligned after the merge."
+            "Reference Sarasa UI SC cmap alias splits, non-digit advances across the "
+            "weight axis, vertical metrics, GDEF, and VORG are aligned after the merge. "
+            "Static TTF outputs use the same final ttfautohint input/output invocation "
+            "shape as upstream Sarasa."
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
             "Default ASCII digits are proportional; tnum restores tabular digits.",
