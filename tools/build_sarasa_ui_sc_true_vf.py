@@ -13,6 +13,7 @@ from typing import Any
 
 from fontTools import subset
 from fontTools.misc.fixedTools import otRound
+from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables import otTables as ot
@@ -39,6 +40,7 @@ REFERENCE_SARASA = Path(
     os.environ.get(
         "REFERENCE_SARASA",
         first_existing(
+            WORK_ROOT / "official-sarasa-ui-sc" / "SarasaUiSC-TTF-Unhinted-1.0.39" / "SarasaUiSC-Regular.ttf",
             WORK_ROOT / "sarasa-original-unhinted" / "SarasaUiSC-Regular.ttf",
             ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-1.0.39" / "SarasaUiPropDigitsSC-Regular.ttf",
         ),
@@ -55,7 +57,7 @@ VF_FAMILY = "Sarasa Ui VF PropDigits SC"
 VF_PS_FAMILY = "Sarasa-Ui-VF-PropDigits-SC"
 STATIC_FAMILY = "Sarasa Ui PropDigits SC"
 STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
-VERSION = "1.0.39-propdigits.2"
+VERSION = "1.0.39-propdigits.3"
 INTER_PREFIX = "inter."
 
 SOURCE_HAN_WEIGHT_STOPS = [
@@ -134,8 +136,42 @@ def is_pua(c: int) -> bool:
     return 0xE000 <= c <= 0xF8FF
 
 
+def is_fe_misc(c: int) -> bool:
+    return (
+        0x3003 <= c <= 0x3007
+        or 0x3012 <= c <= 0x3013
+        or 0x3020 <= c <= 0x33FF
+        or 0x1AFF0 <= c <= 0x1B12F
+        or 0x1F000 <= c <= 0x1F2FF
+    )
+
+
+def is_locale_dependent_fwid_punct(c: int) -> bool:
+    return c in {0xFF01, 0xFF08, 0xFF09, 0xFF0C, 0xFF0E, 0xFF1A, 0xFF1B, 0xFF3B, 0xFF3D, 0xFF5B, 0xFF5D, 0xFF1F}
+
+
+def is_ws(c: int) -> bool:
+    return (
+        (
+            ((0x2000 <= c <= 0x200F) or (0x20A0 <= c < 0x3000))
+            and not (0x2E3A <= c <= 0x2E3B)
+        )
+        or (0xFF01 <= c <= 0xFF5E and not is_locale_dependent_fwid_punct(c))
+    )
+
+
+def source_han_overrides_inter(c: int) -> bool:
+    return (
+        is_ideograph(c)
+        or is_korean(c)
+        or is_enclosed_alphanumerics(c)
+        or is_pua(c)
+        or (not is_western(c) and not is_ws(c) and not is_fe_misc(c))
+    )
+
+
 def use_inter_codepoint(c: int) -> bool:
-    return is_western(c) and not is_korean(c) and not is_enclosed_alphanumerics(c) and not is_pua(c)
+    return not source_han_overrides_inter(c)
 
 
 def set_name_record(font: TTFont, name_id: int, value: str) -> None:
@@ -301,8 +337,15 @@ def reference_unicodes() -> set[int]:
         font.close()
 
 
-def source_han_unicodes_like_sarasa() -> set[int]:
-    return {codepoint for codepoint in reference_unicodes() if not use_inter_codepoint(codepoint)}
+def source_han_unicodes_like_sarasa(base: TTFont, inter_unicodes: set[int]) -> set[int]:
+    base_unicodes = set(base.getBestCmap().keys())
+    unicodes: set[int] = set()
+    for codepoint in reference_unicodes():
+        if codepoint not in base_unicodes:
+            continue
+        if source_han_overrides_inter(codepoint) or codepoint not in inter_unicodes:
+            unicodes.add(codepoint)
+    return unicodes
 
 
 def ensure_gvar_keys(font: TTFont) -> None:
@@ -646,10 +689,10 @@ def remap_inter_gvar_supports(base: TTFont, inter: TTFont) -> None:
             )
 
 
-def load_base(italic: bool) -> tuple[TTFont, dict[str, int]]:
+def load_base(italic: bool, inter_unicodes: set[int]) -> tuple[TTFont, dict[str, int]]:
     base = TTFont(BASE_VF)
     base = instantiateVariableFont(base, AXIS_LIMIT, inplace=False, optimize=True)
-    subset_font(base, source_han_unicodes_like_sarasa())
+    subset_font(base, source_han_unicodes_like_sarasa(base, inter_unicodes))
     sarasa_report = bake_source_han_pwid_and_sanitize(base)
     sarasa_report["hangul_widths_normalized"] = normalize_hangul_widths(base)
     if italic:
@@ -700,8 +743,9 @@ def append_inter_glyphs(base: TTFont, inter: TTFont, allowed_unicodes: set[int])
         base["maxp"].numGlyphs = len(new_order)
 
     remapped_cmap = 0
-    allowed_inter_unicodes = {cp for cp in allowed_unicodes if use_inter_codepoint(cp)}
     inter_cmap = inter.getBestCmap()
+    base_cmap = base.getBestCmap()
+    allowed_inter_unicodes = {cp for cp in allowed_unicodes if cp in inter_cmap and cp not in base_cmap}
     for cmap_table in base["cmap"].tables:
         if not cmap_table.isUnicode():
             continue
@@ -894,6 +938,30 @@ def add_digit_width_features(font: TTFont, inter: TTFont) -> dict[str, Any]:
     }
 
 
+def make_polygon_glyph(points: list[tuple[float, float]]) -> Any:
+    pen = TTGlyphPen(None)
+    pen.moveTo((otRound(points[0][0]), otRound(points[0][1])))
+    for x, y in points[1:]:
+        pen.lineTo((otRound(x), otRound(y)))
+    pen.closePath()
+    return pen.glyph()
+
+
+def add_simple_glyph(font: TTFont, glyph_name: str, source_name: str, points: list[tuple[float, float]]) -> None:
+    font["glyf"].glyphs[glyph_name] = make_polygon_glyph(points)
+    font["hmtx"].metrics[glyph_name] = copy.deepcopy(font["hmtx"].metrics[source_name])
+    if "vmtx" in font and source_name in font["vmtx"].metrics:
+        font["vmtx"].metrics[glyph_name] = copy.deepcopy(font["vmtx"].metrics[source_name])
+    if "gvar" in font:
+        font["gvar"].variations[glyph_name] = []
+    order = font.getGlyphOrder()
+    if glyph_name not in order:
+        order.append(glyph_name)
+        font.setGlyphOrder(order)
+    if "maxp" in font:
+        font["maxp"].numGlyphs = len(font.getGlyphOrder())
+
+
 def glyph_bbox(font: TTFont, glyph_name: str) -> tuple[int, int, int, int] | None:
     if glyph_name not in font["glyf"].glyphs:
         return None
@@ -902,6 +970,157 @@ def glyph_bbox(font: TTFont, glyph_name: str) -> tuple[int, int, int, int] | Non
     if not hasattr(glyph, "xMin"):
         return None
     return glyph.xMin, glyph.yMin, glyph.xMax, glyph.yMax
+
+
+def add_vert_alias(font: TTFont, source_codepoint: int, target_codepoint: int) -> int:
+    if "GSUB" not in font:
+        return 0
+    cmap = font.getBestCmap()
+    source_glyph = cmap.get(source_codepoint)
+    target_glyph = cmap.get(target_codepoint)
+    if not source_glyph or not target_glyph:
+        return 0
+
+    added = 0
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return 0
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag not in {"vert", "vrt2"}:
+            continue
+        for lookup_index in record.Feature.LookupListIndex:
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            if lookup.LookupType != 1:
+                continue
+            for subtable in lookup.SubTable:
+                if not hasattr(subtable, "mapping"):
+                    continue
+                target_substitution = subtable.mapping.get(target_glyph)
+                if target_substitution and subtable.mapping.get(source_glyph) != target_substitution:
+                    subtable.mapping[source_glyph] = target_substitution
+                    added += 1
+    return added
+
+
+def add_continuous_em_dash_feature(font: TTFont) -> dict[str, Any]:
+    cmap = font.getBestCmap()
+    em_dash = cmap.get(0x2014)
+    if not em_dash or em_dash not in font["glyf"].glyphs:
+        return {"continuous_em_dash_feature_added": False, "continuous_em_dash_vert_mappings": 0}
+    vert_aliases = add_vert_alias(font, 0x2014, 0x2015)
+
+    em_dash_box = glyph_bbox(font, em_dash)
+    if not em_dash_box:
+        return {
+            "continuous_em_dash_feature_added": False,
+            "continuous_em_dash_vert_mappings": 0,
+            "continuous_em_dash_vert_aliases": vert_aliases,
+        }
+    x_min, y_min, x_max, y_max = em_dash_box
+    if x_min <= 0:
+        return {
+            "continuous_em_dash_feature_added": False,
+            "continuous_em_dash_vert_mappings": 0,
+            "continuous_em_dash_vert_aliases": vert_aliases,
+        }
+
+    vert_mapping = get_single_substitution_mapping(font, "vert")
+    vrt2_mapping = get_single_substitution_mapping(font, "vrt2")
+    em_dash_v = vert_mapping.get(em_dash) or vrt2_mapping.get(em_dash) or em_dash
+    if em_dash_v not in font["glyf"].glyphs:
+        em_dash_v = em_dash
+    em_dash_v_box = glyph_bbox(font, em_dash_v)
+    if not em_dash_v_box:
+        em_dash_v_box = em_dash_box
+
+    advance_width = font["hmtx"].metrics.get(em_dash, (font["head"].unitsPerEm, 0))[0]
+    x_min_v, y_min_v, x_max_v, _y_max_v = em_dash_v_box
+    advance_height = font["vmtx"].metrics.get(em_dash_v, (font["head"].unitsPerEm, 0))[0] if "vmtx" in font else font["head"].unitsPerEm
+
+    em_dash_cont = em_dash + ".cont"
+    em_dash_v_cont = em_dash_v + ".cont"
+    half_height = (y_max - y_min) / 2
+    add_simple_glyph(
+        font,
+        em_dash_cont,
+        em_dash,
+        [
+            (x_max - advance_width, y_max),
+            (x_max - advance_width - half_height, (y_min + y_max) / 2),
+            (x_max - advance_width, y_min),
+            (x_max, y_min),
+            (x_max, y_max),
+        ],
+    )
+    add_simple_glyph(
+        font,
+        em_dash_v_cont,
+        em_dash_v,
+        [
+            (x_min_v, y_min_v),
+            (x_max_v, y_min_v),
+            (x_max_v, y_min_v + advance_height),
+            ((x_min_v + x_max_v) / 2, y_min_v + advance_height + (x_max_v - x_min_v) / 2),
+            (x_min_v, y_min_v + advance_height),
+        ],
+    )
+
+    single_sub = ot.SingleSubst()
+    single_sub.mapping = {em_dash: em_dash_cont}
+    single_lookup = ot.Lookup()
+    single_lookup.LookupType = 1
+    single_lookup.LookupFlag = 0
+    single_lookup.SubTable = [single_sub]
+    single_lookup.SubTableCount = 1
+    single_index = append_gsub_lookup(font, single_lookup)
+
+    chain = ot.ChainContextSubst()
+    chain.Format = 3
+    chain.BacktrackGlyphCount = 1
+    chain.BacktrackCoverage = [coverage(font, [em_dash, em_dash_cont])]
+    chain.InputGlyphCount = 1
+    chain.InputCoverage = [coverage(font, [em_dash])]
+    chain.LookAheadGlyphCount = 0
+    chain.LookAheadCoverage = []
+    subst_record = ot.SubstLookupRecord()
+    subst_record.SequenceIndex = 0
+    subst_record.LookupListIndex = single_index
+    chain.SubstCount = 1
+    chain.SubstLookupRecord = [subst_record]
+
+    chain_lookup = ot.Lookup()
+    chain_lookup.LookupType = 6
+    chain_lookup.LookupFlag = 0
+    chain_lookup.SubTable = [chain]
+    chain_lookup.SubTableCount = 1
+    chain_index = append_gsub_lookup(font, chain_lookup)
+    append_gsub_feature(font, "calt", [chain_index])
+
+    vert_mappings = 0
+    for tag in ("vert", "vrt2"):
+        if "GSUB" not in font:
+            continue
+        gsub = font["GSUB"].table
+        if not gsub.FeatureList or not gsub.LookupList:
+            continue
+        for record in gsub.FeatureList.FeatureRecord:
+            if record.FeatureTag != tag:
+                continue
+            for lookup_index in record.Feature.LookupListIndex:
+                lookup = gsub.LookupList.Lookup[lookup_index]
+                if lookup.LookupType != 1:
+                    continue
+                for subtable in lookup.SubTable:
+                    if hasattr(subtable, "mapping") and em_dash in subtable.mapping:
+                        subtable.mapping[em_dash_cont] = em_dash_v_cont
+                        vert_mappings += 1
+
+    enable_features_for_all_scripts(font, {"calt", "vert", "vrt2"})
+    return {
+        "continuous_em_dash_feature_added": True,
+        "continuous_em_dash_vert_mappings": vert_mappings,
+        "continuous_em_dash_vert_aliases": vert_aliases,
+    }
 
 
 def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
@@ -972,8 +1191,8 @@ def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
 
 def build_one_variable(italic: bool) -> dict[str, Any]:
     unicodes = reference_unicodes()
-    base, sarasa_report = load_base(italic)
     inter = load_inter(italic)
+    base, sarasa_report = load_base(italic, set(inter.getBestCmap().keys()))
     try:
         merge_report = append_inter_glyphs(base, inter, unicodes)
         digit_report = add_digit_width_features(base, inter)
@@ -983,6 +1202,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     remove_metric_variation_maps(base)
     feature_drop_report = drop_sarasa_width_features(base)
     locl_report = prune_locl_like_reference(base)
+    em_dash_report = add_continuous_em_dash_feature(base)
     nonfinal_features_dropped = drop_nonfinal_gsub_features(base)
     subset_to_current_cmap(base)
     colon_report = add_digit_colon_feature(base)
@@ -1024,6 +1244,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **digit_report,
         **feature_drop_report,
         **locl_report,
+        **em_dash_report,
         "nonfinal_gsub_features_dropped": nonfinal_features_dropped,
         **colon_report,
     }
@@ -1225,13 +1446,16 @@ def build_all() -> dict[str, Any]:
         "source_latin_italic": str(INTER_ITALIC),
         "reference_unicode_set": str(REFERENCE_SARASA),
         "method": (
-            "Source Han Sans SC VF is kept for Sarasa Ui punctuation, symbols, CJK, "
-            "and Korean codepoints; Inter VF is baked with Sarasa's Inter settings "
-            "(ss03 and cv10) and used only for Sarasa's Latin-owned codepoints. "
-            "Source Han pwid/symbol sanitization and Hangul full-width normalization "
-            "are applied before Inter glyphs are appended. The final GSUB set keeps "
-            "ccmp, locl pruned to upstream Sarasa Ui coverage, Hangul Jamo features, "
-            "vert/vrt2, tnum/pnum, and the digit-colon calt rule."
+            "Source Han Sans SC VF and Inter VF are merged through Sarasa pass1-style "
+            "codepoint ownership with VF-availability fallback: Inter VF is baked with "
+            "Sarasa's Inter settings (ss03 and cv10) for Latin and western-symbol "
+            "coverage, while Source Han Sans SC VF is preferred for CJK, Korean, "
+            "Jamo, and localized Sarasa Ui punctuation when that VF source covers the "
+            "codepoint. Source Han pwid/symbol sanitization and Hangul full-width "
+            "normalization are applied before Inter glyphs are appended. The final "
+            "GSUB set keeps ccmp, locl pruned to upstream Sarasa Ui coverage, Hangul "
+            "Jamo features, vert/vrt2, tnum/pnum, continuous em dash, and the "
+            "digit-colon calt rule."
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
             "Default ASCII digits are proportional; tnum restores tabular digits.",

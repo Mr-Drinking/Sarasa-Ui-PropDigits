@@ -37,10 +37,10 @@ VF 不从静态字重插值生成。它直接合并：
 构建时对齐 Sarasa Ui 的处理方式：
 
 - Inter 先烘焙 Sarasa 原版给 Inter 配置的 `ss03` 和 `cv10`。
-- Inter 只接管 Sarasa 交给 Latin 源的码位；UI 标点、符号、CJK、Hangul 和 Jamo 保留 Source Han Sans SC VF。
-- Source Han 侧烘焙 UI 标点需要的 `pwid` 替换，并执行 Sarasa 式符号清洗，例如 `·`、弯引号、短横、省略号、`⸺/⸻` 和注音扩展符号宽度处理。
+- 码位归属遵循 Sarasa pass1 的优先级，并按 VF 源文件实际覆盖做兜底：Latin 和西文符号优先来自 Inter VF；CJK、Hangul、Jamo 和 Sarasa Ui 的本地化标点优先来自 Source Han Sans SC VF。
+- Source Han 侧烘焙 Ui 标点需要的 `pwid` 替换，并执行 Sarasa 式符号清洗，例如 `·`、弯引号、短横、省略号、`⸺/⸻` 和注音扩展符号宽度处理。
 - Hangul/Jamo 宽度归一到全角。
-- 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert/vrt2`、`tnum/pnum` 和数字冒号 `calt`。
+- 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert/vrt2`、`tnum/pnum`、连续 em dash 和数字冒号 `calt`。
 
 ## 字重
 
