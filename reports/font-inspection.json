@@ -4,7 +4,7 @@
   "fonts": [
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "size": 33740572,
+      "size": 33740344,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Italic",
@@ -13,7 +13,7 @@
         "typographic_family": "Sarasa Ui VF PropDigits SC",
         "typographic_subfamily": "Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         630,
         407,
@@ -39,6 +39,7 @@
         "U+2014": 894,
         "U+2025": 1000,
         "U+2026": 1059,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -116,7 +117,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "size": 32970176,
+      "size": 32969948,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Regular",
@@ -125,7 +126,7 @@
         "typographic_family": "Sarasa Ui VF PropDigits SC",
         "typographic_subfamily": "Regular"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         631,
         407,
@@ -151,6 +152,7 @@
         "U+2014": 894,
         "U+2025": 1000,
         "U+2026": 1059,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -228,7 +230,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Bold.ttf",
-      "size": 36354780,
+      "size": 36281504,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold",
@@ -237,7 +239,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Bold"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         682,
         436,
@@ -263,6 +265,7 @@
         "U+2014": 908,
         "U+2025": 1000,
         "U+2026": 1101,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -283,7 +286,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "size": 37076224,
+      "size": 37002760,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold Italic",
@@ -292,7 +295,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Bold Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         682,
         436,
@@ -318,6 +321,7 @@
         "U+2014": 908,
         "U+2025": 1000,
         "U+2026": 1101,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -338,7 +342,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "size": 29838512,
+      "size": 29765536,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Regular",
@@ -347,7 +351,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "ExtraLight"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         611,
         387,
@@ -373,6 +377,7 @@
         "U+2014": 881,
         "U+2025": 1000,
         "U+2026": 1018,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -393,7 +398,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "size": 30014652,
+      "size": 29941620,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Italic",
@@ -402,7 +407,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         610,
         387,
@@ -428,6 +433,7 @@
         "U+2014": 881,
         "U+2025": 1000,
         "U+2026": 1018,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -448,7 +454,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Heavy.ttf",
-      "size": 36576632,
+      "size": 36503692,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Regular",
@@ -457,7 +463,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Heavy"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         711,
         452,
@@ -483,6 +489,7 @@
         "U+2014": 915,
         "U+2025": 1000,
         "U+2026": 1124,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -503,7 +510,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "size": 37295376,
+      "size": 37222240,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Italic",
@@ -512,7 +519,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Heavy Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         711,
         452,
@@ -538,6 +545,7 @@
         "U+2014": 915,
         "U+2025": 1000,
         "U+2026": 1124,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -558,7 +566,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Italic.ttf",
-      "size": 35293412,
+      "size": 35220044,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Italic",
@@ -567,7 +575,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         630,
         407,
@@ -593,6 +601,7 @@
         "U+2014": 894,
         "U+2025": 1000,
         "U+2026": 1059,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -613,7 +622,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Light.ttf",
-      "size": 31247636,
+      "size": 31174428,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Regular",
@@ -622,7 +631,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Light"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         619,
         395,
@@ -648,6 +657,7 @@
         "U+2014": 886,
         "U+2025": 1000,
         "U+2026": 1035,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -668,7 +678,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-LightItalic.ttf",
-      "size": 31700948,
+      "size": 31627592,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Italic",
@@ -677,7 +687,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Light Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         618,
         395,
@@ -703,6 +713,7 @@
         "U+2014": 886,
         "U+2025": 1000,
         "U+2026": 1035,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -723,7 +734,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Medium.ttf",
-      "size": 35744008,
+      "size": 35671116,
       "names": {
         "family": "Sarasa Ui PropDigits SC Medium",
         "subfamily": "Regular",
@@ -732,7 +743,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Medium"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         653,
         420,
@@ -758,6 +769,7 @@
         "U+2014": 897,
         "U+2025": 1000,
         "U+2026": 1070,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -778,7 +790,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-MediumItalic.ttf",
-      "size": 36476612,
+      "size": 36403680,
       "names": {
         "family": "Sarasa Ui PropDigits SC Medium",
         "subfamily": "Italic",
@@ -787,7 +799,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Medium Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         653,
         420,
@@ -813,6 +825,7 @@
         "U+2014": 897,
         "U+2025": 1000,
         "U+2026": 1070,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -833,7 +846,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Normal.ttf",
-      "size": 33829460,
+      "size": 33756000,
       "names": {
         "family": "Sarasa Ui PropDigits SC Normal",
         "subfamily": "Regular",
@@ -842,7 +855,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Normal"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         627,
         403,
@@ -868,6 +881,7 @@
         "U+2014": 892,
         "U+2025": 1000,
         "U+2026": 1052,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -888,7 +902,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-NormalItalic.ttf",
-      "size": 34486092,
+      "size": 34412888,
       "names": {
         "family": "Sarasa Ui PropDigits SC Normal",
         "subfamily": "Italic",
@@ -897,7 +911,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Normal Italic"
       },
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "digit_widths_u0030_to_u0039": [
         626,
         403,
@@ -923,6 +937,7 @@
         "U+2014": 892,
         "U+2025": 1000,
         "U+2026": 1052,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -943,7 +958,7 @@
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Regular.ttf",
-      "size": 34609748,
+      "size": 34536180,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Regular",
@@ -952,7 +967,7 @@
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Regular"
       },
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "digit_widths_u0030_to_u0039": [
         631,
         407,
@@ -978,6 +993,7 @@
         "U+2014": 894,
         "U+2025": 1000,
         "U+2026": 1059,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
