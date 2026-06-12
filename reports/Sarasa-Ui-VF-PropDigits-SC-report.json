@@ -5,7 +5,7 @@
   "source_latin_upright": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\vf-sources\\InterVariable.ttf",
   "source_latin_italic": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\vf-sources\\InterVariable-Italic.woff2",
   "reference_unicode_set": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\SarasaUiSC-TTF-Unhinted-1.0.39\\SarasaUiSC-Regular.ttf",
-  "method": "Source Han Sans SC VF and Inter VF are merged through Sarasa pass1-style codepoint ownership with VF-availability fallback: Inter VF is baked with Sarasa's Inter settings (ss03 and cv10) for Latin and western-symbol coverage, while Source Han Sans SC VF is preferred for CJK, Korean, Jamo, and localized Sarasa Ui punctuation when that VF source covers the codepoint. Source Han pwid/symbol sanitization and Hangul full-width normalization are applied before Inter glyphs are appended. The final layout imports the Inter VF GSUB/GPOS features that Sarasa UI SC exposes, keeps Sarasa's empty cv01-cv13/ss01-ss08 tags, preserves cv14, ccmp, locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. Reference Sarasa UI SC cmap alias splits, non-digit advances across the weight axis, vertical metrics, GDEF, and VORG are aligned after the merge. Static TTF outputs use the same final ttfautohint input/output invocation shape as upstream Sarasa.",
+  "method": "Source Han Sans SC VF and Inter VF are merged through Sarasa pass1-style codepoint ownership with VF-availability fallback: Inter VF is baked with Sarasa's Inter settings (ss03 and cv10) for Latin and western-symbol coverage, while Source Han Sans SC VF is preferred for CJK, Korean, Jamo, and localized Sarasa Ui punctuation when that VF source covers the codepoint. Source Han pwid/symbol sanitization and Hangul full-width normalization are applied before Inter glyphs are appended. The final layout imports the Inter VF GSUB/GPOS features that Sarasa UI SC exposes, keeps Sarasa's empty cv01-cv13/ss01-ss08 tags, preserves cv14, ccmp, locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. Reference Sarasa UI SC cmap alias splits, non-digit advances across the weight axis, horizontal side bearings, vertical metrics, vmtx, GDEF, VORG, and Sarasa-compatible head/OS/2 metadata are aligned after the merge. VF and static outputs both include STAT; static STAT only describes the single instance's style and does not preserve variable fvar/gvar tables. Glyph counts are not padded to match upstream: cmap glyphs and layout-reachable unencoded glyphs are kept, while unreachable glyph count differences are not treated as rendering defects. Static TTF outputs use the same final ttfautohint input/output invocation shape as upstream Sarasa.",
   "intentional_differences_from_upstream_sarasa_ui": [
     "Default ASCII digits are proportional; tnum restores tabular digits.",
     "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
@@ -78,7 +78,7 @@
         "Bold",
         "Heavy"
       ],
-      "glyph_count": 48745,
+      "glyph_count": 48743,
       "default_digit_widths": {
         "U+0030": 631,
         "U+0031": 407,
@@ -104,6 +104,7 @@
         "U+2014": 894,
         "U+2025": 1000,
         "U+2026": 1059,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -130,6 +131,7 @@
       "continuous_em_dash_feature_added": true,
       "continuous_em_dash_vert_mappings": 5,
       "continuous_em_dash_vert_aliases": 1,
+      "vertical_long_dash_ligature_mappings_removed": 2,
       "nonfinal_gsub_features_dropped": 2,
       "inter_gsub_features_imported": 18,
       "inter_gsub_lookups_imported": 43,
@@ -139,13 +141,17 @@
       "reference_alias_glyphs_cloned": 8,
       "reference_advance_profile_groups_split": 0,
       "reference_advance_profile_glyphs_cloned": 0,
-      "reference_advances_aligned": 4,
+      "reference_advances_aligned": 3,
       "reference_advance_glyphs_cloned": 0,
       "reference_advance_variations_added": 6700,
       "reference_advance_variation_corrections": 6729,
+      "reference_vmtx_aligned": 2275,
+      "reference_vertical_vmtx_aligned": 6,
       "empty_gsub_features_added": 21,
       "gdef_classdefs": 43491,
-      "vorg_records": 200,
+      "vorg_records": 203,
+      "sarasa_metadata_fields_synced": 1,
+      "hmtx_lsb_synced": 85,
       "extra_tables_dropped": 1,
       "digit_colon_feature_added": true,
       "digit_colon_raise": 108
@@ -169,7 +175,7 @@
         "Bold",
         "Heavy"
       ],
-      "glyph_count": 48706,
+      "glyph_count": 48704,
       "default_digit_widths": {
         "U+0030": 630,
         "U+0031": 407,
@@ -195,6 +201,7 @@
         "U+2014": 894,
         "U+2025": 1000,
         "U+2026": 1059,
+        "U+22EF": 1000,
         "U+2E3A": 2000,
         "U+2E3B": 3000,
         "U+31B4": 500,
@@ -221,6 +228,7 @@
       "continuous_em_dash_feature_added": true,
       "continuous_em_dash_vert_mappings": 5,
       "continuous_em_dash_vert_aliases": 1,
+      "vertical_long_dash_ligature_mappings_removed": 2,
       "nonfinal_gsub_features_dropped": 2,
       "inter_gsub_features_imported": 18,
       "inter_gsub_lookups_imported": 43,
@@ -230,13 +238,17 @@
       "reference_alias_glyphs_cloned": 8,
       "reference_advance_profile_groups_split": 0,
       "reference_advance_profile_glyphs_cloned": 0,
-      "reference_advances_aligned": 3,
+      "reference_advances_aligned": 2,
       "reference_advance_glyphs_cloned": 0,
       "reference_advance_variations_added": 6761,
       "reference_advance_variation_corrections": 6790,
+      "reference_vmtx_aligned": 2275,
+      "reference_vertical_vmtx_aligned": 6,
       "empty_gsub_features_added": 20,
       "gdef_classdefs": 43482,
-      "vorg_records": 200,
+      "vorg_records": 203,
+      "sarasa_metadata_fields_synced": 1,
+      "hmtx_lsb_synced": 45304,
       "extra_tables_dropped": 1,
       "digit_colon_feature_added": true,
       "digit_colon_raise": 108
@@ -249,7 +261,14 @@
       "wght": 250,
       "italic": false,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 1246,
+      "reference_vertical_vmtx_aligned": 5,
+      "gdef_classdefs": 43452,
+      "vorg_records": 221,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Light.ttf",
@@ -257,7 +276,14 @@
       "wght": 300,
       "italic": false,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 7785,
+      "reference_vertical_vmtx_aligned": 49,
+      "gdef_classdefs": 43452,
+      "vorg_records": 202,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Normal.ttf",
@@ -265,7 +291,9 @@
       "wght": 350,
       "italic": false,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Regular.ttf",
@@ -273,7 +301,14 @@
       "wght": 400,
       "italic": false,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 0,
+      "reference_vertical_vmtx_aligned": 0,
+      "gdef_classdefs": 43452,
+      "vorg_records": 203,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Medium.ttf",
@@ -281,7 +316,9 @@
       "wght": 500,
       "italic": false,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Bold.ttf",
@@ -289,7 +326,14 @@
       "wght": 700,
       "italic": false,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 5677,
+      "reference_vertical_vmtx_aligned": 40,
+      "gdef_classdefs": 43452,
+      "vorg_records": 210,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Heavy.ttf",
@@ -297,7 +341,9 @@
       "wght": 900,
       "italic": false,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
@@ -305,7 +351,14 @@
       "wght": 250,
       "italic": true,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 1262,
+      "reference_vertical_vmtx_aligned": 5,
+      "gdef_classdefs": 43455,
+      "vorg_records": 221,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-LightItalic.ttf",
@@ -313,7 +366,14 @@
       "wght": 300,
       "italic": true,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 7836,
+      "reference_vertical_vmtx_aligned": 49,
+      "gdef_classdefs": 43455,
+      "vorg_records": 202,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-NormalItalic.ttf",
@@ -321,7 +381,9 @@
       "wght": 350,
       "italic": true,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Italic.ttf",
@@ -329,7 +391,14 @@
       "wght": 400,
       "italic": true,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 0,
+      "reference_vertical_vmtx_aligned": 0,
+      "gdef_classdefs": 43455,
+      "vorg_records": 203,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-MediumItalic.ttf",
@@ -337,7 +406,9 @@
       "wght": 500,
       "italic": true,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-BoldItalic.ttf",
@@ -345,7 +416,14 @@
       "wght": 700,
       "italic": true,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "reference_vmtx_aligned": 5714,
+      "reference_vertical_vmtx_aligned": 40,
+      "gdef_classdefs": 43455,
+      "vorg_records": 210,
+      "sarasa_metadata_fields_synced": 1,
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-HeavyItalic.ttf",
@@ -353,7 +431,9 @@
       "wght": 900,
       "italic": true,
       "hinted": true,
-      "hint_tool": "ttfautohint-py"
+      "hint_tool": "ttfautohint-py",
+      "extra_tables_dropped": 0,
+      "hmtx_lsb_synced": 0
     }
   ]
 }

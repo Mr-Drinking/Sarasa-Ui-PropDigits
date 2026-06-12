@@ -102,6 +102,7 @@ INTER_GSUB_FEATURES = {
 }
 FINAL_GSUB_FEATURES = SOURCE_HAN_FINAL_GSUB_FEATURES | INTER_GSUB_FEATURES | UPRIGHT_EMPTY_GSUB_FEATURES | {"pnum", "tnum"}
 INTER_GPOS_FEATURES = {"cpsp", "kern", "mark", "mkmk"}
+SOURCE_HAN_FORCED_CODEPOINTS = {0x22EF}
 REFERENCE_ADVANCE_STOPS = [
     ("ExtraLight", 250),
     ("Light", 300),
@@ -228,7 +229,8 @@ def is_ws(c: int) -> bool:
 
 def source_han_overrides_inter(c: int) -> bool:
     return (
-        is_ideograph(c)
+        c in SOURCE_HAN_FORCED_CODEPOINTS
+        or is_ideograph(c)
         or is_korean(c)
         or is_enclosed_alphanumerics(c)
         or is_pua(c)
@@ -363,6 +365,77 @@ def apply_sarasa_vertical_metrics(font: TTFont) -> None:
     os2.usWinDescent = SARASA_VERTICAL_METRICS["win_descent"]
 
 
+def sync_sarasa_metadata_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
+    os2 = font["OS/2"]
+    ref_os2 = reference["OS/2"]
+    for field in [
+        "version",
+        "xAvgCharWidth",
+        "usWidthClass",
+        "fsType",
+        "ySubscriptXSize",
+        "ySubscriptYSize",
+        "ySubscriptXOffset",
+        "ySubscriptYOffset",
+        "ySuperscriptXSize",
+        "ySuperscriptYSize",
+        "ySuperscriptXOffset",
+        "ySuperscriptYOffset",
+        "yStrikeoutSize",
+        "yStrikeoutPosition",
+        "sFamilyClass",
+        "ulUnicodeRange1",
+        "ulUnicodeRange2",
+        "ulUnicodeRange3",
+        "ulUnicodeRange4",
+        "achVendID",
+        "usFirstCharIndex",
+        "usLastCharIndex",
+        "ulCodePageRange1",
+        "ulCodePageRange2",
+        "sxHeight",
+        "sCapHeight",
+        "usDefaultChar",
+        "usBreakChar",
+        "usMaxContext",
+    ]:
+        if hasattr(os2, field) and hasattr(ref_os2, field):
+            setattr(os2, field, copy.deepcopy(getattr(ref_os2, field)))
+    os2.panose = copy.deepcopy(ref_os2.panose)
+    apply_sarasa_vertical_metrics(font)
+
+    head = font["head"]
+    ref_head = reference["head"]
+    for field in ["fontRevision", "flags", "lowestRecPPEM", "fontDirectionHint", "glyphDataFormat"]:
+        if hasattr(head, field) and hasattr(ref_head, field):
+            setattr(head, field, copy.deepcopy(getattr(ref_head, field)))
+
+    if "vhea" in font and "vhea" in reference:
+        vhea = font["vhea"]
+        ref_vhea = reference["vhea"]
+        for field in [
+            "tableVersion",
+            "ascent",
+            "descent",
+            "lineGap",
+            "advanceHeightMax",
+            "minTopSideBearing",
+            "minBottomSideBearing",
+            "yMaxExtent",
+            "caretSlopeRise",
+            "caretSlopeRun",
+            "caretOffset",
+            "reserved1",
+            "reserved2",
+            "reserved3",
+            "reserved4",
+            "metricDataFormat",
+        ]:
+            if hasattr(vhea, field) and hasattr(ref_vhea, field):
+                setattr(vhea, field, copy.deepcopy(getattr(ref_vhea, field)))
+    return {"sarasa_metadata_fields_synced": 1}
+
+
 def rebuild_gdef_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
     reference_gdef = reference.get("GDEF")
     if not reference_gdef or not getattr(reference_gdef.table, "GlyphClassDef", None):
@@ -400,11 +473,20 @@ def rebuild_vorg_from_reference(font: TTFont, reference: TTFont) -> dict[str, in
     reference_vorg = reference["VORG"]
     reference_cmap = reference.getBestCmap()
     current_cmap = font.getBestCmap()
+    reference_vertical = get_single_substitution_mappings(reference, {"vert", "vrt2"})
+    current_vertical = get_single_substitution_mappings(font, {"vert", "vrt2"})
     records: dict[str, int] = {}
     for codepoint, glyph_name in current_cmap.items():
         ref_glyph = reference_cmap.get(codepoint)
         if ref_glyph in reference_vorg.VOriginRecords:
             records[glyph_name] = reference_vorg.VOriginRecords[ref_glyph]
+        ref_vertical_glyph = reference_vertical.get(ref_glyph) if ref_glyph else None
+        current_vertical_glyph = current_vertical.get(glyph_name)
+        if (
+            ref_vertical_glyph in reference_vorg.VOriginRecords
+            and current_vertical_glyph in font.getGlyphOrder()
+        ):
+            records[current_vertical_glyph] = reference_vorg.VOriginRecords[ref_vertical_glyph]
     for glyph_name in font.getGlyphOrder():
         if glyph_name not in records and glyph_name in reference_vorg.VOriginRecords:
             records[glyph_name] = reference_vorg.VOriginRecords[glyph_name]
@@ -415,6 +497,38 @@ def rebuild_vorg_from_reference(font: TTFont, reference: TTFont) -> dict[str, in
     vorg.VOriginRecords = records
     font["VORG"] = vorg
     return {"vorg_records": len(records)}
+
+
+def align_reference_vmtx(font: TTFont, reference: TTFont, skip_codepoints: set[int]) -> dict[str, int]:
+    if "vmtx" not in font or "vmtx" not in reference:
+        return {"reference_vmtx_aligned": 0, "reference_vertical_vmtx_aligned": 0}
+    reference_cmap = reference.getBestCmap()
+    current_cmap = font.getBestCmap()
+    reference_vertical = get_single_substitution_mappings(reference, {"vert", "vrt2"})
+    current_vertical = get_single_substitution_mappings(font, {"vert", "vrt2"})
+    touched = 0
+    vertical_touched = 0
+    for codepoint in sorted(set(current_cmap) & set(reference_cmap)):
+        if codepoint in skip_codepoints:
+            continue
+        glyph_name = current_cmap[codepoint]
+        ref_glyph = reference_cmap[codepoint]
+        if ref_glyph in reference["vmtx"].metrics:
+            ref_metrics = copy.deepcopy(reference["vmtx"].metrics[ref_glyph])
+            if font["vmtx"].metrics.get(glyph_name) != ref_metrics:
+                font["vmtx"].metrics[glyph_name] = ref_metrics
+                touched += 1
+        ref_vertical_glyph = reference_vertical.get(ref_glyph)
+        current_vertical_glyph = current_vertical.get(glyph_name)
+        if (
+            ref_vertical_glyph in reference["vmtx"].metrics
+            and current_vertical_glyph in font["vmtx"].metrics
+        ):
+            ref_metrics = copy.deepcopy(reference["vmtx"].metrics[ref_vertical_glyph])
+            if font["vmtx"].metrics.get(current_vertical_glyph) != ref_metrics:
+                font["vmtx"].metrics[current_vertical_glyph] = ref_metrics
+                vertical_touched += 1
+    return {"reference_vmtx_aligned": touched, "reference_vertical_vmtx_aligned": vertical_touched}
 
 
 def drop_generated_extra_tables(font: TTFont, keep_stat: bool) -> dict[str, int]:
@@ -444,6 +558,37 @@ def rebuild_stat(font: TTFont, italic: bool) -> None:
     ]
     axes = [
         {"tag": "wght", "name": "Weight", "values": weight_values},
+        {
+            "tag": "ital",
+            "name": "Italic",
+            "values": [
+                {
+                    "value": 1 if italic else 0,
+                    "name": "Italic" if italic else "Roman",
+                    "flags": 0x2 if not italic else 0,
+                }
+            ],
+        },
+    ]
+    buildStatTable(font, axes)
+
+
+def rebuild_static_stat(font: TTFont, weight_name: str, weight_value: int, italic: bool) -> None:
+    from fontTools.otlLib.builder import buildStatTable
+
+    stop = next((item for item in SOURCE_HAN_WEIGHT_STOPS if item["name"] == weight_name), None)
+    axes = [
+        {
+            "tag": "wght",
+            "name": "Weight",
+            "values": [
+                {
+                    "value": weight_value,
+                    "name": weight_name,
+                    "flags": stop.get("flags", 0) if stop else 0,
+                }
+            ],
+        },
         {
             "tag": "ital",
             "name": "Italic",
@@ -538,6 +683,48 @@ def get_single_substitution_mapping(font: TTFont, tag: str) -> dict[str, str]:
                 if hasattr(subtable, "mapping"):
                     mapping.update(subtable.mapping)
     return mapping
+
+
+def get_single_substitution_mappings(font: TTFont, tags: set[str]) -> dict[str, str]:
+    if "GSUB" not in font:
+        return {}
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return {}
+    mapping: dict[str, str] = {}
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag not in tags:
+            continue
+        for lookup_index in record.Feature.LookupListIndex:
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            for subtable in single_substitution_subtables(lookup):
+                if hasattr(subtable, "mapping"):
+                    mapping.update(subtable.mapping)
+    return mapping
+
+
+def remove_vertical_long_dash_ligature_mappings(font: TTFont) -> dict[str, int]:
+    if "GSUB" not in font or "hmtx" not in font or "vmtx" not in font:
+        return {"vertical_long_dash_ligature_mappings_removed": 0}
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return {"vertical_long_dash_ligature_mappings_removed": 0}
+    removed = 0
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag not in {"vert", "vrt2"}:
+            continue
+        for lookup_index in record.Feature.LookupListIndex:
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            for subtable in single_substitution_subtables(lookup):
+                if not hasattr(subtable, "mapping"):
+                    continue
+                for source_name, target_name in list(subtable.mapping.items()):
+                    source_width = font["hmtx"].metrics.get(source_name, (0, 0))[0]
+                    target_height = font["vmtx"].metrics.get(target_name, (0, 0))[0]
+                    if source_width > font["head"].unitsPerEm and target_height > font["head"].unitsPerEm:
+                        del subtable.mapping[source_name]
+                        removed += 1
+    return {"vertical_long_dash_ligature_mappings_removed": removed}
 
 
 def single_substitution_subtables(lookup: ot.Lookup) -> list[Any]:
@@ -965,9 +1152,33 @@ def shift_glyph_y(font: TTFont, glyph_name: str, dy: float) -> None:
     glyph.recalcBounds(glyf)
 
 
+def glyph_x_min(font: TTFont, glyph_name: str, fallback: int = 0) -> int:
+    if glyph_name not in font["glyf"].glyphs:
+        return fallback
+    glyph = font["glyf"][glyph_name]
+    if glyph.isComposite() or getattr(glyph, "numberOfContours", 0) > 0:
+        glyph.recalcBounds(font["glyf"])
+        return getattr(glyph, "xMin", fallback)
+    return fallback
+
+
+def sync_hmtx_lsb_to_glyph_bounds(font: TTFont) -> dict[str, int]:
+    if "hmtx" not in font or "glyf" not in font:
+        return {"hmtx_lsb_synced": 0}
+    touched = 0
+    for glyph_name, (advance_width, lsb) in list(font["hmtx"].metrics.items()):
+        if glyph_name not in font["glyf"].glyphs:
+            continue
+        new_lsb = glyph_x_min(font, glyph_name, lsb)
+        if new_lsb != lsb:
+            font["hmtx"].metrics[glyph_name] = (advance_width, new_lsb)
+            touched += 1
+    return {"hmtx_lsb_synced": touched}
+
+
 def set_advance_width(font: TTFont, glyph_name: str, width: int) -> None:
     _old_width, lsb = font["hmtx"].metrics.get(glyph_name, (width, 0))
-    font["hmtx"].metrics[glyph_name] = (otRound(width), lsb)
+    font["hmtx"].metrics[glyph_name] = (otRound(width), glyph_x_min(font, glyph_name, lsb))
 
 
 def freeze_advance_variation(font: TTFont, glyph_name: str) -> None:
@@ -1011,6 +1222,8 @@ def stretch_to_width(font: TTFont, glyph_name: str, width: int) -> None:
 
 
 def bake_source_han_pwid_and_sanitize(font: TTFont) -> dict[str, int]:
+    for codepoint in SOURCE_HAN_FORCED_CODEPOINTS - set(SANITIZER_TYPES_PWID):
+        clone_cmap_glyph_for_codepoint(font, codepoint)
     pwid_count = bake_single_substitution_feature(font, "pwid", lambda cp: cp in SANITIZER_TYPES_PWID)
     cmap = font.getBestCmap()
     touched = 0
@@ -1803,6 +2016,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         feature_drop_report = drop_sarasa_width_features(base)
         locl_report = prune_locl_like_reference(base)
         em_dash_report = add_continuous_em_dash_feature(base)
+        long_dash_report = remove_vertical_long_dash_ligature_mappings(base)
         source_nonfinal_features_dropped = drop_nonfinal_gsub_features(base, SOURCE_HAN_FINAL_GSUB_FEATURES)
         inter_layout_report = import_inter_layout_features(base, inter)
         digit_report = add_digit_width_features(base, inter)
@@ -1819,10 +2033,12 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         advance_variation_report = align_reference_advance_variations(
             base, reference_fonts, set(range(0x30, 0x3A)) | {0x3A}
         )
+        vmtx_report = align_reference_vmtx(base, reference, set(range(0x30, 0x3A)) | {0x3A})
         subset_to_current_cmap(base)
         empty_feature_report = ensure_empty_gsub_features(base, empty_gsub_features_for_style(italic))
         gdef_report = rebuild_gdef_from_reference(base, reference)
         vorg_report = rebuild_vorg_from_reference(base, reference)
+        metadata_report = sync_sarasa_metadata_from_reference(base, reference)
     finally:
         for reference_font in reference_fonts.values():
             reference_font.close()
@@ -1832,6 +2048,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     update_os2_sarasa_metadata(base)
     rebuild_stat(base, italic)
     extra_table_report = drop_generated_extra_tables(base, keep_stat=True)
+    lsb_report = sync_hmtx_lsb_to_glyph_bounds(base)
     if "DSIG" in base:
         del base["DSIG"]
 
@@ -1844,7 +2061,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     widths = {f"U+{cp:04X}": base["hmtx"].metrics[cmap[cp]][0] for cp in range(0x30, 0x3A)}
     key_widths = {
         f"U+{cp:04X}": base["hmtx"].metrics[cmap[cp]][0]
-        for cp in [0x00B7, 0x2018, 0x2019, 0x201C, 0x201D, 0x2010, 0x2011, 0x2012, 0x2013, 0x2014, 0x2025, 0x2026, 0x2E3A, 0x2E3B, 0x31B4, 0x3131, 0xAC00, 0x1100]
+        for cp in [0x00B7, 0x2018, 0x2019, 0x201C, 0x201D, 0x2010, 0x2011, 0x2012, 0x2013, 0x2014, 0x2025, 0x2026, 0x22EF, 0x2E3A, 0x2E3B, 0x31B4, 0x3131, 0xAC00, 0x1100]
         if cp in cmap
     }
     axes = [(a.axisTag, a.minValue, a.defaultValue, a.maxValue) for a in base["fvar"].axes]
@@ -1865,15 +2082,19 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **feature_drop_report,
         **locl_report,
         **em_dash_report,
+        **long_dash_report,
         "nonfinal_gsub_features_dropped": source_nonfinal_features_dropped,
         **inter_layout_report,
         **alias_report,
         **profile_report,
         **advance_report,
         **advance_variation_report,
+        **vmtx_report,
         **empty_feature_report,
         **gdef_report,
         **vorg_report,
+        **metadata_report,
+        **lsb_report,
         **extra_table_report,
         **colon_report,
     }
@@ -1913,6 +2134,33 @@ def static_output_name(weight_name: str, italic: bool) -> str:
     return f"SarasaUiPropDigitsSC-{weight_name}{'Italic' if italic else ''}.ttf"
 
 
+def postprocess_static_font(path: Path, weight_name: str, weight_value: int, italic: bool) -> dict[str, Any]:
+    font = TTFont(path)
+    report: dict[str, Any] = {}
+    try:
+        reference_path = reference_font_path(weight_name, italic)
+        if reference_path.exists():
+            reference = TTFont(reference_path)
+            try:
+                report.update(align_reference_vmtx(font, reference, set(range(0x30, 0x3A)) | {0x3A}))
+                report.update(rebuild_gdef_from_reference(font, reference))
+                report.update(rebuild_vorg_from_reference(font, reference))
+                report.update(sync_sarasa_metadata_from_reference(font, reference))
+            finally:
+                reference.close()
+        update_static_names(font, weight_name, weight_value, italic)
+        update_os2_sarasa_metadata(font)
+        rebuild_static_stat(font, weight_name, weight_value, italic)
+        report.update(drop_generated_extra_tables(font, keep_stat=True))
+        report.update(sync_hmtx_lsb_to_glyph_bounds(font))
+        if "DSIG" in font:
+            del font["DSIG"]
+        font.save(path, reorderTables=True)
+    finally:
+        font.close()
+    return report
+
+
 def build_static_fonts() -> list[dict[str, Any]]:
     STATIC_DIR.mkdir(parents=True, exist_ok=True)
     shutil.copy2(ROOT / "LICENSE", STATIC_DIR / "LICENSE-Sarasa-Gothic.txt")
@@ -1935,6 +2183,8 @@ def build_static_fonts() -> list[dict[str, Any]]:
                 remove_variable_tables(font)
                 update_static_names(font, weight_name, weight_value, italic)
                 update_os2_sarasa_metadata(font)
+                rebuild_static_stat(font, weight_name, weight_value, italic)
+                sync_hmtx_lsb_to_glyph_bounds(font)
                 if "DSIG" in font:
                     del font["DSIG"]
                 tmp_path = tmp_dir / static_output_name(weight_name, italic)
@@ -1942,6 +2192,7 @@ def build_static_fonts() -> list[dict[str, Any]]:
                 font.save(tmp_path, reorderTables=True)
                 font.close()
                 hint_report = hint_static_font(tmp_path, final_path)
+                postprocess_report = postprocess_static_font(final_path, weight_name, weight_value, italic)
                 outputs.append(
                     {
                         "file": str(final_path.relative_to(ROOT)),
@@ -1949,6 +2200,7 @@ def build_static_fonts() -> list[dict[str, Any]]:
                         "wght": weight_value,
                         "italic": italic,
                         **hint_report,
+                        **postprocess_report,
                     }
                 )
     return outputs
@@ -1970,7 +2222,7 @@ def inspect_font(path: Path) -> dict[str, Any]:
     try:
         cmap = font.getBestCmap()
         digits = [font["hmtx"].metrics[cmap[cp]][0] for cp in range(0x30, 0x3A) if cp in cmap]
-        key_cps = [0x00B7, 0x2018, 0x2019, 0x201C, 0x201D, 0x2010, 0x2011, 0x2012, 0x2013, 0x2014, 0x2025, 0x2026, 0x2E3A, 0x2E3B, 0x31B4, 0x3131, 0xAC00, 0x1100]
+        key_cps = [0x00B7, 0x2018, 0x2019, 0x201C, 0x201D, 0x2010, 0x2011, 0x2012, 0x2013, 0x2014, 0x2025, 0x2026, 0x22EF, 0x2E3A, 0x2E3B, 0x31B4, 0x3131, 0xAC00, 0x1100]
         key_widths = {f"U+{cp:04X}": font["hmtx"].metrics[cmap[cp]][0] for cp in key_cps if cp in cmap}
         axes = []
         instances = []
@@ -2040,6 +2292,11 @@ back to proportional digits. The contextual digit-colon rule raises ':' only
 when it appears between digits.
 
 Static instances are passed through ttfautohint when the tool is available.
+They keep a static STAT table for modern weight/italic style recognition; this
+does not make the static TTFs variable fonts.
+Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
+unencoded glyphs are preserved, while unreachable glyph count differences are
+left as build artifacts.
 These fonts are modified derivatives and are not official Sarasa Gothic,
 Source Han Sans, or Inter releases.
 """
@@ -2087,7 +2344,13 @@ def build_all() -> dict[str, Any]:
             "locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, "
             "vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. "
             "Reference Sarasa UI SC cmap alias splits, non-digit advances across the "
-            "weight axis, vertical metrics, GDEF, and VORG are aligned after the merge. "
+            "weight axis, horizontal side bearings, vertical metrics, vmtx, GDEF, VORG, "
+            "and Sarasa-compatible head/OS/2 metadata are aligned after the merge. "
+            "VF and static outputs both include STAT; static STAT only describes the "
+            "single instance's style and does not preserve variable fvar/gvar tables. "
+            "Glyph counts are not padded to match upstream: cmap glyphs and "
+            "layout-reachable unencoded glyphs are kept, while unreachable glyph count "
+            "differences are not treated as rendering defects. "
             "Static TTF outputs use the same final ttfautohint input/output invocation "
             "shape as upstream Sarasa."
         ),

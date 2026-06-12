@@ -19,5 +19,10 @@ back to proportional digits. The contextual digit-colon rule raises ':' only
 when it appears between digits.
 
 Static instances are passed through ttfautohint when the tool is available.
+They keep a static STAT table for modern weight/italic style recognition; this
+does not make the static TTFs variable fonts.
+Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
+unencoded glyphs are preserved, while unreachable glyph count differences are
+left as build artifacts.
 These fonts are modified derivatives and are not official Sarasa Gothic,
 Source Han Sans, or Inter releases.
