@@ -531,6 +531,135 @@ def align_reference_vmtx(font: TTFont, reference: TTFont, skip_codepoints: set[i
     return {"reference_vmtx_aligned": touched, "reference_vertical_vmtx_aligned": vertical_touched}
 
 
+def reference_vmtx_profiles(
+    reference_fonts: dict[int, TTFont],
+    codepoints: set[int],
+) -> dict[int, tuple[tuple[int, tuple[int, int]], ...]]:
+    profiles: dict[int, tuple[tuple[int, tuple[int, int]], ...]] = {}
+    for codepoint in codepoints:
+        metrics = []
+        for weight_value, reference in sorted(reference_fonts.items()):
+            if "vmtx" not in reference:
+                continue
+            cmap = reference.getBestCmap()
+            glyph_name = cmap.get(codepoint)
+            if glyph_name and glyph_name in reference["vmtx"].metrics:
+                metrics.append((weight_value, tuple(reference["vmtx"].metrics[glyph_name])))
+        if metrics:
+            profiles[codepoint] = tuple(metrics)
+    return profiles
+
+
+def split_reference_vmtx_profiles(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+    skip_codepoints: set[int],
+) -> dict[str, int]:
+    profiles = reference_vmtx_profiles(reference_fonts, set(font.getBestCmap()) - skip_codepoints)
+    split_groups = 0
+    cloned_glyphs = 0
+    for glyph_name, codepoints in list(glyph_to_unicodes(font).items()):
+        relevant = {codepoint for codepoint in codepoints if codepoint in profiles}
+        if len(relevant) <= 1:
+            continue
+        by_profile: dict[tuple[tuple[int, tuple[int, int]], ...], set[int]] = {}
+        for codepoint in relevant:
+            by_profile.setdefault(profiles[codepoint], set()).add(codepoint)
+        if len(by_profile) <= 1:
+            continue
+        keep_profile, _keep_codepoints = max(by_profile.items(), key=lambda item: (len(item[1]), -min(item[1])))
+        for profile, cps in by_profile.items():
+            if profile == keep_profile:
+                continue
+            if clone_cmap_glyph_for_codepoints(font, cps):
+                cloned_glyphs += 1
+        split_groups += 1
+    return {"reference_vmtx_profile_groups_split": split_groups, "reference_vmtx_profile_glyphs_cloned": cloned_glyphs}
+
+
+def glyph_vmtx_at_weight(font: TTFont, weight_value: int) -> dict[str, tuple[int, int]]:
+    instance = instantiateVariableFont(font, {"wght": weight_value}, inplace=False, optimize=True)
+    try:
+        if "vmtx" not in instance:
+            return {}
+        return {glyph_name: tuple(metrics) for glyph_name, metrics in instance["vmtx"].metrics.items()}
+    finally:
+        instance.close()
+
+
+def add_vmtx_tuple_variation(
+    font: TTFont,
+    glyph_name: str,
+    support: tuple[float, float, float],
+    advance_delta: int,
+    tsb_delta: int,
+) -> None:
+    if "gvar" not in font or (not advance_delta and not tsb_delta):
+        return
+    coordinates: list[Any] = [None] * gvar_coordinate_count(font, glyph_name)
+    top_delta = otRound(tsb_delta)
+    bottom_delta = otRound(tsb_delta - advance_delta)
+    coordinates[-4:] = [(0, 0), (0, 0), (0, top_delta), (0, bottom_delta)]
+    font["gvar"].variations.setdefault(glyph_name, []).append(TupleVariation({"wght": support}, coordinates))
+
+
+def align_reference_vmtx_variations(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+    skip_codepoints: set[int],
+) -> dict[str, int]:
+    if "gvar" not in font or "fvar" not in font or "vmtx" not in font:
+        return {"reference_vmtx_variations_added": 0, "reference_vmtx_variation_corrections": 0}
+    correction_weights = [weight for weight in sorted(reference_fonts) if weight != 400]
+    supports = advance_supports(font, correction_weights)
+    reference_vertical = get_single_substitution_mappings(reference_fonts[400], {"vert", "vrt2"})
+    current_vertical = get_single_substitution_mappings(font, {"vert", "vrt2"})
+    variations_added = 0
+    corrections = 0
+    for weight_value in correction_weights:
+        reference = reference_fonts[weight_value]
+        if "vmtx" not in reference:
+            continue
+        reference_cmap = reference.getBestCmap()
+        current_cmap = font.getBestCmap()
+        current_metrics = glyph_vmtx_at_weight(font, weight_value)
+        glyph_deltas: dict[str, tuple[int, int]] = {}
+
+        def queue_delta(glyph_name: str, target_metrics: tuple[int, int]) -> None:
+            nonlocal corrections
+            current = current_metrics.get(glyph_name)
+            if current is None:
+                return
+            advance_delta = target_metrics[0] - current[0]
+            tsb_delta = target_metrics[1] - current[1]
+            if not advance_delta and not tsb_delta:
+                return
+            glyph_deltas[glyph_name] = (advance_delta, tsb_delta)
+            corrections += 1
+
+        for codepoint in sorted(set(current_cmap) & set(reference_cmap)):
+            if codepoint in skip_codepoints:
+                continue
+            glyph_name = current_cmap[codepoint]
+            ref_glyph = reference_cmap[codepoint]
+            if ref_glyph in reference["vmtx"].metrics:
+                queue_delta(glyph_name, tuple(reference["vmtx"].metrics[ref_glyph]))
+
+            ref_vertical_glyph = reference_vertical.get(ref_glyph)
+            current_vertical_glyph = current_vertical.get(glyph_name)
+            if ref_vertical_glyph in reference["vmtx"].metrics and current_vertical_glyph in font["vmtx"].metrics:
+                queue_delta(current_vertical_glyph, tuple(reference["vmtx"].metrics[ref_vertical_glyph]))
+
+        support = supports[weight_value]
+        for glyph_name, (advance_delta, tsb_delta) in glyph_deltas.items():
+            add_vmtx_tuple_variation(font, glyph_name, support, advance_delta, tsb_delta)
+            variations_added += 1
+    return {
+        "reference_vmtx_variations_added": variations_added,
+        "reference_vmtx_variation_corrections": corrections,
+    }
+
+
 def drop_generated_extra_tables(font: TTFont, keep_stat: bool) -> dict[str, int]:
     dropped = 0
     for tag in ("BASE",):
@@ -1007,6 +1136,23 @@ def reference_width_profiles(
     return profiles
 
 
+def reference_lsb_profiles(
+    reference_fonts: dict[int, TTFont],
+    codepoints: set[int],
+) -> dict[int, tuple[tuple[int, int], ...]]:
+    profiles: dict[int, tuple[tuple[int, int], ...]] = {}
+    for codepoint in codepoints:
+        lsbs = []
+        for weight_value, reference in sorted(reference_fonts.items()):
+            cmap = reference.getBestCmap()
+            glyph_name = cmap.get(codepoint)
+            if glyph_name and glyph_name in reference["hmtx"].metrics:
+                lsbs.append((weight_value, reference["hmtx"].metrics[glyph_name][1]))
+        if lsbs:
+            profiles[codepoint] = tuple(lsbs)
+    return profiles
+
+
 def split_reference_advance_profiles(
     font: TTFont,
     reference_fonts: dict[int, TTFont],
@@ -1034,6 +1180,33 @@ def split_reference_advance_profiles(
     return {"reference_advance_profile_groups_split": split_groups, "reference_advance_profile_glyphs_cloned": cloned_glyphs}
 
 
+def split_reference_lsb_profiles(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+    skip_codepoints: set[int],
+) -> dict[str, int]:
+    profiles = reference_lsb_profiles(reference_fonts, set(font.getBestCmap()) - skip_codepoints)
+    split_groups = 0
+    cloned_glyphs = 0
+    for glyph_name, codepoints in list(glyph_to_unicodes(font).items()):
+        relevant = {codepoint for codepoint in codepoints if codepoint in profiles}
+        if len(relevant) <= 1:
+            continue
+        by_profile: dict[tuple[tuple[int, int], ...], set[int]] = {}
+        for codepoint in relevant:
+            by_profile.setdefault(profiles[codepoint], set()).add(codepoint)
+        if len(by_profile) <= 1:
+            continue
+        keep_profile, _keep_codepoints = max(by_profile.items(), key=lambda item: (len(item[1]), -min(item[1])))
+        for profile, cps in by_profile.items():
+            if profile == keep_profile:
+                continue
+            if clone_cmap_glyph_for_codepoints(font, cps):
+                cloned_glyphs += 1
+        split_groups += 1
+    return {"reference_lsb_profile_groups_split": split_groups, "reference_lsb_profile_glyphs_cloned": cloned_glyphs}
+
+
 def gvar_coordinate_count(font: TTFont, glyph_name: str) -> int:
     variations = font["gvar"].variations.get(glyph_name, [])
     if variations:
@@ -1046,6 +1219,15 @@ def add_advance_tuple_variation(font: TTFont, glyph_name: str, support: tuple[fl
         return
     coordinates: list[Any] = [None] * gvar_coordinate_count(font, glyph_name)
     coordinates[-4:] = [(0, 0), (otRound(delta), 0), (0, 0), (0, 0)]
+    font["gvar"].variations.setdefault(glyph_name, []).append(TupleVariation({"wght": support}, coordinates))
+
+
+def add_lsb_tuple_variation(font: TTFont, glyph_name: str, support: tuple[float, float, float], delta: int) -> None:
+    if "gvar" not in font or not delta:
+        return
+    coordinates: list[Any] = [None] * gvar_coordinate_count(font, glyph_name)
+    phantom_delta = otRound(-delta)
+    coordinates[-4:] = [(phantom_delta, 0), (phantom_delta, 0), (0, 0), (0, 0)]
     font["gvar"].variations.setdefault(glyph_name, []).append(TupleVariation({"wght": support}, coordinates))
 
 
@@ -1076,6 +1258,48 @@ def cmap_widths_at_weight(font: TTFont, weight_value: int) -> dict[int, int]:
         }
     finally:
         instance.close()
+
+
+def cmap_hmtx_at_weight(font: TTFont, weight_value: int) -> dict[int, tuple[int, int]]:
+    instance = instantiateVariableFont(font, {"wght": weight_value}, inplace=False, optimize=True)
+    try:
+        cmap = instance.getBestCmap()
+        return {
+            codepoint: tuple(instance["hmtx"].metrics[glyph_name])
+            for codepoint, glyph_name in cmap.items()
+            if glyph_name in instance["hmtx"].metrics
+        }
+    finally:
+        instance.close()
+
+
+def align_reference_hmtx_lsb(font: TTFont, reference: TTFont, skip_codepoints: set[int]) -> dict[str, int]:
+    reference_cmap = reference.getBestCmap()
+    current_cmap = font.getBestCmap()
+    touched = 0
+    cloned = 0
+    targets: dict[str, int] = {}
+    for codepoint in sorted(set(current_cmap) & set(reference_cmap)):
+        if codepoint in skip_codepoints:
+            continue
+        glyph_name = current_cmap[codepoint]
+        ref_glyph = reference_cmap[codepoint]
+        if ref_glyph not in reference["hmtx"].metrics:
+            continue
+        target_lsb = reference["hmtx"].metrics[ref_glyph][1]
+        existing = targets.get(glyph_name)
+        if existing is not None and existing != target_lsb:
+            new_name = clone_cmap_glyph_for_codepoint(font, codepoint)
+            if new_name and new_name != glyph_name:
+                glyph_name = new_name
+                cloned += 1
+        targets[glyph_name] = target_lsb
+    for glyph_name, target_lsb in targets.items():
+        advance_width, lsb = font["hmtx"].metrics[glyph_name]
+        if lsb != target_lsb:
+            font["hmtx"].metrics[glyph_name] = (advance_width, target_lsb)
+            touched += 1
+    return {"reference_lsb_aligned": touched, "reference_lsb_glyphs_cloned": cloned}
 
 
 def align_reference_advance_variations(
@@ -1124,6 +1348,66 @@ def align_reference_advance_variations(
         "reference_advance_variations_added": variations_added,
         "reference_advance_variation_corrections": corrections,
     }
+
+
+def align_reference_lsb_variations(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+    skip_codepoints: set[int],
+) -> dict[str, int]:
+    if "gvar" not in font or "fvar" not in font:
+        return {"reference_lsb_variations_added": 0, "reference_lsb_variation_corrections": 0}
+    correction_weights = [weight for weight in sorted(reference_fonts) if weight != 400]
+    supports = advance_supports(font, correction_weights)
+    variations_added = 0
+    corrections = 0
+    for weight_value in correction_weights:
+        reference = reference_fonts[weight_value]
+        reference_cmap = reference.getBestCmap()
+        current_metrics = cmap_hmtx_at_weight(font, weight_value)
+        glyph_deltas: dict[str, int] = {}
+        cmap = font.getBestCmap()
+        for codepoint in sorted(set(cmap) & set(reference_cmap)):
+            if codepoint in skip_codepoints:
+                continue
+            glyph_name = cmap[codepoint]
+            ref_glyph = reference_cmap[codepoint]
+            if ref_glyph not in reference["hmtx"].metrics:
+                continue
+            current = current_metrics.get(codepoint)
+            if current is None:
+                continue
+            target_lsb = reference["hmtx"].metrics[ref_glyph][1]
+            delta = target_lsb - current[1]
+            if not delta:
+                continue
+            existing_delta = glyph_deltas.get(glyph_name)
+            if existing_delta is not None and existing_delta != delta:
+                new_name = clone_cmap_glyph_for_codepoint(font, codepoint)
+                if new_name and new_name != glyph_name:
+                    glyph_name = new_name
+            glyph_deltas[glyph_name] = delta
+            corrections += 1
+        support = supports[weight_value]
+        for glyph_name, delta in glyph_deltas.items():
+            add_lsb_tuple_variation(font, glyph_name, support, delta)
+            variations_added += 1
+    return {
+        "reference_lsb_variations_added": variations_added,
+        "reference_lsb_variation_corrections": corrections,
+    }
+
+
+def sum_count_reports(*reports: dict[str, int]) -> dict[str, int]:
+    total: dict[str, int] = {}
+    for report in reports:
+        for key, value in report.items():
+            total[key] = total.get(key, 0) + value
+    return total
+
+
+def prefix_count_report(report: dict[str, int], prefix: str) -> dict[str, int]:
+    return {f"{prefix}{key}": value for key, value in report.items()}
 
 
 def bake_single_substitution_feature(
@@ -1736,6 +2020,22 @@ def align_layout_feature_template(font: TTFont, reference: TTFont, table_tag: st
     }
 
 
+def pad_lookup_list_to_reference_count(font: TTFont, reference: TTFont, table_tag: str) -> dict[str, int]:
+    key = table_tag.lower()
+    if table_tag not in font or table_tag not in reference:
+        return {f"{key}_lookups_before_padding": 0, f"{key}_lookups_after_padding": 0}
+    table = font[table_tag].table
+    ref_table = reference[table_tag].table
+    if not table.LookupList or not ref_table.LookupList or not table.LookupList.Lookup:
+        return {f"{key}_lookups_before_padding": 0, f"{key}_lookups_after_padding": 0}
+    before = len(table.LookupList.Lookup)
+    target = len(ref_table.LookupList.Lookup)
+    while len(table.LookupList.Lookup) < target:
+        table.LookupList.Lookup.append(copy.deepcopy(table.LookupList.Lookup[-1]))
+    table.LookupList.LookupCount = len(table.LookupList.Lookup)
+    return {f"{key}_lookups_before_padding": before, f"{key}_lookups_after_padding": len(table.LookupList.Lookup)}
+
+
 def append_single_sub_feature(font: TTFont, tag: str, mapping: dict[str, str]) -> bool:
     mapping = {src: dst for src, dst in mapping.items() if src in font.getGlyphSet() and dst in font.getGlyphSet()}
     if not mapping or "GSUB" not in font:
@@ -2149,13 +2449,26 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         alias_report = split_reference_cmap_aliases(base, reference)
         alias_mapping_report = align_reference_cmap_alias_mappings(base, reference, skip_metric_codepoints)
         profile_report = split_reference_advance_profiles(base, reference_fonts, skip_metric_codepoints)
+        lsb_profile_report = split_reference_lsb_profiles(base, reference_fonts, skip_metric_codepoints)
+        vmtx_profile_report = split_reference_vmtx_profiles(base, reference_fonts, skip_metric_codepoints)
         advance_report = align_reference_advances(base, reference, skip_metric_codepoints)
+        lsb_align_report = align_reference_hmtx_lsb(base, reference, skip_metric_codepoints)
         advance_variation_report = align_reference_advance_variations(base, reference_fonts, skip_metric_codepoints)
+        lsb_variation_report = sum_count_reports(
+            align_reference_lsb_variations(base, reference_fonts, skip_metric_codepoints),
+            align_reference_lsb_variations(base, reference_fonts, skip_metric_codepoints),
+        )
         vmtx_report = align_reference_vmtx(base, reference, skip_metric_codepoints)
+        vmtx_variation_report = sum_count_reports(
+            align_reference_vmtx_variations(base, reference_fonts, skip_metric_codepoints),
+            align_reference_vmtx_variations(base, reference_fonts, skip_metric_codepoints),
+        )
         subset_to_current_cmap(base)
         empty_feature_report = ensure_empty_gsub_features(base, empty_gsub_features_for_style(italic))
         gsub_template_report = align_layout_feature_template(base, reference, "GSUB")
         gpos_template_report = align_layout_feature_template(base, reference, "GPOS")
+        gsub_lookup_report = pad_lookup_list_to_reference_count(base, reference, "GSUB")
+        gpos_lookup_report = pad_lookup_list_to_reference_count(base, reference, "GPOS")
         gdef_report = rebuild_gdef_from_reference(base, reference)
         vorg_report = rebuild_vorg_from_reference(base, reference)
         metadata_report = sync_sarasa_metadata_from_reference(base, reference)
@@ -2168,7 +2481,6 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     update_os2_sarasa_metadata(base)
     rebuild_stat(base, italic)
     extra_table_report = drop_generated_extra_tables(base, keep_stat=True)
-    lsb_report = sync_hmtx_lsb_to_glyph_bounds(base)
     if "DSIG" in base:
         del base["DSIG"]
 
@@ -2176,6 +2488,25 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     out_name = "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf" if italic else "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"
     out_path = VARIABLE_DIR / out_name
     base.save(out_path, reorderTables=True)
+    base.close()
+
+    base = TTFont(out_path)
+    reference_fonts_roundtrip: dict[int, TTFont] = {}
+    try:
+        for weight_name, weight_value in REFERENCE_ADVANCE_STOPS:
+            reference_fonts_roundtrip[weight_value] = open_reference_font(weight_name, italic)
+        roundtrip_lsb_variation_report = prefix_count_report(
+            align_reference_lsb_variations(base, reference_fonts_roundtrip, skip_metric_codepoints),
+            "roundtrip_",
+        )
+        roundtrip_vmtx_variation_report = prefix_count_report(
+            align_reference_vmtx_variations(base, reference_fonts_roundtrip, skip_metric_codepoints),
+            "roundtrip_",
+        )
+        base.save(out_path, reorderTables=True)
+    finally:
+        for reference_font in reference_fonts_roundtrip.values():
+            reference_font.close()
 
     cmap = base.getBestCmap()
     widths = {f"U+{cp:04X}": base["hmtx"].metrics[cmap[cp]][0] for cp in range(0x30, 0x3A)}
@@ -2208,16 +2539,24 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **alias_report,
         **alias_mapping_report,
         **profile_report,
+        **lsb_profile_report,
+        **vmtx_profile_report,
         **advance_report,
+        **lsb_align_report,
         **advance_variation_report,
+        **lsb_variation_report,
         **vmtx_report,
+        **vmtx_variation_report,
+        **roundtrip_lsb_variation_report,
+        **roundtrip_vmtx_variation_report,
         **empty_feature_report,
         **gsub_template_report,
         **gpos_template_report,
+        **gsub_lookup_report,
+        **gpos_lookup_report,
         **gdef_report,
         **vorg_report,
         **metadata_report,
-        **lsb_report,
         **extra_table_report,
         **colon_report,
     }
@@ -2265,6 +2604,7 @@ def postprocess_static_font(path: Path, weight_name: str, weight_value: int, ita
         if reference_path.exists():
             reference = TTFont(reference_path)
             try:
+                report.update(align_reference_hmtx_lsb(font, reference, set(range(0x30, 0x3A)) | {0x3A}))
                 report.update(align_reference_vmtx(font, reference, set(range(0x30, 0x3A)) | {0x3A}))
                 report.update(rebuild_gdef_from_reference(font, reference))
                 report.update(rebuild_vorg_from_reference(font, reference))
@@ -2275,7 +2615,6 @@ def postprocess_static_font(path: Path, weight_name: str, weight_value: int, ita
         update_os2_sarasa_metadata(font)
         rebuild_static_stat(font, weight_name, weight_value, italic)
         report.update(drop_generated_extra_tables(font, keep_stat=True))
-        report.update(sync_hmtx_lsb_to_glyph_bounds(font))
         if "DSIG" in font:
             del font["DSIG"]
         font.save(path, reorderTables=True)
@@ -2437,7 +2776,6 @@ def inspect_font(path: Path) -> dict[str, Any]:
                 "GSUB": layout_table_summary(font, "GSUB"),
                 "GPOS": layout_table_summary(font, "GPOS"),
             },
-            "hmtx_lsb_xmin_mismatches": lsb_mismatch_count(font),
             "fvar_axes": axes,
             "fvar_instances": instances,
             "fsSelection": font["OS/2"].fsSelection,
@@ -2473,8 +2811,9 @@ when it appears between digits.
 Static instances are passed through ttfautohint when the tool is available.
 They keep a static STAT table for modern weight/italic style recognition; this
 does not make the static TTFs variable fonts.
-GSUB/GPOS FeatureRecord order and Script/LangSys coverage are templated from
-the corresponding upstream Sarasa Ui SC static font for each style.
+GSUB/GPOS FeatureRecord order, Script/LangSys coverage, and lookup counts are
+templated from the corresponding upstream Sarasa Ui SC static font for each
+style.
 Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
 unencoded glyphs are preserved, while unreachable glyph count differences are
 left as build artifacts.
@@ -2525,10 +2864,10 @@ def build_all() -> dict[str, Any]:
             "locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, "
             "vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. "
             "Reference Sarasa UI SC cmap alias splits and alias mappings, GSUB/GPOS "
-            "FeatureRecord order and Script/LangSys coverage, non-digit advances "
-            "across the weight axis, horizontal side bearings, vertical metrics, "
-            "vmtx, GDEF, VORG, and Sarasa-compatible head/OS/2 metadata are aligned "
-            "after the merge. "
+            "FeatureRecord order, Script/LangSys coverage, lookup counts, non-digit "
+            "advances and LSB values across the weight axis, vertical metrics, vmtx "
+            "defaults and variations, GDEF, VORG, and Sarasa-compatible head/OS/2 "
+            "metadata are aligned after the merge. "
             "VF and static outputs both include STAT; static STAT only describes the "
             "single instance's style and does not preserve variable fvar/gvar tables. "
             "Glyph counts are not padded to match upstream: cmap glyphs and "
