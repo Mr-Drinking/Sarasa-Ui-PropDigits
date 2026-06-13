@@ -43,6 +43,7 @@ VF 不从静态字重插值生成。它直接合并：
 - 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert/vrt2`、`tnum/pnum`、连续 em dash 和数字冒号 `calt`。
 - 最终 `GSUB`/`GPOS` 的 FeatureRecord 顺序、Script/LangSys 覆盖和 lookup 数量按对应样式的上游 Sarasa Ui SC 静态字体套模板，避免只有 default langsys 而缺少 `JAN`/`KOR`/`ZHH`/`ZHS`/`ZHT`、Latin `CAT`/`MOL`/`ROM` 等语言系统。
 - VF 和静态 TTF 都包含 `STAT`。VF 的 `STAT` 描述 `wght`/`ital` 轴和命名实例；静态 TTF 的 `STAT` 只用于现代应用识别 weight/italic 样式，不表示静态文件仍有 `fvar/gvar` 可变轴。
+- `name` 表包含简体中文显示名：静态为 `更纱黑体 Ui PropDigits SC`，VF 为 `更纱黑体 Ui VF PropDigits SC`。
 - 构建会按上游 Sarasa Ui SC 同步非数字/非冒号 advance、横向 LSB、垂直指标、`GDEF`、`VORG`、`vmtx`、`head`/`OS/2` 中可安全继承的元数据字段；数字和位于数字之间的冒号是本派生字体的刻意差异。
 - glyph 总数不作为构建目标。脚本会保留和同步 cmap 字形以及 GSUB/GPOS/GDEF 可达的未编码 glyph；不会为了让 `maxp.numGlyphs` 与上游相同而补入不可达 glyph。
 - 轮廓上游使用 Source Han Sans SC VF，因此部分字形与 Sarasa 上游静态 TTF 不会逐点完全一致；脚本会同步 Sarasa Ui 的位置/宽度规则，但不会伪造 VF 上游没有的逐点轮廓。

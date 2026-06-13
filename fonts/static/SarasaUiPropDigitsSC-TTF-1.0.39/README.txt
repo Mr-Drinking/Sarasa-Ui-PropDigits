@@ -18,6 +18,8 @@ default; OpenType tnum restores tabular digits, and pnum maps tabular digits
 back to proportional digits. The contextual digit-colon rule raises ':' only
 when it appears between digits.
 
+The name table includes Simplified Chinese display names, such as
+更纱黑体 Ui PropDigits SC ExtraLight.
 Static instances are passed through ttfautohint when the tool is available.
 They keep a static STAT table for modern weight/italic style recognition; this
 does not make the static TTFs variable fonts.

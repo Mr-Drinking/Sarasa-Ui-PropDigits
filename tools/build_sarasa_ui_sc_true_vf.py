@@ -58,8 +58,10 @@ AXIS_LIMIT = {"wght": (250, 400, 900)}
 INTER_AXIS_LIMIT = {"opsz": 14, "wght": (250, 400, 900)}
 VF_FAMILY = "Sarasa Ui VF PropDigits SC"
 VF_PS_FAMILY = "Sarasa-Ui-VF-PropDigits-SC"
+VF_FAMILY_ZH_HANS = "更纱黑体 Ui VF PropDigits SC"
 STATIC_FAMILY = "Sarasa Ui PropDigits SC"
 STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
+STATIC_FAMILY_ZH_HANS = "更纱黑体 Ui PropDigits SC"
 VERSION = "1.0.39-propdigits.3"
 INTER_PREFIX = "inter."
 
@@ -253,9 +255,19 @@ def set_name_record(font: TTFont, name_id: int, value: str) -> None:
         record.string = value.encode(record.getEncoding())
 
 
+def set_windows_name_record(font: TTFont, name_id: int, value: str, lang_id: int) -> None:
+    font["name"].setName(value, name_id, 3, 1, lang_id)
+
+
+def set_zh_hans_name_records(font: TTFont, replacements: dict[int, str]) -> None:
+    for name_id, value in replacements.items():
+        set_windows_name_record(font, name_id, value, 0x0804)
+
+
 def update_vf_names(font: TTFont, italic: bool) -> None:
     subfamily = "Italic" if italic else "Regular"
     full = VF_FAMILY + (" Italic" if italic else "")
+    full_zh_hans = VF_FAMILY_ZH_HANS + (" Italic" if italic else "")
     ps = VF_PS_FAMILY + ("-Italic" if italic else "")
     version = f"Version {VERSION}; Source Han Sans SC VF + Inter VF; PropDigits"
     replacements = {
@@ -271,6 +283,17 @@ def update_vf_names(font: TTFont, italic: bool) -> None:
     }
     for name_id, value in replacements.items():
         set_name_record(font, name_id, value)
+    set_zh_hans_name_records(
+        font,
+        {
+            1: VF_FAMILY_ZH_HANS,
+            2: subfamily,
+            3: f"{VF_FAMILY_ZH_HANS} {subfamily}",
+            4: full_zh_hans,
+            16: VF_FAMILY_ZH_HANS,
+            17: subfamily,
+        },
+    )
 
 
 def legacy_static_family(weight_name: str) -> str:
@@ -279,8 +302,15 @@ def legacy_static_family(weight_name: str) -> str:
     return f"{STATIC_FAMILY} {weight_name}"
 
 
+def legacy_static_family_zh_hans(weight_name: str) -> str:
+    if weight_name in {"Regular", "Bold"}:
+        return STATIC_FAMILY_ZH_HANS
+    return f"{STATIC_FAMILY_ZH_HANS} {weight_name}"
+
+
 def update_static_names(font: TTFont, weight_name: str, weight_value: int, italic: bool) -> None:
     family = legacy_static_family(weight_name)
+    family_zh_hans = legacy_static_family_zh_hans(weight_name)
     if weight_name == "Regular":
         legacy_style = "Italic" if italic else "Regular"
     elif weight_name == "Bold":
@@ -290,6 +320,11 @@ def update_static_names(font: TTFont, weight_name: str, weight_value: int, itali
 
     typographic_style = "Italic" if weight_name == "Regular" and italic else weight_name + (" Italic" if italic else "")
     full = STATIC_FAMILY if weight_name == "Regular" and not italic else f"{STATIC_FAMILY} {typographic_style}"
+    full_zh_hans = (
+        STATIC_FAMILY_ZH_HANS
+        if weight_name == "Regular" and not italic
+        else f"{STATIC_FAMILY_ZH_HANS} {typographic_style}"
+    )
     ps_suffix = "Italic" if weight_name == "Regular" and italic else weight_name + ("-Italic" if italic else "")
     ps = f"{STATIC_PS_FAMILY}-{ps_suffix}"
 
@@ -305,6 +340,17 @@ def update_static_names(font: TTFont, weight_name: str, weight_value: int, itali
     }
     for name_id, value in replacements.items():
         set_name_record(font, name_id, value)
+    set_zh_hans_name_records(
+        font,
+        {
+            1: family_zh_hans,
+            2: legacy_style,
+            3: full_zh_hans,
+            4: full_zh_hans,
+            16: STATIC_FAMILY_ZH_HANS,
+            17: typographic_style,
+        },
+    )
     if 25 in {n.nameID for n in font["name"].names}:
         set_name_record(font, 25, ps)
 
@@ -2901,6 +2947,8 @@ default; OpenType tnum restores tabular digits, and pnum maps tabular digits
 back to proportional digits. The contextual digit-colon rule raises ':' only
 when it appears between digits.
 
+The name table includes Simplified Chinese display names, such as
+更纱黑体 Ui PropDigits SC ExtraLight.
 Static instances are passed through ttfautohint when the tool is available.
 They keep a static STAT table for modern weight/italic style recognition; this
 does not make the static TTFs variable fonts.
