@@ -4,7 +4,7 @@
   "fonts": [
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "size": 36159664,
+      "size": 36160484,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Italic",
@@ -349,7 +349,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "size": 34848108,
+      "size": 34848984,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Regular",

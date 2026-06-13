@@ -1398,6 +1398,89 @@ def align_reference_lsb_variations(
     }
 
 
+def tnum_digit_targets(font: TTFont) -> dict[int, str]:
+    if "hmtx" not in font:
+        return {}
+    mapping = get_single_substitution_mapping(font, "tnum")
+    cmap = font.getBestCmap()
+    targets: dict[int, str] = {}
+    for codepoint in range(0x30, 0x3A):
+        source_glyph = cmap.get(codepoint)
+        target_glyph = mapping.get(source_glyph) if source_glyph else None
+        if not target_glyph:
+            target_glyph = mapping.get(DIGITS[codepoint - 0x30])
+        if target_glyph in font["hmtx"].metrics:
+            targets[codepoint] = target_glyph
+    return targets
+
+
+def reference_digit_hmtx(reference: TTFont) -> dict[int, tuple[int, int]]:
+    cmap = reference.getBestCmap()
+    metrics: dict[int, tuple[int, int]] = {}
+    for codepoint in range(0x30, 0x3A):
+        glyph_name = cmap.get(codepoint)
+        if glyph_name in reference["hmtx"].metrics:
+            metrics[codepoint] = tuple(reference["hmtx"].metrics[glyph_name])
+    return metrics
+
+
+def align_tnum_digit_targets(font: TTFont, reference: TTFont) -> dict[str, int]:
+    targets = tnum_digit_targets(font)
+    reference_metrics = reference_digit_hmtx(reference)
+    touched = 0
+    for codepoint, target_glyph in targets.items():
+        metrics = reference_metrics.get(codepoint)
+        if metrics and tuple(font["hmtx"].metrics[target_glyph]) != metrics:
+            font["hmtx"].metrics[target_glyph] = metrics
+            touched += 1
+    return {"tnum_digit_target_hmtx_aligned": touched}
+
+
+def tnum_digit_target_hmtx_at_weight(font: TTFont, weight_value: int) -> dict[int, tuple[int, int]]:
+    instance = instantiateVariableFont(font, {"wght": weight_value}, inplace=False, optimize=True)
+    try:
+        targets = tnum_digit_targets(instance)
+        return {codepoint: tuple(instance["hmtx"].metrics[glyph_name]) for codepoint, glyph_name in targets.items()}
+    finally:
+        instance.close()
+
+
+def align_tnum_digit_target_variations(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+) -> dict[str, int]:
+    if "gvar" not in font or "fvar" not in font:
+        return {"tnum_digit_target_variations_added": 0, "tnum_digit_target_variation_corrections": 0}
+    correction_weights = [weight for weight in sorted(reference_fonts) if weight != 400]
+    supports = advance_supports(font, correction_weights)
+    targets = tnum_digit_targets(font)
+    variations_added = 0
+    corrections = 0
+    for weight_value in correction_weights:
+        reference_metrics = reference_digit_hmtx(reference_fonts[weight_value])
+        current_metrics = tnum_digit_target_hmtx_at_weight(font, weight_value)
+        support = supports[weight_value]
+        for codepoint, target_glyph in targets.items():
+            target_metrics = reference_metrics.get(codepoint)
+            current = current_metrics.get(codepoint)
+            if not target_metrics or current is None:
+                continue
+            advance_delta = target_metrics[0] - current[0]
+            lsb_delta = target_metrics[1] - current[1]
+            if advance_delta:
+                add_advance_tuple_variation(font, target_glyph, support, advance_delta)
+                variations_added += 1
+            if lsb_delta:
+                add_lsb_tuple_variation(font, target_glyph, support, lsb_delta)
+                variations_added += 1
+            if advance_delta or lsb_delta:
+                corrections += 1
+    return {
+        "tnum_digit_target_variations_added": variations_added,
+        "tnum_digit_target_variation_corrections": corrections,
+    }
+
+
 def sum_count_reports(*reports: dict[str, int]) -> dict[str, int]:
     total: dict[str, int] = {}
     for report in reports:
@@ -2458,6 +2541,8 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
             align_reference_lsb_variations(base, reference_fonts, skip_metric_codepoints),
             align_reference_lsb_variations(base, reference_fonts, skip_metric_codepoints),
         )
+        tnum_target_report = align_tnum_digit_targets(base, reference)
+        tnum_target_variation_report = align_tnum_digit_target_variations(base, reference_fonts)
         vmtx_report = align_reference_vmtx(base, reference, skip_metric_codepoints)
         vmtx_variation_report = sum_count_reports(
             align_reference_vmtx_variations(base, reference_fonts, skip_metric_codepoints),
@@ -2503,6 +2588,10 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
             align_reference_vmtx_variations(base, reference_fonts_roundtrip, skip_metric_codepoints),
             "roundtrip_",
         )
+        roundtrip_tnum_target_variation_report = prefix_count_report(
+            align_tnum_digit_target_variations(base, reference_fonts_roundtrip),
+            "roundtrip_",
+        )
         base.save(out_path, reorderTables=True)
     finally:
         for reference_font in reference_fonts_roundtrip.values():
@@ -2545,10 +2634,13 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **lsb_align_report,
         **advance_variation_report,
         **lsb_variation_report,
+        **tnum_target_report,
+        **tnum_target_variation_report,
         **vmtx_report,
         **vmtx_variation_report,
         **roundtrip_lsb_variation_report,
         **roundtrip_vmtx_variation_report,
+        **roundtrip_tnum_target_variation_report,
         **empty_feature_report,
         **gsub_template_report,
         **gpos_template_report,
@@ -2605,6 +2697,7 @@ def postprocess_static_font(path: Path, weight_name: str, weight_value: int, ita
             reference = TTFont(reference_path)
             try:
                 report.update(align_reference_hmtx_lsb(font, reference, set(range(0x30, 0x3A)) | {0x3A}))
+                report.update(align_tnum_digit_targets(font, reference))
                 report.update(align_reference_vmtx(font, reference, set(range(0x30, 0x3A)) | {0x3A}))
                 report.update(rebuild_gdef_from_reference(font, reference))
                 report.update(rebuild_vorg_from_reference(font, reference))
@@ -2865,9 +2958,9 @@ def build_all() -> dict[str, Any]:
             "vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. "
             "Reference Sarasa UI SC cmap alias splits and alias mappings, GSUB/GPOS "
             "FeatureRecord order, Script/LangSys coverage, lookup counts, non-digit "
-            "advances and LSB values across the weight axis, vertical metrics, vmtx "
-            "defaults and variations, GDEF, VORG, and Sarasa-compatible head/OS/2 "
-            "metadata are aligned after the merge. "
+            "advances and LSB values across the weight axis, tnum digit target hmtx, "
+            "vertical metrics, vmtx defaults and variations, GDEF, VORG, and "
+            "Sarasa-compatible head/OS/2 metadata are aligned after the merge. "
             "VF and static outputs both include STAT; static STAT only describes the "
             "single instance's style and does not preserve variable fvar/gvar tables. "
             "Glyph counts are not padded to match upstream: cmap glyphs and "
