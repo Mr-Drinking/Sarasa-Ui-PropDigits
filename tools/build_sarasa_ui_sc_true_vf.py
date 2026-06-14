@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import argparse
 import copy
+import hashlib
 import json
 import math
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
+from io import BytesIO
 from pathlib import Path
 from typing import Any
 
@@ -34,6 +37,10 @@ def first_existing(*paths: Path) -> Path:
     return paths[0]
 
 
+def log_step(message: str) -> None:
+    print(f"[build] {message}", flush=True)
+
+
 SRC_DIR = Path(os.environ.get("VF_SOURCE_DIR", first_existing(WORK_ROOT / "vf-sources", ROOT / "work" / "vf-sources")))
 BASE_VF = Path(os.environ.get("SOURCE_HAN_SC_VF", SRC_DIR / "SourceHanSansSC-VF.ttf"))
 INTER_UPRIGHT = Path(os.environ.get("INTER_VF", SRC_DIR / "InterVariable.ttf"))
@@ -50,9 +57,29 @@ REFERENCE_SARASA = Path(
 )
 REFERENCE_SARASA_DIR = REFERENCE_SARASA.parent
 
+SARASA_SOURCE_DIR = Path(os.environ.get("SARASA_SOURCE_DIR", WORK_ROOT / "sarasa-gothic-src"))
+SARASA_CHLOROPHYTUM = Path(
+    os.environ.get(
+        "SARASA_CHLOROPHYTUM",
+        SARASA_SOURCE_DIR / "node_modules" / "@chlorophytum" / "cli" / "bin" / "_startup",
+    )
+)
+SARASA_HINT_CONFIGS = {
+    "ExtraLight": "ExtraLight",
+    "Light": "Light",
+    "Normal": "Regular",
+    "Regular": "Regular",
+    "Medium": "SemiBold",
+    "Bold": "Bold",
+    "Heavy": "Bold",
+}
+SARASA_HINT_JOBS = int(os.environ.get("SARASA_HINT_JOBS", str(os.cpu_count() or 1)))
+
 VARIABLE_DIR = ROOT / "fonts" / "variable"
 STATIC_DIR = ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-1.0.39"
+STATIC_UNHINTED_DIR = ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39"
 REPORT_DIR = ROOT / "reports"
+BUILD_CACHE_DIR = Path(os.environ.get("SARASA_BUILD_CACHE", ROOT / ".build-cache" / "sarasa-propdigits-sc"))
 
 AXIS_LIMIT = {"wght": (250, 400, 900)}
 INTER_AXIS_LIMIT = {"opsz": 14, "wght": (250, 400, 900)}
@@ -74,6 +101,16 @@ SOURCE_HAN_WEIGHT_STOPS = [
     {"name": "Bold", "value": 700, "range_min": 650, "range_max": 800},
     {"name": "Heavy", "value": 900, "range_min": 800, "range_max": 900},
 ]
+
+STATIC_STYLE_SOURCES = {
+    "ExtraLight": {"shs": "ExtraLight", "inter": "ExtraLight", "sarasa": "ExtraLight", "hcfg": "ExtraLight"},
+    "Light": {"shs": "Light", "inter": "Light", "sarasa": "Light", "hcfg": "Light"},
+    "Normal": {"shs": "Normal", "inter": None, "inter_weight": 350, "sarasa": "Regular", "hcfg": "Regular"},
+    "Regular": {"shs": "Regular", "inter": "Regular", "sarasa": "Regular", "hcfg": "Regular"},
+    "Medium": {"shs": "Medium", "inter": "Medium", "sarasa": "SemiBold", "hcfg": "SemiBold"},
+    "Bold": {"shs": "Bold", "inter": "Bold", "sarasa": "Bold", "hcfg": "Bold"},
+    "Heavy": {"shs": "Heavy", "inter": "Black", "sarasa": "Bold", "hcfg": "Bold"},
+}
 
 DIGITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 DIGITS_TF = [f"{name}.tf" for name in DIGITS]
@@ -1450,11 +1487,14 @@ def tnum_digit_targets(font: TTFont) -> dict[int, str]:
     mapping = get_single_substitution_mapping(font, "tnum")
     cmap = font.getBestCmap()
     targets: dict[int, str] = {}
-    for codepoint in range(0x30, 0x3A):
+    for codepoint in [*range(0x30, 0x3A), 0x3A]:
         source_glyph = cmap.get(codepoint)
         target_glyph = mapping.get(source_glyph) if source_glyph else None
         if not target_glyph:
-            target_glyph = mapping.get(DIGITS[codepoint - 0x30])
+            if 0x30 <= codepoint <= 0x39:
+                target_glyph = mapping.get(DIGITS[codepoint - 0x30])
+            elif codepoint == 0x3A:
+                target_glyph = mapping.get("colon")
         if target_glyph in font["hmtx"].metrics:
             targets[codepoint] = target_glyph
     return targets
@@ -1463,7 +1503,7 @@ def tnum_digit_targets(font: TTFont) -> dict[int, str]:
 def reference_digit_hmtx(reference: TTFont) -> dict[int, tuple[int, int]]:
     cmap = reference.getBestCmap()
     metrics: dict[int, tuple[int, int]] = {}
-    for codepoint in range(0x30, 0x3A):
+    for codepoint in [*range(0x30, 0x3A), 0x3A]:
         glyph_name = cmap.get(codepoint)
         if glyph_name in reference["hmtx"].metrics:
             metrics[codepoint] = tuple(reference["hmtx"].metrics[glyph_name])
@@ -2706,26 +2746,549 @@ def remove_variable_tables(font: TTFont) -> None:
             del font[tag]
 
 
+def tool_executable(env_name: str, command_name: str) -> str:
+    env_value = os.environ.get(env_name)
+    if env_value:
+        return env_value
+    found = shutil.which(command_name)
+    if found:
+        return found
+    return command_name
+
+
+def run_checked(cmd: list[str], cwd: Path | None = None, capture_output: bool = True) -> None:
+    result = subprocess.run(cmd, cwd=cwd, capture_output=capture_output)
+    if result.returncode != 0:
+        stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
+        stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
+        raise RuntimeError(stderr or stdout or f"{cmd[0]} failed with exit code {result.returncode}")
+
+
+def run_ttfautohint(args: list[str]) -> str:
+    exe = os.environ.get("TTFAUTOHINT") or shutil.which("ttfautohint")
+    if exe:
+        run_checked([exe, *args])
+        return exe
+    try:
+        import ttfautohint
+
+        result = ttfautohint.run(args, capture_output=True)
+        if result.returncode != 0:
+            stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
+            stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
+            raise RuntimeError(stderr or stdout or f"ttfautohint-py failed with exit code {result.returncode}")
+        return "ttfautohint-py"
+    except ImportError:
+        raise FileNotFoundError("ttfautohint executable or Python module is required")
+
+
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def optional_file_sha256(path: Path) -> str | None:
+    return file_sha256(path) if path.exists() else None
+
+
+def stable_sfnt_sha256(path: Path) -> str:
+    try:
+        font = TTFont(path, recalcTimestamp=False)
+        try:
+            if "head" in font:
+                font["head"].created = 0
+                font["head"].modified = 0
+            buffer = BytesIO()
+            font.save(buffer, reorderTables=True)
+            return hashlib.sha256(buffer.getvalue()).hexdigest()
+        finally:
+            font.close()
+    except Exception:
+        return file_sha256(path)
+
+
+def chlorophytum_package_id() -> dict[str, Any]:
+    package_dir = SARASA_SOURCE_DIR / "node_modules" / "@chlorophytum" / "cli"
+    package_json = package_dir / "package.json"
+    return {
+        "startup": optional_file_sha256(SARASA_CHLOROPHYTUM),
+        "package": optional_file_sha256(package_json),
+    }
+
+
+def static_fe_cache_key(weight_name: str, kanji: Path, hangul: Path) -> str:
+    config_name, config_path = sarasa_hint_config(weight_name)
+    payload = {
+        "kind": "static-fe-chlorophytum",
+        "version": 2,
+        "weight": weight_name,
+        "config_name": config_name,
+        "config_sha256": file_sha256(config_path),
+        "kanji_sha256": stable_sfnt_sha256(kanji),
+        "hangul_sha256": stable_sfnt_sha256(hangul),
+        "chlorophytum": chlorophytum_package_id(),
+    }
+    text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def restore_static_fe_cache(weight_name: str, kanji: Path, hangul: Path, hani_out: Path, hang_out: Path) -> dict[str, Any] | None:
+    if os.environ.get("SARASA_DISABLE_BUILD_CACHE") == "1":
+        return None
+    key = static_fe_cache_key(weight_name, kanji, hangul)
+    cache_dir = BUILD_CACHE_DIR / "static-fe" / key
+    cached_hani = cache_dir / "hani.ttf"
+    cached_hang = cache_dir / "hang.ttf"
+    manifest = cache_dir / "manifest.json"
+    if not cached_hani.exists() or not cached_hang.exists() or not manifest.exists():
+        return None
+    hani_out.parent.mkdir(parents=True, exist_ok=True)
+    hang_out.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(cached_hani, hani_out)
+    shutil.copy2(cached_hang, hang_out)
+    _config_name, config_path = sarasa_hint_config(weight_name)
+    return {
+        "hani": {
+            "chlorophytum_hinted": True,
+            "chlorophytum_cache_hit": True,
+            "chlorophytum_cache_key": key,
+            "chlorophytum_hint_config": config_path.stem,
+        },
+        "hang": {
+            "chlorophytum_hinted": True,
+            "chlorophytum_cache_hit": True,
+            "chlorophytum_cache_key": key,
+            "chlorophytum_hint_config": config_path.stem,
+        },
+    }
+
+
+def store_static_fe_cache(
+    weight_name: str,
+    kanji: Path,
+    hangul: Path,
+    hani_out: Path,
+    hang_out: Path,
+    report: dict[str, Any],
+) -> None:
+    if os.environ.get("SARASA_DISABLE_BUILD_CACHE") == "1":
+        return
+    key = static_fe_cache_key(weight_name, kanji, hangul)
+    cache_dir = BUILD_CACHE_DIR / "static-fe" / key
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(hani_out, cache_dir / "hani.ttf")
+    shutil.copy2(hang_out, cache_dir / "hang.ttf")
+    manifest = {
+        "key": key,
+        "weight": weight_name,
+        "created_by": "tools/build_sarasa_ui_sc_true_vf.py",
+        "report": report,
+    }
+    (cache_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def hint_static_font(in_path: Path, out_path: Path) -> dict[str, Any]:
     if os.environ.get("SARASA_SKIP_TTFAUTOHINT") == "1":
         shutil.copy2(in_path, out_path)
         return {"hinted": False, "hint_tool": "skipped"}
-    exe = os.environ.get("TTFAUTOHINT")
-    if exe:
-        result = subprocess.run([exe, str(in_path), str(out_path)], capture_output=True)
-        if result.returncode != 0:
-            raise RuntimeError(result.stderr.decode("utf-8", "replace"))
-        return {"hinted": True, "hint_tool": exe}
-    try:
-        import ttfautohint
+    return {"hinted": True, "hint_tool": run_ttfautohint([str(in_path), str(out_path)])}
 
-        result = ttfautohint.run([str(in_path), str(out_path)], capture_output=True)
-        if result.returncode != 0:
-            raise RuntimeError(result.stderr.decode("utf-8", "replace"))
-        return {"hinted": True, "hint_tool": "ttfautohint-py"}
-    except ImportError:
-        shutil.copy2(in_path, out_path)
-        return {"hinted": False, "hint_tool": "missing"}
+
+def node_executable() -> str:
+    for env_name in ("SARASA_NODE", "NODE"):
+        env_value = os.environ.get(env_name)
+        if env_value:
+            return env_value
+    found = shutil.which("node")
+    if found:
+        return found
+    bundled = Path.home() / ".cache" / "codex-runtimes" / "codex-primary-runtime" / "dependencies" / "node" / "bin" / "node.exe"
+    if bundled.exists():
+        return str(bundled)
+    return "node"
+
+
+def sarasa_hint_config(weight_name: str) -> tuple[str, Path]:
+    config_name = SARASA_HINT_CONFIGS.get(weight_name, weight_name)
+    return config_name, SARASA_SOURCE_DIR / "hcfg" / f"{config_name}.json"
+
+
+def chlorophytum_hint_static_font(
+    in_path: Path,
+    out_path: Path,
+    weight_name: str,
+    tmp_dir: Path,
+) -> dict[str, Any]:
+    return chlorophytum_hint_static_fonts([(in_path, out_path, weight_name)], tmp_dir)[out_path]
+
+
+def chlorophytum_hint_static_fonts(
+    jobs: list[tuple[Path, Path, str]],
+    tmp_dir: Path,
+) -> dict[Path, dict[str, Any]]:
+    if not jobs:
+        return {}
+    tmp_dir.mkdir(parents=True, exist_ok=True)
+    config_names = {sarasa_hint_config(weight_name)[0] for _in_path, _out_path, weight_name in jobs}
+    if len(config_names) != 1:
+        raise ValueError(f"Chlorophytum batch must use one hcfg, got {sorted(config_names)}")
+    config_name = next(iter(config_names))
+    config_path = SARASA_SOURCE_DIR / "hcfg" / f"{config_name}.json"
+
+    reports: dict[Path, dict[str, Any]] = {}
+    if os.environ.get("SARASA_SKIP_CHLOROPHYTUM") == "1":
+        for in_path, out_path, _weight_name in jobs:
+            shutil.copy2(in_path, out_path)
+            reports[out_path] = {
+                "chlorophytum_hinted": False,
+                "chlorophytum_hint_tool": "skipped",
+                "chlorophytum_hint_config": config_name,
+            }
+        return reports
+    if not SARASA_CHLOROPHYTUM.exists() or not config_path.exists():
+        for in_path, out_path, _weight_name in jobs:
+            shutil.copy2(in_path, out_path)
+            reports[out_path] = {
+                "chlorophytum_hinted": False,
+                "chlorophytum_hint_tool": "missing",
+                "chlorophytum_hint_config": config_name,
+            }
+        return reports
+
+    cache_path = tmp_dir / f"{config_name}.hc.gz"
+    node = node_executable()
+    hint_cmd = [
+        node,
+        str(SARASA_CHLOROPHYTUM),
+        "hint",
+        "-c",
+        str(config_path),
+        "-h",
+        str(cache_path),
+        "--jobs",
+        str(SARASA_HINT_JOBS),
+    ]
+    hint_paths: dict[Path, Path] = {}
+    for in_path, _out_path, _weight_name in jobs:
+        hint_path = tmp_dir / f"{in_path.stem}.hint.gz"
+        hint_paths[in_path] = hint_path
+        hint_cmd.extend([str(in_path), str(hint_path)])
+    verbose = os.environ.get("SARASA_CHLOROPHYTUM_VERBOSE") == "1"
+    result = subprocess.run(hint_cmd, cwd=SARASA_SOURCE_DIR, capture_output=not verbose)
+    if result.returncode != 0:
+        stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
+        stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
+        raise RuntimeError(stderr or stdout or f"Chlorophytum hint failed with exit code {result.returncode}")
+
+    instruct_cmd = [
+        node,
+        str(SARASA_CHLOROPHYTUM),
+        "instruct",
+        "-c",
+        str(config_path),
+    ]
+    for in_path, out_path, _weight_name in jobs:
+        instruct_cmd.extend([str(in_path), str(hint_paths[in_path]), str(out_path)])
+    result = subprocess.run(instruct_cmd, cwd=SARASA_SOURCE_DIR, capture_output=not verbose)
+    if result.returncode != 0:
+        stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
+        stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
+        raise RuntimeError(stderr or stdout or f"Chlorophytum instruct failed with exit code {result.returncode}")
+
+    for _in_path, out_path, _weight_name in jobs:
+        reports[out_path] = {
+            "chlorophytum_hinted": True,
+            "chlorophytum_hint_tool": str(SARASA_CHLOROPHYTUM),
+            "chlorophytum_hint_config": config_name,
+            "chlorophytum_hint_jobs": SARASA_HINT_JOBS,
+            "chlorophytum_hint_group_size": len(jobs),
+            "chlorophytum_hint_cache": str(cache_path),
+        }
+    return reports
+
+
+def sarasa_style_name(weight_name: str, italic: bool) -> str:
+    style = str(STATIC_STYLE_SOURCES[weight_name]["sarasa"])
+    if not italic:
+        return style
+    if style == "Regular":
+        return "Italic"
+    return f"{style}Italic"
+
+
+def sarasa_ui_flags() -> dict[str, bool]:
+    return {
+        "goth": False,
+        "mono": False,
+        "pwid": True,
+        "tnum": True,
+        "term": False,
+    }
+
+
+def sarasa_latin_config() -> dict[str, Any]:
+    return {
+        "bakeFeatures": [{"tag": "ss03"}, {"tag": "cv10"}],
+        "dropFeatures": [
+            "cv01",
+            "cv02",
+            "cv03",
+            "cv04",
+            "cv05",
+            "cv06",
+            "cv07",
+            "cv08",
+            "cv09",
+            "cv10",
+            "cv11",
+            "cv12",
+            "cv13",
+            "ss01",
+            "ss02",
+            "ss03",
+            "ss04",
+            "ss05",
+            "ss06",
+            "ss07",
+            "ss08",
+        ],
+    }
+
+
+def sarasa_module_runner(tmp_dir: Path) -> Path:
+    runner = tmp_dir / "run-sarasa-module.mjs"
+    if not runner.exists():
+        runner.write_text(
+            "\n".join(
+                [
+                    'import { pathToFileURL } from "node:url";',
+                    "const recipe = process.argv[2];",
+                    "const args = JSON.parse(process.argv[3]);",
+                    "const mod = await import(pathToFileURL(recipe).href);",
+                    "await mod.default(args);",
+                    "",
+                ]
+            ),
+            encoding="utf-8",
+        )
+    return runner
+
+
+def run_sarasa_module(tmp_dir: Path, recipe: str, args: dict[str, Any]) -> None:
+    runner = sarasa_module_runner(tmp_dir)
+    cmd = [
+        node_executable(),
+        str(runner),
+        str(SARASA_SOURCE_DIR / recipe),
+        json.dumps(args, ensure_ascii=False),
+    ]
+    run_checked(cmd, cwd=SARASA_SOURCE_DIR)
+
+
+def otc2otf_executable() -> str:
+    return tool_executable("OTC2OTF", "otc2otf")
+
+
+def otf2ttf_executable() -> str:
+    return tool_executable("OTF2TTF", "otf2ttf")
+
+
+def build_shs_ttf(weight_name: str, tmp_dir: Path) -> Path:
+    source = STATIC_STYLE_SOURCES[weight_name]
+    shs_weight = str(source["shs"])
+    out_dir = tmp_dir / "shs"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_ttf = out_dir / f"SC-{shs_weight}.ttf"
+    if out_ttf.exists():
+        return out_ttf
+
+    source_ttc = SARASA_SOURCE_DIR / "sources" / "shs" / f"SourceHanSans-{shs_weight}.ttc"
+    if not source_ttc.exists():
+        raise FileNotFoundError(source_ttc)
+    extract_dir = tmp_dir / "shs-extract" / shs_weight
+    extract_dir.mkdir(parents=True, exist_ok=True)
+    copied_ttc = extract_dir / source_ttc.name
+    if not copied_ttc.exists():
+        shutil.copy2(source_ttc, copied_ttc)
+    expected_otf = extract_dir / f"SourceHanSansSC-{shs_weight}.otf"
+    if not expected_otf.exists():
+        run_checked([otc2otf_executable(), str(copied_ttc)], cwd=extract_dir)
+    if not expected_otf.exists():
+        candidates = list(extract_dir.rglob(f"SourceHanSansSC-{shs_weight}.otf"))
+        if candidates:
+            expected_otf = candidates[0]
+    if not expected_otf.exists():
+        raise FileNotFoundError(expected_otf)
+    if out_ttf.exists():
+        out_ttf.unlink()
+    run_checked([otf2ttf_executable(), "-o", str(out_ttf), str(expected_otf)])
+    return out_ttf
+
+
+def inter_source_style(weight_name: str, italic: bool) -> str | None:
+    source = STATIC_STYLE_SOURCES[weight_name]
+    inter_style = source.get("inter")
+    if inter_style is None:
+        return None
+    inter_style = str(inter_style)
+    if italic:
+        if inter_style == "Regular":
+            return "Italic"
+        return f"{inter_style}Italic"
+    return inter_style
+
+
+def build_inter_source(weight_name: str, weight_value: int, italic: bool, tmp_dir: Path) -> Path:
+    out_dir = tmp_dir / "inter"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    style = inter_source_style(weight_name, italic)
+    if style:
+        raw_source = SARASA_SOURCE_DIR / "sources" / "Inter" / f"Inter-{style}.ttf"
+        if not raw_source.exists():
+            raise FileNotFoundError(raw_source)
+        raw_path = raw_source
+        out_path = out_dir / f"Inter-{style}.dehint.ttf"
+    else:
+        suffix = "Italic" if italic else ""
+        raw_path = out_dir / f"Inter-{weight_name}{suffix}.vf-instance.ttf"
+        out_path = out_dir / f"Inter-{weight_name}{suffix}.dehint.ttf"
+        if not raw_path.exists():
+            inter = TTFont(INTER_ITALIC if italic else INTER_UPRIGHT)
+            inter = instantiateVariableFont(inter, {"opsz": 14, "wght": weight_value}, inplace=False, optimize=True)
+            try:
+                remove_variable_tables(inter)
+                inter.flavor = None
+                inter.save(raw_path, reorderTables=True)
+            finally:
+                inter.close()
+    if not out_path.exists():
+        run_ttfautohint(["-d", str(raw_path), str(out_path)])
+    return out_path
+
+
+def build_sarasa_static_fragments(
+    weight_name: str,
+    weight_value: int,
+    italic: bool,
+    tmp_dir: Path,
+) -> dict[str, Any]:
+    suffix = f"{weight_name}{'Italic' if italic else ''}"
+    fe_dir = tmp_dir / "fragments" / f"{weight_name}-fe"
+    work_dir = tmp_dir / "fragments" / suffix
+    fe_dir.mkdir(parents=True, exist_ok=True)
+    work_dir.mkdir(parents=True, exist_ok=True)
+    shs_ttf = build_shs_ttf(weight_name, tmp_dir)
+    inter_ttf = build_inter_source(weight_name, weight_value, italic, tmp_dir)
+    style_name = sarasa_style_name(weight_name, italic)
+    flags = sarasa_ui_flags()
+
+    kanji = fe_dir / "kanji0.ttf"
+    hangul = fe_dir / "hangul0.ttf"
+    non_kanji = fe_dir / "non-kanji0.ttf"
+    ws = work_dir / "ws0.ttf"
+    as_punct = work_dir / "as0.ttf"
+    fe_misc = work_dir / "fe-misc0.ttf"
+    pass1 = work_dir / "pass1.ttf"
+
+    if not kanji.exists():
+        run_sarasa_module(
+            tmp_dir,
+            "make/kanji/build.mjs",
+            {"main": str(shs_ttf), "classicalOverride": None, "o": str(kanji)},
+        )
+    if not hangul.exists():
+        run_sarasa_module(tmp_dir, "make/hangul/build.mjs", {"main": str(shs_ttf), "o": str(hangul)})
+    if not non_kanji.exists():
+        run_sarasa_module(tmp_dir, "make/non-kanji/build.mjs", {"main": str(shs_ttf), "o": str(non_kanji)})
+
+    punct_args = {
+        "family": "Ui",
+        "region": "SC",
+        "style": style_name,
+        "main": str(non_kanji),
+        "lgc": str(inter_ttf),
+        **flags,
+    }
+    if not ws.exists():
+        run_sarasa_module(tmp_dir, "make/punct/ws.mjs", {**punct_args, "o": str(ws)})
+    if not as_punct.exists():
+        run_sarasa_module(tmp_dir, "make/punct/as.mjs", {**punct_args, "o": str(as_punct)})
+    if not fe_misc.exists():
+        run_sarasa_module(tmp_dir, "make/punct/fe-misc.mjs", {**punct_args, "o": str(fe_misc)})
+
+    if not pass1.exists():
+        run_sarasa_module(
+            tmp_dir,
+            "make/pass1/index.mjs",
+            {
+                "main": str(inter_ttf),
+                "as": str(as_punct),
+                "ws": str(ws),
+                "feMisc": str(fe_misc),
+                "o": str(pass1),
+                "family": "Ui",
+                "subfamily": "SC",
+                "style": style_name,
+                "italize": italic,
+                "version": "1.0.39",
+                "latinCfg": sarasa_latin_config(),
+                **flags,
+            },
+        )
+    return {
+        "pass1": pass1,
+        "kanji": kanji,
+        "hangul": hangul,
+        "sarasa_static_style": style_name,
+        "sarasa_source_han_style": str(STATIC_STYLE_SOURCES[weight_name]["shs"]),
+        "sarasa_inter_style": inter_source_style(weight_name, italic) or f"VF-{weight_value}{'Italic' if italic else ''}",
+    }
+
+
+def build_sarasa_pass2(
+    pass1: Path,
+    kanji: Path,
+    hangul: Path,
+    out_path: Path,
+    italic: bool,
+    tmp_dir: Path,
+) -> None:
+    run_sarasa_module(
+        tmp_dir,
+        "make/pass2/index.mjs",
+        {
+            "main": str(pass1),
+            "kanji": str(kanji),
+            "hangul": str(hangul),
+            "o": str(out_path),
+            "italize": italic,
+        },
+    )
+
+
+def apply_static_propdigits(font: TTFont) -> dict[str, int]:
+    pnum = get_single_substitution_mapping(font, "pnum")
+    if not pnum or "cmap" not in font:
+        return {"static_propdigit_cmap_remaps": 0}
+    default_cmap = font.getBestCmap()
+    remap: dict[int, str] = {}
+    for codepoint in [*range(0x30, 0x3A), 0x3A]:
+        glyph_name = default_cmap.get(codepoint)
+        target = pnum.get(glyph_name or "")
+        if target and target in font.getGlyphSet():
+            remap[codepoint] = target
+    touched = 0
+    for cmap_table in font["cmap"].tables:
+        if not cmap_table.isUnicode():
+            continue
+        for codepoint, target in remap.items():
+            if cmap_table.cmap.get(codepoint) != target:
+                cmap_table.cmap[codepoint] = target
+                touched += 1
+    return {"static_propdigit_cmap_remaps": touched}
 
 
 def static_output_name(weight_name: str, italic: bool) -> str:
@@ -2754,6 +3317,13 @@ def postprocess_static_font(path: Path, weight_name: str, weight_value: int, ita
         update_os2_sarasa_metadata(font)
         rebuild_static_stat(font, weight_name, weight_value, italic)
         report.update(drop_generated_extra_tables(font, keep_stat=True))
+        report.update(apply_static_propdigits(font))
+        report.update(
+            {
+                "digit_colon_feature_added": False,
+                "digit_colon_source": "inter-calt",
+            }
+        )
         if "DSIG" in font:
             del font["DSIG"]
         font.save(path, reorderTables=True)
@@ -2762,46 +3332,145 @@ def postprocess_static_font(path: Path, weight_name: str, weight_value: int, ita
     return report
 
 
+def prepare_static_pass1_derivatives(path: Path) -> dict[str, Any]:
+    return {
+        "pass1_digit_colon_feature_added": False,
+        "pass1_digit_colon_source": "inter-calt",
+    }
+
+
 def build_static_fonts() -> list[dict[str, Any]]:
-    STATIC_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(ROOT / "LICENSE", STATIC_DIR / "LICENSE-Sarasa-Gothic.txt")
-    for path in STATIC_DIR.glob("SarasaUiPropDigitsSC-*.ttf"):
-        path.unlink()
+    log_step("static: clean output directories")
+    for out_dir in [STATIC_DIR, STATIC_UNHINTED_DIR]:
+        out_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / "LICENSE", out_dir / "LICENSE-Sarasa-Gothic.txt")
+        for path in out_dir.glob("SarasaUiPropDigitsSC-*.ttf"):
+            path.unlink()
 
     outputs: list[dict[str, Any]] = []
-    sources = [
-        (False, VARIABLE_DIR / "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"),
-        (True, VARIABLE_DIR / "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf"),
-    ]
     with tempfile.TemporaryDirectory() as tmp_dir_raw:
         tmp_dir = Path(tmp_dir_raw)
-        for italic, vf_path in sources:
+        hinted_fe_cache: dict[str, dict[str, Any]] = {}
+        for italic in [False, True]:
             for stop in SOURCE_HAN_WEIGHT_STOPS:
                 weight_name = stop["name"]
                 weight_value = int(stop["value"])
-                font = TTFont(vf_path)
-                font = instantiateVariableFont(font, {"wght": weight_value}, inplace=False, optimize=True)
-                remove_variable_tables(font)
-                update_static_names(font, weight_name, weight_value, italic)
-                update_os2_sarasa_metadata(font)
-                rebuild_static_stat(font, weight_name, weight_value, italic)
-                sync_hmtx_lsb_to_glyph_bounds(font)
-                if "DSIG" in font:
-                    del font["DSIG"]
-                tmp_path = tmp_dir / static_output_name(weight_name, italic)
-                final_path = STATIC_DIR / static_output_name(weight_name, italic)
-                font.save(tmp_path, reorderTables=True)
-                font.close()
-                hint_report = hint_static_font(tmp_path, final_path)
-                postprocess_report = postprocess_static_font(final_path, weight_name, weight_value, italic)
+                style_label = f"{weight_name}{' Italic' if italic else ''}"
+                log_step(f"static {style_label}: build Sarasa fragments")
+                fragments = build_sarasa_static_fragments(weight_name, weight_value, italic, tmp_dir)
+                pass1_derivative_report = prepare_static_pass1_derivatives(fragments["pass1"])
+
+                unhinted_tmp = tmp_dir / "unhinted" / static_output_name(weight_name, italic)
+                unhinted_tmp.parent.mkdir(parents=True, exist_ok=True)
+                unhinted_path = STATIC_UNHINTED_DIR / static_output_name(weight_name, italic)
+                log_step(f"static {style_label}: compose unhinted pass2")
+                build_sarasa_pass2(
+                    fragments["pass1"],
+                    fragments["kanji"],
+                    fragments["hangul"],
+                    unhinted_tmp,
+                    italic,
+                    tmp_dir,
+                )
+                log_step(f"static {style_label}: postprocess unhinted")
+                unhinted_report = postprocess_static_font(unhinted_tmp, weight_name, weight_value, italic)
+                shutil.copy2(unhinted_tmp, unhinted_path)
                 outputs.append(
                     {
-                        "file": str(final_path.relative_to(ROOT)),
+                        "file": str(unhinted_path.relative_to(ROOT)),
                         "weight": weight_name,
                         "wght": weight_value,
                         "italic": italic,
+                        "hinted_variant": False,
+                        "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
+                        "hinted": False,
+                        "hint_tool": "unhinted",
+                        "chlorophytum_hinted": False,
+                        **{k: v for k, v in fragments.items() if isinstance(v, str)},
+                        **pass1_derivative_report,
+                        **unhinted_report,
+                    }
+                )
+
+                hinted_work = tmp_dir / "hinted" / f"{weight_name}{'Italic' if italic else ''}"
+                hinted_work.mkdir(parents=True, exist_ok=True)
+                pass1_hinted = hinted_work / "pass1.ttfautohint.ttf"
+                pass1_instructed = hinted_work / "pass1.ttf"
+                hinted_tmp = hinted_work / static_output_name(weight_name, italic)
+                hinted_path = STATIC_DIR / static_output_name(weight_name, italic)
+
+                log_step(f"static {style_label}: ttfautohint pass1")
+                hint_report = hint_static_font(fragments["pass1"], pass1_hinted)
+                log_step(f"static {style_label}: Chlorophytum pass1")
+                pass1_chlorophytum = chlorophytum_hint_static_fonts(
+                    [(pass1_hinted, pass1_instructed, weight_name)],
+                    hinted_work / "pass1-hints",
+                )[pass1_instructed]
+                if weight_name not in hinted_fe_cache:
+                    fe_work = tmp_dir / "hinted-fe" / weight_name
+                    fe_work.mkdir(parents=True, exist_ok=True)
+                    hani_instructed = fe_work / "hani.ttf"
+                    hang_instructed = fe_work / "hang.ttf"
+                    log_step(f"static {style_label}: restore cached kanji/hangul")
+                    fe_chlorophytum_report = restore_static_fe_cache(
+                        weight_name,
+                        fragments["kanji"],
+                        fragments["hangul"],
+                        hani_instructed,
+                        hang_instructed,
+                    )
+                    if fe_chlorophytum_report is None:
+                        log_step(f"static {style_label}: Chlorophytum kanji/hangul")
+                        fe_chlorophytum = chlorophytum_hint_static_fonts(
+                            [
+                                (fragments["kanji"], hani_instructed, weight_name),
+                                (fragments["hangul"], hang_instructed, weight_name),
+                            ],
+                            fe_work / "hints",
+                        )
+                        fe_chlorophytum_report = {
+                            "hani": fe_chlorophytum[hani_instructed],
+                            "hang": fe_chlorophytum[hang_instructed],
+                        }
+                        store_static_fe_cache(
+                            weight_name,
+                            fragments["kanji"],
+                            fragments["hangul"],
+                            hani_instructed,
+                            hang_instructed,
+                            fe_chlorophytum_report,
+                        )
+                    else:
+                        log_step(f"static {style_label}: cached kanji/hangul hit")
+                    hinted_fe_cache[weight_name] = {
+                        "hani": hani_instructed,
+                        "hang": hang_instructed,
+                        "report": fe_chlorophytum_report,
+                    }
+                else:
+                    log_step(f"static {style_label}: reuse Chlorophytum kanji/hangul")
+                hani_instructed = hinted_fe_cache[weight_name]["hani"]
+                hang_instructed = hinted_fe_cache[weight_name]["hang"]
+                fe_chlorophytum_report = hinted_fe_cache[weight_name]["report"]
+                log_step(f"static {style_label}: compose hinted pass2")
+                build_sarasa_pass2(pass1_instructed, hani_instructed, hang_instructed, hinted_tmp, italic, tmp_dir)
+                log_step(f"static {style_label}: postprocess hinted")
+                hinted_postprocess = postprocess_static_font(hinted_tmp, weight_name, weight_value, italic)
+                shutil.copy2(hinted_tmp, hinted_path)
+                outputs.append(
+                    {
+                        "file": str(hinted_path.relative_to(ROOT)),
+                        "weight": weight_name,
+                        "wght": weight_value,
+                        "italic": italic,
+                        "hinted_variant": True,
+                        "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
+                        **{k: v for k, v in fragments.items() if isinstance(v, str)},
+                        **pass1_derivative_report,
                         **hint_report,
-                        **postprocess_report,
+                        "pass1_chlorophytum": pass1_chlorophytum,
+                        "fe_chlorophytum": fe_chlorophytum_report,
+                        **hinted_postprocess,
                     }
                 )
     return outputs
@@ -2926,11 +3595,28 @@ def inspect_font(path: Path) -> dict[str, Any]:
         font.close()
 
 
-def write_static_readme() -> None:
-    text = """Sarasa Ui PropDigits SC TTF 1.0.39
+def static_readme_text(hinted: bool) -> str:
+    title = "Sarasa Ui PropDigits SC TTF 1.0.39" if hinted else "Sarasa Ui PropDigits SC TTF Unhinted 1.0.39"
+    hint_note = (
+        "The hinted set is built through the same static fragment route as upstream\n"
+        "Sarasa: pass1 is first processed with ttfautohint, pass1/kanji/hangul\n"
+        "fragments are then instructed with Sarasa's upstream Chlorophytum hcfg\n"
+        "flow, and pass2 composes the final TTF. Normal, Medium, and Heavy use the\n"
+        "upstream Regular, SemiBold, and Bold hcfg profiles respectively because\n"
+        "upstream Sarasa does not ship matching static output styles. Static\n"
+        "PropDigits remaps ':' to an existing pnum glyph and reuses Inter/Sarasa's\n"
+        "retained calt rule, so no extra digit-colon glyph is added after hinting."
+        if hinted
+        else "The unhinted set is built through the same static fragment route as\n"
+        "upstream Sarasa, but uses the unhinted pass1/kanji/hangul fragments\n"
+        "directly in pass2. It intentionally skips ttfautohint and Chlorophytum,\n"
+        "providing a formal static output without TrueType instructions."
+    )
+    return f"""{title}
 
-This directory contains static TrueType instances generated from the corrected
-Sarasa Ui VF PropDigits SC build.
+This directory contains static TrueType fonts generated from static Source Han
+Sans SC and Inter sources through Sarasa's pass1/kanji/hangul/pass2 build path,
+then patched with the PropDigits derivative behavior.
 
 Weights:
 
@@ -2945,23 +3631,30 @@ Weights:
 Each weight has an upright and Italic file. ASCII digits are proportional by
 default; OpenType tnum restores tabular digits, and pnum maps tabular digits
 back to proportional digits. The contextual digit-colon rule raises ':' only
-when it appears between digits.
+when it appears between digits by reusing Inter/Sarasa's retained calt data.
 
 The name table includes Simplified Chinese display names, such as
 更纱黑体 Ui PropDigits SC ExtraLight.
-Static instances are passed through ttfautohint when the tool is available.
+{hint_note}
 They keep a static STAT table for modern weight/italic style recognition; this
 does not make the static TTFs variable fonts.
-GSUB/GPOS FeatureRecord order, Script/LangSys coverage, and lookup counts are
-templated from the corresponding upstream Sarasa Ui SC static font for each
-style.
+GSUB/GPOS FeatureRecord order, Script/LangSys coverage, and the base lookup
+structure are templated from the corresponding upstream Sarasa Ui SC static
+font for each style; the static digit-colon behavior does not add its own
+lookup.
 Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
 unencoded glyphs are preserved, while unreachable glyph count differences are
 left as build artifacts.
 These fonts are modified derivatives and are not official Sarasa Gothic,
 Source Han Sans, or Inter releases.
 """
-    (STATIC_DIR / "README.txt").write_text(text, encoding="utf-8")
+
+
+def write_static_readme() -> None:
+    STATIC_DIR.mkdir(parents=True, exist_ok=True)
+    STATIC_UNHINTED_DIR.mkdir(parents=True, exist_ok=True)
+    (STATIC_DIR / "README.txt").write_text(static_readme_text(True), encoding="utf-8")
+    (STATIC_UNHINTED_DIR / "README.txt").write_text(static_readme_text(False), encoding="utf-8")
 
 
 def write_reports(build_report: dict[str, Any]) -> None:
@@ -2969,7 +3662,11 @@ def write_reports(build_report: dict[str, Any]) -> None:
     build_text = json.dumps(build_report, ensure_ascii=False, indent=2)
     (REPORT_DIR / "Sarasa-Ui-VF-PropDigits-SC-report.json").write_text(build_text, encoding="utf-8")
 
-    font_paths = sorted(VARIABLE_DIR.glob("*.ttf")) + sorted(STATIC_DIR.glob("SarasaUiPropDigitsSC-*.ttf"))
+    font_paths = (
+        sorted(VARIABLE_DIR.glob("*.ttf"))
+        + sorted(STATIC_DIR.glob("SarasaUiPropDigitsSC-*.ttf"))
+        + sorted(STATIC_UNHINTED_DIR.glob("SarasaUiPropDigitsSC-*.ttf"))
+    )
     inspection = {
         "title": "Sarasa Ui VF PropDigits SC / Sarasa Ui PropDigits SC font inspection",
         "note": "Generated by tools/build_sarasa_ui_sc_true_vf.py using fontTools.",
@@ -2978,16 +3675,33 @@ def write_reports(build_report: dict[str, Any]) -> None:
     (REPORT_DIR / "font-inspection.json").write_text(json.dumps(inspection, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def build_all() -> dict[str, Any]:
+def existing_variable_outputs() -> list[dict[str, Any]]:
+    return [
+        {"file": str(path.relative_to(ROOT)), "rebuilt": False}
+        for path in sorted(VARIABLE_DIR.glob("*.ttf"))
+    ]
+
+
+def build_all(static_only: bool = False) -> dict[str, Any]:
     for path in [BASE_VF, INTER_UPRIGHT, INTER_ITALIC, REFERENCE_SARASA]:
         if not path.exists():
             raise FileNotFoundError(path)
-    variable_outputs = [build_one_variable(False), build_one_variable(True)]
+    if static_only:
+        log_step("variable: skipped by --static-only")
+        variable_outputs = existing_variable_outputs()
+    else:
+        log_step("variable upright: build")
+        upright_output = build_one_variable(False)
+        log_step("variable italic: build")
+        italic_output = build_one_variable(True)
+        variable_outputs = [upright_output, italic_output]
+    log_step("static: build hinted and unhinted")
     static_outputs = build_static_fonts()
     write_static_readme()
     report = {
         "family": VF_FAMILY,
         "version": VERSION,
+        "static_only": static_only,
         "source_base": str(BASE_VF),
         "source_latin_upright": str(INTER_UPRIGHT),
         "source_latin_italic": str(INTER_ITALIC),
@@ -3003,9 +3717,9 @@ def build_all() -> dict[str, Any]:
             "layout imports the Inter VF GSUB/GPOS features that Sarasa UI SC exposes, "
             "keeps Sarasa's empty cv01-cv13/ss01-ss08 tags, preserves cv14, ccmp, "
             "locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, "
-            "vert/vrt2, tnum/pnum, continuous em dash, and the digit-colon calt rule. "
+            "vert/vrt2, tnum/pnum, continuous em dash, and the VF digit-colon calt rule. "
             "Reference Sarasa UI SC cmap alias splits and alias mappings, GSUB/GPOS "
-            "FeatureRecord order, Script/LangSys coverage, lookup counts, non-digit "
+            "FeatureRecord order, Script/LangSys coverage, base lookup structure, non-digit "
             "advances and LSB values across the weight axis, tnum digit target hmtx, "
             "vertical metrics, vmtx defaults and variations, GDEF, VORG, and "
             "Sarasa-compatible head/OS/2 metadata are aligned after the merge. "
@@ -3014,13 +3728,22 @@ def build_all() -> dict[str, Any]:
             "Glyph counts are not padded to match upstream: cmap glyphs and "
             "layout-reachable unencoded glyphs are kept, while unreachable glyph count "
             "differences are not treated as rendering defects. "
-            "Static TTF outputs use the same final ttfautohint input/output invocation "
-            "shape as upstream Sarasa."
+            "Static TTF outputs are built from static Source Han Sans SC and Inter "
+            "sources through Sarasa's pass1/kanji/hangul/pass2 fragment path, then "
+            "patched with PropDigits cmap remaps for digits and colon, naming, metadata, layout, "
+            "GDEF/VORG, and static STAT rules. The hinted static set follows upstream "
+            "Sarasa's order: ttfautohint on pass1, Chlorophytum hcfg instruction on "
+            "pass1/kanji/hangul fragments, then pass2 composition. The unhinted static "
+            "set skips both hinting tools and composes unhinted fragments directly, "
+            "providing a formal static output without TrueType instructions. Normal, Medium, and Heavy "
+            "use the upstream Regular, SemiBold, and Bold static styles or hcfg profiles "
+            "respectively because upstream Sarasa does not ship matching static output "
+            "styles."
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
-            "Default ASCII digits are proportional; tnum restores tabular digits.",
+            "Default ASCII digits and ':' use proportional glyphs; tnum restores tabular glyphs.",
             "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
-            "A contextual calt rule raises colon only between digits.",
+            "A contextual calt rule raises colon only between digits; static TTFs reuse Inter/Sarasa's retained rule.",
         ],
         "final_gsub_features": sorted(FINAL_GSUB_FEATURES),
         "variable_outputs": variable_outputs,
@@ -3032,8 +3755,9 @@ def build_all() -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.parse_args()
-    report = build_all()
+    parser.add_argument("--static-only", action="store_true", help="Rebuild static hinted/unhinted TTFs without rebuilding VF outputs.")
+    args = parser.parse_args()
+    report = build_all(static_only=args.static_only)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
