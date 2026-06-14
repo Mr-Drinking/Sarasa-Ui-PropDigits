@@ -4514,29 +4514,28 @@ def inspect_font(path: Path) -> dict[str, Any]:
 def static_readme_text(hinted: bool) -> str:
     title = "Sarasa Ui PropDigits SC TTF 1.0.39" if hinted else "Sarasa Ui PropDigits SC TTF Unhinted 1.0.39"
     hint_note = (
-        "The hinted set is built through the same static fragment route as upstream\n"
-        "Sarasa: pass1 is first processed with ttfautohint, pass1/kanji/hangul\n"
-        "fragments are then instructed with Sarasa's upstream Chlorophytum hcfg\n"
-        "flow, and pass2 composes the final TTF. Normal, Medium, and Heavy use the\n"
-        "upstream Regular, SemiBold, and Bold hcfg profiles respectively because\n"
-        "upstream Sarasa does not ship matching static output styles. Static\n"
-        "PropDigits remaps ':' to an existing pnum glyph, removes the old colon\n"
-        "context substitution, and appends Inter-compatible colon-run calt rules.\n"
-        "Exact upstream styles also sync the upstream TrueType\n"
-        "instruction tables and per-glyph programs when outlines match."
+        "hinted 套件沿用上游 Sarasa 的静态片段构建路径：pass1 先经过\n"
+        "ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游\n"
+        "Chlorophytum hcfg 流程写入指令，最后由 pass2 合成最终 TTF。\n"
+        "Normal、Medium、Heavy 分别使用上游 Regular、SemiBold、Bold 的\n"
+        "hcfg 配置，因为上游 Sarasa 没有发布这些静态输出样式。\n"
+        "静态 PropDigits 会把 ':' remap 到已有的 pnum glyph，移除旧的冒号\n"
+        "上下文替换，再追加与 Inter 一致的 colon-run calt 规则。对于轮廓匹配的\n"
+        "exact 上游样式，还会同步上游 TrueType instruction tables 和逐字形\n"
+        "program。"
         if hinted
-        else "The unhinted set is built through the same static fragment route as\n"
-        "upstream Sarasa, but uses the unhinted pass1/kanji/hangul fragments\n"
-        "directly in pass2. It intentionally skips ttfautohint and Chlorophytum,\n"
-        "providing a formal static output without TrueType instructions."
+        else "unhinted 套件同样沿用上游 Sarasa 的静态片段构建路径，但直接用\n"
+        "未 hint 的 pass1/kanji/hangul 片段进入 pass2。它会跳过\n"
+        "ttfautohint 和 Chlorophytum，提供正式的无 TrueType instructions\n"
+        "静态输出。"
     )
     return f"""{title}
 
-This directory contains static TrueType fonts generated from static Source Han
-Sans SC and Inter sources through Sarasa's pass1/kanji/hangul/pass2 build path,
-then patched with the PropDigits derivative behavior.
+本目录包含静态 TrueType 字体。这些字体从静态 Source Han Sans SC 和
+Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 构建路径生成，
+然后补上 PropDigits 派生行为。
 
-Weights:
+字重：
 
 - ExtraLight 250
 - Light 300
@@ -4546,33 +4545,27 @@ Weights:
 - Bold 700
 - Heavy 900
 
-Each weight has an upright and Italic file. ASCII digits are proportional by
-default; OpenType tnum restores tabular digits, and pnum maps tabular digits
-back to proportional digits. Static TTFs and VFs use Inter-compatible calt
-data for contextual colon raising: 1:2 raises ':', 1:a and a:2 do not, and
-colon runs such as 1::2 follow Inter's colon-run behavior.
+每个字重都包含正体和 Italic 文件。ASCII 数字默认使用比例宽度；
+OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字。
+静态 TTF 与 VF 使用一致的、与 Inter 兼容的 calt 冒号行为：
+1:2 会上浮 ':'，1:a 和 a:2 不会上浮，1::2 等连续冒号上下文遵循
+Inter 的 colon-run 规则。
 
-The name table includes Simplified Chinese display names, such as
+name 表包含简体中文显示名，例如：
 更纱黑体 Ui PropDigits SC ExtraLight.
 {hint_note}
-They keep a static STAT table for modern weight/italic style recognition; this
-does not make the static TTFs variable fonts.
-GSUB/GPOS FeatureRecord order, Script/LangSys coverage, and the base lookup
-structure are templated from the corresponding upstream Sarasa Ui SC static
-font for each style.
-Exact static styles preserve upstream simple glyph flags, glyf bounding boxes,
-and composite component names for non-digit/non-colon cmap glyphs. Static TTFs
-use post format 2 so these glyph names remain stable after the default
-proportional digits are remapped onto U+0030..U+0039. The final glyf write
-keeps upstream OVERLAP_SIMPLE semantics and uses OTS-compatible repeat encoding
-for repeated overlap flags instead of clearing bit 6. The
-unhinted OTS maxZones/gasp warnings are inherited from the upstream unhinted
-baseline and pass with return code 0.
-Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
-unencoded glyphs are preserved, while unreachable glyph count differences are
-left as build artifacts.
-These fonts are modified derivatives and are not official Sarasa Gothic,
-Source Han Sans, or Inter releases.
+静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
+静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
+覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui SC 静态字体套模板。
+对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
+glyf bbox 和组合字形组件名。静态 TTF 使用 post format 2，让默认比例数字
+remap 到 U+0030..U+0039 后，相关 glyph names 仍能稳定保留。最终写出 glyf
+时保留上游 OVERLAP_SIMPLE 语义，并用 OTS 可接受的 repeat 编码保存重复
+overlap flags，而不是清除 bit 6。unhinted 套件中的 OTS maxZones/gasp 警告
+继承自上游 unhinted 基线，返回码为 0。
+glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未编码字形会保留，
+不可达 glyph 数量差异视为构建产物。
+这些字体是修改派生版，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。
 """
 
 
@@ -4594,8 +4587,8 @@ def write_reports(build_report: dict[str, Any]) -> None:
         + sorted(STATIC_UNHINTED_DIR.glob("SarasaUiPropDigitsSC-*.ttf"))
     )
     inspection = {
-        "title": "Sarasa Ui VF PropDigits SC / Sarasa Ui PropDigits SC font inspection",
-        "note": "Generated by tools/build_sarasa_ui_propdigits_sc.py using fontTools.",
+        "title": "Sarasa Ui VF PropDigits SC / Sarasa Ui PropDigits SC 字体检查",
+        "note": "由 tools/build_sarasa_ui_propdigits_sc.py 使用 fontTools 生成。",
         "fonts": [inspect_font(path) for path in font_paths],
     }
     (REPORT_DIR / "font-inspection.json").write_text(json.dumps(inspection, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -4645,47 +4638,38 @@ def build_all(static_only: bool = False) -> dict[str, Any]:
         "source_latin_italic": str(INTER_ITALIC),
         "reference_unicode_set": str(REFERENCE_SARASA),
         "method": (
-            "Source Han Sans SC VF and Inter VF are merged through Sarasa pass1-style "
-            "codepoint ownership with VF-availability fallback: Inter VF is baked with "
-            "Sarasa's Inter settings (ss03 and cv10) for Latin and western-symbol "
-            "coverage, while Source Han Sans SC VF is preferred for CJK, Korean, "
-            "Jamo, and localized Sarasa Ui punctuation when that VF source covers the "
-            "codepoint. Source Han pwid/symbol sanitization and Hangul full-width "
-            "normalization are applied before Inter glyphs are appended. The final "
-            "layout imports the Inter VF GSUB/GPOS features that Sarasa UI SC exposes, "
-            "keeps Sarasa's empty cv01-cv13/ss01-ss08 tags, preserves cv14, ccmp, "
-            "locl pruned to upstream Sarasa UI coverage, Hangul Jamo features, "
-            "vert/vrt2, tnum/pnum, continuous em dash, and Inter-compatible digit-colon calt rules. "
-            "Reference Sarasa UI SC cmap alias splits and alias mappings, GSUB/GPOS "
-            "FeatureRecord order, Script/LangSys coverage, base lookup structure, non-digit "
-            "advances and LSB values across the weight axis, tnum digit target hmtx, "
-            "vertical metrics, vmtx defaults and variations, GDEF, VORG, and "
-            "Sarasa-compatible head/OS/2 metadata are aligned after the merge. "
-            "VF and static outputs both include STAT; static STAT only describes the "
-            "single instance's style and does not preserve variable fvar/gvar tables. "
-            "Glyph counts are not padded to match upstream: cmap glyphs and "
-            "layout-reachable unencoded glyphs are kept, while unreachable glyph count "
-            "differences are not treated as rendering defects. "
-            "Static TTF outputs are built from static Source Han Sans SC and Inter "
-            "sources through Sarasa's pass1/kanji/hangul/pass2 fragment path, then "
-            "patched with PropDigits cmap remaps for digits and colon, naming, metadata, layout, "
-            "GDEF/VORG, upstream-compatible glyf flags/bboxes/component names, static post-format-2 glyph names, "
-            "OTS-compatible glyf repeat encoding, and static STAT rules. The hinted static set follows upstream "
-            "Sarasa's order: ttfautohint on pass1, Chlorophytum hcfg instruction on "
-            "pass1/kanji/hangul fragments, then pass2 composition. For exact upstream "
-            "styles whose outlines match Sarasa Ui SC, upstream TrueType instruction "
-            "tables and per-glyph programs are synced after composition. The unhinted static "
-            "set skips both hinting tools and composes unhinted fragments directly, "
-            "providing a formal static output without TrueType instructions. Normal, Medium, and Heavy "
-            "use the upstream Regular, SemiBold, and Bold static styles or hcfg profiles "
-            "respectively because upstream Sarasa does not ship matching static output "
-            "styles."
+            "VF 由 Source Han Sans SC VF 与 Inter VF 合并而来。码位归属采用 "
+            "Sarasa pass1 风格，并按 VF 源文件实际覆盖做兜底：Inter VF 以 Sarasa "
+            "的 Inter 设置（ss03 和 cv10）烘焙后用于 Latin 和西文符号覆盖；CJK、"
+            "Korean、Jamo 以及 Sarasa Ui 本地化标点优先来自 Source Han Sans SC VF。"
+            "在追加 Inter glyph 前，会先应用 Source Han 的 pwid/符号清洗和 Hangul "
+            "全角归一。最终 layout 导入 Sarasa UI SC 暴露的 Inter VF GSUB/GPOS 特性，"
+            "保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 "
+            "Sarasa UI 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、"
+            "连续 em dash，以及与 Inter 一致的数字冒号 colon-run calt 规则。合并后会"
+            "对齐参考 Sarasa UI SC 的 cmap alias split 和 alias mapping、GSUB/GPOS "
+            "FeatureRecord 顺序、Script/LangSys 覆盖、基础 lookup 结构、非数字 advance "
+            "和 LSB 的权重轴规则、tnum 数字目标 hmtx、垂直指标、vmtx 默认值和变化、"
+            "GDEF、VORG，以及与 Sarasa 兼容的 head/OS/2 metadata。VF 和静态输出都包含 "
+            "STAT；静态 STAT 只描述单实例样式，不保留 fvar/gvar 可变表。glyph 总数不强行"
+            "补齐到与上游一致：cmap 字形和布局可达的未编码字形会保留，不可达 glyph 数量"
+            "差异不视为渲染缺陷。静态 TTF 从静态 Source Han Sans SC 和 Inter 源字体出发，"
+            "经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字"
+            "和冒号 cmap remap、命名、metadata、layout、GDEF/VORG、与上游兼容的 glyf "
+            "flags/bbox/组件名、静态 post format 2 glyph names、OTS-compatible glyf repeat "
+            "编码和静态 STAT 规则。hinted 静态套件沿用上游 Sarasa 的顺序：pass1 先经过 "
+            "ttfautohint，随后 pass1/kanji/hangul 片段用 Chlorophytum hcfg 写入指令，最后"
+            "由 pass2 合成。对于轮廓匹配的 exact 上游样式，合成后同步上游 TrueType "
+            "instruction tables 和逐字形 program。unhinted 静态套件跳过这两个 hint 工具，"
+            "直接合成未 hint 的片段，提供无 TrueType instructions 的正式静态输出。"
+            "Normal、Medium、Heavy 分别使用上游 Regular、SemiBold、Bold 的静态样式或 hcfg "
+            "配置，因为上游 Sarasa 没有发布对应的静态输出样式。"
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
-            "Default ASCII digits and ':' use proportional glyphs; tnum restores tabular glyphs.",
-            "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
-            "VF and static TTFs use Inter-compatible contextual colon-run behavior.",
-            "Static TTFs use post format 2 to preserve audit-stable glyph names after PropDigits cmap remaps; VF keeps its existing post/GID model.",
+            "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
+            "字重实例遵循 Source Han Sans stop：250、300、350、400、500、700、900。",
+            "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
+            "静态 TTF 使用 post format 2，以便 PropDigits cmap remap 后仍保留审计稳定的 glyph names；VF 保持既有 post/GID 模型。",
         ],
         "final_gsub_features": sorted(FINAL_GSUB_FEATURES),
         "variable_outputs": variable_outputs,
@@ -4697,7 +4681,7 @@ def build_all(static_only: bool = False) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--static-only", action="store_true", help="Rebuild static hinted/unhinted TTFs without rebuilding VF outputs.")
+    parser.add_argument("--static-only", action="store_true", help="只重建静态 hinted/unhinted TTF，不重建 VF 输出。")
     args = parser.parse_args()
     report = build_all(static_only=args.static_only)
     print(json.dumps(report, ensure_ascii=False, indent=2))

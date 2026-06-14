@@ -1,10 +1,10 @@
 Sarasa Ui PropDigits SC TTF Unhinted 1.0.39
 
-This directory contains static TrueType fonts generated from static Source Han
-Sans SC and Inter sources through Sarasa's pass1/kanji/hangul/pass2 build path,
-then patched with the PropDigits derivative behavior.
+本目录包含静态 TrueType 字体。这些字体从静态 Source Han Sans SC 和
+Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 构建路径生成，
+然后补上 PropDigits 派生行为。
 
-Weights:
+字重：
 
 - ExtraLight 250
 - Light 300
@@ -14,33 +14,27 @@ Weights:
 - Bold 700
 - Heavy 900
 
-Each weight has an upright and Italic file. ASCII digits are proportional by
-default; OpenType tnum restores tabular digits, and pnum maps tabular digits
-back to proportional digits. Static TTFs and VFs use Inter-compatible calt
-data for contextual colon raising: 1:2 raises ':', 1:a and a:2 do not, and
-colon runs such as 1::2 follow Inter's colon-run behavior.
+每个字重都包含正体和 Italic 文件。ASCII 数字默认使用比例宽度；
+OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字。
+静态 TTF 与 VF 使用一致的、与 Inter 兼容的 calt 冒号行为：
+1:2 会上浮 ':'，1:a 和 a:2 不会上浮，1::2 等连续冒号上下文遵循
+Inter 的 colon-run 规则。
 
-The name table includes Simplified Chinese display names, such as
+name 表包含简体中文显示名，例如：
 更纱黑体 Ui PropDigits SC ExtraLight.
-The unhinted set is built through the same static fragment route as
-upstream Sarasa, but uses the unhinted pass1/kanji/hangul fragments
-directly in pass2. It intentionally skips ttfautohint and Chlorophytum,
-providing a formal static output without TrueType instructions.
-They keep a static STAT table for modern weight/italic style recognition; this
-does not make the static TTFs variable fonts.
-GSUB/GPOS FeatureRecord order, Script/LangSys coverage, and the base lookup
-structure are templated from the corresponding upstream Sarasa Ui SC static
-font for each style.
-Exact static styles preserve upstream simple glyph flags, glyf bounding boxes,
-and composite component names for non-digit/non-colon cmap glyphs. Static TTFs
-use post format 2 so these glyph names remain stable after the default
-proportional digits are remapped onto U+0030..U+0039. The final glyf write
-keeps upstream OVERLAP_SIMPLE semantics and uses OTS-compatible repeat encoding
-for repeated overlap flags instead of clearing bit 6. The
-unhinted OTS maxZones/gasp warnings are inherited from the upstream unhinted
-baseline and pass with return code 0.
-Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
-unencoded glyphs are preserved, while unreachable glyph count differences are
-left as build artifacts.
-These fonts are modified derivatives and are not official Sarasa Gothic,
-Source Han Sans, or Inter releases.
+unhinted 套件同样沿用上游 Sarasa 的静态片段构建路径，但直接用
+未 hint 的 pass1/kanji/hangul 片段进入 pass2。它会跳过
+ttfautohint 和 Chlorophytum，提供正式的无 TrueType instructions
+静态输出。
+静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
+静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
+覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui SC 静态字体套模板。
+对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
+glyf bbox 和组合字形组件名。静态 TTF 使用 post format 2，让默认比例数字
+remap 到 U+0030..U+0039 后，相关 glyph names 仍能稳定保留。最终写出 glyf
+时保留上游 OVERLAP_SIMPLE 语义，并用 OTS 可接受的 repeat 编码保存重复
+overlap flags，而不是清除 bit 6。unhinted 套件中的 OTS maxZones/gasp 警告
+继承自上游 unhinted 基线，返回码为 0。
+glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未编码字形会保留，
+不可达 glyph 数量差异视为构建产物。
+这些字体是修改派生版，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。

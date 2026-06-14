@@ -8,12 +8,12 @@
   "source_latin_italic": "InterVariable-Italic.woff2",
   "reference_unicode_set": "SarasaUiSC 1.0.39 unhinted/SarasaUiSC-Regular.ttf",
   "reference_hinted_set": "SarasaUiSC 1.0.39 hinted/",
-  "method": "Targeted repair for final-output parity: existing VF outputs keep the Source Han Sans SC VF + Inter VF merge model, and existing static TTFs keep the static Source Han Sans SC + static Inter Sarasa pass1/kanji/hangul/pass2 route. Final postprocess remaps default ASCII digits and ':' to pnum glyphs, removes old digit-colon contextual substitutions, and appends Inter-compatible colon-run calt rules for both static and VF. Static exact styles preserve upstream simple glyph flags, stored glyf bounding boxes, recursively-reached component glyph flags, composite component names, GDEF/VORG/vmtx, metadata, and hinted TrueType instruction tables/programs when outlines match. Static TTFs use post format 2 so the upstream-style component glyph names remain stable after PropDigits cmap remaps; VF keeps its existing post/GID model.",
+  "method": "针对最终输出一致性的修复：既有 VF 输出继续保留 Source Han Sans SC VF + Inter VF 的合并模型，既有静态 TTF 继续保留静态 Source Han Sans SC + 静态 Inter 的 Sarasa pass1/kanji/hangul/pass2 路径。最终后处理会把默认 ASCII 数字和冒号 remap 到 pnum glyph，移除旧的数字冒号上下文替换，并为静态 TTF 和 VF 追加与 Inter 一致的 colon-run calt 规则。静态 exact 样式会在轮廓匹配时保留上游 simple glyph flags、已存储的 glyf bbox、递归可达组件 glyph flags、组合字形组件名、GDEF/VORG/vmtx、metadata，以及 hinted TrueType instruction tables/programs。静态 TTF 使用 post format 2，让 PropDigits cmap remap 后的上游风格组件 glyph names 仍能稳定保留；VF 保持既有 post/GID 模型。",
   "intentional_differences_from_upstream_sarasa_ui": [
-    "Default ASCII digits and ':' use proportional glyphs; tnum restores tabular glyphs.",
-    "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
-    "VF and static TTFs use Inter-compatible contextual colon-run behavior.",
-    "Static TTFs use post format 2 to preserve audit-stable glyph names after PropDigits cmap remaps; VF keeps its existing post/GID model."
+    "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
+    "字重实例遵循 Source Han Sans stop：250、300、350、400、500、700、900。",
+    "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
+    "静态 TTF 使用 post format 2，以便 PropDigits cmap remap 后仍保留审计稳定的 glyph names；VF 保持既有 post/GID 模型。"
   ],
   "final_gsub_features": [
     "aalt",
@@ -1198,10 +1198,10 @@
       "fonts_checked": 30,
       "failed": [],
       "warnings_count": 42,
-      "unhinted_warning_baseline": "Unhinted fonts may report upstream maxZones/gasp sentinel warnings while returning 0."
+      "unhinted_warning_baseline": "unhinted 字体可能打印上游基线已有的 maxZones/gasp sentinel 警告，但返回码为 0。"
     },
     "fontbakery_sample": {
-      "command_scope": "PropDigits hinted Regular, unhinted Regular, and upright VF; skip-network; error-code-on ERROR.",
+      "command_scope": "检查 PropDigits hinted Regular、unhinted Regular 和正体 VF；使用 skip-network；仅 ERROR 作为错误退出码。",
       "result": {
         "(not finished)": 0,
         "FAIL": 7,
@@ -1334,11 +1334,11 @@
           "file": "SarasaUiSC-Regular.ttf"
         }
       ],
-      "interpretation": "Remaining items are upstream-baseline or collection-shape checks such as font_version, GDEF mark/spacing, post table version, xAvgCharWidth, underline/family, and VF axis range checks."
+      "interpretation": "剩余项目属于上游基线或集合形态检查，例如 font_version、GDEF mark/spacing、post table version、xAvgCharWidth、underline/family 和 VF axis range。"
     },
-    "inter_colon_behavior": "Static and VF calt were checked against Inter samples: 1:2 raises, 1:a/a:2/a:b do not, and colon runs follow Inter behavior.",
-    "hint_sync": "Hinted exact styles keep synced upstream instruction tables and per-glyph programs after final postprocess.",
-    "glyf_write": "Static outputs preserve OVERLAP_SIMPLE semantics and use OTS-compatible repeat encoding for repeated overlap flags instead of clearing bit 6."
+    "inter_colon_behavior": "静态 TTF 与 VF 的 calt 已按 Inter 样例检查：1:2 会上浮，1:a/a:2/a:b 不会上浮，连续冒号遵循 Inter 行为。",
+    "hint_sync": "hinted exact 样式在最终后处理后仍保留已同步的上游 instruction tables 和逐字形 programs。",
+    "glyf_write": "静态输出保留 OVERLAP_SIMPLE 语义，并用 OTS 可接受的 repeat 编码保存重复 overlap flags，而不是清除 bit 6。"
   },
   "build_script": "tools/build_sarasa_ui_propdigits_sc.py",
   "bootstrap_sources": {
