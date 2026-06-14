@@ -3,16 +3,17 @@
   "version": "1.0.39-propdigits.3",
   "static_only": false,
   "targeted_rebuild": true,
-  "source_base": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\vf-sources\\SourceHanSansSC-VF.ttf",
-  "source_latin_upright": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\vf-sources\\InterVariable.ttf",
-  "source_latin_italic": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\vf-sources\\InterVariable-Italic.woff2",
-  "reference_unicode_set": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\SarasaUiSC-TTF-Unhinted-1.0.39\\SarasaUiSC-Regular.ttf",
-  "reference_hinted_set": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-12\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\SarasaUiSC-TTF-1.0.39",
-  "method": "Targeted rebuild for final-output fixes: VF outputs are rebuilt from Source Han Sans SC VF and Inter VF. Existing static TTFs, already generated from static Source Han Sans SC and static Inter through Sarasa pass1/kanji/hangul/pass2, are passed through the same final postprocess used by a full build: PropDigits cmap remaps, naming, metadata, STAT, GDEF/VORG, OTS-compatible glyf flag encoding, and hinted exact-style instruction sync when outlines match.",
+  "source_base": "SourceHanSansSC-VF.ttf",
+  "source_latin_upright": "InterVariable.ttf",
+  "source_latin_italic": "InterVariable-Italic.woff2",
+  "reference_unicode_set": "SarasaUiSC 1.0.39 unhinted/SarasaUiSC-Regular.ttf",
+  "reference_hinted_set": "SarasaUiSC 1.0.39 hinted/",
+  "method": "Targeted repair for final-output parity: existing VF outputs keep the Source Han Sans SC VF + Inter VF merge model, and existing static TTFs keep the static Source Han Sans SC + static Inter Sarasa pass1/kanji/hangul/pass2 route. Final postprocess remaps default ASCII digits and ':' to pnum glyphs, removes old digit-colon contextual substitutions, and appends Inter-compatible colon-run calt rules for both static and VF. Static exact styles preserve upstream simple glyph flags, stored glyf bounding boxes, recursively-reached component glyph flags, composite component names, GDEF/VORG/vmtx, metadata, and hinted TrueType instruction tables/programs when outlines match. Static TTFs use post format 2 so the upstream-style component glyph names remain stable after PropDigits cmap remaps; VF keeps its existing post/GID model.",
   "intentional_differences_from_upstream_sarasa_ui": [
     "Default ASCII digits and ':' use proportional glyphs; tnum restores tabular glyphs.",
     "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
-    "VF adds a strict contextual calt rule for colon between digits; static TTFs reuse Inter/Sarasa's broader retained contextual colon rule."
+    "VF and static TTFs use Inter-compatible contextual colon-run behavior.",
+    "Static TTFs use post format 2 to preserve audit-stable glyph names after PropDigits cmap remaps; VF keeps its existing post/GID model."
   ],
   "final_gsub_features": [
     "aalt",
@@ -189,8 +190,11 @@
       "extra_tables_dropped": 1,
       "digit_colon_feature_added": true,
       "digit_colon_raise": 108,
-      "digit_colon_single_lookup_index": 81,
-      "digit_colon_chain_lookup_index": 82
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs"
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
@@ -319,8 +323,11 @@
       "extra_tables_dropped": 1,
       "digit_colon_feature_added": true,
       "digit_colon_raise": 108,
-      "digit_colon_single_lookup_index": 81,
-      "digit_colon_chain_lookup_index": 82
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs"
     }
   ],
   "static_outputs": [
@@ -342,11 +349,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Light.ttf",
@@ -366,11 +383,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Normal.ttf",
@@ -382,10 +409,16 @@
       "targeted_final_postprocess": true,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 47249,
-      "glyf_overlap_simple_glyphs_touched": 47065,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Regular.ttf",
@@ -405,11 +438,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Medium.ttf",
@@ -421,10 +464,16 @@
       "targeted_final_postprocess": true,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 47241,
-      "glyf_overlap_simple_glyphs_touched": 47065,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Bold.ttf",
@@ -444,11 +493,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Heavy.ttf",
@@ -460,10 +519,16 @@
       "targeted_final_postprocess": true,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 47292,
-      "glyf_overlap_simple_glyphs_touched": 47065,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
@@ -483,11 +548,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-LightItalic.ttf",
@@ -507,11 +582,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-NormalItalic.ttf",
@@ -523,10 +608,16 @@
       "targeted_final_postprocess": true,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 47302,
-      "glyf_overlap_simple_glyphs_touched": 47063,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Italic.ttf",
@@ -546,11 +637,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-MediumItalic.ttf",
@@ -562,10 +663,16 @@
       "targeted_final_postprocess": true,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 47313,
-      "glyf_overlap_simple_glyphs_touched": 47063,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-BoldItalic.ttf",
@@ -585,11 +692,21 @@
       "sarasa_metadata_fields_synced": 1,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-HeavyItalic.ttf",
@@ -601,10 +718,16 @@
       "targeted_final_postprocess": true,
       "extra_tables_dropped": 0,
       "static_propdigit_cmap_remaps": 0,
-      "glyf_overlap_simple_flags_cleared": 47263,
-      "glyf_overlap_simple_glyphs_touched": 47063,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLight.ttf",
@@ -627,11 +750,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48734,
       "hint_glyph_programs_skipped": 22,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Light.ttf",
@@ -654,11 +787,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48734,
       "hint_glyph_programs_skipped": 22,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Normal.ttf",
@@ -673,10 +816,16 @@
       "hint_tables_synced": 0,
       "hint_glyph_programs_synced": 0,
       "hint_glyph_programs_skipped": 0,
-      "glyf_overlap_simple_flags_cleared": 47249,
-      "glyf_overlap_simple_glyphs_touched": 47065,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Regular.ttf",
@@ -699,11 +848,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48735,
       "hint_glyph_programs_skipped": 21,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Medium.ttf",
@@ -718,10 +877,16 @@
       "hint_tables_synced": 0,
       "hint_glyph_programs_synced": 0,
       "hint_glyph_programs_skipped": 0,
-      "glyf_overlap_simple_flags_cleared": 47241,
-      "glyf_overlap_simple_glyphs_touched": 47065,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Bold.ttf",
@@ -744,11 +909,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48734,
       "hint_glyph_programs_skipped": 22,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 102,
+      "reference_glyf_bboxes_synced": 45861,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Heavy.ttf",
@@ -763,10 +938,16 @@
       "hint_tables_synced": 0,
       "hint_glyph_programs_synced": 0,
       "hint_glyph_programs_skipped": 0,
-      "glyf_overlap_simple_flags_cleared": 47292,
-      "glyf_overlap_simple_glyphs_touched": 47065,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
@@ -789,11 +970,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48695,
       "hint_glyph_programs_skipped": 22,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-LightItalic.ttf",
@@ -816,11 +1007,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48695,
       "hint_glyph_programs_skipped": 22,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-NormalItalic.ttf",
@@ -835,10 +1036,16 @@
       "hint_tables_synced": 0,
       "hint_glyph_programs_synced": 0,
       "hint_glyph_programs_skipped": 0,
-      "glyf_overlap_simple_flags_cleared": 47302,
-      "glyf_overlap_simple_glyphs_touched": 47063,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Italic.ttf",
@@ -861,11 +1068,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48696,
       "hint_glyph_programs_skipped": 21,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-MediumItalic.ttf",
@@ -880,10 +1097,16 @@
       "hint_tables_synced": 0,
       "hint_glyph_programs_synced": 0,
       "hint_glyph_programs_skipped": 0,
-      "glyf_overlap_simple_flags_cleared": 47313,
-      "glyf_overlap_simple_glyphs_touched": 47063,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-BoldItalic.ttf",
@@ -906,11 +1129,21 @@
       "hint_tables_synced": 4,
       "hint_glyph_programs_synced": 48695,
       "hint_glyph_programs_skipped": 22,
-      "glyf_overlap_simple_flags_cleared": 0,
-      "glyf_overlap_simple_glyphs_touched": 0,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt",
-      "gdef_mark_sets": 2
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "gdef_mark_sets": 2,
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "reference_glyf_flags_synced": 99,
+      "reference_glyf_bboxes_synced": 45858,
+      "reference_component_aliases_removed": 2,
+      "reference_component_names_synced": 4,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     },
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-HeavyItalic.ttf",
@@ -925,10 +1158,194 @@
       "hint_tables_synced": 0,
       "hint_glyph_programs_synced": 0,
       "hint_glyph_programs_skipped": 0,
-      "glyf_overlap_simple_flags_cleared": 47263,
-      "glyf_overlap_simple_glyphs_touched": 47063,
-      "digit_colon_feature_added": false,
-      "digit_colon_source": "inter-calt"
+      "digit_colon_feature_added": true,
+      "digit_colon_source": "inter-compatible-calt",
+      "static_digit_glyphs_renamed": 20,
+      "static_post_format2_names": 1,
+      "digit_colon_existing_calt_mappings_removed": 1,
+      "digit_colon_single_lookup_index": 111,
+      "digit_colon_chain_lookup_index": 112,
+      "digit_colon_calt_feature_links": 4,
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "glyf_overlap_simple_flags_policy": "preserve-upstream-for-exact-static-styles"
     }
-  ]
+  ],
+  "final_repair_verification": {
+    "exact_static_unexpected_counts": [],
+    "freetype_raster": {
+      "Regular": {
+        "mismatches": 0,
+        "samples": [],
+        "ppems": [
+          9,
+          12,
+          16
+        ],
+        "codepoints_checked": 46272
+      },
+      "Italic": {
+        "mismatches": 0,
+        "samples": [],
+        "ppems": [
+          9,
+          12,
+          16
+        ],
+        "codepoints_checked": 46272
+      }
+    },
+    "ots": {
+      "fonts_checked": 30,
+      "failed": [],
+      "warnings_count": 42,
+      "unhinted_warning_baseline": "Unhinted fonts may report upstream maxZones/gasp sentinel warnings while returning 0."
+    },
+    "fontbakery_sample": {
+      "command_scope": "PropDigits hinted Regular, unhinted Regular, and upright VF; skip-network; error-code-on ERROR.",
+      "result": {
+        "(not finished)": 0,
+        "FAIL": 7,
+        "PASS": 88,
+        "SKIP": 38,
+        "WARN": 10
+      },
+      "notable_fail_warn": [
+        {
+          "status": "FAIL",
+          "check": "opentype/family/bold_italic_unique_for_nameid1",
+          "code": "unique-fsselection",
+          "file": null
+        },
+        {
+          "status": "FAIL",
+          "check": "opentype/family/consistent_family_name",
+          "code": "inconsistent-family-name",
+          "file": null
+        },
+        {
+          "status": "FAIL",
+          "check": "opentype/family/underline_thickness",
+          "code": "inconsistent-underline-thickness",
+          "file": null
+        },
+        {
+          "status": "FAIL",
+          "check": "opentype/font_version",
+          "code": "mismatch",
+          "file": "SarasaUiPropDigitsSC-Regular.ttf"
+        },
+        {
+          "status": "FAIL",
+          "check": "opentype/font_version",
+          "code": "mismatch",
+          "file": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/gdef_mark_chars",
+          "code": "mark-chars",
+          "file": "SarasaUiPropDigitsSC-Regular.ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/gdef_mark_chars",
+          "code": "mark-chars",
+          "file": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/gdef_spacing_marks",
+          "code": "spacing-mark-glyphs",
+          "file": "SarasaUiPropDigitsSC-Regular.ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/gdef_spacing_marks",
+          "code": "spacing-mark-glyphs",
+          "file": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/post_table_version",
+          "code": "post-table-version",
+          "file": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"
+        },
+        {
+          "status": "FAIL",
+          "check": "opentype/varfont/family_axis_ranges",
+          "code": "axis-range-mismatch",
+          "file": null
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/xavgcharwidth",
+          "code": "xAvgCharWidth-wrong",
+          "file": "SarasaUiPropDigitsSC-Regular.ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/xavgcharwidth",
+          "code": "xAvgCharWidth-wrong",
+          "file": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"
+        }
+      ],
+      "upstream_regular_baseline_result": {
+        "(not finished)": 0,
+        "FAIL": 3,
+        "PASS": 54,
+        "SKIP": 33,
+        "WARN": 8
+      },
+      "upstream_regular_baseline_notable_fail_warn": [
+        {
+          "status": "FAIL",
+          "check": "opentype/family/bold_italic_unique_for_nameid1",
+          "code": "unique-fsselection",
+          "file": null
+        },
+        {
+          "status": "FAIL",
+          "check": "opentype/font_version",
+          "code": "mismatch",
+          "file": "SarasaUiSC-Regular.ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/gdef_mark_chars",
+          "code": "mark-chars",
+          "file": "SarasaUiSC-Regular.ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/gdef_spacing_marks",
+          "code": "spacing-mark-glyphs",
+          "file": "SarasaUiSC-Regular.ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/post_table_version",
+          "code": "post-table-version",
+          "file": "SarasaUiSC-Regular.ttf"
+        },
+        {
+          "status": "WARN",
+          "check": "opentype/xavgcharwidth",
+          "code": "xAvgCharWidth-wrong",
+          "file": "SarasaUiSC-Regular.ttf"
+        }
+      ],
+      "interpretation": "Remaining items are upstream-baseline or collection-shape checks such as font_version, GDEF mark/spacing, post table version, xAvgCharWidth, underline/family, and VF axis range checks."
+    },
+    "inter_colon_behavior": "Static and VF calt were checked against Inter samples: 1:2 raises, 1:a/a:2/a:b do not, and colon runs follow Inter behavior.",
+    "hint_sync": "Hinted exact styles keep synced upstream instruction tables and per-glyph programs after final postprocess.",
+    "glyf_write": "Static outputs preserve OVERLAP_SIMPLE semantics and use OTS-compatible repeat encoding for repeated overlap flags instead of clearing bit 6."
+  },
+  "build_script": "tools/build_sarasa_ui_propdigits_sc.py",
+  "bootstrap_sources": {
+    "sarasa_gothic": "v1.0.39",
+    "sarasa_ui_sc_ttf": "1.0.39 hinted/unhinted",
+    "source_han_sans": "2.005R",
+    "inter": "v4.1",
+    "node": "v24.16.0"
+  }
 }
