@@ -20,6 +20,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables.TupleVariation import TupleVariation
+from fontTools.ttLib.tables.ttProgram import Program
 from fontTools.ttLib.tables import otTables as ot
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance
 from fontTools.varLib.models import piecewiseLinearMap
@@ -56,6 +57,16 @@ REFERENCE_SARASA = Path(
     )
 )
 REFERENCE_SARASA_DIR = REFERENCE_SARASA.parent
+REFERENCE_SARASA_HINTED_DIR = Path(
+    os.environ.get(
+        "REFERENCE_SARASA_HINTED_DIR",
+        first_existing(
+            WORK_ROOT / "official-sarasa-ui-sc" / "SarasaUiSC-TTF-1.0.39",
+            WORK_ROOT / "sarasa-original" / "SarasaUiSC-TTF-1.0.39",
+            REFERENCE_SARASA_DIR,
+        ),
+    )
+)
 
 SARASA_SOURCE_DIR = Path(os.environ.get("SARASA_SOURCE_DIR", WORK_ROOT / "sarasa-gothic-src"))
 SARASA_CHLOROPHYTUM = Path(
@@ -196,6 +207,10 @@ def reference_style_name(weight_name: str, italic: bool) -> str:
 
 def reference_font_path(weight_name: str, italic: bool) -> Path:
     return REFERENCE_SARASA_DIR / f"SarasaUiSC-{reference_style_name(weight_name, italic)}.ttf"
+
+
+def hinted_reference_font_path(weight_name: str, italic: bool) -> Path:
+    return REFERENCE_SARASA_HINTED_DIR / f"SarasaUiSC-{reference_style_name(weight_name, italic)}.ttf"
 
 
 def open_reference_font(weight_name: str, italic: bool) -> TTFont:
@@ -370,7 +385,7 @@ def update_static_names(font: TTFont, weight_name: str, weight_value: int, itali
         2: legacy_style,
         3: ps + f";{VERSION}",
         4: full,
-        5: f"Version {VERSION}; Source Han Sans SC VF + Inter VF; PropDigits",
+        5: f"Version {VERSION}; static Source Han Sans SC + static Inter; PropDigits",
         6: ps,
         16: STATIC_FAMILY,
         17: typographic_style,
@@ -407,7 +422,7 @@ def update_static_names(font: TTFont, weight_name: str, weight_value: int, itali
         font["head"].macStyle |= 0b01
     else:
         font["head"].macStyle &= ~0b01
-    if weight_name == "Regular" and not italic:
+    if weight_value < 700 and not italic:
         os2.fsSelection |= 1 << 6
 
 
@@ -433,6 +448,7 @@ def update_os2_sarasa_metadata(font: TTFont) -> None:
     os2.ulCodePageRange1 = 2147746207
     os2.ulCodePageRange2 = 0
     apply_sarasa_vertical_metrics(font)
+    update_caret_slope(font)
 
 
 def apply_sarasa_vertical_metrics(font: TTFont) -> None:
@@ -446,6 +462,18 @@ def apply_sarasa_vertical_metrics(font: TTFont) -> None:
     os2.sTypoLineGap = SARASA_VERTICAL_METRICS["typo_line_gap"]
     os2.usWinAscent = SARASA_VERTICAL_METRICS["win_ascent"]
     os2.usWinDescent = SARASA_VERTICAL_METRICS["win_descent"]
+
+
+def update_caret_slope(font: TTFont) -> None:
+    hhea = font["hhea"]
+    italic_angle = float(font["post"].italicAngle)
+    if italic_angle:
+        hhea.caretSlopeRise = 1000
+        hhea.caretSlopeRun = otRound(math.tan(math.radians(-italic_angle)) * hhea.caretSlopeRise)
+    else:
+        hhea.caretSlopeRise = 1
+        hhea.caretSlopeRun = 0
+    hhea.caretOffset = 0
 
 
 def sync_sarasa_metadata_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
@@ -519,10 +547,104 @@ def sync_sarasa_metadata_from_reference(font: TTFont, reference: TTFont) -> dict
     return {"sarasa_metadata_fields_synced": 1}
 
 
+def glyph_coordinates_match(font: TTFont, glyph_name: str, reference: TTFont, ref_glyph_name: str) -> bool:
+    try:
+        coordinates, end_pts, flags = font["glyf"][glyph_name].getCoordinates(font["glyf"])
+        ref_coordinates, ref_end_pts, ref_flags = reference["glyf"][ref_glyph_name].getCoordinates(reference["glyf"])
+    except Exception:
+        return False
+    return (
+        len(coordinates) == len(ref_coordinates)
+        and list(end_pts) == list(ref_end_pts)
+        and list(flags) == list(ref_flags)
+        and all(tuple(coordinates[i]) == tuple(ref_coordinates[i]) for i in range(len(coordinates)))
+    )
+
+
+def sync_hinting_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
+    if "glyf" not in font or "glyf" not in reference:
+        return {"hint_tables_synced": 0, "hint_glyph_programs_synced": 0, "hint_glyph_programs_skipped": 0}
+
+    tables_synced = 0
+    for tag in ("fpgm", "prep", "cvt ", "gasp"):
+        if tag in reference:
+            font[tag] = copy.deepcopy(reference[tag])
+            tables_synced += 1
+        elif tag in font:
+            del font[tag]
+
+    if "maxp" in font and "maxp" in reference:
+        for field in (
+            "maxZones",
+            "maxTwilightPoints",
+            "maxStorage",
+            "maxFunctionDefs",
+            "maxInstructionDefs",
+            "maxStackElements",
+            "maxSizeOfInstructions",
+        ):
+            if hasattr(font["maxp"], field) and hasattr(reference["maxp"], field):
+                setattr(font["maxp"], field, copy.deepcopy(getattr(reference["maxp"], field)))
+
+    synced = 0
+    skipped = 0
+    empty_program = Program()
+    empty_program.fromBytecode([])
+    for glyph_name in font.getGlyphOrder():
+        if glyph_name not in reference["glyf"].glyphs:
+            skipped += 1
+            continue
+        if not glyph_coordinates_match(font, glyph_name, reference, glyph_name):
+            skipped += 1
+            continue
+        ref_program = getattr(reference["glyf"][glyph_name], "program", empty_program)
+        font["glyf"][glyph_name].program = copy.deepcopy(ref_program)
+        synced += 1
+    return {
+        "hint_tables_synced": tables_synced,
+        "hint_glyph_programs_synced": synced,
+        "hint_glyph_programs_skipped": skipped,
+    }
+
+
+def clear_simple_glyph_overlap_flags(font: TTFont) -> dict[str, int]:
+    if "glyf" not in font:
+        return {"glyf_overlap_simple_flags_cleared": 0, "glyf_overlap_simple_glyphs_touched": 0}
+    flags_cleared = 0
+    glyphs_touched = 0
+    for glyph_name in font.getGlyphOrder():
+        glyph = font["glyf"][glyph_name]
+        if getattr(glyph, "numberOfContours", 0) <= 0 or not hasattr(glyph, "flags"):
+            continue
+        flags = list(glyph.flags)
+        cleaned = [flag & ~0x40 for flag in flags]
+        if cleaned == flags:
+            continue
+        glyph.flags[:] = cleaned
+        flags_cleared += sum(1 for old, new in zip(flags, cleaned) if old != new)
+        glyphs_touched += 1
+    return {
+        "glyf_overlap_simple_flags_cleared": flags_cleared,
+        "glyf_overlap_simple_glyphs_touched": glyphs_touched,
+    }
+
+
+def count_simple_glyph_overlap_flags(font: TTFont) -> int:
+    if "glyf" not in font:
+        return 0
+    count = 0
+    for glyph_name in font.getGlyphOrder():
+        glyph = font["glyf"][glyph_name]
+        if getattr(glyph, "numberOfContours", 0) > 0 and hasattr(glyph, "flags"):
+            count += sum(1 for flag in glyph.flags if flag & 0x40)
+    return count
+
+
 def rebuild_gdef_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
     reference_gdef = reference.get("GDEF")
     if not reference_gdef or not getattr(reference_gdef.table, "GlyphClassDef", None):
-        return {"gdef_classdefs": 0}
+        return {"gdef_classdefs": 0, "gdef_mark_sets": 0}
+    glyph_set = set(font.getGlyphOrder())
     reference_cmap = reference.getBestCmap()
     current_cmap = font.getBestCmap()
     reference_classes = reference_gdef.table.GlyphClassDef.classDefs
@@ -537,17 +659,17 @@ def rebuild_gdef_from_reference(font: TTFont, reference: TTFont) -> dict[str, in
             continue
         if glyph_name in reference_classes:
             class_defs[glyph_name] = reference_classes[glyph_name]
+    class_defs = {glyph_name: value for glyph_name, value in class_defs.items() if glyph_name in glyph_set}
 
-    gdef = newTable("GDEF")
-    gdef.table = ot.GDEF()
-    gdef.table.Version = 0x00010000
-    gdef.table.GlyphClassDef = ot.GlyphClassDef()
+    gdef = copy.deepcopy(reference_gdef)
     gdef.table.GlyphClassDef.classDefs = class_defs
-    gdef.table.AttachList = None
-    gdef.table.LigCaretList = None
-    gdef.table.MarkAttachClassDef = None
+    mark_sets = getattr(gdef.table, "MarkGlyphSetsDef", None)
+    if mark_sets and getattr(mark_sets, "Coverage", None):
+        for coverage_table in mark_sets.Coverage:
+            coverage_table.glyphs = [glyph_name for glyph_name in coverage_table.glyphs if glyph_name in glyph_set]
+        mark_sets.MarkSetCount = len(mark_sets.Coverage)
     font["GDEF"] = gdef
-    return {"gdef_classdefs": len(class_defs)}
+    return {"gdef_classdefs": len(class_defs), "gdef_mark_sets": mark_sets.MarkSetCount if mark_sets else 0}
 
 
 def rebuild_vorg_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
@@ -777,6 +899,7 @@ def rebuild_stat(font: TTFont, italic: bool) -> None:
                 {
                     "value": 1 if italic else 0,
                     "name": "Italic" if italic else "Roman",
+                    **({"linkedValue": 1} if not italic else {}),
                     "flags": 0x2 if not italic else 0,
                 }
             ],
@@ -808,6 +931,7 @@ def rebuild_static_stat(font: TTFont, weight_name: str, weight_value: int, itali
                 {
                     "value": 1 if italic else 0,
                     "name": "Italic" if italic else "Roman",
+                    **({"linkedValue": 1} if not italic else {}),
                     "flags": 0x2 if not italic else 0,
                 }
             ],
@@ -825,9 +949,14 @@ def update_fvar_instances(font: TTFont, italic: bool) -> None:
         instance = NamedInstance()
         instance.coordinates = {"wght": float(weight_value)}
         instance.flags = 0
-        instance.subfamilyNameID = name_table.addName(weight_name)
-        ps_suffix = weight_name + ("Italic" if italic else "")
-        instance.postscriptNameID = name_table.addName(f"{VF_PS_FAMILY}-{ps_suffix}")
+        if weight_name == "Regular":
+            instance.subfamilyNameID = name_table.addName("Italic" if italic else "Regular")
+            instance.postscriptNameID = name_table.addName(f"{VF_PS_FAMILY}-Italic" if italic else VF_PS_FAMILY)
+        else:
+            instance.subfamilyNameID = name_table.addName(weight_name + (" Italic" if italic else ""))
+            instance.postscriptNameID = name_table.addName(
+                f"{VF_PS_FAMILY}-{weight_name}{'Italic' if italic else ''}"
+            )
         instances.append(instance)
     font["fvar"].instances = instances
 
@@ -2311,6 +2440,26 @@ def enable_features_for_all_scripts(font: TTFont, tags: set[str], table_tag: str
             langsys.FeatureCount = len(feature_indices)
 
 
+def merge_gsub_lookup_indices_into_features(font: TTFont, tag: str, lookup_indices: list[int]) -> dict[str, int]:
+    if "GSUB" not in font or not font["GSUB"].table.FeatureList:
+        return {f"{tag}_features_merged": 0, f"{tag}_feature_lookup_links_added": 0}
+    merged = 0
+    added = 0
+    for record in font["GSUB"].table.FeatureList.FeatureRecord:
+        if record.FeatureTag != tag:
+            continue
+        indices = list(record.Feature.LookupListIndex or [])
+        before = len(indices)
+        for lookup_index in lookup_indices:
+            if lookup_index not in indices:
+                indices.append(lookup_index)
+        record.Feature.LookupListIndex = indices
+        record.Feature.LookupCount = len(indices)
+        merged += 1
+        added += len(indices) - before
+    return {f"{tag}_features_merged": merged, f"{tag}_feature_lookup_links_added": added}
+
+
 def ensure_empty_gsub_features(font: TTFont, tags: set[str]) -> dict[str, int]:
     added = 0
     for tag in sorted(tags):
@@ -2587,7 +2736,12 @@ def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
     chain_index = append_gsub_lookup(font, chain_lookup)
     append_gsub_feature(font, "calt", [chain_index])
     enable_features_for_all_scripts(font, {"calt"})
-    return {"digit_colon_feature_added": True, "digit_colon_raise": raise_amount}
+    return {
+        "digit_colon_feature_added": True,
+        "digit_colon_raise": raise_amount,
+        "digit_colon_single_lookup_index": single_index,
+        "digit_colon_chain_lookup_index": chain_index,
+    }
 
 
 def build_one_variable(italic: bool) -> dict[str, Any]:
@@ -2640,6 +2794,11 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         gpos_template_report = align_layout_feature_template(base, reference, "GPOS")
         gsub_lookup_report = pad_lookup_list_to_reference_count(base, reference, "GSUB")
         gpos_lookup_report = pad_lookup_list_to_reference_count(base, reference, "GPOS")
+        digit_colon_merge_report = merge_gsub_lookup_indices_into_features(
+            base,
+            "calt",
+            [colon_report["digit_colon_chain_lookup_index"]] if colon_report.get("digit_colon_feature_added") else [],
+        )
         gdef_report = rebuild_gdef_from_reference(base, reference)
         vorg_report = rebuild_vorg_from_reference(base, reference)
         metadata_report = sync_sarasa_metadata_from_reference(base, reference)
@@ -2732,6 +2891,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **gpos_template_report,
         **gsub_lookup_report,
         **gpos_lookup_report,
+        **digit_colon_merge_report,
         **gdef_report,
         **vorg_report,
         **metadata_report,
@@ -3297,7 +3457,13 @@ def static_output_name(weight_name: str, italic: bool) -> str:
     return f"SarasaUiPropDigitsSC-{weight_name}{'Italic' if italic else ''}.ttf"
 
 
-def postprocess_static_font(path: Path, weight_name: str, weight_value: int, italic: bool) -> dict[str, Any]:
+def postprocess_static_font(
+    path: Path,
+    weight_name: str,
+    weight_value: int,
+    italic: bool,
+    hinted: bool,
+) -> dict[str, Any]:
     font = TTFont(path)
     report: dict[str, Any] = {}
     try:
@@ -3318,6 +3484,23 @@ def postprocess_static_font(path: Path, weight_name: str, weight_value: int, ita
         rebuild_static_stat(font, weight_name, weight_value, italic)
         report.update(drop_generated_extra_tables(font, keep_stat=True))
         report.update(apply_static_propdigits(font))
+        if hinted:
+            hinted_reference_path = hinted_reference_font_path(weight_name, italic)
+            if hinted_reference_path.exists():
+                hinted_reference = TTFont(hinted_reference_path)
+                try:
+                    report.update(sync_hinting_from_reference(font, hinted_reference))
+                finally:
+                    hinted_reference.close()
+            else:
+                report.update(
+                    {
+                        "hint_tables_synced": 0,
+                        "hint_glyph_programs_synced": 0,
+                        "hint_glyph_programs_skipped": 0,
+                    }
+                )
+        report.update(clear_simple_glyph_overlap_flags(font))
         report.update(
             {
                 "digit_colon_feature_added": False,
@@ -3373,7 +3556,7 @@ def build_static_fonts() -> list[dict[str, Any]]:
                     tmp_dir,
                 )
                 log_step(f"static {style_label}: postprocess unhinted")
-                unhinted_report = postprocess_static_font(unhinted_tmp, weight_name, weight_value, italic)
+                unhinted_report = postprocess_static_font(unhinted_tmp, weight_name, weight_value, italic, False)
                 shutil.copy2(unhinted_tmp, unhinted_path)
                 outputs.append(
                     {
@@ -3455,7 +3638,7 @@ def build_static_fonts() -> list[dict[str, Any]]:
                 log_step(f"static {style_label}: compose hinted pass2")
                 build_sarasa_pass2(pass1_instructed, hani_instructed, hang_instructed, hinted_tmp, italic, tmp_dir)
                 log_step(f"static {style_label}: postprocess hinted")
-                hinted_postprocess = postprocess_static_font(hinted_tmp, weight_name, weight_value, italic)
+                hinted_postprocess = postprocess_static_font(hinted_tmp, weight_name, weight_value, italic, True)
                 shutil.copy2(hinted_tmp, hinted_path)
                 outputs.append(
                     {
@@ -3518,6 +3701,31 @@ def layout_table_summary(font: TTFont, table_tag: str) -> dict[str, Any]:
     }
 
 
+def shape_glyph_names(path: Path, text: str, script: str | None = None, language: str | None = None) -> list[str] | None:
+    try:
+        import uharfbuzz as hb
+    except ImportError:
+        return None
+    data = path.read_bytes()
+    face = hb.Face(data)
+    hb_font = hb.Font(face)
+    hb_font.scale = (face.upem, face.upem)
+    buffer = hb.Buffer()
+    buffer.add_str(text)
+    if script:
+        buffer.script = script
+    if language:
+        buffer.language = language
+    buffer.guess_segment_properties()
+    hb.shape(hb_font, buffer, {"calt": True})
+    font = TTFont(path)
+    try:
+        glyph_order = font.getGlyphOrder()
+        return [glyph_order[info.codepoint] for info in buffer.glyph_infos]
+    finally:
+        font.close()
+
+
 def lsb_mismatch_count(font: TTFont) -> int | None:
     if "hmtx" not in font or "glyf" not in font:
         return None
@@ -3572,6 +3780,12 @@ def inspect_font(path: Path) -> dict[str, Any]:
             "has_pnum": has_feature(font, "pnum"),
             "has_digit_colon_calt": has_feature(font, "calt"),
             "has_hints": any(tag in font for tag in ("fpgm", "prep", "cvt ")),
+            "glyf_overlap_simple_flags": count_simple_glyph_overlap_flags(font),
+            "shape_1_colon_2": {
+                "default": shape_glyph_names(path, "1:2"),
+                "latn": shape_glyph_names(path, "1:2", "Latn"),
+                "hani_zhs": shape_glyph_names(path, "1:2", "Hani", "ZHS"),
+            },
             "tables": {
                 "BASE": "BASE" in font,
                 "GDEF": "GDEF" in font,
@@ -3605,7 +3819,9 @@ def static_readme_text(hinted: bool) -> str:
         "upstream Regular, SemiBold, and Bold hcfg profiles respectively because\n"
         "upstream Sarasa does not ship matching static output styles. Static\n"
         "PropDigits remaps ':' to an existing pnum glyph and reuses Inter/Sarasa's\n"
-        "retained calt rule, so no extra digit-colon glyph is added after hinting."
+        "retained contextual calt rule, so no extra digit-colon glyph is added\n"
+        "after hinting. Exact upstream styles also sync the upstream TrueType\n"
+        "instruction tables and per-glyph programs when outlines match."
         if hinted
         else "The unhinted set is built through the same static fragment route as\n"
         "upstream Sarasa, but uses the unhinted pass1/kanji/hangul fragments\n"
@@ -3630,8 +3846,10 @@ Weights:
 
 Each weight has an upright and Italic file. ASCII digits are proportional by
 default; OpenType tnum restores tabular digits, and pnum maps tabular digits
-back to proportional digits. The contextual digit-colon rule raises ':' only
-when it appears between digits by reusing Inter/Sarasa's retained calt data.
+back to proportional digits. Static TTFs reuse Inter/Sarasa's retained calt
+data for contextual colon raising, so numeric-adjacent contexts such as 1:2,
+1:a, a:2, and 1::2 may raise ':', while plain alphabetic text such as a:b is
+left alone.
 
 The name table includes Simplified Chinese display names, such as
 更纱黑体 Ui PropDigits SC ExtraLight.
@@ -3642,6 +3860,9 @@ GSUB/GPOS FeatureRecord order, Script/LangSys coverage, and the base lookup
 structure are templated from the corresponding upstream Sarasa Ui SC static
 font for each style; the static digit-colon behavior does not add its own
 lookup.
+Simple glyf overlap flags are cleared at final write-out for OTS/web-font
+compatibility; this changes the raw glyf encoding flag only, not coordinates
+or TrueType instructions.
 Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
 unencoded glyphs are preserved, while unreachable glyph count differences are
 left as build artifacts.
@@ -3731,9 +3952,11 @@ def build_all(static_only: bool = False) -> dict[str, Any]:
             "Static TTF outputs are built from static Source Han Sans SC and Inter "
             "sources through Sarasa's pass1/kanji/hangul/pass2 fragment path, then "
             "patched with PropDigits cmap remaps for digits and colon, naming, metadata, layout, "
-            "GDEF/VORG, and static STAT rules. The hinted static set follows upstream "
+            "GDEF/VORG, OTS-compatible glyf flag encoding, and static STAT rules. The hinted static set follows upstream "
             "Sarasa's order: ttfautohint on pass1, Chlorophytum hcfg instruction on "
-            "pass1/kanji/hangul fragments, then pass2 composition. The unhinted static "
+            "pass1/kanji/hangul fragments, then pass2 composition. For exact upstream "
+            "styles whose outlines match Sarasa Ui SC, upstream TrueType instruction "
+            "tables and per-glyph programs are synced after composition. The unhinted static "
             "set skips both hinting tools and composes unhinted fragments directly, "
             "providing a formal static output without TrueType instructions. Normal, Medium, and Heavy "
             "use the upstream Regular, SemiBold, and Bold static styles or hcfg profiles "
@@ -3743,7 +3966,7 @@ def build_all(static_only: bool = False) -> dict[str, Any]:
         "intentional_differences_from_upstream_sarasa_ui": [
             "Default ASCII digits and ':' use proportional glyphs; tnum restores tabular glyphs.",
             "Weight instances follow Source Han Sans stops: 250, 300, 350, 400, 500, 700, 900.",
-            "A contextual calt rule raises colon only between digits; static TTFs reuse Inter/Sarasa's retained rule.",
+            "VF adds a strict contextual calt rule for colon between digits; static TTFs reuse Inter/Sarasa's broader retained contextual colon rule.",
         ],
         "final_gsub_features": sorted(FINAL_GSUB_FEATURES),
         "variable_outputs": variable_outputs,

@@ -16,8 +16,10 @@ Weights:
 
 Each weight has an upright and Italic file. ASCII digits are proportional by
 default; OpenType tnum restores tabular digits, and pnum maps tabular digits
-back to proportional digits. The contextual digit-colon rule raises ':' only
-when it appears between digits by reusing Inter/Sarasa's retained calt data.
+back to proportional digits. Static TTFs reuse Inter/Sarasa's retained calt
+data for contextual colon raising, so numeric-adjacent contexts such as 1:2,
+1:a, a:2, and 1::2 may raise ':', while plain alphabetic text such as a:b is
+left alone.
 
 The name table includes Simplified Chinese display names, such as
 更纱黑体 Ui PropDigits SC ExtraLight.
@@ -31,6 +33,9 @@ GSUB/GPOS FeatureRecord order, Script/LangSys coverage, and the base lookup
 structure are templated from the corresponding upstream Sarasa Ui SC static
 font for each style; the static digit-colon behavior does not add its own
 lookup.
+Simple glyf overlap flags are cleared at final write-out for OTS/web-font
+compatibility; this changes the raw glyf encoding flag only, not coordinates
+or TrueType instructions.
 Glyph counts are not padded to match upstream; cmap glyphs and layout-reachable
 unencoded glyphs are preserved, while unreachable glyph count differences are
 left as build artifacts.
