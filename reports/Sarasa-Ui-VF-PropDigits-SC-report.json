@@ -216,7 +216,13 @@
         "900": 900
       },
       "inter_outline_correction_variations_added": 2572,
-      "inter_outline_correction_glyphs": 643
+      "inter_outline_correction_glyphs": 643,
+      "post_inter_outline_metric_stabilization": {
+        "reference_lsb_variations_added": 3634,
+        "reference_lsb_variation_corrections": 3647,
+        "reference_vmtx_variations_added": 1788,
+        "reference_vmtx_variation_corrections": 1791
+      }
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
@@ -371,7 +377,13 @@
         "900": 900
       },
       "inter_outline_correction_variations_added": 2578,
-      "inter_outline_correction_glyphs": 645
+      "inter_outline_correction_glyphs": 645,
+      "post_inter_outline_metric_stabilization": {
+        "reference_lsb_variations_added": 3852,
+        "reference_lsb_variation_corrections": 3865,
+        "reference_vmtx_variations_added": 1811,
+        "reference_vmtx_variation_corrections": 1814
+      }
     }
   ],
   "static_outputs": [
@@ -1391,5 +1403,41 @@
     "source_han_sans": "2.005R",
     "inter": "v4.1",
     "node": "v24.16.0"
+  },
+  "final_exact_metric_audit": {
+    "scope": "VF exact weights against official SarasaUiSC; ASCII digits and colon skipped intentionally",
+    "weights": [
+      "ExtraLight 200",
+      "Light 300",
+      "Regular 400",
+      "SemiBold 600",
+      "Bold 700"
+    ],
+    "upright": {
+      "advance_mismatches": 0,
+      "hmtx_lsb_mismatches": 0,
+      "vertical_advance_mismatches": 0,
+      "vmtx_side_bearing_mismatches": 0
+    },
+    "italic": {
+      "advance_mismatches": 0,
+      "hmtx_lsb_mismatches": 0,
+      "vertical_advance_mismatches": 0,
+      "vmtx_side_bearing_mismatches": 0
+    }
+  },
+  "post_inter_outline_metric_stabilization": {
+    "upright": {
+      "reference_lsb_variations_added": 3634,
+      "reference_lsb_variation_corrections": 3647,
+      "reference_vmtx_variations_added": 1788,
+      "reference_vmtx_variation_corrections": 1791
+    },
+    "italic": {
+      "reference_lsb_variations_added": 3852,
+      "reference_lsb_variation_corrections": 3865,
+      "reference_vmtx_variations_added": 1811,
+      "reference_vmtx_variation_corrections": 1814
+    }
   }
 }
