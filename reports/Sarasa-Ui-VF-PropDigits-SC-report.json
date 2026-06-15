@@ -1439,5 +1439,7 @@
       "reference_vmtx_variations_added": 1811,
       "reference_vmtx_variation_corrections": 1814
     }
-  }
+  },
+  "os2_vendor_id": "MRDK",
+  "os2_vendor_id_policy": "Use MRDK for this modified repository build instead of inheriting upstream Sarasa Ui SC placeholder ???? or Source Han/Inter official vendor IDs."
 }

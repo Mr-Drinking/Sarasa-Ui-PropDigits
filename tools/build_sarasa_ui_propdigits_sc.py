@@ -204,6 +204,7 @@ STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
 STATIC_FAMILY_ZH_HANS = "更纱黑体 Ui PropDigits SC"
 VERSION = "1.0.39-propdigits.3"
 INTER_PREFIX = "inter."
+OS2_VENDOR_ID = "MRDK"
 
 SOURCE_HAN_WEIGHT_STOPS = [
     {"name": "ExtraLight", "value": 200, "range_min": 200, "range_max": 299},
@@ -558,7 +559,7 @@ def update_style_flags(font: TTFont, italic: bool) -> None:
 def update_os2_sarasa_metadata(font: TTFont) -> None:
     os2 = font["OS/2"]
     os2.version = max(os2.version, 4)
-    os2.achVendID = "????"
+    os2.achVendID = OS2_VENDOR_ID
     os2.ulCodePageRange1 = 2147746207
     os2.ulCodePageRange2 = 0
     apply_sarasa_vertical_metrics(font)
@@ -4747,6 +4748,8 @@ Inter 的 colon-run 规则。
 
 name 表包含简体中文显示名，例如：
 更纱黑体 Ui PropDigits SC ExtraLight.
+OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui SC 的
+???? 占位值。
 {hint_note}
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys

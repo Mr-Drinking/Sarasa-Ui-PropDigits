@@ -26,6 +26,8 @@ Inter 的 colon-run 规则。
 
 name 表包含简体中文显示名，例如：
 更纱黑体 Ui PropDigits SC ExtraLight.
+OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui SC 的
+???? 占位值。
 unhinted 套件同样沿用上游 Sarasa 的静态片段构建路径，但直接用
 未 hint 的 pass1/kanji/hangul 片段进入 pass2。它会跳过
 ttfautohint 和 Chlorophytum，提供正式的无 TrueType instructions

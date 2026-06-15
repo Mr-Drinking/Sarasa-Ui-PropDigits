@@ -363,7 +363,7 @@
       ],
       "usWeightClass": 400,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -729,7 +729,7 @@
       ],
       "usWeightClass": 400,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -1038,7 +1038,7 @@
       "fvar_instances": [],
       "usWeightClass": 700,
       "fsSelection": 160,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -1346,7 +1346,7 @@
       "fvar_instances": [],
       "usWeightClass": 700,
       "fsSelection": 161,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -1655,7 +1655,7 @@
       "fvar_instances": [],
       "usWeightClass": 200,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -1963,7 +1963,7 @@
       "fvar_instances": [],
       "usWeightClass": 200,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -2272,7 +2272,7 @@
       "fvar_instances": [],
       "usWeightClass": 900,
       "fsSelection": 160,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -2580,7 +2580,7 @@
       "fvar_instances": [],
       "usWeightClass": 900,
       "fsSelection": 161,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -2888,7 +2888,7 @@
       "fvar_instances": [],
       "usWeightClass": 400,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -3197,7 +3197,7 @@
       "fvar_instances": [],
       "usWeightClass": 300,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -3505,7 +3505,7 @@
       "fvar_instances": [],
       "usWeightClass": 300,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -3814,7 +3814,7 @@
       "fvar_instances": [],
       "usWeightClass": 500,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -4122,7 +4122,7 @@
       "fvar_instances": [],
       "usWeightClass": 500,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -4431,7 +4431,7 @@
       "fvar_instances": [],
       "usWeightClass": 350,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -4739,7 +4739,7 @@
       "fvar_instances": [],
       "usWeightClass": 350,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -5048,7 +5048,7 @@
       "fvar_instances": [],
       "usWeightClass": 400,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -5357,7 +5357,7 @@
       "fvar_instances": [],
       "usWeightClass": 700,
       "fsSelection": 160,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -5665,7 +5665,7 @@
       "fvar_instances": [],
       "usWeightClass": 700,
       "fsSelection": 161,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -5974,7 +5974,7 @@
       "fvar_instances": [],
       "usWeightClass": 200,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -6282,7 +6282,7 @@
       "fvar_instances": [],
       "usWeightClass": 200,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -6591,7 +6591,7 @@
       "fvar_instances": [],
       "usWeightClass": 900,
       "fsSelection": 160,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -6899,7 +6899,7 @@
       "fvar_instances": [],
       "usWeightClass": 900,
       "fsSelection": 161,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -7207,7 +7207,7 @@
       "fvar_instances": [],
       "usWeightClass": 400,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -7516,7 +7516,7 @@
       "fvar_instances": [],
       "usWeightClass": 300,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -7824,7 +7824,7 @@
       "fvar_instances": [],
       "usWeightClass": 300,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -8133,7 +8133,7 @@
       "fvar_instances": [],
       "usWeightClass": 500,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -8441,7 +8441,7 @@
       "fvar_instances": [],
       "usWeightClass": 500,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -8750,7 +8750,7 @@
       "fvar_instances": [],
       "usWeightClass": 350,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -9058,7 +9058,7 @@
       "fvar_instances": [],
       "usWeightClass": 350,
       "fsSelection": 129,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     },
@@ -9367,7 +9367,7 @@
       "fvar_instances": [],
       "usWeightClass": 400,
       "fsSelection": 192,
-      "vendor": "????",
+      "vendor": "MRDK",
       "codepage_range_1": 2147746207,
       "codepage_range_2": 0
     }
