@@ -8,10 +8,10 @@
   "source_latin_italic": "InterVariable-Italic.woff2",
   "reference_unicode_set": "SarasaUiSC 1.0.39 unhinted/SarasaUiSC-Regular.ttf",
   "reference_hinted_set": "SarasaUiSC 1.0.39 hinted/",
-  "method": "针对最终输出一致性的修复：既有 VF 输出继续保留 Source Han Sans SC VF + Inter VF 的合并模型，既有静态 TTF 继续保留静态 Source Han Sans SC + 静态 Inter 的 Sarasa pass1/kanji/hangul/pass2 路径。最终后处理会把默认 ASCII 数字和冒号 remap 到 pnum glyph，移除旧的数字冒号上下文替换，并为静态 TTF 和 VF 追加与 Inter 一致的 colon-run calt 规则。静态 exact 样式会在轮廓匹配时保留上游 simple glyph flags、已存储的 glyf bbox、递归可达组件 glyph flags、组合字形组件名、GDEF/VORG/vmtx、metadata，以及 hinted TrueType instruction tables/programs。静态 TTF 使用 post format 2，让 PropDigits cmap remap 后的上游风格组件 glyph names 仍能稳定保留；VF 保持既有 post/GID 模型。",
+  "method": "针对最终输出一致性的修复：既有 VF 输出继续保留 Source Han Sans SC VF + Inter VF 的合并模型，既有静态 TTF 继续保留静态 Source Han Sans SC + 静态 Inter 的 Sarasa pass1/kanji/hangul/pass2 路径。最终后处理会把默认 ASCII 数字和冒号 remap 到 pnum glyph，移除旧的数字冒号上下文替换，并为静态 TTF 和 VF 追加与 Inter 一致的 colon-run calt 规则。静态 exact 样式会在轮廓匹配时保留上游 simple glyph flags、已存储的 glyf bbox、递归可达组件 glyph flags、组合字形组件名、GDEF/VORG/vmtx、metadata，以及 hinted TrueType instruction tables/programs。静态 TTF 使用 post format 2，让 PropDigits cmap remap 后的上游风格组件 glyph names 仍能稳定保留；VF 保持既有 post/GID 模型。公开字重采用 Sarasa/CSS 口径：ExtraLight 为 200，CJK 轮廓来源仍是 Source Han Sans SC 的 ExtraLight 250，VF 通过 avar 轴映射让 public wght=200 对应 Source Han 内部 wght=250。",
   "intentional_differences_from_upstream_sarasa_ui": [
     "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
-    "字重实例遵循 Source Han Sans stop：250、300、350、400、500、700、900。",
+    "公开字重遵循 Sarasa/CSS 口径：200、300、350、400、500、700、900；CJK 内部仍使用 Source Han ExtraLight 250 作为 public 200 的来源。",
     "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
     "静态 TTF 使用 post format 2，以便 PropDigits cmap remap 后仍保留审计稳定的 glyph names；VF 保持既有 post/GID 模型。"
   ],
@@ -68,7 +68,7 @@
       "axes": [
         [
           "wght",
-          250.0,
+          200.0,
           400.0,
           900.0
         ]
@@ -194,14 +194,36 @@
       "digit_colon_chain_lookup_index": 112,
       "digit_colon_existing_calt_mappings_removed": 1,
       "digit_colon_calt_feature_links": 4,
-      "digit_colon_context": "inter-compatible-colon-runs"
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "public_wght_axis_applied": true,
+      "public_wght_axis": [
+        200,
+        400,
+        900
+      ],
+      "source_han_internal_wght_axis": [
+        250,
+        400,
+        900
+      ],
+      "source_han_public_to_internal_wght": {
+        "200": 250,
+        "300": 300,
+        "350": 350,
+        "400": 400,
+        "500": 500,
+        "700": 700,
+        "900": 900
+      },
+      "inter_outline_correction_variations_added": 2572,
+      "inter_outline_correction_glyphs": 643
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
       "axes": [
         [
           "wght",
-          250.0,
+          200.0,
           400.0,
           900.0
         ]
@@ -327,14 +349,36 @@
       "digit_colon_chain_lookup_index": 112,
       "digit_colon_existing_calt_mappings_removed": 1,
       "digit_colon_calt_feature_links": 4,
-      "digit_colon_context": "inter-compatible-colon-runs"
+      "digit_colon_context": "inter-compatible-colon-runs",
+      "public_wght_axis_applied": true,
+      "public_wght_axis": [
+        200,
+        400,
+        900
+      ],
+      "source_han_internal_wght_axis": [
+        250,
+        400,
+        900
+      ],
+      "source_han_public_to_internal_wght": {
+        "200": 250,
+        "300": 300,
+        "350": 350,
+        "400": 400,
+        "500": 500,
+        "700": 700,
+        "900": 900
+      },
+      "inter_outline_correction_variations_added": 2578,
+      "inter_outline_correction_glyphs": 645
     }
   ],
   "static_outputs": [
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-ExtraLight.ttf",
       "weight": "ExtraLight",
-      "wght": 250,
+      "wght": 200,
       "italic": false,
       "hinted_variant": false,
       "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
@@ -533,7 +577,7 @@
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
       "weight": "ExtraLight",
-      "wght": 250,
+      "wght": 200,
       "italic": true,
       "hinted_variant": false,
       "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
@@ -732,7 +776,7 @@
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLight.ttf",
       "weight": "ExtraLight",
-      "wght": 250,
+      "wght": 200,
       "italic": false,
       "hinted_variant": true,
       "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
@@ -952,7 +996,7 @@
     {
       "file": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
       "weight": "ExtraLight",
-      "wght": 250,
+      "wght": 200,
       "italic": true,
       "hinted_variant": true,
       "source_static_build": "sarasa-pass1-kanji-hangul-pass2",

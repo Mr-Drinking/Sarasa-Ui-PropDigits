@@ -8,10 +8,12 @@ import json
 import math
 import os
 import platform
+import site
 import shutil
 import struct
 import subprocess
 import sys
+import sysconfig
 import tarfile
 import tempfile
 import urllib.request
@@ -27,6 +29,7 @@ PYTHON_DEPS = {
     "brotli": "brotli",
     "ttfautohint": "ttfautohint-py",
     "py7zr": "py7zr",
+    "afdko": "afdko",
 }
 
 
@@ -191,7 +194,8 @@ REPORT_DIR = ROOT / "reports"
 BUILD_CACHE_DIR = Path(os.environ.get("SARASA_BUILD_CACHE", ROOT / ".build-cache" / "sarasa-propdigits-sc"))
 
 AXIS_LIMIT = {"wght": (250, 400, 900)}
-INTER_AXIS_LIMIT = {"opsz": 14, "wght": (250, 400, 900)}
+PUBLIC_AXIS_LIMIT = {"wght": (200, 400, 900)}
+INTER_AXIS_LIMIT = {"opsz": 14, "wght": (200, 400, 900)}
 VF_FAMILY = "Sarasa Ui VF PropDigits SC"
 VF_PS_FAMILY = "Sarasa-Ui-VF-PropDigits-SC"
 VF_FAMILY_ZH_HANS = "更纱黑体 Ui VF PropDigits SC"
@@ -202,7 +206,7 @@ VERSION = "1.0.39-propdigits.3"
 INTER_PREFIX = "inter."
 
 SOURCE_HAN_WEIGHT_STOPS = [
-    {"name": "ExtraLight", "value": 250, "range_min": 250, "range_max": 299},
+    {"name": "ExtraLight", "value": 200, "range_min": 200, "range_max": 299},
     {"name": "Light", "value": 300, "range_min": 300, "range_max": 349},
     {"name": "Normal", "value": 350, "range_min": 350, "range_max": 399},
     {"name": "Regular", "value": 400, "range_min": 400, "range_max": 499, "flags": 0x2},
@@ -210,6 +214,17 @@ SOURCE_HAN_WEIGHT_STOPS = [
     {"name": "Bold", "value": 700, "range_min": 650, "range_max": 800},
     {"name": "Heavy", "value": 900, "range_min": 800, "range_max": 900},
 ]
+
+SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT = {
+    200: 250,
+    300: 300,
+    350: 350,
+    400: 400,
+    500: 500,
+    700: 700,
+    900: 900,
+}
+INTER_OUTLINE_CORRECTION_WEIGHTS = [300, 350, 500, 700]
 
 STATIC_STYLE_SOURCES = {
     "ExtraLight": {"shs": "ExtraLight", "inter": "ExtraLight", "sarasa": "ExtraLight", "hcfg": "ExtraLight"},
@@ -253,7 +268,7 @@ FINAL_GSUB_FEATURES = SOURCE_HAN_FINAL_GSUB_FEATURES | INTER_GSUB_FEATURES | UPR
 INTER_GPOS_FEATURES = {"cpsp", "kern", "mark", "mkmk"}
 SOURCE_HAN_FORCED_CODEPOINTS = {0x22EF}
 REFERENCE_ADVANCE_STOPS = [
-    ("ExtraLight", 250),
+    ("ExtraLight", 200),
     ("Light", 300),
     ("Regular", 400),
     ("SemiBold", 600),
@@ -1502,17 +1517,73 @@ def align_reference_advances(font: TTFont, reference: TTFont, skip_codepoints: s
     return {"reference_advances_aligned": touched, "reference_advance_glyphs_cloned": cloned}
 
 
+def weight_axis(font: TTFont) -> Any:
+    return next(axis for axis in font["fvar"].axes if axis.axisTag == "wght")
+
+
+def normalize_axis_value(value: float, min_value: float, default_value: float, max_value: float) -> float:
+    if value == default_value:
+        return 0.0
+    if value < default_value:
+        return (value - default_value) / (default_value - min_value)
+    return (value - default_value) / (max_value - default_value)
+
+
+def denormalize_axis_value(normalized: float, min_value: float, default_value: float, max_value: float) -> float:
+    if normalized == 0.0:
+        return default_value
+    if normalized < 0.0:
+        return default_value + normalized * (default_value - min_value)
+    return default_value + normalized * (max_value - default_value)
+
+
 def normalized_wght(font: TTFont, value: int) -> float:
-    axis = next(axis for axis in font["fvar"].axes if axis.axisTag == "wght")
-    if value == axis.defaultValue:
-        normalized = 0.0
-    if value < axis.defaultValue:
-        normalized = (value - axis.defaultValue) / (axis.defaultValue - axis.minValue)
-    elif value > axis.defaultValue:
-        normalized = (value - axis.defaultValue) / (axis.maxValue - axis.defaultValue)
+    axis = weight_axis(font)
+    normalized = normalize_axis_value(value, axis.minValue, axis.defaultValue, axis.maxValue)
     if "avar" in font and "wght" in font["avar"].segments:
         normalized = piecewiseLinearMap(normalized, font["avar"].segments["wght"])
     return normalized
+
+
+def source_han_public_avar_segment(font: TTFont) -> dict[float, float]:
+    source_axis = weight_axis(font)
+    source_segment = {-1.0: -1.0, 0.0: 0.0, 1.0: 1.0}
+    if "avar" in font and "wght" in font["avar"].segments:
+        source_segment = dict(font["avar"].segments["wght"])
+    public_min, public_default, public_max = PUBLIC_AXIS_LIMIT["wght"]
+    segment: dict[float, float] = {}
+    for public_value, source_value in SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT.items():
+        public_normalized = normalize_axis_value(public_value, public_min, public_default, public_max)
+        source_normalized = normalize_axis_value(
+            source_value,
+            source_axis.minValue,
+            source_axis.defaultValue,
+            source_axis.maxValue,
+        )
+        segment[public_normalized] = piecewiseLinearMap(source_normalized, source_segment)
+    return dict(sorted(segment.items()))
+
+
+def apply_public_weight_axis(font: TTFont) -> dict[str, Any]:
+    if "fvar" not in font:
+        return {"public_wght_axis_applied": False}
+    source_axis = weight_axis(font)
+    source_axis_limit = [source_axis.minValue, source_axis.defaultValue, source_axis.maxValue]
+    segment = source_han_public_avar_segment(font)
+    public_min, public_default, public_max = PUBLIC_AXIS_LIMIT["wght"]
+    source_axis.minValue = public_min
+    source_axis.defaultValue = public_default
+    source_axis.maxValue = public_max
+    if "avar" not in font:
+        font["avar"] = newTable("avar")
+        font["avar"].segments = {}
+    font["avar"].segments["wght"] = segment
+    return {
+        "public_wght_axis_applied": True,
+        "public_wght_axis": [public_min, public_default, public_max],
+        "source_han_internal_wght_axis": source_axis_limit,
+        "source_han_public_to_internal_wght": SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT,
+    }
 
 
 def reference_width_profiles(
@@ -1608,6 +1679,73 @@ def gvar_coordinate_count(font: TTFont, glyph_name: str) -> int:
     if variations:
         return len(variations[0].coordinates)
     return len(font["glyf"][glyph_name].getCoordinates(font["glyf"])[0]) + 4
+
+
+def simple_glyph_coordinates(font: TTFont, glyph_name: str) -> list[tuple[int, int]] | None:
+    if "glyf" not in font or glyph_name not in font["glyf"].glyphs:
+        return None
+    glyph = font["glyf"][glyph_name]
+    if glyph.isComposite():
+        return None
+    coordinates = glyph.getCoordinates(font["glyf"])[0]
+    if not coordinates:
+        return None
+    return [(x, y) for x, y in coordinates]
+
+
+def inter_outline_correction_pairs(font: TTFont, inter: TTFont) -> list[tuple[str, str]]:
+    glyphs = set(font.getGlyphOrder())
+    pairs: list[tuple[str, str]] = []
+    for source_name in inter.getGlyphOrder():
+        if source_name == ".notdef":
+            continue
+        prefixed_name = prefixed(source_name)
+        if prefixed_name in glyphs:
+            pairs.append((source_name, prefixed_name))
+        elif source_name in glyphs:
+            pairs.append((source_name, source_name))
+    return pairs
+
+
+def add_inter_outline_correction_variations(font: TTFont, inter: TTFont) -> dict[str, int]:
+    if "gvar" not in font or "glyf" not in font or "fvar" not in font or "glyf" not in inter or "fvar" not in inter:
+        return {"inter_outline_correction_variations_added": 0, "inter_outline_correction_glyphs": 0}
+    pairs = inter_outline_correction_pairs(font, inter)
+    supports = advance_supports(font, INTER_OUTLINE_CORRECTION_WEIGHTS)
+    added = 0
+    touched_glyphs: set[str] = set()
+    for weight_value in INTER_OUTLINE_CORRECTION_WEIGHTS:
+        current = instantiateVariableFont(font, {"wght": weight_value}, inplace=False, optimize=True)
+        target = instantiateVariableFont(inter, {"wght": weight_value}, inplace=False, optimize=True)
+        try:
+            support = supports[weight_value]
+            for source_name, target_name in pairs:
+                current_coordinates = simple_glyph_coordinates(current, target_name)
+                target_coordinates = simple_glyph_coordinates(target, source_name)
+                if (
+                    current_coordinates is None
+                    or target_coordinates is None
+                    or len(current_coordinates) != len(target_coordinates)
+                ):
+                    continue
+                deltas = [
+                    (otRound(target_x - current_x), otRound(target_y - current_y))
+                    for (current_x, current_y), (target_x, target_y) in zip(current_coordinates, target_coordinates)
+                ]
+                if not any(dx or dy for dx, dy in deltas):
+                    continue
+                coordinates: list[Any] = list(deltas)
+                coordinates.extend([(0, 0)] * (gvar_coordinate_count(font, target_name) - len(coordinates)))
+                font["gvar"].variations.setdefault(target_name, []).append(TupleVariation({"wght": support}, coordinates))
+                added += 1
+                touched_glyphs.add(target_name)
+        finally:
+            current.close()
+            target.close()
+    return {
+        "inter_outline_correction_variations_added": added,
+        "inter_outline_correction_glyphs": len(touched_glyphs),
+    }
 
 
 def add_advance_tuple_variation(font: TTFont, glyph_name: str, support: tuple[float, float, float], delta: int) -> None:
@@ -2105,28 +2243,47 @@ def inverse_piecewise_map(value: float, segment: dict[float, float]) -> float:
 
 
 def remap_inter_gvar_supports(base: TTFont, inter: TTFont) -> None:
-    if "gvar" not in inter or "avar" not in inter or "avar" not in base:
+    if "gvar" not in inter or "fvar" not in inter or "fvar" not in base:
         return
-    inter_segment = inter["avar"].segments.get("wght")
-    base_segment = base["avar"].segments.get("wght")
-    if not inter_segment or not base_segment:
-        return
+    inter_axis = weight_axis(inter)
+    base_axis = weight_axis(base)
+    inter_segment = {-1.0: -1.0, 0.0: 0.0, 1.0: 1.0}
+    base_segment = {-1.0: -1.0, 0.0: 0.0, 1.0: 1.0}
+    if "avar" in inter and "wght" in inter["avar"].segments:
+        inter_segment = inter["avar"].segments["wght"]
+    if "avar" in base and "wght" in base["avar"].segments:
+        base_segment = base["avar"].segments["wght"]
     for variations in inter["gvar"].variations.values():
         for variation in variations:
             support = variation.axes.get("wght")
             if not support:
                 continue
             variation.axes["wght"] = tuple(
-                piecewise_map(inverse_piecewise_map(value, inter_segment), base_segment)
+                piecewise_map(
+                    normalize_axis_value(
+                        denormalize_axis_value(
+                            inverse_piecewise_map(value, inter_segment),
+                            inter_axis.minValue,
+                            inter_axis.defaultValue,
+                            inter_axis.maxValue,
+                        ),
+                        base_axis.minValue,
+                        base_axis.defaultValue,
+                        base_axis.maxValue,
+                    ),
+                    base_segment,
+                )
                 for value in support
             )
 
 
-def load_base(italic: bool, inter_unicodes: set[int]) -> tuple[TTFont, dict[str, int]]:
+def load_base(italic: bool, inter_unicodes: set[int]) -> tuple[TTFont, dict[str, Any]]:
     base = TTFont(BASE_VF)
     base = instantiateVariableFont(base, AXIS_LIMIT, inplace=False, optimize=True)
+    public_axis_report = apply_public_weight_axis(base)
     subset_font(base, source_han_unicodes_like_sarasa(base, inter_unicodes))
     sarasa_report = bake_source_han_pwid_and_sanitize(base)
+    sarasa_report.update(public_axis_report)
     sarasa_report["hangul_widths_normalized"] = normalize_hangul_widths(base)
     if italic:
         shear_font(base, 9.4)
@@ -3186,6 +3343,11 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         source_nonfinal_features_dropped = drop_nonfinal_gsub_features(base, SOURCE_HAN_FINAL_GSUB_FEATURES)
         inter_layout_report = import_inter_layout_features(base, inter)
         digit_report = add_digit_width_features(base, inter)
+        target_inter = load_inter(italic)
+        try:
+            inter_outline_report = add_inter_outline_correction_variations(base, target_inter)
+        finally:
+            target_inter.close()
     finally:
         inter.close()
 
@@ -3289,6 +3451,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **sarasa_report,
         **merge_report,
         **digit_report,
+        **inter_outline_report,
         **feature_drop_report,
         **locl_report,
         **em_dash_report,
@@ -3331,6 +3494,24 @@ def remove_variable_tables(font: TTFont) -> None:
             del font[tag]
 
 
+def python_script_dirs() -> list[Path]:
+    candidates: list[Path] = []
+    py_version_dir = f"Python{sys.version_info.major}{sys.version_info.minor}"
+    for value in [
+        sysconfig.get_path("scripts"),
+        Path(site.USER_BASE) / ("Scripts" if platform.system().lower() == "windows" else "bin"),
+        Path(site.getuserbase()) / py_version_dir / ("Scripts" if platform.system().lower() == "windows" else "bin"),
+        Path(os.environ.get("APPDATA", "")) / "Python" / py_version_dir / "Scripts",
+        Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Python" / py_version_dir / "Scripts",
+    ]:
+        if not value:
+            continue
+        path = Path(value)
+        if path not in candidates:
+            candidates.append(path)
+    return candidates
+
+
 def tool_executable(env_name: str, command_name: str) -> str:
     env_value = os.environ.get(env_name)
     if env_value:
@@ -3338,6 +3519,14 @@ def tool_executable(env_name: str, command_name: str) -> str:
     found = shutil.which(command_name)
     if found:
         return found
+    names = [command_name]
+    if platform.system().lower() == "windows":
+        names.extend([f"{command_name}.exe", f"{command_name}.cmd", f"{command_name}.bat"])
+    for directory in python_script_dirs():
+        for name in names:
+            candidate = directory / name
+            if candidate.exists():
+                return str(candidate)
     return command_name
 
 
@@ -4502,6 +4691,7 @@ def inspect_font(path: Path) -> dict[str, Any]:
             },
             "fvar_axes": axes,
             "fvar_instances": instances,
+            "usWeightClass": font["OS/2"].usWeightClass,
             "fsSelection": font["OS/2"].fsSelection,
             "vendor": font["OS/2"].achVendID,
             "codepage_range_1": font["OS/2"].ulCodePageRange1,
@@ -4537,13 +4727,17 @@ Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 构建路径生�
 
 字重：
 
-- ExtraLight 250
+- ExtraLight 200
 - Light 300
 - Normal 350
 - Regular 400
 - Medium 500
 - Bold 700
 - Heavy 900
+
+公开字重采用 Sarasa/CSS 口径：ExtraLight 是 200。CJK 轮廓来源仍是
+Source Han Sans SC 的 ExtraLight 口径 250；VF 通过轴映射让 public
+wght=200 对应 Source Han 内部 wght=250，而 Inter 对应 wght=200。
 
 每个字重都包含正体和 Italic 文件。ASCII 数字默认使用比例宽度；
 OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字。
@@ -4664,10 +4858,13 @@ def build_all(static_only: bool = False) -> dict[str, Any]:
             "直接合成未 hint 的片段，提供无 TrueType instructions 的正式静态输出。"
             "Normal、Medium、Heavy 分别使用上游 Regular、SemiBold、Bold 的静态样式或 hcfg "
             "配置，因为上游 Sarasa 没有发布对应的静态输出样式。"
+            "公开字重采用 Sarasa/CSS 口径：ExtraLight 为 200，Light/Regular/Bold/Heavy "
+            "分别为 300/400/700/900；CJK 轮廓来源仍是 Source Han Sans SC 的 ExtraLight "
+            "250，VF 通过 avar 轴映射让 public wght=200 对应 Source Han 内部 wght=250。"
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
             "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
-            "字重实例遵循 Source Han Sans stop：250、300、350、400、500、700、900。",
+            "公开字重遵循 Sarasa/CSS 口径：200、300、350、400、500、700、900；CJK 内部仍使用 Source Han ExtraLight 250 作为 public 200 的来源。",
             "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
             "静态 TTF 使用 post format 2，以便 PropDigits cmap remap 后仍保留审计稳定的 glyph names；VF 保持既有 post/GID 模型。",
         ],
