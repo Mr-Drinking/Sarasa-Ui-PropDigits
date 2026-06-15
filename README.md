@@ -58,6 +58,7 @@ VF 不从静态字重插值生成。它直接合并：
 - 最终 `GSUB`/`GPOS` 的 FeatureRecord 顺序、Script / LangSys 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui SC 静态字体套模板，避免只有 default langsys 而缺少 `JAN`/`KOR`/`ZHH`/`ZHS`/`ZHT`、Latin `CAT`/`MOL`/`ROM` 等语言系统。VF 与静态 TTF 都会移除过宽或过窄的既有冒号上下文替换，再追加一组与 Inter shaping 样例一致的 colon-run lookup。
 - VF、hinted 静态 TTF 和 unhinted 静态 TTF 都包含 `STAT`。VF 的 `STAT` 描述 `wght`/`ital` 轴和命名实例；静态 TTF 的 `STAT` 只用于现代应用识别 weight / italic 样式，不表示静态文件仍有 `fvar` `gvar` 可变轴。
 - `name` 表包含简体中文显示名：静态为 `更纱黑体 Ui PropDigits SC`，VF 为 `更纱黑体 Ui VF PropDigits SC`。
+- `OS/2.achVendID` 使用本派生项目的 `MRDK`，不继承上游 Sarasa Ui SC 的 `????` 占位值，也不冒充 Source Han Sans 或 Inter 的官方 vendor。
 - 构建会按上游 Sarasa Ui SC 同步非数字与非冒号 advance、横向 LSB、垂直指标、`GDEF`、`VORG`、`vmtx`、`head`/`OS/2` 中可安全继承的元数据字段；静态 exact 样式还会保留上游 simple glyph flags、glyf bbox 和组合字形的组件名。数字和与 Inter 兼容的冒号上下文是本派生字体的刻意差异。
 - 静态 TTF 不从 VF 实例化。hinted 和 unhinted 两套都使用静态 Source Han Sans SC 与静态 Inter，按 Sarasa 上游的 `pass1`、`kanji`、`hangul`、`pass2` 片段流程构建；最终 TTF 将默认数字和 `:` remap 到已有的 pnum glyph，清理旧冒号上下文替换后追加与 Inter shaping 样例一致的 colon-run `calt`，中文名、metadata、glyf flags / bbox、组件名和静态 `STAT` 也在最终 TTF 上同步。
 - hinted 静态 TTF 与上游 Sarasa 的顺序保持一致：`pass1` 先经过 `ttfautohint`，随后 `pass1`/`kanji`/`hangul` 片段用同版本 Chlorophytum `hcfg` 写入 TrueType 指令，最后由 `pass2` 合成。对于官方存在且轮廓相同的 exact 样式，最终 TTF 还会同步官方 TrueType instruction tables 和同名 glyph 的 program；官方没有的 `Normal`/`Medium`/`Heavy` 静态字重分别使用上游 `Regular`/`SemiBold`/`Bold` 的构建样式或 hint 配置。冒号上浮使用现有片段里的 raised glyph，缺失时才在最终 TTF 上补齐。
