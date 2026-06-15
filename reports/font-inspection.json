@@ -4,7 +4,7 @@
   "fonts": [
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "size": 36160776,
+      "size": 36290900,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Italic",
@@ -128,7 +128,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 109,
           "scripts": [
             {
               "tag": "DFLT",
@@ -305,7 +305,7 @@
       "fvar_axes": [
         {
           "tag": "wght",
-          "min": 250.0,
+          "min": 200.0,
           "default": 400.0,
           "max": 900.0
         }
@@ -314,7 +314,7 @@
         {
           "name": "ExtraLight Italic",
           "coordinates": {
-            "wght": 250.0
+            "wght": 200.0
           },
           "postscript": "Sarasa-Ui-VF-PropDigits-SC-ExtraLightItalic"
         },
@@ -361,6 +361,7 @@
           "postscript": "Sarasa-Ui-VF-PropDigits-SC-HeavyItalic"
         }
       ],
+      "usWeightClass": 400,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -368,7 +369,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "size": 34848940,
+      "size": 34981228,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Regular",
@@ -493,7 +494,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 109,
           "scripts": [
             {
               "tag": "DFLT",
@@ -670,7 +671,7 @@
       "fvar_axes": [
         {
           "tag": "wght",
-          "min": 250.0,
+          "min": 200.0,
           "default": 400.0,
           "max": 900.0
         }
@@ -679,7 +680,7 @@
         {
           "name": "ExtraLight",
           "coordinates": {
-            "wght": 250.0
+            "wght": 200.0
           },
           "postscript": "Sarasa-Ui-VF-PropDigits-SC-ExtraLight"
         },
@@ -726,6 +727,7 @@
           "postscript": "Sarasa-Ui-VF-PropDigits-SC-Heavy"
         }
       ],
+      "usWeightClass": 400,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -1034,6 +1036,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 700,
       "fsSelection": 160,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -1341,6 +1344,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 700,
       "fsSelection": 161,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -1649,6 +1653,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 200,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -1956,6 +1961,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 200,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -2264,6 +2270,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 900,
       "fsSelection": 160,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -2571,6 +2578,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 900,
       "fsSelection": 161,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -2878,6 +2886,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 400,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -3186,6 +3195,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 300,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -3493,6 +3503,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 300,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -3801,6 +3812,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 500,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -4108,6 +4120,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 500,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -4416,6 +4429,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 350,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -4723,6 +4737,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 350,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -5031,6 +5046,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 400,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -5339,6 +5355,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 700,
       "fsSelection": 160,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -5646,6 +5663,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 700,
       "fsSelection": 161,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -5954,6 +5972,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 200,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -6261,6 +6280,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 200,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -6569,6 +6589,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 900,
       "fsSelection": 160,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -6876,6 +6897,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 900,
       "fsSelection": 161,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -7183,6 +7205,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 400,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -7491,6 +7514,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 300,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -7798,6 +7822,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 300,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -8106,6 +8131,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 500,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -8413,6 +8439,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 500,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -8721,6 +8748,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 350,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -9028,6 +9056,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 350,
       "fsSelection": 129,
       "vendor": "????",
       "codepage_range_1": 2147746207,
@@ -9336,6 +9365,7 @@
       },
       "fvar_axes": [],
       "fvar_instances": [],
+      "usWeightClass": 400,
       "fsSelection": 192,
       "vendor": "????",
       "codepage_range_1": 2147746207,

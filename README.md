@@ -2,7 +2,7 @@
 
 这个仓库包含两个 Sarasa Ui SC 派生字体系列：
 
-- **Sarasa Ui VF PropDigits SC**：正体和 Italic 可变字体，`wght` 轴为 `250..900`。
+- **Sarasa Ui VF PropDigits SC**：正体和 Italic 可变字体，公开 `wght` 轴为 `200..900`。
 - **Sarasa Ui PropDigits SC**：从静态 Source Han Sans SC 和 Inter 按 Sarasa 静态片段路径构建的 TTF，包含 hinted 与 unhinted 两套，每套 7 个字重及对应 Italic。
 
 两个系列都把 ASCII 数字 `U+0030..U+0039` 设为默认变宽数字，并提供 OpenType `tnum`/`pnum` 在变宽数字和等宽数字之间切换。VF 与静态 TTF 都按 Inter 相关 `calt` 行为处理冒号：`1:2` 会上浮，`1:a`、`a:2`、`a:b` 不会上浮，`1::2`、`1:::a`、`a:::2` 等冒号串遵循 Inter 的 colon-run 规则。
@@ -28,7 +28,6 @@ reports/
   font-inspection.json
 tools/
   build_sarasa_ui_propdigits_sc.py
-  build_sarasa_ui_sc_true_vf.py  # 兼容旧脚本名的入口
 ```
 
 ## 构建逻辑
@@ -41,6 +40,10 @@ VF 不从静态字重插值生成。它直接合并：
 
 构建时对齐 Sarasa Ui 的处理方式：
 
+- VF 的公开 `wght` 轴是 `200..900`，默认值 `400`。Source Han Sans SC VF
+  内部仍按 `250..900` 裁剪并参与插值；最终 `avar` 把 public `200` 映射到
+  Source Han 内部 `250`，其余公开实例尽量映射到同数字上游位置。Inter VF
+  则直接按 public `200..900` 裁剪。
 - Inter 先烘焙 Sarasa 原版给 Inter 配置的 `ss03` 和 `cv10`。
 - 码位归属遵循 Sarasa pass1 的优先级，并按 VF 源文件实际覆盖做兜底：Latin 和西文符号优先来自 Inter VF；CJK、Hangul、Jamo 和 Sarasa Ui 的本地化标点优先来自 Source Han Sans SC VF。
 - Source Han 侧烘焙 Ui 标点需要的 `pwid` 替换，并执行 Sarasa 式符号清洗，例如 `·`、弯引号、短横、省略号、`⸺/⸻` 和注音扩展符号宽度处理。
@@ -60,15 +63,22 @@ VF 不从静态字重插值生成。它直接合并：
 
 ## 字重
 
-VF 实例和静态 TTF 都使用思源黑体式字重级别：
+VF 实例和静态 TTF 都使用更接近 Sarasa/CSS 的公开字重体系：
 
-- `ExtraLight` `250`
+- `ExtraLight` `200`
 - `Light` `300`
 - `Normal` `350`
 - `Regular` `400`
 - `Medium` `500`
 - `Bold` `700`
 - `Heavy` `900`
+
+其中 `Normal`、`Medium`、`Heavy` 是本项目保留的扩展实例。`ExtraLight 200`
+是公开字重口径；CJK 轮廓来源仍是 Source Han Sans SC 的 ExtraLight 口径
+`250`，不会伪造 Source Han 不存在的 `200` CJK 轮廓。VF 通过 `avar`
+轴映射让 public `wght=200` 对应 Source Han 内部 `wght=250`，同时让 Inter
+对应 public `wght=200`；public `300/350/400/500/700/900` 分别映射到
+Source Han 和 Inter 的同数字上游位置。
 
 ## 文件
 
@@ -101,7 +111,7 @@ python tools\build_sarasa_ui_propdigits_sc.py
 python tools\build_sarasa_ui_propdigits_sc.py --static-only
 ```
 
-脚本会在缺失依赖或源文件时准备固定版本的构建输入：Sarasa Gothic `v1.0.39`、SarasaUiSC TTF `1.0.39` hinted/unhinted、Source Han Sans `2.005R` VF、Inter `v4.1`、Node.js `v24.16.0`，以及 Sarasa 上游 npm 依赖。已有的目标文件/目录会直接复用；默认工作目录为仓库同级目录。
+脚本会在缺失依赖或源文件时准备固定版本的构建输入：Sarasa Gothic `v1.0.39`、SarasaUiSC TTF `1.0.39` hinted/unhinted、Source Han Sans `2.005R` VF、Inter `v4.1`、Node.js `v24.16.0`，以及 Sarasa 上游 npm 依赖。Python 包依赖也会自动安装，包括 `fontTools`、`uharfbuzz`、`brotli`、`ttfautohint-py`、`py7zr` 和 AFDKO；静态 Source Han TTC 转换会使用 AFDKO 提供的 `otc2otf`/`otf2ttf`，脚本会同时查找系统 `PATH` 和当前 Python 的 Scripts 目录。已有的目标文件/目录会直接复用；默认工作目录为仓库同级目录。
 
 因此，clone 后通常只需要直接运行构建脚本。脚本会把下载缓存放在同级 `source-archives/`，把 Sarasa Gothic 上游源码放在同级 `Sarasa-Gothic/`，把官方 SarasaUiSC 参考字体放在同级 `official-sarasa-ui-sc/`，把 VF 输入放在同级 `vf-sources/`，把固定 Node.js 运行时放在同级 `node/`。如果这些目录或文件已经存在，脚本会跳过下载/解包；如果没有，它会自动下载。默认会使用这份固定 Node.js，而不是系统里碰巧安装的 Node；只有显式设置 `SARASA_NODE`、`NODE` 或 `NPM` 时才会改用外部运行时。
 
@@ -116,6 +126,8 @@ python tools\build_sarasa_ui_propdigits_sc.py --static-only
 - `REFERENCE_SARASA`
 - `REFERENCE_SARASA_HINTED_DIR`
 - `TTFAUTOHINT`
+- `OTC2OTF`
+- `OTF2TTF`
 - `SARASA_SOURCE_DIR`
 - `SARASA_NODE`
 - `NODE`
