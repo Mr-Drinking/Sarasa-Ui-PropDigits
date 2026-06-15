@@ -1,5 +1,11 @@
 # 更纱黑体 Ui PropDigits SC
 
+## 为什么要制作它？
+
+曾几何时，我试图使用[更纱黑体（Sarasa Gothic）](https://github.com/be5invis/sarasa-gothic)作为 Android 手机的默认字体（因为个人更喜欢 [SF Pro](https://developer.apple.com/cn/fonts/) / [Inter](https://rsms.me/inter/) 而非 [Roboto](https://fonts.google.com/specimen/Roboto)），但由于修改软件只支持一个字体，我需要一个可变字体。但可惜的是，[原版更纱并不支持](https://github.com/be5invis/Sarasa-Gothic/issues/314)，我只好自己动手，用 Codex 中的 GPT-5.5 制作了本字体的可变版本；静态版本以及比例宽数字则是源于我对其成为 [Unigram](https://github.com/unigramdev/unigram) / Windows 默认字体的需要。
+
+## 简介
+
 这个仓库包含两个 Sarasa Ui SC 派生字体系列：
 
 - **Sarasa Ui VF PropDigits SC**：正体和 Italic 可变字体，公开 `wght` 轴为 `200..900`。
@@ -47,13 +53,13 @@ VF 不从静态字重插值生成。它直接合并：
 - Inter 先烘焙 Sarasa 原版给 Inter 配置的 `ss03` 和 `cv10`。
 - 码位归属遵循 Sarasa pass1 的优先级，并按 VF 源文件实际覆盖做兜底：Latin 和西文符号优先来自 Inter VF；CJK、Hangul、Jamo 和 Sarasa Ui 的本地化标点优先来自 Source Han Sans SC VF。
 - Source Han 侧烘焙 Ui 标点需要的 `pwid` 替换，并执行 Sarasa 式符号清洗，例如 `·`、弯引号、短横、省略号、`⸺/⸻` 和注音扩展符号宽度处理。
-- Hangul/Jamo 宽度归一到全角。
-- 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert/vrt2`、`tnum/pnum`、连续 em dash 和与 Inter 兼容的冒号 `calt`。
-- 最终 `GSUB`/`GPOS` 的 FeatureRecord 顺序、Script/LangSys 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui SC 静态字体套模板，避免只有 default langsys 而缺少 `JAN`/`KOR`/`ZHH`/`ZHS`/`ZHT`、Latin `CAT`/`MOL`/`ROM` 等语言系统。VF 与静态 TTF 都会移除过宽/过窄的既有冒号上下文替换，再追加一组与 Inter shaping 样例一致的 colon-run lookup。
-- VF、hinted 静态 TTF 和 unhinted 静态 TTF 都包含 `STAT`。VF 的 `STAT` 描述 `wght`/`ital` 轴和命名实例；静态 TTF 的 `STAT` 只用于现代应用识别 weight/italic 样式，不表示静态文件仍有 `fvar/gvar` 可变轴。
+- Hangul / Jamo 宽度归一到全角。
+- 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert` `vrt2`、`tnum` `pnum`、连续 em dash 和与 Inter 兼容的冒号 `calt`。
+- 最终 `GSUB`/`GPOS` 的 FeatureRecord 顺序、Script / LangSys 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui SC 静态字体套模板，避免只有 default langsys 而缺少 `JAN`/`KOR`/`ZHH`/`ZHS`/`ZHT`、Latin `CAT`/`MOL`/`ROM` 等语言系统。VF 与静态 TTF 都会移除过宽或过窄的既有冒号上下文替换，再追加一组与 Inter shaping 样例一致的 colon-run lookup。
+- VF、hinted 静态 TTF 和 unhinted 静态 TTF 都包含 `STAT`。VF 的 `STAT` 描述 `wght`/`ital` 轴和命名实例；静态 TTF 的 `STAT` 只用于现代应用识别 weight / italic 样式，不表示静态文件仍有 `fvar` `gvar` 可变轴。
 - `name` 表包含简体中文显示名：静态为 `更纱黑体 Ui PropDigits SC`，VF 为 `更纱黑体 Ui VF PropDigits SC`。
-- 构建会按上游 Sarasa Ui SC 同步非数字/非冒号 advance、横向 LSB、垂直指标、`GDEF`、`VORG`、`vmtx`、`head`/`OS/2` 中可安全继承的元数据字段；静态 exact 样式还会保留上游 simple glyph flags、glyf bbox 和组合字形的组件名。数字和与 Inter 兼容的冒号上下文是本派生字体的刻意差异。
-- 静态 TTF 不从 VF 实例化。hinted 和 unhinted 两套都使用静态 Source Han Sans SC 与静态 Inter，按 Sarasa 上游的 `pass1`、`kanji`、`hangul`、`pass2` 片段流程构建；最终 TTF 将默认数字和 `:` remap 到已有的 pnum glyph，清理旧冒号上下文替换后追加与 Inter shaping 样例一致的 colon-run `calt`，中文名、metadata、glyf flags/bbox、组件名和静态 `STAT` 也在最终 TTF 上同步。
+- 构建会按上游 Sarasa Ui SC 同步非数字与非冒号 advance、横向 LSB、垂直指标、`GDEF`、`VORG`、`vmtx`、`head`/`OS/2` 中可安全继承的元数据字段；静态 exact 样式还会保留上游 simple glyph flags、glyf bbox 和组合字形的组件名。数字和与 Inter 兼容的冒号上下文是本派生字体的刻意差异。
+- 静态 TTF 不从 VF 实例化。hinted 和 unhinted 两套都使用静态 Source Han Sans SC 与静态 Inter，按 Sarasa 上游的 `pass1`、`kanji`、`hangul`、`pass2` 片段流程构建；最终 TTF 将默认数字和 `:` remap 到已有的 pnum glyph，清理旧冒号上下文替换后追加与 Inter shaping 样例一致的 colon-run `calt`，中文名、metadata、glyf flags / bbox、组件名和静态 `STAT` 也在最终 TTF 上同步。
 - hinted 静态 TTF 与上游 Sarasa 的顺序保持一致：`pass1` 先经过 `ttfautohint`，随后 `pass1`/`kanji`/`hangul` 片段用同版本 Chlorophytum `hcfg` 写入 TrueType 指令，最后由 `pass2` 合成。对于官方存在且轮廓相同的 exact 样式，最终 TTF 还会同步官方 TrueType instruction tables 和同名 glyph 的 program；官方没有的 `Normal`/`Medium`/`Heavy` 静态字重分别使用上游 `Regular`/`SemiBold`/`Bold` 的构建样式或 hint 配置。冒号上浮使用现有片段里的 raised glyph，缺失时才在最终 TTF 上补齐。
 - unhinted 静态 TTF 使用相同的静态片段路径，但跳过 `ttfautohint` 和 Chlorophytum，直接由未 hint 的 `pass1`/`kanji`/`hangul` 合成；这是一套正式输出，供需要无 TrueType instructions 版本的使用场景选择。
 - 静态 TTF 使用 `post` format 2 保存 glyph names；这是为了在默认比例数字改挂到 U+0030..U+0039 后，`glyph01332`/`glyph01334` 这类上游组件名仍能在保存、重开和审计中稳定保留。VF 仍保持原来的 `post`/GID 模型。
@@ -63,21 +69,21 @@ VF 不从静态字重插值生成。它直接合并：
 
 ## 字重
 
-VF 实例和静态 TTF 都使用更接近 Sarasa/CSS 的公开字重体系：
+VF 实例和静态 TTF 都使用更接近 Sarasa / CSS 的公开字重体系：
 
-- `ExtraLight` `200`
-- `Light` `300`
-- `Normal` `350`
-- `Regular` `400`
-- `Medium` `500`
-- `Bold` `700`
-- `Heavy` `900`
+- `ExtraLight`：`200`
+- `Light`：`300`
+- `Normal`：`350`
+- `Regular`：`400`
+- `Medium`：`500`
+- `Bold`：`700`
+- `Heavy`：`900`
 
 其中 `Normal`、`Medium`、`Heavy` 是本项目保留的扩展实例。`ExtraLight 200`
 是公开字重口径；CJK 轮廓来源仍是 Source Han Sans SC 的 ExtraLight 口径
-`250`，不会伪造 Source Han 不存在的 `200` CJK 轮廓。VF 通过 `avar`
+`250`；VF 通过 `avar`
 轴映射让 public `wght=200` 对应 Source Han 内部 `wght=250`，同时让 Inter
-对应 public `wght=200`；public `300/350/400/500/700/900` 分别映射到
+对应 public `wght=200`；public `300` `350` `400` `500` `700` `900` 分别映射到
 Source Han 和 Inter 的同数字上游位置。
 
 ## 文件
