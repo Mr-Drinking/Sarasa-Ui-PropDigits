@@ -1,3 +1,11 @@
+<p align="center">
+  <img
+    src="assets/Sarasa_Ui_Specimen.svg"
+    alt="Sarasa Ui VF"
+    title="Sarasa Ui VF"
+  >
+</p>
+
 # 更纱黑体 Ui PropDigits SC
 
 ## 为什么要制作它？
