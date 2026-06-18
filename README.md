@@ -21,6 +21,8 @@
 
 两个系列都把 ASCII 数字 `U+0030..U+0039` 设为默认变宽数字，并提供 OpenType `tnum`/`pnum` 在变宽数字和等宽数字之间切换。VF 与静态 TTF 都按 Inter 相关 `calt` 行为处理冒号：`1:2` 会上浮，`1:a`、`a:2`、`a:b` 不会上浮，`1::2`、`1:::a`、`a:::2` 等冒号串遵循 Inter 的 colon-run 规则。
 
+另外，其他地区版本正在紧张刺激地 hinting 中，但因为 Chlorophytum 实在慢得可怜，我的 Ryzen 9 9900X 跑一次 Regular 就要三四十分钟，而我们有六个地区（CL、HC、J、K、SC、TC）乘以七级字重要进行微调，所以预计还要「一小段」时间才能与大家见面了。
+
 ## 文件结构
 
 ```text
@@ -74,7 +76,7 @@ VF 不从静态字重插值生成。它直接合并：
 - 静态 TTF 使用 `post` format 2 保存 glyph names；这是为了在默认比例数字改挂到 U+0030..U+0039 后，`glyph01332`/`glyph01334` 这类上游组件名仍能在保存、重开和审计中稳定保留。VF 仍保持原来的 `post`/GID 模型。
 - glyph 总数不作为构建目标。脚本会保留和同步 cmap 字形以及 GSUB/GPOS/GDEF 可达的未编码 glyph；不会为了让 `maxp.numGlyphs` 与上游相同而补入不可达 glyph。
 - 静态 TTF 不再为了 OTS 清除上游 `OVERLAP_SIMPLE` flags；这些 flags 会影响 FreeType rasterization，exact 样式应与上游保持一致。最终写出会强制重编译 `glyf`，并把带 `OVERLAP_SIMPLE` 的重复 flags 写成 OTS 可接受的 repeat 编码，而不是删除 bit 6。OTS 对上游 unhinted 和本派生 unhinted 可能仍打印 `maxp maxZones: 0`、`gasp` sentinel/丢表等基线警告，但返回码通过。
-- VF 轮廓上游使用 Source Han Sans SC VF，因此部分字形与 Sarasa 上游静态 TTF 不会逐点完全一致；脚本会同步 Sarasa Ui 的位置/宽度规则，但不会伪造 VF 上游没有的逐点轮廓。静态 TTF 使用静态 Source Han Sans SC，因此 exact 样式会审计非数字/非冒号码位的 bbox、坐标、flags 和组件名一致性。
+- VF 轮廓上游使用 Source Han Sans SC VF，因此部分字形与 Sarasa 上游静态 TTF 不会逐点完全一致；脚本会同步 Sarasa Ui 的位置/宽度规则，但不会伪造 VF 上游没有的逐点轮廓。静态 TTF 使用静态 Source Han Sans SC，因此 exact 样式会审计非数字与非冒号码位的 bbox、坐标、flags 和组件名一致性。
 
 ## 字重
 
