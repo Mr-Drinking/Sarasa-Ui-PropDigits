@@ -1,0 +1,3050 @@
+{
+  "title": "Sarasa Ui PropDigits 多地区发布前审计",
+  "generated_at": "2026-06-21 06:21:20 +0800",
+  "summary": {
+    "metadata_failures": 0,
+    "static_exact_failures": 0,
+    "vf_metric_failures": 0,
+    "static_fonts_checked": 168,
+    "variable_fonts_checked": 12,
+    "static_exact_cases": 96,
+    "vf_metric_cases": 24
+  },
+  "metadata_failures": [],
+  "static_exact_nonzero": [],
+  "vf_metrics_nonzero": [],
+  "static_exact": [
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-ExtraLight.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Light.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Regular.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Bold.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-ExtraLightItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-LightItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Italic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-BoldItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-ExtraLight.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-Light.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-Regular.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-Bold.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-ExtraLightItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-LightItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-Italic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\hinted\\SarasaUiCL-BoldItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42882
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Light",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Light",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Light",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Light",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsSC-TTF-1.0.39\\SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\hinted\\SarasaUiSC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Light",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Light",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Light",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Light",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsTC-TTF-1.0.39\\SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\hinted\\SarasaUiTC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Light",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Light",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Light",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Light",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsHC-TTF-1.0.39\\SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\hinted\\SarasaUiHC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Light",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Light",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Light",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Light",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsJ-TTF-1.0.39\\SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\hinted\\SarasaUiJ-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Light",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Light",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsK-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "ExtraLight",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-ExtraLight.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Light",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-Regular.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "ExtraLight",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-ExtraLightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Light",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Regular",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-Italic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Bold",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsK-TTF-1.0.39\\SarasaUiPropDigitsK-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\hinted\\SarasaUiK-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    }
+  ],
+  "vf_metrics": [
+    {
+      "region": "CL",
+      "weight": "Light",
+      "wght": 300,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Light.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42870
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Bold.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42870
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "wght": 300,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-LightItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42870
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-BoldItalic.ttf",
+      "intentional_skip": {
+        "reason": "CL 跟随 Shanggu Sans 1.028 官方静态 TTF/VF，不再以 Sarasa 1.0.39 内置旧 subset 为 exact 轮廓基线。",
+        "codepoints": 42873
+      },
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 42870
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Light",
+      "wght": 300,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Light",
+      "wght": 300,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "SC",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui-sc\\unhinted\\SarasaUiSC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Light",
+      "wght": 300,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Light",
+      "wght": 300,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "TC",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\TC\\unhinted\\SarasaUiTC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Light",
+      "wght": 300,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Light",
+      "wght": 300,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "HC",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\HC\\unhinted\\SarasaUiHC-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Light",
+      "wght": 300,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Light",
+      "wght": 300,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "J",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\J\\unhinted\\SarasaUiJ-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Light",
+      "wght": 300,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-Light.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": false,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-Bold.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Light",
+      "wght": 300,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-LightItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    },
+    {
+      "region": "K",
+      "weight": "Bold",
+      "wght": 700,
+      "italic": true,
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\K\\unhinted\\SarasaUiK-BoldItalic.ttf",
+      "counts": {
+        "missing_target": 0,
+        "missing_reference": 0,
+        "glyph_name": 0,
+        "h_advance": 0,
+        "h_lsb": 0,
+        "v_advance": 0,
+        "v_side_bearing": 0,
+        "bbox": 0,
+        "outline_or_flags": 0,
+        "skipped_intentional": 11
+      },
+      "samples": {}
+    }
+  ],
+  "metadata_samples": {
+    "static": [
+      {
+        "file": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "weight": 200,
+        "vendor": "MRDK",
+        "has_fvar": false,
+        "has_gvar": false,
+        "has_stat": true,
+        "has_hint_tables": true,
+        "glyph_program_count": 47069,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "glyph01471",
+          "raised_0941": "glyph01472",
+          "raised_1_2": "glyph01472",
+          "shapes": {
+            "09:41": [
+              "glyph01330",
+              "glyph01341",
+              "glyph01472",
+              "glyph01335",
+              "glyph01331"
+            ],
+            "1:2": [
+              "glyph01331",
+              "glyph01472",
+              "glyph01332"
+            ],
+            "1:a": [
+              "glyph01331",
+              "glyph01471",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "glyph01471",
+              "glyph01332"
+            ],
+            "a:b": [
+              "a",
+              "glyph01471",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "file": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "weight": 200,
+        "vendor": "MRDK",
+        "has_fvar": false,
+        "has_gvar": false,
+        "has_stat": true,
+        "has_hint_tables": true,
+        "glyph_program_count": 47067,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "glyph01440",
+          "raised_0941": "glyph01441",
+          "raised_1_2": "glyph01441",
+          "shapes": {
+            "09:41": [
+              "glyph01299",
+              "glyph01310",
+              "glyph01441",
+              "glyph01304",
+              "glyph01300"
+            ],
+            "1:2": [
+              "glyph01300",
+              "glyph01441",
+              "glyph01301"
+            ],
+            "1:a": [
+              "glyph01300",
+              "glyph01440",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "glyph01440",
+              "glyph01301"
+            ],
+            "a:b": [
+              "a",
+              "glyph01440",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "file": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Light.ttf",
+        "weight": 300,
+        "vendor": "MRDK",
+        "has_fvar": false,
+        "has_gvar": false,
+        "has_stat": true,
+        "has_hint_tables": true,
+        "glyph_program_count": 47071,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "glyph01471",
+          "raised_0941": "glyph01472",
+          "raised_1_2": "glyph01472",
+          "shapes": {
+            "09:41": [
+              "glyph01330",
+              "glyph01341",
+              "glyph01472",
+              "glyph01335",
+              "glyph01331"
+            ],
+            "1:2": [
+              "glyph01331",
+              "glyph01472",
+              "glyph01332"
+            ],
+            "1:a": [
+              "glyph01331",
+              "glyph01471",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "glyph01471",
+              "glyph01332"
+            ],
+            "a:b": [
+              "a",
+              "glyph01471",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "file": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-LightItalic.ttf",
+        "weight": 300,
+        "vendor": "MRDK",
+        "has_fvar": false,
+        "has_gvar": false,
+        "has_stat": true,
+        "has_hint_tables": true,
+        "glyph_program_count": 47067,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "glyph01440",
+          "raised_0941": "glyph01441",
+          "raised_1_2": "glyph01441",
+          "shapes": {
+            "09:41": [
+              "glyph01299",
+              "glyph01310",
+              "glyph01441",
+              "glyph01304",
+              "glyph01300"
+            ],
+            "1:2": [
+              "glyph01300",
+              "glyph01441",
+              "glyph01301"
+            ],
+            "1:a": [
+              "glyph01300",
+              "glyph01440",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "glyph01440",
+              "glyph01301"
+            ],
+            "a:b": [
+              "a",
+              "glyph01440",
+              "b"
+            ]
+          }
+        }
+      }
+    ],
+    "variable": [
+      {
+        "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+        "vendor": "MRDK",
+        "axes": [
+          {
+            "tag": "wght",
+            "min": 200.0,
+            "default": 400.0,
+            "max": 900.0
+          }
+        ],
+        "instances": [
+          200,
+          300,
+          350,
+          400,
+          500,
+          700,
+          900
+        ],
+        "has_fvar": true,
+        "has_gvar": true,
+        "has_stat": true,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "colon",
+          "raised_0941": "glyph48279",
+          "raised_1_2": "glyph48279",
+          "shapes": {
+            "09:41": [
+              "zero",
+              "nine",
+              "glyph48279",
+              "four",
+              "one"
+            ],
+            "1:2": [
+              "one",
+              "glyph48279",
+              "two"
+            ],
+            "1:a": [
+              "one",
+              "colon",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "colon",
+              "two"
+            ],
+            "a:b": [
+              "a",
+              "colon",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+        "vendor": "MRDK",
+        "axes": [
+          {
+            "tag": "wght",
+            "min": 200.0,
+            "default": 400.0,
+            "max": 900.0
+          }
+        ],
+        "instances": [
+          200,
+          300,
+          350,
+          400,
+          500,
+          700,
+          900
+        ],
+        "has_fvar": true,
+        "has_gvar": true,
+        "has_stat": true,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "colon",
+          "raised_0941": "glyph48246",
+          "raised_1_2": "glyph48246",
+          "shapes": {
+            "09:41": [
+              "zero",
+              "nine",
+              "glyph48246",
+              "four",
+              "one"
+            ],
+            "1:2": [
+              "one",
+              "glyph48246",
+              "two"
+            ],
+            "1:a": [
+              "one",
+              "colon",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "colon",
+              "two"
+            ],
+            "a:b": [
+              "a",
+              "colon",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+        "vendor": "MRDK",
+        "axes": [
+          {
+            "tag": "wght",
+            "min": 200.0,
+            "default": 400.0,
+            "max": 900.0
+          }
+        ],
+        "instances": [
+          200,
+          300,
+          350,
+          400,
+          500,
+          700,
+          900
+        ],
+        "has_fvar": true,
+        "has_gvar": true,
+        "has_stat": true,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "colon",
+          "raised_0941": "glyph48734",
+          "raised_1_2": "glyph48734",
+          "shapes": {
+            "09:41": [
+              "zero",
+              "nine",
+              "glyph48734",
+              "four",
+              "one"
+            ],
+            "1:2": [
+              "one",
+              "glyph48734",
+              "two"
+            ],
+            "1:a": [
+              "one",
+              "colon",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "colon",
+              "two"
+            ],
+            "a:b": [
+              "a",
+              "colon",
+              "b"
+            ]
+          }
+        }
+      },
+      {
+        "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+        "vendor": "MRDK",
+        "axes": [
+          {
+            "tag": "wght",
+            "min": 200.0,
+            "default": 400.0,
+            "max": 900.0
+          }
+        ],
+        "instances": [
+          200,
+          300,
+          350,
+          400,
+          500,
+          700,
+          900
+        ],
+        "has_fvar": true,
+        "has_gvar": true,
+        "has_stat": true,
+        "uppercase_UI_names": [],
+        "colon": {
+          "ok": true,
+          "raw_colon": "colon",
+          "raised_0941": "glyph48695",
+          "raised_1_2": "glyph48695",
+          "shapes": {
+            "09:41": [
+              "zero",
+              "nine",
+              "glyph48695",
+              "four",
+              "one"
+            ],
+            "1:2": [
+              "one",
+              "glyph48695",
+              "two"
+            ],
+            "1:a": [
+              "one",
+              "colon",
+              "a"
+            ],
+            "a:2": [
+              "a",
+              "colon",
+              "two"
+            ],
+            "a:b": [
+              "a",
+              "colon",
+              "b"
+            ]
+          }
+        }
+      }
+    ]
+  }
+}
