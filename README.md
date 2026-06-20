@@ -16,8 +16,8 @@
 
 这个仓库包含 Sarasa Ui 的 PropDigits 多地区派生字体：
 
-- **Sarasa Ui VF PropDigits CL/SC/TC/HC/J/K**：正体和 Italic 可变字体，公开 `wght` 轴为 `200..900`。
-- **Sarasa Ui PropDigits CL/SC/TC/HC/J/K**：从静态 Source Han Sans、Inter 和必要的地区覆盖源按 Sarasa 静态片段路径构建的 TTF，包含 hinted 与 unhinted 两套，每套 7 个字重及对应 Italic。
+- **Sarasa Ui VF PropDigits CL / SC / TC / HC / J / K**：正体和 Italic 可变字体，公开 `wght` 轴为 `200..900`。
+- **Sarasa Ui PropDigits CL / SC / TC / HC / J / K**：从静态 Source Han Sans、Inter 和必要的地区覆盖源按 Sarasa 静态片段路径构建的 TTF，包含 hinted 与 unhinted 两套，每套 7 个字重及对应 Italic。
 
 CL 的传统旧字形覆盖跟随 Shanggu Sans `1.028` 官方发布物：静态 TTF 使用 `ShangguSansTC-*.ttf`，VF 使用 `ShangguSansTC-VF.ttf`。这样静态和 VF 使用同一 Shanggu 发布口径，而不是继续绑定 Sarasa `1.0.39` 当时内置的旧 subset 转换产物。
 
@@ -25,7 +25,7 @@ CL 的传统旧字形覆盖跟随 Shanggu Sans `1.028` 官方发布物：静态 
 
 ## 地区
 
-- `CL`：传统旧字形。静态 TTF 的汉字底稿先取 `SourceHanSansK`，再用 Shanggu Sans `1.028` 官方 `ShangguSansTC` 静态 TTF 覆盖传统旧字形；VF 使用 `SourceHanSansK-VF` 加 `ShangguSansTC-VF` 覆盖。
+- `CL`：传统旧字形。静态 TTF 的汉字底稿先取 `SourceHanSansK`，再用 [Shanggu Sans](https://github.com/GuiWonder/Shanggu) 的 v1.028 官方 `ShangguSansTC` 静态 TTF 覆盖传统旧字形；VF 使用 `SourceHanSansK-VF` 加 `ShangguSansTC-VF` 覆盖。
 - `SC`：简体中文，来源为 `SourceHanSansSC`。
 - `TC`：繁体中文台湾字形，来源为 `SourceHanSansTC`。
 - `HC`：繁体中文香港字形，来源为 `SourceHanSansHC`。
@@ -104,19 +104,11 @@ VF 实例和静态 TTF 都使用更接近 Sarasa / CSS 的公开字重体系：
 
 ## 文件
 
-VF：
+- VF：[fonts/variable](fonts/variable)
+- hinted 静态 TTF：[fonts/static](fonts/static)
+- unhinted 静态 TTF：[fonts/static](fonts/static)
 
-- [fonts/variable](fonts/variable)
-
-hinted 静态 TTF：
-
-- [fonts/static](fonts/static)
-
-unhinted 静态 TTF：
-
-- [fonts/static](fonts/static)
-
-每个地区、每套静态版包含 14 个文件：7 个字重，每个字重有正体和 Italic。两套静态 TTF 都从 Sarasa 静态片段路径构建；hinted 版额外经过 `ttfautohint` 和 Sarasa 上游 Chlorophytum hint 流程，unhinted 版保留无 TrueType instructions 的静态输出。
+每个地区、每套静态版包含 14 个文件：7 个字重，每个字重有正体和 Italic。两套静态 TTF 都从 Sarasa 静态片段路径构建；hinted 版额外经过 `ttfautohint` 和 Sarasa 上游 Chlorophytum 的 hint 流程，unhinted 版保留无 TrueType instructions 的静态输出。
 
 Release 会提供按地区拆分和全集打包的 TTF 压缩包：
 
@@ -220,4 +212,4 @@ python tools\build_sarasa_ui_propdigits_sc.py --static-only --regions SC --resum
 
 字体按 SIL Open Font License 1.1 分发，见 [LICENSE](LICENSE)。
 
-这是修改版字体，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。
+这是修改版字体，不是 Sarasa Gothic、Source Han Sans、Inter 或 Shanggu Sans 的官方发布。
