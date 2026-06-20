@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import copy
 import hashlib
+import importlib.metadata
 import importlib.util
 import json
 import math
@@ -18,27 +19,38 @@ import tarfile
 import tempfile
 import urllib.request
 import zipfile
+from datetime import datetime
 from io import BytesIO
 from pathlib import Path
 from typing import Any
 
 
 PYTHON_DEPS = {
-    "fontTools": "fonttools[woff]",
-    "uharfbuzz": "uharfbuzz",
-    "brotli": "brotli",
-    "ttfautohint": "ttfautohint-py",
-    "py7zr": "py7zr",
-    "afdko": "afdko",
+    "fontTools": ("fonttools", "fonttools[woff]==4.63.0", "4.63.0"),
+    "uharfbuzz": ("uharfbuzz", "uharfbuzz==0.55.0", "0.55.0"),
+    "brotli": ("Brotli", "brotli==1.2.0", "1.2.0"),
+    "ttfautohint": ("ttfautohint-py", "ttfautohint-py==0.6.0", "0.6.0"),
+    "py7zr": ("py7zr", "py7zr==1.1.0", "1.1.0"),
+    "afdko": ("afdko", "afdko==5.0.1", "5.0.1"),
 }
 
 
 def ensure_python_deps() -> None:
-    missing = [package for module, package in PYTHON_DEPS.items() if importlib.util.find_spec(module) is None]
-    if not missing:
+    if os.environ.get("SARASA_SKIP_PYTHON_DEPS") == "1":
         return
-    print(f"[build] install missing Python dependencies: {' '.join(missing)}", flush=True)
-    subprocess.check_call([sys.executable, "-m", "pip", "install", *missing])
+    needed = []
+    for module, (distribution, package_spec, expected_version) in PYTHON_DEPS.items():
+        installed_version = None
+        try:
+            installed_version = importlib.metadata.version(distribution)
+        except importlib.metadata.PackageNotFoundError:
+            pass
+        if importlib.util.find_spec(module) is None or installed_version != expected_version:
+            needed.append(package_spec)
+    if not needed:
+        return
+    print(f"[build] install Python build dependencies: {' '.join(needed)}", flush=True)
+    subprocess.check_call([sys.executable, "-m", "pip", "install", *needed])
 
 
 ensure_python_deps()
@@ -125,28 +137,186 @@ def first_existing(*paths: Path) -> Path:
 
 
 def log_step(message: str) -> None:
-    print(f"[build] {message}", flush=True)
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[build {timestamp}] {message}", flush=True)
 
 
 SARASA_VERSION = "1.0.39"
 SARASA_TAG = f"v{SARASA_VERSION}"
 SOURCE_HAN_TAG = "2.005R"
 INTER_TAG = "v4.1"
-NODE_VERSION = "v24.16.0"
+SHANGGU_TAG = "1.028"
+SHANGGU_SANS_TTF_ARCHIVE_NAME = "ShangguSansTTFs.7z"
+SHANGGU_SANS_TTF_SHA256 = "a7fc794127270fff06224e2129e28ea917669bb3601296f219ea64fe0266b6f0"
+SHANGGU_SANS_VF_ARCHIVE_NAME = "ShangguSansVF_TTFs.7z"
+SHANGGU_SANS_VF_SHA256 = "31b207a05332196ff444114d66de1c7b622d3a7244ec15a2485e8d0844cb1984"
+NODE_VERSION = "v26.3.0"
 SOURCE_ARCHIVE_DIR = WORK_ROOT / "source-archives"
 NODE_DIR = Path(os.environ.get("SARASA_NODE_DIR", WORK_ROOT / "node"))
-REFERENCE_ROOT = Path(os.environ.get("REFERENCE_SARASA_ROOT", WORK_ROOT / "official-sarasa-ui-sc"))
+REFERENCE_ROOT = Path(os.environ.get("REFERENCE_SARASA_ROOT", WORK_ROOT / "official-sarasa-ui"))
+REFERENCE_SC_LEGACY_ROOT = Path(
+    os.environ.get("REFERENCE_SARASA_SC_ROOT", WORK_ROOT / "official-sarasa-ui-sc")
+)
 
 SRC_DIR = Path(os.environ.get("VF_SOURCE_DIR", first_existing(WORK_ROOT / "vf-sources", ROOT / "work" / "vf-sources")))
-BASE_VF = Path(os.environ.get("SOURCE_HAN_SC_VF", SRC_DIR / "SourceHanSansSC-VF.ttf"))
 INTER_UPRIGHT = Path(os.environ.get("INTER_VF", SRC_DIR / "InterVariable.ttf"))
 INTER_ITALIC = Path(os.environ.get("INTER_ITALIC_VF", SRC_DIR / "InterVariable-Italic.woff2"))
+
+REGION_ORDER = ["CL", "SC", "TC", "HC", "J", "K"]
+REGION_CONFIGS: dict[str, dict[str, Any]] = {
+    "CL": {
+        "source_han_static_prefix": "SourceHanSansK",
+        "source_han_vf_basename": "SourceHanSansK-VF.ttf",
+        "classical_vf_override_basename": f"shanggu-{SHANGGU_TAG}/ShangguSansTC-VF.ttf",
+        "sarasa_prefix": "SarasaUiCL",
+        "local_family": "更紗黑體",
+        "local_lang_id": 0x0404,
+        "classical": True,
+    },
+    "SC": {
+        "source_han_static_prefix": "SourceHanSansSC",
+        "source_han_vf_basename": "SourceHanSansSC-VF.ttf",
+        "classical_vf_override_basename": None,
+        "sarasa_prefix": "SarasaUiSC",
+        "local_family": "更纱黑体",
+        "local_lang_id": 0x0804,
+        "classical": False,
+    },
+    "TC": {
+        "source_han_static_prefix": "SourceHanSansTC",
+        "source_han_vf_basename": "SourceHanSansTC-VF.ttf",
+        "classical_vf_override_basename": None,
+        "sarasa_prefix": "SarasaUiTC",
+        "local_family": "更紗黑體",
+        "local_lang_id": 0x0404,
+        "classical": False,
+    },
+    "HC": {
+        "source_han_static_prefix": "SourceHanSansHC",
+        "source_han_vf_basename": "SourceHanSansHC-VF.ttf",
+        "classical_vf_override_basename": None,
+        "sarasa_prefix": "SarasaUiHC",
+        "local_family": "更紗黑體",
+        "local_lang_id": 0x0C04,
+        "classical": False,
+    },
+    "J": {
+        "source_han_static_prefix": "SourceHanSans",
+        "source_han_vf_basename": "SourceHanSans-VF.ttf",
+        "classical_vf_override_basename": None,
+        "sarasa_prefix": "SarasaUiJ",
+        "local_family": "更紗ゴシック",
+        "local_lang_id": 0x0411,
+        "classical": False,
+    },
+    "K": {
+        "source_han_static_prefix": "SourceHanSansK",
+        "source_han_vf_basename": "SourceHanSansK-VF.ttf",
+        "classical_vf_override_basename": None,
+        "sarasa_prefix": "SarasaUiK",
+        "local_family": "사라사 고딕",
+        "local_lang_id": 0x0412,
+        "classical": False,
+    },
+}
+
+
+def check_region(region: str) -> str:
+    region = region.upper()
+    if region not in REGION_CONFIGS:
+        raise ValueError(f"unknown region {region!r}; expected one of {', '.join(REGION_ORDER)}")
+    return region
+
+
+def region_config(region: str) -> dict[str, Any]:
+    return REGION_CONFIGS[check_region(region)]
+
+
+def region_reference_root(region: str) -> Path:
+    region = check_region(region)
+    if region == "SC" and REFERENCE_SC_LEGACY_ROOT.exists():
+        return REFERENCE_SC_LEGACY_ROOT
+    return REFERENCE_ROOT / region
+
+
+def region_reference_dir(region: str, hinted: bool) -> Path:
+    return region_reference_root(region) / ("hinted" if hinted else "unhinted")
+
+
+def sarasa_region_prefix(region: str) -> str:
+    return str(region_config(region)["sarasa_prefix"])
+
+
+def source_han_static_prefix(region: str) -> str:
+    return str(region_config(region)["source_han_static_prefix"])
+
+
+def source_han_vf_basename(region: str) -> str | None:
+    value = region_config(region)["source_han_vf_basename"]
+    return str(value) if value else None
+
+
+def classical_vf_override_basename(region: str) -> str | None:
+    value = region_config(region)["classical_vf_override_basename"]
+    return str(value) if value else None
+
+
+def source_han_vf_path(region: str) -> Path:
+    region = check_region(region)
+    env_value = os.environ.get(f"SOURCE_HAN_{region}_VF")
+    if region == "SC":
+        env_value = env_value or os.environ.get("SOURCE_HAN_SC_VF")
+    basename = source_han_vf_basename(region)
+    if not basename:
+        raise ValueError(f"region {region} has no Source Han Sans VF equivalent")
+    return Path(env_value) if env_value else SRC_DIR / basename
+
+
+def classical_vf_override_path(region: str) -> Path | None:
+    region = check_region(region)
+    basename = classical_vf_override_basename(region)
+    if not basename:
+        return None
+    env_value = (
+        os.environ.get(f"SHANGGU_{region}_VF")
+        or os.environ.get(f"CLASSICAL_{region}_VF")
+        or os.environ.get("SHANGGU_SANS_TC_VF")
+        or os.environ.get("SHANGGU_CLASSICAL_VF")
+    )
+    return Path(env_value) if env_value else SRC_DIR / basename
+
+
+def classical_static_override_path(region: str, weight_name: str) -> Path | None:
+    region = check_region(region)
+    if not region_config(region)["classical"]:
+        return None
+    source = STATIC_STYLE_SOURCES[weight_name]
+    shanggu_weight = str(source["shs"])
+    file_name = f"ShangguSansTC-{shanggu_weight}.ttf"
+    env_value = (
+        os.environ.get(f"SHANGGU_{region}_{weight_name.upper()}_TTF")
+        or os.environ.get(f"CLASSICAL_{region}_{weight_name.upper()}_TTF")
+    )
+    if env_value:
+        return Path(env_value)
+    env_dir = (
+        os.environ.get(f"SHANGGU_{region}_STATIC_DIR")
+        or os.environ.get(f"CLASSICAL_{region}_STATIC_DIR")
+        or os.environ.get("SHANGGU_SANS_TC_STATIC_DIR")
+        or os.environ.get("SHANGGU_CLASSICAL_STATIC_DIR")
+    )
+    if env_dir:
+        return Path(env_dir) / file_name
+    return SRC_DIR / f"shanggu-{SHANGGU_TAG}" / "static" / file_name
+
+
+BASE_VF = source_han_vf_path("SC")
 REFERENCE_SARASA = Path(
     os.environ.get(
         "REFERENCE_SARASA",
         first_existing(
-            REFERENCE_ROOT / "unhinted" / "SarasaUiSC-Regular.ttf",
-            REFERENCE_ROOT / f"SarasaUiSC-TTF-Unhinted-{SARASA_VERSION}" / "SarasaUiSC-Regular.ttf",
+            region_reference_dir("SC", False) / "SarasaUiSC-Regular.ttf",
+            REFERENCE_SC_LEGACY_ROOT / f"SarasaUiSC-TTF-Unhinted-{SARASA_VERSION}" / "SarasaUiSC-Regular.ttf",
             WORK_ROOT / "sarasa-original-unhinted" / "SarasaUiSC-Regular.ttf",
         ),
     )
@@ -156,8 +326,8 @@ REFERENCE_SARASA_HINTED_DIR = Path(
     os.environ.get(
         "REFERENCE_SARASA_HINTED_DIR",
         first_existing(
-            REFERENCE_ROOT / "hinted",
-            REFERENCE_ROOT / f"SarasaUiSC-TTF-{SARASA_VERSION}",
+            region_reference_dir("SC", True),
+            REFERENCE_SC_LEGACY_ROOT / f"SarasaUiSC-TTF-{SARASA_VERSION}",
             WORK_ROOT / "sarasa-original" / f"SarasaUiSC-TTF-{SARASA_VERSION}",
             REFERENCE_SARASA_DIR,
         ),
@@ -188,10 +358,11 @@ SARASA_HINT_CONFIGS = {
 SARASA_HINT_JOBS = int(os.environ.get("SARASA_HINT_JOBS", str(os.cpu_count() or 1)))
 
 VARIABLE_DIR = ROOT / "fonts" / "variable"
-STATIC_DIR = ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-1.0.39"
-STATIC_UNHINTED_DIR = ROOT / "fonts" / "static" / "SarasaUiPropDigitsSC-TTF-Unhinted-1.0.39"
+STATIC_ROOT = ROOT / "fonts" / "static"
+STATIC_DIR = STATIC_ROOT / f"SarasaUiPropDigitsSC-TTF-{SARASA_VERSION}"
+STATIC_UNHINTED_DIR = STATIC_ROOT / f"SarasaUiPropDigitsSC-TTF-Unhinted-{SARASA_VERSION}"
 REPORT_DIR = ROOT / "reports"
-BUILD_CACHE_DIR = Path(os.environ.get("SARASA_BUILD_CACHE", ROOT / ".build-cache" / "sarasa-propdigits-sc"))
+BUILD_CACHE_DIR = Path(os.environ.get("SARASA_BUILD_CACHE", ROOT / ".build-cache" / "sarasa-ui-propdigits"))
 
 AXIS_LIMIT = {"wght": (250, 400, 900)}
 PUBLIC_AXIS_LIMIT = {"wght": (200, 400, 900)}
@@ -202,9 +373,55 @@ VF_FAMILY_ZH_HANS = "更纱黑体 Ui VF PropDigits SC"
 STATIC_FAMILY = "Sarasa Ui PropDigits SC"
 STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
 STATIC_FAMILY_ZH_HANS = "更纱黑体 Ui PropDigits SC"
-VERSION = "1.0.39-propdigits.3"
+VERSION = "1.0.39.2"
 INTER_PREFIX = "inter."
 OS2_VENDOR_ID = "MRDK"
+
+def vf_family(region: str) -> str:
+    return f"Sarasa Ui VF PropDigits {check_region(region)}"
+
+
+def vf_ps_family(region: str) -> str:
+    return f"Sarasa-Ui-VF-PropDigits-{check_region(region)}"
+
+
+def vf_family_local(region: str) -> str:
+    config = region_config(region)
+    return f"{config['local_family']} Ui VF PropDigits {check_region(region)}"
+
+
+def static_family(region: str) -> str:
+    return f"Sarasa Ui PropDigits {check_region(region)}"
+
+
+def static_ps_family(region: str) -> str:
+    return f"Sarasa-Ui-PropDigits-{check_region(region)}"
+
+
+def static_family_local(region: str) -> str:
+    config = region_config(region)
+    return f"{config['local_family']} Ui PropDigits {check_region(region)}"
+
+
+def static_dir(region: str, hinted: bool) -> Path:
+    region = check_region(region)
+    hint_part = "TTF" if hinted else "TTF-Unhinted"
+    return STATIC_ROOT / f"SarasaUiPropDigits{region}-{hint_part}-{SARASA_VERSION}"
+
+
+def static_file_prefix(region: str) -> str:
+    return f"SarasaUiPropDigits{check_region(region)}"
+
+
+def variable_output_name(region: str, italic: bool) -> str:
+    region = check_region(region)
+    suffix = f"{region}-Italic[wght].ttf" if italic else f"{region}[wght].ttf"
+    return f"Sarasa-Ui-VF-PropDigits-{suffix}"
+
+
+def variable_regions(regions: list[str]) -> list[str]:
+    return [region for region in regions if source_han_vf_basename(region)]
+
 
 SOURCE_HAN_WEIGHT_STOPS = [
     {"name": "ExtraLight", "value": 200, "range_min": 200, "range_max": 299},
@@ -320,16 +537,16 @@ def reference_style_name(weight_name: str, italic: bool) -> str:
     return weight_name
 
 
-def reference_font_path(weight_name: str, italic: bool) -> Path:
-    return REFERENCE_SARASA_DIR / f"SarasaUiSC-{reference_style_name(weight_name, italic)}.ttf"
+def reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
+    return region_reference_dir(region, False) / f"{sarasa_region_prefix(region)}-{reference_style_name(weight_name, italic)}.ttf"
 
 
-def hinted_reference_font_path(weight_name: str, italic: bool) -> Path:
-    return REFERENCE_SARASA_HINTED_DIR / f"SarasaUiSC-{reference_style_name(weight_name, italic)}.ttf"
+def hinted_reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
+    return region_reference_dir(region, True) / f"{sarasa_region_prefix(region)}-{reference_style_name(weight_name, italic)}.ttf"
 
 
-def open_reference_font(weight_name: str, italic: bool) -> TTFont:
-    path = reference_font_path(weight_name, italic)
+def open_reference_font(region: str, weight_name: str, italic: bool) -> TTFont:
+    path = reference_font_path(region, weight_name, italic)
     if not path.exists():
         raise FileNotFoundError(path)
     return TTFont(path)
@@ -431,53 +648,71 @@ def set_zh_hans_name_records(font: TTFont, replacements: dict[int, str]) -> None
         set_windows_name_record(font, name_id, value, 0x0804)
 
 
-def update_vf_names(font: TTFont, italic: bool) -> None:
+def set_localized_name_records(font: TTFont, region: str, replacements: dict[int, str]) -> None:
+    lang_id = int(region_config(region)["local_lang_id"])
+    for name_id, value in replacements.items():
+        set_windows_name_record(font, name_id, value, lang_id)
+
+
+def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
     subfamily = "Italic" if italic else "Regular"
-    full = VF_FAMILY + (" Italic" if italic else "")
-    full_zh_hans = VF_FAMILY_ZH_HANS + (" Italic" if italic else "")
-    ps = VF_PS_FAMILY + ("-Italic" if italic else "")
-    version = f"Version {VERSION}; Source Han Sans SC VF + Inter VF; PropDigits"
+    family = vf_family(region)
+    family_local = vf_family_local(region)
+    ps_family = vf_ps_family(region)
+    full = family + (" Italic" if italic else "")
+    full_local = family_local + (" Italic" if italic else "")
+    ps = ps_family + ("-Italic" if italic else "")
+    source_label = source_han_vf_basename(region) or source_han_static_prefix(region)
+    if classical_vf_override_basename(region):
+        source_label += " + ShangguSansTC-VF"
+    version = f"Version {VERSION}; {source_label} + Inter VF; PropDigits"
     replacements = {
-        1: VF_FAMILY,
+        1: family,
         2: subfamily,
         3: ps + f";{VERSION}",
         4: full,
         5: version,
         6: ps,
-        16: VF_FAMILY,
+        16: family,
         17: subfamily,
         25: ps,
     }
     for name_id, value in replacements.items():
         set_name_record(font, name_id, value)
-    set_zh_hans_name_records(
+    set_localized_name_records(
         font,
+        region,
         {
-            1: VF_FAMILY_ZH_HANS,
+            1: family_local,
             2: subfamily,
-            3: f"{VF_FAMILY_ZH_HANS} {subfamily}",
-            4: full_zh_hans,
-            16: VF_FAMILY_ZH_HANS,
+            3: f"{family_local} {subfamily}",
+            4: full_local,
+            16: family_local,
             17: subfamily,
         },
     )
 
 
-def legacy_static_family(weight_name: str) -> str:
+def legacy_static_family(region: str, weight_name: str) -> str:
+    family = static_family(region)
     if weight_name in {"Regular", "Bold"}:
-        return STATIC_FAMILY
-    return f"{STATIC_FAMILY} {weight_name}"
+        return family
+    return f"{family} {weight_name}"
 
 
-def legacy_static_family_zh_hans(weight_name: str) -> str:
+def legacy_static_family_local(region: str, weight_name: str) -> str:
+    family = static_family_local(region)
     if weight_name in {"Regular", "Bold"}:
-        return STATIC_FAMILY_ZH_HANS
-    return f"{STATIC_FAMILY_ZH_HANS} {weight_name}"
+        return family
+    return f"{family} {weight_name}"
 
 
-def update_static_names(font: TTFont, weight_name: str, weight_value: int, italic: bool) -> None:
-    family = legacy_static_family(weight_name)
-    family_zh_hans = legacy_static_family_zh_hans(weight_name)
+def update_static_names(font: TTFont, region: str, weight_name: str, weight_value: int, italic: bool) -> None:
+    family = legacy_static_family(region, weight_name)
+    family_local = legacy_static_family_local(region, weight_name)
+    typographic_family = static_family(region)
+    typographic_family_local = static_family_local(region)
+    ps_family = static_ps_family(region)
     if weight_name == "Regular":
         legacy_style = "Italic" if italic else "Regular"
     elif weight_name == "Bold":
@@ -486,35 +721,36 @@ def update_static_names(font: TTFont, weight_name: str, weight_value: int, itali
         legacy_style = "Italic" if italic else "Regular"
 
     typographic_style = "Italic" if weight_name == "Regular" and italic else weight_name + (" Italic" if italic else "")
-    full = STATIC_FAMILY if weight_name == "Regular" and not italic else f"{STATIC_FAMILY} {typographic_style}"
-    full_zh_hans = (
-        STATIC_FAMILY_ZH_HANS
+    full = typographic_family if weight_name == "Regular" and not italic else f"{typographic_family} {typographic_style}"
+    full_local = (
+        typographic_family_local
         if weight_name == "Regular" and not italic
-        else f"{STATIC_FAMILY_ZH_HANS} {typographic_style}"
+        else f"{typographic_family_local} {typographic_style}"
     )
     ps_suffix = "Italic" if weight_name == "Regular" and italic else weight_name + ("-Italic" if italic else "")
-    ps = f"{STATIC_PS_FAMILY}-{ps_suffix}"
+    ps = f"{ps_family}-{ps_suffix}"
 
     replacements = {
         1: family,
         2: legacy_style,
         3: ps + f";{VERSION}",
         4: full,
-        5: f"Version {VERSION}; static Source Han Sans SC + static Inter; PropDigits",
+        5: f"Version {VERSION}; static {source_han_static_prefix(region)} + static Inter; PropDigits",
         6: ps,
-        16: STATIC_FAMILY,
+        16: typographic_family,
         17: typographic_style,
     }
     for name_id, value in replacements.items():
         set_name_record(font, name_id, value)
-    set_zh_hans_name_records(
+    set_localized_name_records(
         font,
+        region,
         {
-            1: family_zh_hans,
+            1: family_local,
             2: legacy_style,
-            3: full_zh_hans,
-            4: full_zh_hans,
-            16: STATIC_FAMILY_ZH_HANS,
+            3: full_local,
+            4: full_local,
+            16: typographic_family_local,
             17: typographic_style,
         },
     )
@@ -955,6 +1191,30 @@ def reference_vmtx_profiles(
     return profiles
 
 
+def reference_vertical_vmtx_profiles(
+    reference_fonts: dict[int, TTFont],
+    codepoints: set[int],
+) -> dict[int, tuple[tuple[int, tuple[int, int]], ...]]:
+    vertical_maps = {
+        weight_value: get_single_substitution_mappings(reference, {"vert", "vrt2"})
+        for weight_value, reference in reference_fonts.items()
+    }
+    profiles: dict[int, tuple[tuple[int, tuple[int, int]], ...]] = {}
+    for codepoint in codepoints:
+        metrics = []
+        for weight_value, reference in sorted(reference_fonts.items()):
+            if "vmtx" not in reference:
+                continue
+            cmap = reference.getBestCmap()
+            glyph_name = cmap.get(codepoint)
+            vertical_glyph = vertical_maps[weight_value].get(glyph_name) if glyph_name else None
+            if vertical_glyph and vertical_glyph in reference["vmtx"].metrics:
+                metrics.append((weight_value, tuple(reference["vmtx"].metrics[vertical_glyph])))
+        if metrics:
+            profiles[codepoint] = tuple(metrics)
+    return profiles
+
+
 def split_reference_vmtx_profiles(
     font: TTFont,
     reference_fonts: dict[int, TTFont],
@@ -980,6 +1240,92 @@ def split_reference_vmtx_profiles(
                 cloned_glyphs += 1
         split_groups += 1
     return {"reference_vmtx_profile_groups_split": split_groups, "reference_vmtx_profile_glyphs_cloned": cloned_glyphs}
+
+
+def split_reference_vertical_vmtx_aliases(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+    skip_codepoints: set[int],
+) -> dict[str, int]:
+    if "GSUB" not in font or "vmtx" not in font or "glyf" not in font:
+        return {
+            "reference_vertical_vmtx_alias_groups_split": 0,
+            "reference_vertical_vmtx_alias_glyphs_cloned": 0,
+            "reference_vertical_vmtx_alias_mappings_updated": 0,
+        }
+
+    cmap = font.getBestCmap()
+    relevant_codepoints = set(cmap) - skip_codepoints
+    encoded_profiles = reference_vmtx_profiles(reference_fonts, relevant_codepoints)
+    vertical_profiles = reference_vertical_vmtx_profiles(reference_fonts, relevant_codepoints)
+    current_vertical = get_single_substitution_mappings(font, {"vert", "vrt2"})
+    if not vertical_profiles or not current_vertical:
+        return {
+            "reference_vertical_vmtx_alias_groups_split": 0,
+            "reference_vertical_vmtx_alias_glyphs_cloned": 0,
+            "reference_vertical_vmtx_alias_mappings_updated": 0,
+        }
+
+    reference_400 = reference_fonts.get(400) or next(iter(reference_fonts.values()))
+    reference_400_cmap = reference_400.getBestCmap()
+    reference_400_vertical = get_single_substitution_mappings(reference_400, {"vert", "vrt2"})
+    encoded_profiles_by_glyph: dict[str, set[tuple[tuple[int, tuple[int, int]], ...]]] = {}
+    for codepoint, glyph_name in cmap.items():
+        profile = encoded_profiles.get(codepoint)
+        if profile:
+            encoded_profiles_by_glyph.setdefault(glyph_name, set()).add(profile)
+
+    roles_by_target: dict[str, list[tuple[int, str, tuple[tuple[int, tuple[int, int]], ...], str | None]]] = {}
+    for codepoint in sorted(relevant_codepoints):
+        source_name = cmap.get(codepoint)
+        target_name = current_vertical.get(source_name) if source_name else None
+        profile = vertical_profiles.get(codepoint)
+        if not source_name or not target_name or not profile or target_name not in font["glyf"].glyphs:
+            continue
+        ref_source = reference_400_cmap.get(codepoint)
+        ref_target = reference_400_vertical.get(ref_source) if ref_source else None
+        roles_by_target.setdefault(target_name, []).append((codepoint, source_name, profile, ref_target))
+
+    replacements: dict[tuple[str, str], str] = {}
+    split_groups = 0
+    cloned_glyphs = 0
+    for target_name, roles in roles_by_target.items():
+        encoded_for_target = encoded_profiles_by_glyph.get(target_name, set())
+        profiles_to_clone: set[tuple[tuple[int, tuple[int, int]], ...]] = set()
+        if encoded_for_target:
+            profiles_to_clone = {profile for _cp, _source, profile, _ref_target in roles if profile not in encoded_for_target}
+        else:
+            roles_by_profile: dict[tuple[tuple[int, tuple[int, int]], ...], list[tuple[int, str, str | None]]] = {}
+            for codepoint, source_name, profile, ref_target in roles:
+                roles_by_profile.setdefault(profile, []).append((codepoint, source_name, ref_target))
+            if len(roles_by_profile) > 1:
+                keep_profile = max(
+                    roles_by_profile.items(),
+                    key=lambda item: (len(item[1]), -min(codepoint for codepoint, _source, _ref_target in item[1])),
+                )[0]
+                profiles_to_clone = {profile for profile in roles_by_profile if profile != keep_profile}
+
+        clones_by_profile: dict[tuple[tuple[int, tuple[int, int]], ...], str] = {}
+        for codepoint, source_name, profile, ref_target in roles:
+            if profile not in profiles_to_clone:
+                continue
+            if profile not in clones_by_profile:
+                preferred_name = ref_target or f"{target_name}.v{codepoint:04X}"
+                clone_name = clone_glyph(font, target_name, preferred_name)
+                if not clone_name:
+                    continue
+                clones_by_profile[profile] = clone_name
+                cloned_glyphs += 1
+            replacements[(source_name, target_name)] = clones_by_profile[profile]
+        if clones_by_profile:
+            split_groups += 1
+
+    updated = update_single_substitution_mappings(font, {"vert", "vrt2"}, replacements)
+    return {
+        "reference_vertical_vmtx_alias_groups_split": split_groups,
+        "reference_vertical_vmtx_alias_glyphs_cloned": cloned_glyphs,
+        "reference_vertical_vmtx_alias_mappings_updated": updated,
+    }
 
 
 def glyph_vmtx_at_weight(font: TTFont, weight_value: int) -> dict[str, tuple[int, int]]:
@@ -1140,9 +1486,10 @@ def rebuild_static_stat(font: TTFont, weight_name: str, weight_value: int, itali
     buildStatTable(font, axes)
 
 
-def update_fvar_instances(font: TTFont, italic: bool) -> None:
+def update_fvar_instances(font: TTFont, region: str, italic: bool) -> None:
     name_table = font["name"]
     instances = []
+    ps_family = vf_ps_family(region)
     for stop in SOURCE_HAN_WEIGHT_STOPS:
         weight_name = stop["name"]
         weight_value = stop["value"]
@@ -1151,28 +1498,28 @@ def update_fvar_instances(font: TTFont, italic: bool) -> None:
         instance.flags = 0
         if weight_name == "Regular":
             instance.subfamilyNameID = name_table.addName("Italic" if italic else "Regular")
-            instance.postscriptNameID = name_table.addName(f"{VF_PS_FAMILY}-Italic" if italic else VF_PS_FAMILY)
+            instance.postscriptNameID = name_table.addName(f"{ps_family}-Italic" if italic else ps_family)
         else:
             instance.subfamilyNameID = name_table.addName(weight_name + (" Italic" if italic else ""))
             instance.postscriptNameID = name_table.addName(
-                f"{VF_PS_FAMILY}-{weight_name}{'Italic' if italic else ''}"
+                f"{ps_family}-{weight_name}{'Italic' if italic else ''}"
             )
         instances.append(instance)
     font["fvar"].instances = instances
 
 
-def reference_unicodes() -> set[int]:
-    font = TTFont(REFERENCE_SARASA)
+def reference_unicodes(region: str) -> set[int]:
+    font = TTFont(reference_font_path(region, "Regular", False))
     try:
         return set(font.getBestCmap().keys())
     finally:
         font.close()
 
 
-def source_han_unicodes_like_sarasa(base: TTFont, inter_unicodes: set[int]) -> set[int]:
+def source_han_unicodes_like_sarasa(region: str, base: TTFont, inter_unicodes: set[int]) -> set[int]:
     base_unicodes = set(base.getBestCmap().keys())
     unicodes: set[int] = set()
-    for codepoint in reference_unicodes():
+    for codepoint in reference_unicodes(region):
         if codepoint not in base_unicodes:
             continue
         if source_han_overrides_inter(codepoint) or codepoint not in inter_unicodes:
@@ -1244,6 +1591,29 @@ def get_single_substitution_mappings(font: TTFont, tags: set[str]) -> dict[str, 
     return mapping
 
 
+def update_single_substitution_mappings(font: TTFont, tags: set[str], replacements: dict[tuple[str, str], str]) -> int:
+    if "GSUB" not in font or not replacements:
+        return 0
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return 0
+    updated = 0
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag not in tags:
+            continue
+        for lookup_index in record.Feature.LookupListIndex:
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            for subtable in single_substitution_subtables(lookup):
+                if not hasattr(subtable, "mapping"):
+                    continue
+                for source_name, target_name in list(subtable.mapping.items()):
+                    new_target = replacements.get((source_name, target_name))
+                    if new_target and new_target != target_name:
+                        subtable.mapping[source_name] = new_target
+                        updated += 1
+    return updated
+
+
 def remove_vertical_long_dash_ligature_mappings(font: TTFont) -> dict[str, int]:
     if "GSUB" not in font or "hmtx" not in font or "vmtx" not in font:
         return {"vertical_long_dash_ligature_mappings_removed": 0}
@@ -1287,8 +1657,8 @@ def glyph_to_unicodes(font: TTFont) -> dict[str, set[int]]:
     return result
 
 
-def reference_locl_source_unicodes() -> set[int]:
-    font = TTFont(REFERENCE_SARASA)
+def reference_locl_source_unicodes(region: str) -> set[int]:
+    font = TTFont(reference_font_path(region, "Regular", False))
     try:
         reverse = glyph_to_unicodes(font)
         unicodes: set[int] = set()
@@ -1299,8 +1669,8 @@ def reference_locl_source_unicodes() -> set[int]:
         font.close()
 
 
-def prune_locl_like_reference(font: TTFont) -> dict[str, int]:
-    allowed_unicodes = reference_locl_source_unicodes()
+def prune_locl_like_reference(font: TTFont, region: str) -> dict[str, int]:
+    allowed_unicodes = reference_locl_source_unicodes(region)
     reverse = glyph_to_unicodes(font)
     before = 0
     after = 0
@@ -1371,6 +1741,73 @@ def copy_glyph_data(font: TTFont, source_name: str, target_name: str) -> None:
         font["gvar"].variations[target_name] = copy.deepcopy(font["gvar"].variations.get(source_name, []))
 
 
+def clone_glyph(font: TTFont, source_name: str, preferred_name: str) -> str | None:
+    if source_name not in font["glyf"].glyphs or source_name not in font["hmtx"].metrics:
+        return None
+    existing = set(font.getGlyphOrder()) | set(font["glyf"].glyphs)
+    base_name = preferred_name if preferred_name and preferred_name not in {".notdef", source_name} else f"{source_name}.clone"
+    new_name = base_name
+    suffix = 1
+    while new_name in existing:
+        suffix += 1
+        new_name = f"{base_name}.{suffix}"
+    font["glyf"].glyphs[new_name] = copy.deepcopy(font["glyf"][source_name])
+    font["hmtx"].metrics[new_name] = copy.deepcopy(font["hmtx"].metrics[source_name])
+    if "vmtx" in font and source_name in font["vmtx"].metrics:
+        font["vmtx"].metrics[new_name] = copy.deepcopy(font["vmtx"].metrics[source_name])
+    if "gvar" in font:
+        font["gvar"].variations[new_name] = copy.deepcopy(font["gvar"].variations.get(source_name, []))
+    if "VORG" in font and source_name in font["VORG"].VOriginRecords:
+        font["VORG"].VOriginRecords[new_name] = copy.deepcopy(font["VORG"].VOriginRecords[source_name])
+    order = font.getGlyphOrder()
+    order.append(new_name)
+    font.setGlyphOrder(order)
+    if "maxp" in font:
+        font["maxp"].numGlyphs = len(order)
+    return new_name
+
+
+def copy_external_glyph_data(target: TTFont, target_name: str, source: TTFont, source_name: str) -> None:
+    if source_name not in source["glyf"].glyphs or target_name not in target["glyf"].glyphs:
+        return
+    target["glyf"].glyphs[target_name] = copy.deepcopy(source["glyf"][source_name])
+    if source_name in source["hmtx"].metrics:
+        target["hmtx"].metrics[target_name] = copy.deepcopy(source["hmtx"].metrics[source_name])
+    if "vmtx" in target and "vmtx" in source and source_name in source["vmtx"].metrics:
+        target["vmtx"].metrics[target_name] = copy.deepcopy(source["vmtx"].metrics[source_name])
+    if "gvar" in target:
+        target["gvar"].variations[target_name] = (
+            copy.deepcopy(source["gvar"].variations.get(source_name, [])) if "gvar" in source else []
+        )
+    if "VORG" in target and "VORG" in source:
+        if source_name in source["VORG"].VOriginRecords:
+            target["VORG"].VOriginRecords[target_name] = copy.deepcopy(source["VORG"].VOriginRecords[source_name])
+        else:
+            target["VORG"].VOriginRecords.pop(target_name, None)
+
+
+def apply_classical_vf_override(base: TTFont, override: TTFont, region: str) -> dict[str, int]:
+    if not region_config(region)["classical"]:
+        return {"classical_vf_override_codepoints": 0, "classical_vf_override_glyphs": 0}
+    base_cmap = base.getBestCmap() or {}
+    override_cmap = override.getBestCmap() or {}
+    reference_cps = reference_unicodes(region)
+    replaced_glyphs: set[str] = set()
+    replaced_codepoints = 0
+    for codepoint in sorted(reference_cps & set(base_cmap) & set(override_cmap)):
+        if not is_ideograph(codepoint):
+            continue
+        target_name = base_cmap[codepoint]
+        source_name = override_cmap[codepoint]
+        copy_external_glyph_data(base, target_name, override, source_name)
+        replaced_glyphs.add(target_name)
+        replaced_codepoints += 1
+    return {
+        "classical_vf_override_codepoints": replaced_codepoints,
+        "classical_vf_override_glyphs": len(replaced_glyphs),
+    }
+
+
 def clone_cmap_glyph_for_codepoint(font: TTFont, codepoint: int) -> str | None:
     cmap = font.getBestCmap()
     glyph_name = cmap.get(codepoint)
@@ -1386,16 +1823,9 @@ def clone_cmap_glyph_for_codepoint(font: TTFont, codepoint: int) -> str | None:
         suffix += 1
         new_name = f"{glyph_name}.u{codepoint:04X}.{suffix}"
 
-    font["glyf"].glyphs[new_name] = copy.deepcopy(font["glyf"][glyph_name])
-    font["hmtx"].metrics[new_name] = copy.deepcopy(font["hmtx"].metrics[glyph_name])
-    if "vmtx" in font and glyph_name in font["vmtx"].metrics:
-        font["vmtx"].metrics[new_name] = copy.deepcopy(font["vmtx"].metrics[glyph_name])
-    if "gvar" in font:
-        font["gvar"].variations[new_name] = copy.deepcopy(font["gvar"].variations.get(glyph_name, []))
-    order.append(new_name)
-    font.setGlyphOrder(order)
-    if "maxp" in font:
-        font["maxp"].numGlyphs = len(order)
+    new_name = clone_glyph(font, glyph_name, new_name)
+    if not new_name:
+        return None
     for cmap_table in font["cmap"].tables:
         if cmap_table.isUnicode() and cmap_table.cmap.get(codepoint) == glyph_name:
             cmap_table.cmap[codepoint] = new_name
@@ -2278,12 +2708,21 @@ def remap_inter_gvar_supports(base: TTFont, inter: TTFont) -> None:
             )
 
 
-def load_base(italic: bool, inter_unicodes: set[int]) -> tuple[TTFont, dict[str, Any]]:
-    base = TTFont(BASE_VF)
+def load_base(region: str, italic: bool, inter_unicodes: set[int]) -> tuple[TTFont, dict[str, Any]]:
+    base = TTFont(source_han_vf_path(region))
     base = instantiateVariableFont(base, AXIS_LIMIT, inplace=False, optimize=True)
+    sarasa_report: dict[str, Any] = {}
+    override_path = classical_vf_override_path(region)
+    if override_path:
+        override = TTFont(override_path)
+        try:
+            override = instantiateVariableFont(override, AXIS_LIMIT, inplace=False, optimize=True)
+            sarasa_report.update(apply_classical_vf_override(base, override, region))
+        finally:
+            override.close()
     public_axis_report = apply_public_weight_axis(base)
-    subset_font(base, source_han_unicodes_like_sarasa(base, inter_unicodes))
-    sarasa_report = bake_source_han_pwid_and_sanitize(base)
+    subset_font(base, source_han_unicodes_like_sarasa(region, base, inter_unicodes))
+    sarasa_report.update(bake_source_han_pwid_and_sanitize(base))
     sarasa_report.update(public_axis_report)
     sarasa_report["hangul_widths_normalized"] = normalize_hangul_widths(base)
     if italic:
@@ -3228,6 +3667,132 @@ def remove_existing_calt_colon_substitutions(font: TTFont, colon: str) -> tuple[
     return raised, removed
 
 
+def coverage_contains_glyph(cov: Any, glyph_name: str) -> bool:
+    return glyph_name in (getattr(cov, "glyphs", []) or [])
+
+
+def digit_colon_calt_lookup_indices(font: TTFont, colon: str) -> set[int]:
+    if "GSUB" not in font or not font["GSUB"].table.FeatureList or not font["GSUB"].table.LookupList:
+        return set()
+    lookup_list = font["GSUB"].table.LookupList.Lookup
+    result: set[int] = set()
+    for feature_record in font["GSUB"].table.FeatureList.FeatureRecord:
+        if feature_record.FeatureTag != "calt":
+            continue
+        for lookup_index in list(feature_record.Feature.LookupListIndex or []):
+            if lookup_index >= len(lookup_list):
+                continue
+            lookup = lookup_list[lookup_index]
+            if lookup.LookupType != 6:
+                continue
+            target_indices: set[int] = set()
+            for subtable in lookup.SubTable:
+                input_coverages = getattr(subtable, "InputCoverage", []) or []
+                if not any(coverage_contains_glyph(cov, colon) for cov in input_coverages):
+                    continue
+                for record in getattr(subtable, "SubstLookupRecord", []) or []:
+                    target_index = record.LookupListIndex
+                    if target_index < len(lookup_list) and lookup_list[target_index].LookupType == 1:
+                        target_indices.add(target_index)
+            if target_indices:
+                result.add(lookup_index)
+                result.update(target_indices)
+    return result
+
+
+def remove_gsub_lookups(font: TTFont, remove_indices: set[int]) -> dict[str, int]:
+    if "GSUB" not in font or not font["GSUB"].table.LookupList or not remove_indices:
+        return {"gsub_lookups_removed": 0}
+    gsub = font["GSUB"].table
+    old_lookups = gsub.LookupList.Lookup
+    remove_indices = {index for index in remove_indices if 0 <= index < len(old_lookups)}
+    if not remove_indices:
+        return {"gsub_lookups_removed": 0}
+
+    index_map: dict[int, int] = {}
+    new_lookups = []
+    for old_index, lookup in enumerate(old_lookups):
+        if old_index in remove_indices:
+            continue
+        index_map[old_index] = len(new_lookups)
+        new_lookups.append(lookup)
+
+    if gsub.FeatureList:
+        for feature_record in gsub.FeatureList.FeatureRecord:
+            indices = [
+                index_map[index]
+                for index in list(feature_record.Feature.LookupListIndex or [])
+                if index in index_map
+            ]
+            feature_record.Feature.LookupListIndex = indices
+            feature_record.Feature.LookupCount = len(indices)
+
+    def remap_records(container: Any) -> None:
+        records = list(getattr(container, "SubstLookupRecord", []) or [])
+        if records:
+            kept_records = []
+            for record in records:
+                if record.LookupListIndex not in index_map:
+                    continue
+                record.LookupListIndex = index_map[record.LookupListIndex]
+                kept_records.append(record)
+            container.SubstLookupRecord = kept_records
+            if hasattr(container, "SubstCount"):
+                container.SubstCount = len(kept_records)
+        for rule_set_attr in ("SubRuleSet", "ChainSubRuleSet", "SubClassSet", "ChainSubClassSet"):
+            for rule_set in getattr(container, rule_set_attr, []) or []:
+                if not rule_set:
+                    continue
+                for rule_list_attr in ("SubRule", "ChainSubRule", "SubClassRule", "ChainSubClassRule"):
+                    for rule in getattr(rule_set, rule_list_attr, []) or []:
+                        remap_records(rule)
+
+    for lookup in new_lookups:
+        for subtable in lookup.SubTable:
+            remap_records(subtable)
+
+    gsub.LookupList.Lookup = new_lookups
+    gsub.LookupList.LookupCount = len(new_lookups)
+    return {"gsub_lookups_removed": len(remove_indices)}
+
+
+def drop_empty_feature_records(font: TTFont, table_tag: str, tag: str) -> dict[str, int]:
+    if table_tag not in font or not font[table_tag].table.FeatureList:
+        return {f"{tag}_empty_feature_records_removed": 0}
+    table = font[table_tag].table
+    old_records = table.FeatureList.FeatureRecord
+    index_map: dict[int, int] = {}
+    new_records = []
+    removed = 0
+    for old_index, record in enumerate(old_records):
+        if record.FeatureTag == tag and not list(record.Feature.LookupListIndex or []):
+            removed += 1
+            continue
+        index_map[old_index] = len(new_records)
+        new_records.append(record)
+    if not removed:
+        return {f"{tag}_empty_feature_records_removed": 0}
+    table.FeatureList.FeatureRecord = new_records
+    table.FeatureList.FeatureCount = len(new_records)
+    if table.ScriptList:
+        for script_record in table.ScriptList.ScriptRecord:
+            langsys_list = []
+            if script_record.Script.DefaultLangSys:
+                langsys_list.append(script_record.Script.DefaultLangSys)
+            langsys_list.extend(record.LangSys for record in script_record.Script.LangSysRecord)
+            for langsys in langsys_list:
+                indices = [
+                    index_map[index]
+                    for index in list(langsys.FeatureIndex or [])
+                    if index in index_map
+                ]
+                langsys.FeatureIndex = indices
+                langsys.FeatureCount = len(indices)
+                if getattr(langsys, "ReqFeatureIndex", 0xFFFF) != 0xFFFF:
+                    langsys.ReqFeatureIndex = index_map.get(langsys.ReqFeatureIndex, 0xFFFF)
+    return {f"{tag}_empty_feature_records_removed": removed}
+
+
 def ensure_raised_colon_glyph(font: TTFont, colon: str, raised: str | None) -> tuple[str, int]:
     glyphs = font.getGlyphSet()
     if raised and raised in glyphs:
@@ -3271,6 +3836,9 @@ def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
         return {"digit_colon_feature_added": False, "digit_colon_raise": 0}
 
     existing_raised, removed = remove_existing_calt_colon_substitutions(font, colon)
+    old_colon_lookup_indices = digit_colon_calt_lookup_indices(font, colon)
+    lookup_cleanup_report = remove_gsub_lookups(font, old_colon_lookup_indices)
+    empty_feature_report = drop_empty_feature_records(font, "GSUB", "calt")
     raised, raised_created = ensure_raised_colon_glyph(font, colon, existing_raised)
     glyphs = font.getGlyphSet()
     colonish = [name for name in dict.fromkeys([colon, raised]) if name in glyphs]
@@ -3315,10 +3883,19 @@ def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
     chain_lookup.SubTable = chain_subtables
     chain_lookup.SubTableCount = len(chain_subtables)
     chain_index = append_gsub_lookup(font, chain_lookup)
-    append_gsub_feature(font, "calt", [chain_index])
+    merge_report = merge_gsub_lookup_indices_into_features(font, "calt", [chain_index])
+    feature_added = False
+    if merge_report["calt_features_merged"] == 0:
+        append_gsub_feature(font, "calt", [chain_index])
+        feature_added = True
     enable_features_for_all_scripts(font, {"calt"})
     return {
         "digit_colon_feature_added": True,
+        "digit_colon_calt_feature_added": feature_added,
+        **merge_report,
+        "digit_colon_existing_calt_lookups_removed": len(old_colon_lookup_indices),
+        **lookup_cleanup_report,
+        **empty_feature_report,
         "digit_colon_existing_calt_mappings_removed": removed,
         "digit_colon_raised_glyph_created": raised_created,
         "digit_colon_context": "inter-compatible-colon-runs",
@@ -3327,18 +3904,22 @@ def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
     }
 
 
-def build_one_variable(italic: bool) -> dict[str, Any]:
-    unicodes = reference_unicodes()
+def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
+    region = check_region(region)
+    style_label = f"{region} {'italic' if italic else 'upright'}"
+    unicodes = reference_unicodes(region)
+    log_step(f"variable {style_label}: load sources")
     inter = load_inter(italic)
-    base, sarasa_report = load_base(italic, set(inter.getBestCmap().keys()))
+    base, sarasa_report = load_base(region, italic, set(inter.getBestCmap().keys()))
     reference_fonts: dict[int, TTFont] = {}
     try:
         for weight_name, weight_value in REFERENCE_ADVANCE_STOPS:
-            reference_fonts[weight_value] = open_reference_font(weight_name, italic)
+            reference_fonts[weight_value] = open_reference_font(region, weight_name, italic)
+        log_step(f"variable {style_label}: merge outlines and layout")
         merge_report = append_inter_glyphs(base, inter, unicodes)
         remove_metric_variation_maps(base)
         feature_drop_report = drop_sarasa_width_features(base)
-        locl_report = prune_locl_like_reference(base)
+        locl_report = prune_locl_like_reference(base, region)
         em_dash_report = add_continuous_em_dash_feature(base)
         long_dash_report = remove_vertical_long_dash_ligature_mappings(base)
         source_nonfinal_features_dropped = drop_nonfinal_gsub_features(base, SOURCE_HAN_FINAL_GSUB_FEATURES)
@@ -3362,16 +3943,21 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         profile_report = split_reference_advance_profiles(base, reference_fonts, skip_metric_codepoints)
         lsb_profile_report = split_reference_lsb_profiles(base, reference_fonts, skip_metric_codepoints)
         vmtx_profile_report = split_reference_vmtx_profiles(base, reference_fonts, skip_metric_codepoints)
+        vertical_vmtx_alias_report = split_reference_vertical_vmtx_aliases(base, reference_fonts, skip_metric_codepoints)
         advance_report = align_reference_advances(base, reference, skip_metric_codepoints)
         lsb_align_report = align_reference_hmtx_lsb(base, reference, skip_metric_codepoints)
+        log_step(f"variable {style_label}: align exact-weight advances")
         advance_variation_report = align_reference_advance_variations(base, reference_fonts, skip_metric_codepoints)
+        log_step(f"variable {style_label}: align exact-weight LSB")
         lsb_variation_report = sum_count_reports(
             align_reference_lsb_variations(base, reference_fonts, skip_metric_codepoints),
             align_reference_lsb_variations(base, reference_fonts, skip_metric_codepoints),
         )
         tnum_target_report = align_tnum_digit_targets(base, reference)
+        log_step(f"variable {style_label}: align tnum exact-weight metrics")
         tnum_target_variation_report = align_tnum_digit_target_variations(base, reference_fonts)
         vmtx_report = align_reference_vmtx(base, reference, skip_metric_codepoints)
+        log_step(f"variable {style_label}: align exact-weight vmtx")
         vmtx_variation_report = sum_count_reports(
             align_reference_vmtx_variations(base, reference_fonts, skip_metric_codepoints),
             align_reference_vmtx_variations(base, reference_fonts, skip_metric_codepoints),
@@ -3393,8 +3979,8 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     finally:
         for reference_font in reference_fonts.values():
             reference_font.close()
-    update_vf_names(base, italic)
-    update_fvar_instances(base, italic)
+    update_vf_names(base, region, italic)
+    update_fvar_instances(base, region, italic)
     update_style_flags(base, italic)
     update_os2_sarasa_metadata(base)
     rebuild_stat(base, italic)
@@ -3403,8 +3989,9 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         del base["DSIG"]
 
     VARIABLE_DIR.mkdir(parents=True, exist_ok=True)
-    out_name = "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf" if italic else "Sarasa-Ui-VF-PropDigits-SC[wght].ttf"
+    out_name = variable_output_name(region, italic)
     out_path = VARIABLE_DIR / out_name
+    log_step(f"variable {style_label}: save")
     base.save(out_path, reorderTables=True)
     base.close()
 
@@ -3412,19 +3999,23 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
     reference_fonts_roundtrip: dict[int, TTFont] = {}
     try:
         for weight_name, weight_value in REFERENCE_ADVANCE_STOPS:
-            reference_fonts_roundtrip[weight_value] = open_reference_font(weight_name, italic)
+            reference_fonts_roundtrip[weight_value] = open_reference_font(region, weight_name, italic)
+        log_step(f"variable {style_label}: roundtrip LSB")
         roundtrip_lsb_variation_report = prefix_count_report(
             align_reference_lsb_variations(base, reference_fonts_roundtrip, skip_metric_codepoints),
             "roundtrip_",
         )
+        log_step(f"variable {style_label}: roundtrip vmtx")
         roundtrip_vmtx_variation_report = prefix_count_report(
             align_reference_vmtx_variations(base, reference_fonts_roundtrip, skip_metric_codepoints),
             "roundtrip_",
         )
+        log_step(f"variable {style_label}: roundtrip tnum")
         roundtrip_tnum_target_variation_report = prefix_count_report(
             align_tnum_digit_target_variations(base, reference_fonts_roundtrip),
             "roundtrip_",
         )
+        log_step(f"variable {style_label}: save roundtrip")
         base.save(out_path, reorderTables=True)
     finally:
         for reference_font in reference_fonts_roundtrip.values():
@@ -3444,6 +4035,8 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
 
     return {
         "file": str(out_path.relative_to(ROOT)),
+        "region": region,
+        "source_han_region": source_han_vf_basename(region),
         "axes": axes,
         "instances": instances,
         "glyph_count": glyph_count,
@@ -3464,6 +4057,7 @@ def build_one_variable(italic: bool) -> dict[str, Any]:
         **profile_report,
         **lsb_profile_report,
         **vmtx_profile_report,
+        **vertical_vmtx_alias_report,
         **advance_report,
         **lsb_align_report,
         **advance_variation_report,
@@ -3556,6 +4150,25 @@ def download_file(url: str, path: Path) -> Path:
     return path
 
 
+def file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def download_file_checked(url: str, path: Path, sha256: str) -> Path:
+    if path.exists() and path.stat().st_size and file_sha256(path).lower() != sha256.lower():
+        path.unlink()
+    result = download_file(url, path)
+    actual = file_sha256(result)
+    if actual.lower() != sha256.lower():
+        result.unlink(missing_ok=True)
+        raise RuntimeError(f"sha256 mismatch for {result}: expected {sha256}, got {actual}")
+    return result
+
+
 def extract_zip_basename(archive: Path, basename: str, out_path: Path) -> Path:
     if out_path.exists():
         return out_path
@@ -3602,6 +4215,27 @@ def extract_7z_ttf_prefix(archive: Path, out_dir: Path, prefix: str) -> None:
             zf.extractall(tmp_dir)
         for path in tmp_dir.rglob(f"{prefix}*.ttf"):
             shutil.copy2(path, out_dir / path.name)
+
+
+def extract_7z_basename(archive: Path, basename: str, out_path: Path) -> Path:
+    if out_path.exists():
+        return out_path
+    import py7zr
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="sarasa-extract-") as tmp_name:
+        tmp_dir = Path(tmp_name)
+        log_step(f"extract {basename}")
+        with py7zr.SevenZipFile(archive) as zf:
+            members = [name for name in zf.getnames() if Path(name).name == basename]
+            if not members:
+                raise FileNotFoundError(f"{basename} not found in {archive}")
+            zf.extract(path=tmp_dir, targets=[sorted(members, key=len)[0]])
+        matches = list(tmp_dir.rglob(basename))
+        if not matches:
+            raise FileNotFoundError(f"{basename} not extracted from {archive}")
+        shutil.copy2(matches[0], out_path)
+    return out_path
 
 
 def node_platform_archive() -> tuple[str, str, str]:
@@ -3709,9 +4343,18 @@ def bootstrap_sarasa_source_tree() -> None:
     extract_zip_tree(source_zip, SARASA_SOURCE_DIR)
 
 
-def ensure_vf_sources() -> None:
+def ensure_vf_sources(regions: list[str]) -> None:
     global INTER_ITALIC
-    if BASE_VF.exists() and INTER_UPRIGHT.exists() and INTER_ITALIC.exists():
+    needed_vfs = [source_han_vf_path(region) for region in variable_regions(regions)]
+    needed_classical_vfs = [
+        path for path in (classical_vf_override_path(region) for region in variable_regions(regions)) if path
+    ]
+    if (
+        all(path.exists() for path in needed_vfs)
+        and all(path.exists() for path in needed_classical_vfs)
+        and INTER_UPRIGHT.exists()
+        and INTER_ITALIC.exists()
+    ):
         return
     SRC_DIR.mkdir(parents=True, exist_ok=True)
     source_han_zip = download_file(
@@ -3722,7 +4365,19 @@ def ensure_vf_sources() -> None:
         f"https://github.com/rsms/inter/releases/download/{INTER_TAG}/Inter-4.1.zip",
         SOURCE_ARCHIVE_DIR / "Inter-4.1.zip",
     )
-    extract_zip_basename(source_han_zip, "SourceHanSansSC-VF.ttf", BASE_VF)
+    for region in variable_regions(regions):
+        target = source_han_vf_path(region)
+        if not target.exists():
+            extract_zip_basename(source_han_zip, source_han_vf_basename(region) or "", target)
+    if any(not path.exists() for path in needed_classical_vfs):
+        shanggu_archive = download_file_checked(
+            f"https://github.com/GuiWonder/Shanggu/releases/download/{SHANGGU_TAG}/{SHANGGU_SANS_VF_ARCHIVE_NAME}",
+            SOURCE_ARCHIVE_DIR / f"ShangguSansVF_TTFs-{SHANGGU_TAG}.7z",
+            SHANGGU_SANS_VF_SHA256,
+        )
+        for target in needed_classical_vfs:
+            if not target.exists():
+                extract_7z_basename(shanggu_archive, target.name, target)
     extract_zip_basename(inter_zip, "InterVariable.ttf", INTER_UPRIGHT)
     if not INTER_ITALIC.exists():
         italic = extract_zip_first_basename(
@@ -3733,26 +4388,49 @@ def ensure_vf_sources() -> None:
         INTER_ITALIC = italic
 
 
-def ensure_reference_sarasa() -> None:
-    global REFERENCE_SARASA, REFERENCE_SARASA_DIR, REFERENCE_SARASA_HINTED_DIR
-    hinted_regular = REFERENCE_SARASA_HINTED_DIR / "SarasaUiSC-Regular.ttf"
-    if REFERENCE_SARASA.exists() and hinted_regular.exists():
+def ensure_classical_static_sources(regions: list[str]) -> None:
+    needed = [
+        path
+        for region in regions
+        if region_config(region)["classical"]
+        for weight_name in STATIC_STYLE_SOURCES
+        for path in [classical_static_override_path(region, weight_name)]
+        if path
+    ]
+    if not needed or all(path.exists() for path in needed):
         return
-    hinted_archive = download_file(
-        f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/SarasaUiSC-TTF-{SARASA_VERSION}.7z",
-        SOURCE_ARCHIVE_DIR / f"SarasaUiSC-TTF-{SARASA_VERSION}.7z",
+    shanggu_archive = download_file_checked(
+        f"https://github.com/GuiWonder/Shanggu/releases/download/{SHANGGU_TAG}/{SHANGGU_SANS_TTF_ARCHIVE_NAME}",
+        SOURCE_ARCHIVE_DIR / f"ShangguSansTTFs-{SHANGGU_TAG}.7z",
+        SHANGGU_SANS_TTF_SHA256,
     )
-    unhinted_archive = download_file(
-        f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/SarasaUiSC-TTF-Unhinted-{SARASA_VERSION}.7z",
-        SOURCE_ARCHIVE_DIR / f"SarasaUiSC-TTF-Unhinted-{SARASA_VERSION}.7z",
-    )
-    hinted_dir = REFERENCE_ROOT / "hinted"
-    unhinted_dir = REFERENCE_ROOT / "unhinted"
-    extract_7z_ttf_prefix(hinted_archive, hinted_dir, "SarasaUiSC-")
-    extract_7z_ttf_prefix(unhinted_archive, unhinted_dir, "SarasaUiSC-")
-    REFERENCE_SARASA = unhinted_dir / "SarasaUiSC-Regular.ttf"
-    REFERENCE_SARASA_DIR = unhinted_dir
-    REFERENCE_SARASA_HINTED_DIR = hinted_dir
+    for target in needed:
+        if not target.exists():
+            extract_7z_basename(shanggu_archive, target.name, target)
+
+
+def ensure_reference_sarasa(regions: list[str]) -> None:
+    global REFERENCE_SARASA, REFERENCE_SARASA_DIR, REFERENCE_SARASA_HINTED_DIR
+    for region in regions:
+        prefix = sarasa_region_prefix(region)
+        hinted_dir = region_reference_dir(region, True)
+        unhinted_dir = region_reference_dir(region, False)
+        hinted_regular = hinted_dir / f"{prefix}-Regular.ttf"
+        unhinted_regular = unhinted_dir / f"{prefix}-Regular.ttf"
+        if not (hinted_regular.exists() and unhinted_regular.exists()):
+            hinted_archive = download_file(
+                f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-{SARASA_VERSION}.7z",
+                SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-{SARASA_VERSION}.7z",
+            )
+            unhinted_archive = download_file(
+                f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
+                SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
+            )
+            extract_7z_ttf_prefix(hinted_archive, hinted_dir, f"{prefix}-")
+            extract_7z_ttf_prefix(unhinted_archive, unhinted_dir, f"{prefix}-")
+    REFERENCE_SARASA = reference_font_path("SC", "Regular", False)
+    REFERENCE_SARASA_DIR = REFERENCE_SARASA.parent
+    REFERENCE_SARASA_HINTED_DIR = region_reference_dir("SC", True)
 
 
 def ensure_sarasa_source_tree() -> None:
@@ -3774,13 +4452,14 @@ def ensure_sarasa_source_tree() -> None:
         run_checked([npm_executable(), "install"], cwd=SARASA_SOURCE_DIR, capture_output=False, env=local_runtime_env())
 
 
-def ensure_build_sources(static_only: bool) -> None:
+def ensure_build_sources(static_only: bool, regions: list[str]) -> None:
     if os.environ.get("SARASA_SKIP_SOURCE_BOOTSTRAP") == "1":
         return
-    ensure_reference_sarasa()
+    ensure_reference_sarasa(regions)
     ensure_sarasa_source_tree()
+    ensure_classical_static_sources(regions)
     if not static_only:
-        ensure_vf_sources()
+        ensure_vf_sources(regions)
 
 
 def run_ttfautohint(args: list[str]) -> str:
@@ -3935,13 +4614,15 @@ def chlorophytum_hint_static_font(
     out_path: Path,
     weight_name: str,
     tmp_dir: Path,
+    hint_jobs: int | None = None,
 ) -> dict[str, Any]:
-    return chlorophytum_hint_static_fonts([(in_path, out_path, weight_name)], tmp_dir)[out_path]
+    return chlorophytum_hint_static_fonts([(in_path, out_path, weight_name)], tmp_dir, hint_jobs=hint_jobs)[out_path]
 
 
 def chlorophytum_hint_static_fonts(
     jobs: list[tuple[Path, Path, str]],
     tmp_dir: Path,
+    hint_jobs: int | None = None,
 ) -> dict[Path, dict[str, Any]]:
     if not jobs:
         return {}
@@ -3972,6 +4653,7 @@ def chlorophytum_hint_static_fonts(
             }
         return reports
 
+    actual_hint_jobs = max(1, int(hint_jobs or SARASA_HINT_JOBS))
     cache_path = tmp_dir / f"{config_name}.hc.gz"
     node = node_executable()
     hint_cmd = [
@@ -3983,7 +4665,7 @@ def chlorophytum_hint_static_fonts(
         "-h",
         str(cache_path),
         "--jobs",
-        str(SARASA_HINT_JOBS),
+        str(actual_hint_jobs),
     ]
     hint_paths: dict[Path, Path] = {}
     for in_path, _out_path, _weight_name in jobs:
@@ -4017,7 +4699,7 @@ def chlorophytum_hint_static_fonts(
             "chlorophytum_hinted": True,
             "chlorophytum_hint_tool": str(SARASA_CHLOROPHYTUM),
             "chlorophytum_hint_config": config_name,
-            "chlorophytum_hint_jobs": SARASA_HINT_JOBS,
+            "chlorophytum_hint_jobs": actual_hint_jobs,
             "chlorophytum_hint_group_size": len(jobs),
             "chlorophytum_hint_cache": str(cache_path),
         }
@@ -4110,12 +4792,13 @@ def otf2ttf_executable() -> str:
     return tool_executable("OTF2TTF", "otf2ttf")
 
 
-def build_shs_ttf(weight_name: str, tmp_dir: Path) -> Path:
+def build_shs_ttf(region: str, weight_name: str, tmp_dir: Path) -> Path:
+    region = check_region(region)
     source = STATIC_STYLE_SOURCES[weight_name]
     shs_weight = str(source["shs"])
     out_dir = tmp_dir / "shs"
     out_dir.mkdir(parents=True, exist_ok=True)
-    out_ttf = out_dir / f"SC-{shs_weight}.ttf"
+    out_ttf = out_dir / f"{region}-{shs_weight}.ttf"
     if out_ttf.exists():
         return out_ttf
 
@@ -4127,11 +4810,12 @@ def build_shs_ttf(weight_name: str, tmp_dir: Path) -> Path:
     copied_ttc = extract_dir / source_ttc.name
     if not copied_ttc.exists():
         shutil.copy2(source_ttc, copied_ttc)
-    expected_otf = extract_dir / f"SourceHanSansSC-{shs_weight}.otf"
+    shs_prefix = source_han_static_prefix(region)
+    expected_otf = extract_dir / f"{shs_prefix}-{shs_weight}.otf"
     if not expected_otf.exists():
         run_checked([otc2otf_executable(), str(copied_ttc)], cwd=extract_dir)
     if not expected_otf.exists():
-        candidates = list(extract_dir.rglob(f"SourceHanSansSC-{shs_weight}.otf"))
+        candidates = list(extract_dir.rglob(f"{shs_prefix}-{shs_weight}.otf"))
         if candidates:
             expected_otf = candidates[0]
     if not expected_otf.exists():
@@ -4140,6 +4824,17 @@ def build_shs_ttf(weight_name: str, tmp_dir: Path) -> Path:
         out_ttf.unlink()
     run_checked([otf2ttf_executable(), "-o", str(out_ttf), str(expected_otf)])
     return out_ttf
+
+
+def build_classical_override_ttf(region: str, weight_name: str, tmp_dir: Path) -> Path:
+    override_ttf = classical_static_override_path(region, weight_name)
+    if not override_ttf:
+        raise ValueError(f"region {region} has no classical static override")
+    if not override_ttf.exists():
+        ensure_classical_static_sources([region])
+    if not override_ttf.exists():
+        raise FileNotFoundError(override_ttf)
+    return override_ttf
 
 
 def inter_source_style(weight_name: str, italic: bool) -> str | None:
@@ -4184,17 +4879,19 @@ def build_inter_source(weight_name: str, weight_value: int, italic: bool, tmp_di
 
 
 def build_sarasa_static_fragments(
+    region: str,
     weight_name: str,
     weight_value: int,
     italic: bool,
     tmp_dir: Path,
 ) -> dict[str, Any]:
+    region = check_region(region)
     suffix = f"{weight_name}{'Italic' if italic else ''}"
-    fe_dir = tmp_dir / "fragments" / f"{weight_name}-fe"
-    work_dir = tmp_dir / "fragments" / suffix
+    fe_dir = tmp_dir / "fragments" / f"{region}-{weight_name}-fe"
+    work_dir = tmp_dir / "fragments" / f"{region}-{suffix}"
     fe_dir.mkdir(parents=True, exist_ok=True)
     work_dir.mkdir(parents=True, exist_ok=True)
-    shs_ttf = build_shs_ttf(weight_name, tmp_dir)
+    shs_ttf = build_shs_ttf(region, weight_name, tmp_dir)
     inter_ttf = build_inter_source(weight_name, weight_value, italic, tmp_dir)
     style_name = sarasa_style_name(weight_name, italic)
     flags = sarasa_ui_flags()
@@ -4208,10 +4905,11 @@ def build_sarasa_static_fragments(
     pass1 = work_dir / "pass1.ttf"
 
     if not kanji.exists():
+        classical_override = build_classical_override_ttf(region, weight_name, tmp_dir) if region_config(region)["classical"] else None
         run_sarasa_module(
             tmp_dir,
             "make/kanji/build.mjs",
-            {"main": str(shs_ttf), "classicalOverride": None, "o": str(kanji)},
+            {"main": str(shs_ttf), "classicalOverride": str(classical_override) if classical_override else None, "o": str(kanji)},
         )
     if not hangul.exists():
         run_sarasa_module(tmp_dir, "make/hangul/build.mjs", {"main": str(shs_ttf), "o": str(hangul)})
@@ -4220,7 +4918,7 @@ def build_sarasa_static_fragments(
 
     punct_args = {
         "family": "Ui",
-        "region": "SC",
+        "region": region,
         "style": style_name,
         "main": str(non_kanji),
         "lgc": str(inter_ttf),
@@ -4244,7 +4942,7 @@ def build_sarasa_static_fragments(
                 "feMisc": str(fe_misc),
                 "o": str(pass1),
                 "family": "Ui",
-                "subfamily": "SC",
+                "subfamily": region,
                 "style": style_name,
                 "italize": italic,
                 "version": "1.0.39",
@@ -4256,8 +4954,10 @@ def build_sarasa_static_fragments(
         "pass1": pass1,
         "kanji": kanji,
         "hangul": hangul,
+        "region": region,
         "sarasa_static_style": style_name,
         "sarasa_source_han_style": str(STATIC_STYLE_SOURCES[weight_name]["shs"]),
+        "sarasa_source_han_region": source_han_static_prefix(region),
         "sarasa_inter_style": inter_source_style(weight_name, italic) or f"VF-{weight_value}{'Italic' if italic else ''}",
     }
 
@@ -4337,14 +5037,46 @@ def apply_static_digit_glyph_names(font: TTFont) -> dict[str, int]:
     return {"static_digit_glyphs_renamed": renamed, "static_post_format2_names": post_format2}
 
 
-def static_output_name(weight_name: str, italic: bool) -> str:
+def static_output_name(region: str, weight_name: str, italic: bool) -> str:
+    prefix = static_file_prefix(region)
     if weight_name == "Regular":
-        return "SarasaUiPropDigitsSC-Italic.ttf" if italic else "SarasaUiPropDigitsSC-Regular.ttf"
-    return f"SarasaUiPropDigitsSC-{weight_name}{'Italic' if italic else ''}.ttf"
+        return f"{prefix}-Italic.ttf" if italic else f"{prefix}-Regular.ttf"
+    return f"{prefix}-{weight_name}{'Italic' if italic else ''}.ttf"
+
+
+def static_weight_output_paths(region: str, weight_name: str) -> list[tuple[Path, bool, bool]]:
+    return [
+        (static_dir(region, hinted) / static_output_name(region, weight_name, italic), hinted, italic)
+        for hinted in [False, True]
+        for italic in [False, True]
+    ]
+
+
+def static_weight_complete(region: str, weight_name: str) -> bool:
+    return all(path.exists() for path, _hinted, _italic in static_weight_output_paths(region, weight_name))
+
+
+def skipped_static_weight_outputs(region: str, stop: dict[str, Any]) -> list[dict[str, Any]]:
+    weight_name = str(stop["name"])
+    weight_value = int(stop["value"])
+    return [
+        {
+            "file": str(path.relative_to(ROOT)),
+            "region": region,
+            "weight": weight_name,
+            "wght": weight_value,
+            "italic": italic,
+            "hinted_variant": hinted,
+            "rebuilt": False,
+            "resume_static_skipped": True,
+        }
+        for path, hinted, italic in static_weight_output_paths(region, weight_name)
+    ]
 
 
 def postprocess_static_font(
     path: Path,
+    region: str,
     weight_name: str,
     weight_value: int,
     italic: bool,
@@ -4354,7 +5086,7 @@ def postprocess_static_font(
     font.recalcBBoxes = False
     report: dict[str, Any] = {}
     try:
-        reference_path = reference_font_path(weight_name, italic)
+        reference_path = reference_font_path(region, weight_name, italic)
         reference: TTFont | None = None
         if reference_path.exists():
             reference = TTFont(reference_path, recalcBBoxes=False, recalcTimestamp=False)
@@ -4369,7 +5101,7 @@ def postprocess_static_font(
                 reference.close()
                 reference = None
                 raise
-        update_static_names(font, weight_name, weight_value, italic)
+        update_static_names(font, region, weight_name, weight_value, italic)
         update_os2_sarasa_metadata(font)
         rebuild_static_stat(font, weight_name, weight_value, italic)
         report.update(drop_generated_extra_tables(font, keep_stat=True))
@@ -4379,21 +5111,14 @@ def postprocess_static_font(
             report.update(sync_static_glyf_from_reference(font, reference, PROPDIGITS_CODEPOINTS))
         report.update(add_digit_colon_feature(font))
         if hinted:
-            hinted_reference_path = hinted_reference_font_path(weight_name, italic)
-            if hinted_reference_path.exists():
-                hinted_reference = TTFont(hinted_reference_path, recalcBBoxes=False, recalcTimestamp=False)
-                try:
-                    report.update(sync_hinting_from_reference(font, hinted_reference))
-                finally:
-                    hinted_reference.close()
-            else:
-                report.update(
-                    {
-                        "hint_tables_synced": 0,
-                        "hint_glyph_programs_synced": 0,
-                        "hint_glyph_programs_skipped": 0,
-                    }
-                )
+            report.update(
+                {
+                    "hint_tables_synced": 0,
+                    "hint_glyph_programs_synced": 0,
+                    "hint_glyph_programs_skipped": 0,
+                    "hint_reference_sync": "skipped-rehinted-output",
+                }
+            )
         report["digit_colon_source"] = "inter-compatible-calt"
         if "DSIG" in font:
             del font["DSIG"]
@@ -4413,140 +5138,186 @@ def prepare_static_pass1_derivatives(path: Path) -> dict[str, Any]:
     }
 
 
-def build_static_fonts() -> list[dict[str, Any]]:
-    log_step("static: clean output directories")
-    for out_dir in [STATIC_DIR, STATIC_UNHINTED_DIR]:
-        out_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(ROOT / "LICENSE", out_dir / "LICENSE-Sarasa-Gothic.txt")
-        for path in out_dir.glob("SarasaUiPropDigitsSC-*.ttf"):
-            path.unlink()
-
+def build_static_weight(
+    region: str,
+    stop: dict[str, Any],
+    tmp_dir: Path,
+    hint_jobs: int,
+) -> list[dict[str, Any]]:
     outputs: list[dict[str, Any]] = []
-    with tempfile.TemporaryDirectory() as tmp_dir_raw:
-        tmp_dir = Path(tmp_dir_raw)
-        hinted_fe_cache: dict[str, dict[str, Any]] = {}
-        for italic in [False, True]:
-            for stop in SOURCE_HAN_WEIGHT_STOPS:
-                weight_name = stop["name"]
-                weight_value = int(stop["value"])
-                style_label = f"{weight_name}{' Italic' if italic else ''}"
-                log_step(f"static {style_label}: build Sarasa fragments")
-                fragments = build_sarasa_static_fragments(weight_name, weight_value, italic, tmp_dir)
-                pass1_derivative_report = prepare_static_pass1_derivatives(fragments["pass1"])
+    weight_name = str(stop["name"])
+    weight_value = int(stop["value"])
+    hinted_fe_entry: dict[str, Any] | None = None
+    tmp_dir.mkdir(parents=True, exist_ok=True)
 
-                unhinted_tmp = tmp_dir / "unhinted" / static_output_name(weight_name, italic)
-                unhinted_tmp.parent.mkdir(parents=True, exist_ok=True)
-                unhinted_path = STATIC_UNHINTED_DIR / static_output_name(weight_name, italic)
-                log_step(f"static {style_label}: compose unhinted pass2")
-                build_sarasa_pass2(
-                    fragments["pass1"],
+    for italic in [False, True]:
+        style_label = f"{region} {weight_name}{' Italic' if italic else ''}"
+        log_step(f"static {style_label}: build Sarasa fragments")
+        fragments = build_sarasa_static_fragments(region, weight_name, weight_value, italic, tmp_dir)
+        pass1_derivative_report = prepare_static_pass1_derivatives(fragments["pass1"])
+
+        unhinted_tmp = tmp_dir / "unhinted" / region / static_output_name(region, weight_name, italic)
+        unhinted_tmp.parent.mkdir(parents=True, exist_ok=True)
+        unhinted_path = static_dir(region, False) / static_output_name(region, weight_name, italic)
+        log_step(f"static {style_label}: compose unhinted pass2")
+        build_sarasa_pass2(
+            fragments["pass1"],
+            fragments["kanji"],
+            fragments["hangul"],
+            unhinted_tmp,
+            italic,
+            tmp_dir,
+        )
+        log_step(f"static {style_label}: postprocess unhinted")
+        unhinted_report = postprocess_static_font(unhinted_tmp, region, weight_name, weight_value, italic, False)
+        shutil.copy2(unhinted_tmp, unhinted_path)
+        outputs.append(
+            {
+                "file": str(unhinted_path.relative_to(ROOT)),
+                "region": region,
+                "weight": weight_name,
+                "wght": weight_value,
+                "italic": italic,
+                "hinted_variant": False,
+                "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
+                "hinted": False,
+                "hint_tool": "unhinted",
+                "chlorophytum_hinted": False,
+                **{k: v for k, v in fragments.items() if isinstance(v, str)},
+                **pass1_derivative_report,
+                **unhinted_report,
+            }
+        )
+
+        hinted_work = tmp_dir / "hinted" / region / f"{weight_name}{'Italic' if italic else ''}"
+        hinted_work.mkdir(parents=True, exist_ok=True)
+        pass1_hinted = hinted_work / "pass1.ttfautohint.ttf"
+        pass1_instructed = hinted_work / "pass1.ttf"
+        hinted_tmp = hinted_work / static_output_name(region, weight_name, italic)
+        hinted_path = static_dir(region, True) / static_output_name(region, weight_name, italic)
+
+        log_step(f"static {style_label}: ttfautohint pass1")
+        hint_report = hint_static_font(fragments["pass1"], pass1_hinted)
+        log_step(f"static {style_label}: Chlorophytum pass1")
+        pass1_chlorophytum = chlorophytum_hint_static_fonts(
+            [(pass1_hinted, pass1_instructed, weight_name)],
+            hinted_work / "pass1-hints",
+            hint_jobs=hint_jobs,
+        )[pass1_instructed]
+
+        if hinted_fe_entry is None:
+            fe_work = tmp_dir / "hinted-fe" / region / weight_name
+            fe_work.mkdir(parents=True, exist_ok=True)
+            hani_instructed = fe_work / "hani.ttf"
+            hang_instructed = fe_work / "hang.ttf"
+            log_step(f"static {style_label}: restore cached kanji/hangul")
+            fe_chlorophytum_report = restore_static_fe_cache(
+                weight_name,
+                fragments["kanji"],
+                fragments["hangul"],
+                hani_instructed,
+                hang_instructed,
+            )
+            if fe_chlorophytum_report is None:
+                log_step(f"static {style_label}: Chlorophytum kanji/hangul")
+                fe_chlorophytum = chlorophytum_hint_static_fonts(
+                    [
+                        (fragments["kanji"], hani_instructed, weight_name),
+                        (fragments["hangul"], hang_instructed, weight_name),
+                    ],
+                    fe_work / "hints",
+                    hint_jobs=hint_jobs,
+                )
+                fe_chlorophytum_report = {
+                    "hani": fe_chlorophytum[hani_instructed],
+                    "hang": fe_chlorophytum[hang_instructed],
+                }
+                store_static_fe_cache(
+                    weight_name,
                     fragments["kanji"],
                     fragments["hangul"],
-                    unhinted_tmp,
-                    italic,
-                    tmp_dir,
+                    hani_instructed,
+                    hang_instructed,
+                    fe_chlorophytum_report,
                 )
-                log_step(f"static {style_label}: postprocess unhinted")
-                unhinted_report = postprocess_static_font(unhinted_tmp, weight_name, weight_value, italic, False)
-                shutil.copy2(unhinted_tmp, unhinted_path)
-                outputs.append(
-                    {
-                        "file": str(unhinted_path.relative_to(ROOT)),
-                        "weight": weight_name,
-                        "wght": weight_value,
-                        "italic": italic,
-                        "hinted_variant": False,
-                        "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
-                        "hinted": False,
-                        "hint_tool": "unhinted",
-                        "chlorophytum_hinted": False,
-                        **{k: v for k, v in fragments.items() if isinstance(v, str)},
-                        **pass1_derivative_report,
-                        **unhinted_report,
-                    }
-                )
+            else:
+                log_step(f"static {style_label}: cached kanji/hangul hit")
+            hinted_fe_entry = {
+                "hani": hani_instructed,
+                "hang": hang_instructed,
+                "report": fe_chlorophytum_report,
+            }
+        else:
+            log_step(f"static {style_label}: reuse Chlorophytum kanji/hangul")
 
-                hinted_work = tmp_dir / "hinted" / f"{weight_name}{'Italic' if italic else ''}"
-                hinted_work.mkdir(parents=True, exist_ok=True)
-                pass1_hinted = hinted_work / "pass1.ttfautohint.ttf"
-                pass1_instructed = hinted_work / "pass1.ttf"
-                hinted_tmp = hinted_work / static_output_name(weight_name, italic)
-                hinted_path = STATIC_DIR / static_output_name(weight_name, italic)
+        hani_instructed = hinted_fe_entry["hani"]
+        hang_instructed = hinted_fe_entry["hang"]
+        fe_chlorophytum_report = hinted_fe_entry["report"]
+        log_step(f"static {style_label}: compose hinted pass2")
+        build_sarasa_pass2(pass1_instructed, hani_instructed, hang_instructed, hinted_tmp, italic, tmp_dir)
+        log_step(f"static {style_label}: postprocess hinted")
+        hinted_postprocess = postprocess_static_font(hinted_tmp, region, weight_name, weight_value, italic, True)
+        shutil.copy2(hinted_tmp, hinted_path)
+        outputs.append(
+            {
+                "file": str(hinted_path.relative_to(ROOT)),
+                "region": region,
+                "weight": weight_name,
+                "wght": weight_value,
+                "italic": italic,
+                "hinted_variant": True,
+                "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
+                **{k: v for k, v in fragments.items() if isinstance(v, str)},
+                **pass1_derivative_report,
+                **hint_report,
+                "hinted": True,
+                "hint_tool": "ttfautohint-plus-chlorophytum",
+                "chlorophytum_hinted": True,
+                "pass1_chlorophytum": pass1_chlorophytum,
+                "fe_chlorophytum": fe_chlorophytum_report,
+                **hinted_postprocess,
+            }
+        )
+    return outputs
 
-                log_step(f"static {style_label}: ttfautohint pass1")
-                hint_report = hint_static_font(fragments["pass1"], pass1_hinted)
-                log_step(f"static {style_label}: Chlorophytum pass1")
-                pass1_chlorophytum = chlorophytum_hint_static_fonts(
-                    [(pass1_hinted, pass1_instructed, weight_name)],
-                    hinted_work / "pass1-hints",
-                )[pass1_instructed]
-                if weight_name not in hinted_fe_cache:
-                    fe_work = tmp_dir / "hinted-fe" / weight_name
-                    fe_work.mkdir(parents=True, exist_ok=True)
-                    hani_instructed = fe_work / "hani.ttf"
-                    hang_instructed = fe_work / "hang.ttf"
-                    log_step(f"static {style_label}: restore cached kanji/hangul")
-                    fe_chlorophytum_report = restore_static_fe_cache(
-                        weight_name,
-                        fragments["kanji"],
-                        fragments["hangul"],
-                        hani_instructed,
-                        hang_instructed,
-                    )
-                    if fe_chlorophytum_report is None:
-                        log_step(f"static {style_label}: Chlorophytum kanji/hangul")
-                        fe_chlorophytum = chlorophytum_hint_static_fonts(
-                            [
-                                (fragments["kanji"], hani_instructed, weight_name),
-                                (fragments["hangul"], hang_instructed, weight_name),
-                            ],
-                            fe_work / "hints",
-                        )
-                        fe_chlorophytum_report = {
-                            "hani": fe_chlorophytum[hani_instructed],
-                            "hang": fe_chlorophytum[hang_instructed],
-                        }
-                        store_static_fe_cache(
-                            weight_name,
-                            fragments["kanji"],
-                            fragments["hangul"],
-                            hani_instructed,
-                            hang_instructed,
-                            fe_chlorophytum_report,
-                        )
-                    else:
-                        log_step(f"static {style_label}: cached kanji/hangul hit")
-                    hinted_fe_cache[weight_name] = {
-                        "hani": hani_instructed,
-                        "hang": hang_instructed,
-                        "report": fe_chlorophytum_report,
-                    }
+
+def build_static_fonts(regions: list[str], resume: bool = False) -> list[dict[str, Any]]:
+    log_step("static: prepare output directories")
+    for region in regions:
+        for out_dir in [static_dir(region, True), static_dir(region, False)]:
+            out_dir.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / "LICENSE", out_dir / "LICENSE-Sarasa-Gothic.txt")
+            if not resume:
+                for path in out_dir.glob(f"{static_file_prefix(region)}-*.ttf"):
+                    path.unlink()
+
+    outputs: list[dict[str, Any]] = []
+    hint_jobs = SARASA_HINT_JOBS
+    log_step(f"static: Chlorophytum jobs={hint_jobs}")
+    weight_order = {str(stop["name"]): index for index, stop in enumerate(SOURCE_HAN_WEIGHT_STOPS)}
+    region_order = {region: index for index, region in enumerate(regions)}
+    with tempfile.TemporaryDirectory() as tmp_dir_raw:
+        tmp_dir = Path(tmp_dir_raw)
+        for region in regions:
+            region_tmp = tmp_dir / "weights" / region
+            stops_to_build: list[dict[str, Any]] = []
+            for stop in SOURCE_HAN_WEIGHT_STOPS:
+                weight_name = str(stop["name"])
+                if resume and static_weight_complete(region, weight_name):
+                    log_step(f"static {region} {weight_name}: skip existing complete weight")
+                    outputs.extend(skipped_static_weight_outputs(region, stop))
                 else:
-                    log_step(f"static {style_label}: reuse Chlorophytum kanji/hangul")
-                hani_instructed = hinted_fe_cache[weight_name]["hani"]
-                hang_instructed = hinted_fe_cache[weight_name]["hang"]
-                fe_chlorophytum_report = hinted_fe_cache[weight_name]["report"]
-                log_step(f"static {style_label}: compose hinted pass2")
-                build_sarasa_pass2(pass1_instructed, hani_instructed, hang_instructed, hinted_tmp, italic, tmp_dir)
-                log_step(f"static {style_label}: postprocess hinted")
-                hinted_postprocess = postprocess_static_font(hinted_tmp, weight_name, weight_value, italic, True)
-                shutil.copy2(hinted_tmp, hinted_path)
-                outputs.append(
-                    {
-                        "file": str(hinted_path.relative_to(ROOT)),
-                        "weight": weight_name,
-                        "wght": weight_value,
-                        "italic": italic,
-                        "hinted_variant": True,
-                        "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
-                        **{k: v for k, v in fragments.items() if isinstance(v, str)},
-                        **pass1_derivative_report,
-                        **hint_report,
-                        "pass1_chlorophytum": pass1_chlorophytum,
-                        "fe_chlorophytum": fe_chlorophytum_report,
-                        **hinted_postprocess,
-                    }
-                )
+                    stops_to_build.append(stop)
+            for stop in stops_to_build:
+                outputs.extend(build_static_weight(region, stop, region_tmp / str(stop["name"]), hint_jobs))
+    outputs.sort(
+        key=lambda item: (
+            region_order.get(str(item.get("region")), 999),
+            weight_order.get(str(item.get("weight")), 999),
+            bool(item.get("italic")),
+            bool(item.get("hinted_variant")),
+        )
+    )
     return outputs
 
 
@@ -4702,18 +5473,25 @@ def inspect_font(path: Path) -> dict[str, Any]:
         font.close()
 
 
-def static_readme_text(hinted: bool) -> str:
-    title = "Sarasa Ui PropDigits SC TTF 1.0.39" if hinted else "Sarasa Ui PropDigits SC TTF Unhinted 1.0.39"
+def static_readme_text(region: str, hinted: bool) -> str:
+    family = static_family(region)
+    family_local = static_family_local(region)
+    shs_prefix = source_han_static_prefix(region)
+    title = f"{family} TTF {SARASA_VERSION}" if hinted else f"{family} TTF Unhinted {SARASA_VERSION}"
+    cl_note = (
+        f"CL 地区的传统旧字形覆盖跟随 Shanggu Sans {SHANGGU_TAG} 官方 TTF：\n"
+        "汉字底稿先取 SourceHanSansK，再用 ShangguSansTC 静态 TTF 覆盖。"
+        if region == "CL"
+        else f"{region} 地区沿用 Sarasa 上游路径：CJK 底稿来自 {shs_prefix}。"
+    )
     hint_note = (
-        "hinted 套件沿用上游 Sarasa 的静态片段构建路径：pass1 先经过\n"
-        "ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游\n"
-        "Chlorophytum hcfg 流程写入指令，最后由 pass2 合成最终 TTF。\n"
-        "Normal、Medium、Heavy 分别使用上游 Regular、SemiBold、Bold 的\n"
-        "hcfg 配置，因为上游 Sarasa 没有发布这些静态输出样式。\n"
-        "静态 PropDigits 会把 ':' remap 到已有的 pnum glyph，移除旧的冒号\n"
-        "上下文替换，再追加与 Inter 一致的 colon-run calt 规则。对于轮廓匹配的\n"
-        "exact 上游样式，还会同步上游 TrueType instruction tables 和逐字形\n"
-        "program。"
+        "hinted 套件会对本项目实际生成的静态片段重新 hint：pass1 先经过\n"
+        "ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 Chlorophytum\n"
+        "hcfg 流程写入 TrueType instructions，最后由 pass2 合成最终 TTF。\n"
+        "Normal、Medium、Heavy 这类项目扩展字重也按当前轮廓重新生成 hint，\n"
+        "不会冒充官方 Sarasa 已发布静态字重。静态 PropDigits 会把 ':' remap\n"
+        "到已有的 pnum glyph，移除旧的冒号上下文替换，再追加与 Inter 一致的\n"
+        "colon-run calt 规则。"
         if hinted
         else "unhinted 套件同样沿用上游 Sarasa 的静态片段构建路径，但直接用\n"
         "未 hint 的 pass1/kanji/hangul 片段进入 pass2。它会跳过\n"
@@ -4722,9 +5500,11 @@ def static_readme_text(hinted: bool) -> str:
     )
     return f"""{title}
 
-本目录包含静态 TrueType 字体。这些字体从静态 Source Han Sans SC 和
+本目录包含静态 TrueType 字体。这些字体从静态 {shs_prefix} 和
 Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 构建路径生成，
 然后补上 PropDigits 派生行为。
+
+{cl_note}
 
 字重：
 
@@ -4737,7 +5517,7 @@ Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 构建路径生�
 - Heavy 900
 
 公开字重采用 Sarasa/CSS 口径：ExtraLight 是 200。CJK 轮廓来源仍是
-Source Han Sans SC 的 ExtraLight 口径 250；VF 通过轴映射让 public
+Source Han Sans 的 ExtraLight 口径 250；VF 通过轴映射让 public
 wght=200 对应 Source Han 内部 wght=250，而 Inter 对应 wght=200。
 
 每个字重都包含正体和 Italic 文件。ASCII 数字默认使用比例宽度；
@@ -4746,14 +5526,14 @@ OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字�
 1:2 会上浮 ':'，1:a 和 a:2 不会上浮，1::2 等连续冒号上下文遵循
 Inter 的 colon-run 规则。
 
-name 表包含简体中文显示名，例如：
-更纱黑体 Ui PropDigits SC ExtraLight.
-OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui SC 的
+name 表包含地区本地化显示名，例如：
+{family_local} ExtraLight.
+OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
 ???? 占位值。
 {hint_note}
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
-覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui SC 静态字体套模板。
+覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui {region} 静态字体套模板。
 对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
 glyf bbox 和组合字形组件名。静态 TTF 使用 post format 2，让默认比例数字
 remap 到 U+0030..U+0039 后，相关 glyph names 仍能稳定保留。最终写出 glyf
@@ -4766,25 +5546,31 @@ glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未
 """
 
 
-def write_static_readme() -> None:
-    STATIC_DIR.mkdir(parents=True, exist_ok=True)
-    STATIC_UNHINTED_DIR.mkdir(parents=True, exist_ok=True)
-    (STATIC_DIR / "README.txt").write_text(static_readme_text(True), encoding="utf-8")
-    (STATIC_UNHINTED_DIR / "README.txt").write_text(static_readme_text(False), encoding="utf-8")
+def write_static_readme(regions: list[str]) -> None:
+    for region in regions:
+        hinted_dir = static_dir(region, True)
+        unhinted_dir = static_dir(region, False)
+        hinted_dir.mkdir(parents=True, exist_ok=True)
+        unhinted_dir.mkdir(parents=True, exist_ok=True)
+        (hinted_dir / "README.txt").write_text(static_readme_text(region, True), encoding="utf-8")
+        (unhinted_dir / "README.txt").write_text(static_readme_text(region, False), encoding="utf-8")
 
 
 def write_reports(build_report: dict[str, Any]) -> None:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     build_text = json.dumps(build_report, ensure_ascii=False, indent=2)
-    (REPORT_DIR / "Sarasa-Ui-VF-PropDigits-SC-report.json").write_text(build_text, encoding="utf-8")
+    (REPORT_DIR / "Sarasa-Ui-PropDigits-report.json").write_text(build_text, encoding="utf-8")
+    legacy_report = REPORT_DIR / "Sarasa-Ui-VF-PropDigits-SC-report.json"
+    if legacy_report.exists():
+        legacy_report.unlink()
 
     font_paths = (
         sorted(VARIABLE_DIR.glob("*.ttf"))
-        + sorted(STATIC_DIR.glob("SarasaUiPropDigitsSC-*.ttf"))
-        + sorted(STATIC_UNHINTED_DIR.glob("SarasaUiPropDigitsSC-*.ttf"))
+        + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-{SARASA_VERSION}/*.ttf"))
+        + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-Unhinted-{SARASA_VERSION}/*.ttf"))
     )
     inspection = {
-        "title": "Sarasa Ui VF PropDigits SC / Sarasa Ui PropDigits SC 字体检查",
+        "title": "Sarasa Ui VF PropDigits / Sarasa Ui PropDigits 多地区字体检查",
         "note": "由 tools/build_sarasa_ui_propdigits_sc.py 使用 fontTools 生成。",
         "fonts": [inspect_font(path) for path in font_paths],
     }
@@ -4798,11 +5584,29 @@ def existing_variable_outputs() -> list[dict[str, Any]]:
     ]
 
 
-def build_all(static_only: bool = False) -> dict[str, Any]:
-    ensure_build_sources(static_only)
-    required_paths = [REFERENCE_SARASA]
+def parse_regions(value: str | None) -> list[str]:
+    if not value:
+        return list(REGION_ORDER)
+    result = [check_region(part.strip()) for part in value.replace(";", ",").split(",") if part.strip()]
+    if not result:
+        return list(REGION_ORDER)
+    return list(dict.fromkeys(result))
+
+
+def build_all(
+    static_only: bool = False,
+    regions: list[str] | None = None,
+    resume_static: bool = False,
+) -> dict[str, Any]:
+    regions = list(REGION_ORDER if regions is None else dict.fromkeys(check_region(region) for region in regions))
+    ensure_build_sources(static_only, regions)
+    required_paths = [reference_font_path(region, "Regular", False) for region in regions]
     if not static_only:
-        required_paths.extend([BASE_VF, INTER_UPRIGHT, INTER_ITALIC])
+        required_paths.extend([source_han_vf_path(region) for region in variable_regions(regions)])
+        required_paths.extend(
+            path for path in (classical_vf_override_path(region) for region in variable_regions(regions)) if path
+        )
+        required_paths.extend([INTER_UPRIGHT, INTER_ITALIC])
     for path in required_paths:
         if not path.exists():
             raise FileNotFoundError(path)
@@ -4810,59 +5614,77 @@ def build_all(static_only: bool = False) -> dict[str, Any]:
         log_step("variable: skipped by --static-only")
         variable_outputs = existing_variable_outputs()
     else:
-        log_step("variable upright: build")
-        upright_output = build_one_variable(False)
-        log_step("variable italic: build")
-        italic_output = build_one_variable(True)
-        variable_outputs = [upright_output, italic_output]
+        variable_outputs = []
+        for region in variable_regions(regions):
+            log_step(f"variable {region} upright: build")
+            variable_outputs.append(build_one_variable(region, False))
+            log_step(f"variable {region} italic: build")
+            variable_outputs.append(build_one_variable(region, True))
     log_step("static: build hinted and unhinted")
-    static_outputs = build_static_fonts()
-    write_static_readme()
+    static_outputs = build_static_fonts(regions, resume=resume_static)
+    write_static_readme(regions)
     report = {
-        "family": VF_FAMILY,
+        "family": "Sarasa Ui PropDigits",
         "version": VERSION,
+        "regions": regions,
+        "variable_regions": variable_regions(regions),
+        "static_regions": regions,
         "static_only": static_only,
+        "resume_static": resume_static,
         "build_script": "tools/build_sarasa_ui_propdigits_sc.py",
         "bootstrap_sources": {
             "sarasa_gothic": SARASA_TAG,
-            "sarasa_ui_sc_ttf": f"{SARASA_VERSION} hinted/unhinted",
+            "sarasa_ui_ttf": f"{SARASA_VERSION} hinted/unhinted",
             "source_han_sans": SOURCE_HAN_TAG,
             "inter": INTER_TAG,
             "node": NODE_VERSION,
         },
-        "source_base": str(BASE_VF),
+        "source_base_by_region": {
+            region: str(source_han_vf_path(region)) for region in variable_regions(regions)
+        },
+        "classical_vf_override_by_region": {
+            region: str(path)
+            for region in variable_regions(regions)
+            for path in [classical_vf_override_path(region)]
+            if path
+        },
         "source_latin_upright": str(INTER_UPRIGHT),
         "source_latin_italic": str(INTER_ITALIC),
-        "reference_unicode_set": str(REFERENCE_SARASA),
+        "reference_unicode_set_by_region": {
+            region: str(reference_font_path(region, "Regular", False)) for region in regions
+        },
         "method": (
-            "VF 由 Source Han Sans SC VF 与 Inter VF 合并而来。码位归属采用 "
-            "Sarasa pass1 风格，并按 VF 源文件实际覆盖做兜底：Inter VF 以 Sarasa "
+            "VF 由对应地区的 CJK VF 与 Inter VF 合并而来；SC/TC/HC/J/K 使用对应 "
+            "Source Han Sans VF。CL 以 Shanggu Sans "
+            f"{SHANGGU_TAG} 的官方 TTF/VF 发布物作为传统旧字形来源：静态 TTF 的 "
+            "classical override 直接使用 ShangguSansTC 静态 TTF，VF 以 "
+            "SourceHanSansK-VF 为底稿并用 ShangguSansTC-VF 覆盖对应 ideograph 字形。"
+            "码位归属采用 Sarasa pass1 风格，并按 VF 源文件实际覆盖做兜底：Inter VF 以 Sarasa "
             "的 Inter 设置（ss03 和 cv10）烘焙后用于 Latin 和西文符号覆盖；CJK、"
-            "Korean、Jamo 以及 Sarasa Ui 本地化标点优先来自 Source Han Sans SC VF。"
+            "Korean、Jamo 以及 Sarasa Ui 本地化标点优先来自对应地区的 Source Han Sans VF。"
             "在追加 Inter glyph 前，会先应用 Source Han 的 pwid/符号清洗和 Hangul "
-            "全角归一。最终 layout 导入 Sarasa UI SC 暴露的 Inter VF GSUB/GPOS 特性，"
+            "全角归一。最终 layout 导入对应地区 Sarasa Ui 暴露的 Inter VF GSUB/GPOS 特性，"
             "保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 "
-            "Sarasa UI 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、"
+            "Sarasa Ui 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、"
             "连续 em dash，以及与 Inter 一致的数字冒号 colon-run calt 规则。合并后会"
-            "对齐参考 Sarasa UI SC 的 cmap alias split 和 alias mapping、GSUB/GPOS "
+            "对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB/GPOS "
             "FeatureRecord 顺序、Script/LangSys 覆盖、基础 lookup 结构、非数字 advance "
             "和 LSB 的权重轴规则、tnum 数字目标 hmtx、垂直指标、vmtx 默认值和变化、"
             "GDEF、VORG，以及与 Sarasa 兼容的 head/OS/2 metadata。VF 和静态输出都包含 "
             "STAT；静态 STAT 只描述单实例样式，不保留 fvar/gvar 可变表。glyph 总数不强行"
             "补齐到与上游一致：cmap 字形和布局可达的未编码字形会保留，不可达 glyph 数量"
-            "差异不视为渲染缺陷。静态 TTF 从静态 Source Han Sans SC 和 Inter 源字体出发，"
+            "差异不视为渲染缺陷。静态 TTF 从对应地区静态 Source Han Sans 和 Inter 源字体出发，"
             "经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字"
             "和冒号 cmap remap、命名、metadata、layout、GDEF/VORG、与上游兼容的 glyf "
             "flags/bbox/组件名、静态 post format 2 glyph names、OTS-compatible glyf repeat "
-            "编码和静态 STAT 规则。hinted 静态套件沿用上游 Sarasa 的顺序：pass1 先经过 "
-            "ttfautohint，随后 pass1/kanji/hangul 片段用 Chlorophytum hcfg 写入指令，最后"
-            "由 pass2 合成。对于轮廓匹配的 exact 上游样式，合成后同步上游 TrueType "
-            "instruction tables 和逐字形 program。unhinted 静态套件跳过这两个 hint 工具，"
-            "直接合成未 hint 的片段，提供无 TrueType instructions 的正式静态输出。"
-            "Normal、Medium、Heavy 分别使用上游 Regular、SemiBold、Bold 的静态样式或 hcfg "
-            "配置，因为上游 Sarasa 没有发布对应的静态输出样式。"
+            "编码和静态 STAT 规则。hinted 静态套件会对本项目实际生成的片段重新 hint："
+            "pass1 先经过 ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 "
+            "Chlorophytum hcfg 写入 TrueType instructions，最后由 pass2 合成最终 TTF。"
+            "unhinted 静态套件提供无 TrueType instructions 的正式静态输出。"
+            "Normal、Medium、Heavy 分别使用上游 Regular、SemiBold、Bold 作为对齐参考，"
+            "因为上游 Sarasa 没有发布对应的静态输出样式。"
             "公开字重采用 Sarasa/CSS 口径：ExtraLight 为 200，Light/Regular/Bold/Heavy "
-            "分别为 300/400/700/900；CJK 轮廓来源仍是 Source Han Sans SC 的 ExtraLight "
+            "分别为 300/400/700/900；CJK 轮廓来源仍是 Source Han Sans 的 ExtraLight "
             "250，VF 通过 avar 轴映射让 public wght=200 对应 Source Han 内部 wght=250。"
         ),
         "intentional_differences_from_upstream_sarasa_ui": [
@@ -4882,8 +5704,18 @@ def build_all(static_only: bool = False) -> dict[str, Any]:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--static-only", action="store_true", help="只重建静态 hinted/unhinted TTF，不重建 VF 输出。")
+    parser.add_argument(
+        "--regions",
+        default=",".join(REGION_ORDER),
+        help="逗号分隔的地区列表，默认 CL,SC,TC,HC,J,K。",
+    )
+    parser.add_argument(
+        "--resume-static",
+        action="store_true",
+        help="保留现有静态输出，只重建缺失的完整字重；同一字重的 hinted/unhinted 正体与 Italic 都存在时跳过。",
+    )
     args = parser.parse_args()
-    report = build_all(static_only=args.static_only)
+    report = build_all(static_only=args.static_only, regions=parse_regions(args.regions), resume_static=args.resume_static)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 
