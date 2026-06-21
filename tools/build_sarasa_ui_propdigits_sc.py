@@ -3177,12 +3177,18 @@ def drop_nonfinal_gsub_features(font: TTFont, allowed_features: set[str] = FINAL
     return drop_feature_records(font["GSUB"], tags - allowed_features)
 
 
-def align_layout_feature_template(font: TTFont, reference: TTFont, table_tag: str) -> dict[str, int]:
+def align_layout_feature_template(
+    font: TTFont,
+    reference: TTFont,
+    table_tag: str,
+    use_reference_lookup_indices: bool = False,
+) -> dict[str, int]:
     key = table_tag.lower()
     if table_tag not in font or table_tag not in reference:
         return {
             f"{key}_feature_records_before_template": 0,
             f"{key}_feature_records_after_template": 0,
+            f"{key}_empty_feature_records_added_from_template": 0,
             f"{key}_langsys_after_template": 0,
         }
     table = font[table_tag].table
@@ -3191,6 +3197,7 @@ def align_layout_feature_template(font: TTFont, reference: TTFont, table_tag: st
         return {
             f"{key}_feature_records_before_template": 0,
             f"{key}_feature_records_after_template": 0,
+            f"{key}_empty_feature_records_added_from_template": 0,
             f"{key}_langsys_after_template": 0,
         }
 
@@ -3202,14 +3209,24 @@ def align_layout_feature_template(font: TTFont, reference: TTFont, table_tag: st
     ref_to_new: dict[int, int] = {}
     used_by_tag: dict[str, int] = {}
     new_records = []
+    empty_added = 0
     for ref_index, ref_record in enumerate(ref_table.FeatureList.FeatureRecord):
         candidates = current_by_tag.get(ref_record.FeatureTag)
-        if not candidates:
+        if candidates:
+            use_index = min(used_by_tag.get(ref_record.FeatureTag, 0), len(candidates) - 1)
+            used_by_tag[ref_record.FeatureTag] = used_by_tag.get(ref_record.FeatureTag, 0) + 1
+            record = copy.deepcopy(candidates[use_index])
+            record.FeatureTag = ref_record.FeatureTag
+        elif not list(ref_record.Feature.LookupListIndex or []):
+            record = copy.deepcopy(ref_record)
+            record.Feature.LookupListIndex = []
+            record.Feature.LookupCount = 0
+            empty_added += 1
+        else:
             continue
-        use_index = min(used_by_tag.get(ref_record.FeatureTag, 0), len(candidates) - 1)
-        used_by_tag[ref_record.FeatureTag] = used_by_tag.get(ref_record.FeatureTag, 0) + 1
-        record = copy.deepcopy(candidates[use_index])
-        record.FeatureTag = ref_record.FeatureTag
+        if use_reference_lookup_indices:
+            record.Feature.LookupListIndex = list(ref_record.Feature.LookupListIndex or [])
+            record.Feature.LookupCount = len(record.Feature.LookupListIndex)
         ref_to_new[ref_index] = len(new_records)
         new_records.append(record)
 
@@ -3217,6 +3234,7 @@ def align_layout_feature_template(font: TTFont, reference: TTFont, table_tag: st
         return {
             f"{key}_feature_records_before_template": old_count,
             f"{key}_feature_records_after_template": old_count,
+            f"{key}_empty_feature_records_added_from_template": 0,
             f"{key}_langsys_after_template": 0,
         }
 
@@ -3266,7 +3284,295 @@ def align_layout_feature_template(font: TTFont, reference: TTFont, table_tag: st
     return {
         f"{key}_feature_records_before_template": old_count,
         f"{key}_feature_records_after_template": len(new_records),
+        f"{key}_empty_feature_records_added_from_template": empty_added,
         f"{key}_langsys_after_template": langsys_count,
+    }
+
+
+def empty_coverage() -> ot.Coverage:
+    coverage = ot.Coverage()
+    coverage.glyphs = []
+    return coverage
+
+
+VALUE_RECORD_FIELDS = [
+    (0x0001, "XPlacement", 0),
+    (0x0002, "YPlacement", 0),
+    (0x0004, "XAdvance", 0),
+    (0x0008, "YAdvance", 0),
+    (0x0010, "XPlaDevice", None),
+    (0x0020, "YPlaDevice", None),
+    (0x0040, "XAdvDevice", None),
+    (0x0080, "YAdvDevice", None),
+]
+
+
+def value_record_for_format(source: Any | None, value_format: int) -> ot.ValueRecord | None:
+    if value_format == 0:
+        return None
+    record = ot.ValueRecord()
+    for bit, attr, default in VALUE_RECORD_FIELDS:
+        if value_format & bit:
+            setattr(record, attr, copy.deepcopy(getattr(source, attr, default)))
+    return record
+
+
+def empty_gpos_subtable(lookup_type: int) -> Any:
+    if lookup_type == 1:
+        subtable = ot.SinglePos()
+        subtable.Format = 1
+        subtable.Coverage = empty_coverage()
+        subtable.ValueFormat = 0
+        subtable.Value = None
+        return subtable
+    if lookup_type == 2:
+        subtable = ot.PairPos()
+        subtable.Format = 1
+        subtable.Coverage = empty_coverage()
+        subtable.ValueFormat1 = 0
+        subtable.ValueFormat2 = 0
+        subtable.PairSet = []
+        subtable.PairSetCount = 0
+        return subtable
+    if lookup_type == 3:
+        subtable = ot.CursivePos()
+        subtable.Format = 1
+        subtable.Coverage = empty_coverage()
+        subtable.EntryExitRecord = []
+        subtable.EntryExitCount = 0
+        return subtable
+    if lookup_type == 4:
+        subtable = ot.MarkBasePos()
+        subtable.Format = 1
+        subtable.MarkCoverage = empty_coverage()
+        subtable.BaseCoverage = empty_coverage()
+        subtable.ClassCount = 0
+        subtable.MarkArray = ot.MarkArray()
+        subtable.MarkArray.MarkCount = 0
+        subtable.MarkArray.MarkRecord = []
+        subtable.BaseArray = ot.BaseArray()
+        subtable.BaseArray.BaseCount = 0
+        subtable.BaseArray.BaseRecord = []
+        return subtable
+    if lookup_type == 5:
+        subtable = ot.MarkLigPos()
+        subtable.Format = 1
+        subtable.MarkCoverage = empty_coverage()
+        subtable.LigatureCoverage = empty_coverage()
+        subtable.ClassCount = 0
+        subtable.MarkArray = ot.MarkArray()
+        subtable.MarkArray.MarkCount = 0
+        subtable.MarkArray.MarkRecord = []
+        subtable.LigatureArray = ot.LigatureArray()
+        subtable.LigatureArray.LigatureCount = 0
+        subtable.LigatureArray.LigatureAttach = []
+        return subtable
+    if lookup_type == 6:
+        subtable = ot.MarkMarkPos()
+        subtable.Format = 1
+        subtable.Mark1Coverage = empty_coverage()
+        subtable.Mark2Coverage = empty_coverage()
+        subtable.ClassCount = 0
+        subtable.Mark1Array = ot.MarkArray()
+        subtable.Mark1Array.MarkCount = 0
+        subtable.Mark1Array.MarkRecord = []
+        subtable.Mark2Array = ot.Mark2Array()
+        subtable.Mark2Array.Mark2Count = 0
+        subtable.Mark2Array.Mark2Record = []
+        return subtable
+    raise ValueError(f"Unsupported empty GPOS lookup type: {lookup_type}")
+
+
+def align_single_pos_format(subtable: Any, reference: Any) -> Any:
+    reference_format = getattr(reference, "Format", getattr(subtable, "Format", 1))
+    reference_value_format = getattr(reference, "ValueFormat", getattr(subtable, "ValueFormat", 0))
+    glyphs = list(getattr(getattr(subtable, "Coverage", None), "glyphs", []) or [])
+    if getattr(subtable, "Format", 1) == 2:
+        values = list(getattr(subtable, "Value", []) or [])
+        source_value = values[0] if values else None
+    else:
+        source_value = getattr(subtable, "Value", None)
+    subtable.ValueFormat = reference_value_format
+    if reference_format == 2:
+        subtable.Format = 2
+        subtable.Value = [value_record_for_format(source_value, reference_value_format) for _ in glyphs]
+        subtable.ValueCount = len(subtable.Value)
+    else:
+        subtable.Format = 1
+        subtable.Value = value_record_for_format(source_value, reference_value_format)
+        if hasattr(subtable, "ValueCount"):
+            delattr(subtable, "ValueCount")
+    return subtable
+
+
+def empty_class_def() -> ot.ClassDef:
+    class_def = ot.ClassDef()
+    class_def.classDefs = {}
+    return class_def
+
+
+def build_class2_record(value_format1: int, value_format2: int, value1: Any | None = None, value2: Any | None = None) -> Any:
+    record = ot.Class2Record()
+    record.Value1 = value_record_for_format(value1, value_format1)
+    record.Value2 = value_record_for_format(value2, value_format2)
+    return record
+
+
+def align_pair_pos_format(subtable: Any, reference: Any) -> Any:
+    reference_format = getattr(reference, "Format", getattr(subtable, "Format", 1))
+    value_format1 = getattr(reference, "ValueFormat1", getattr(subtable, "ValueFormat1", 0))
+    value_format2 = getattr(reference, "ValueFormat2", getattr(subtable, "ValueFormat2", 0))
+    if reference_format == 2:
+        if getattr(subtable, "Format", 1) == 2:
+            class1_records = list(getattr(subtable, "Class1Record", []) or [])
+            for class1_record in class1_records:
+                for class2_record in getattr(class1_record, "Class2Record", []) or []:
+                    class2_record.Value1 = value_record_for_format(getattr(class2_record, "Value1", None), value_format1)
+                    class2_record.Value2 = value_record_for_format(getattr(class2_record, "Value2", None), value_format2)
+            subtable.ValueFormat1 = value_format1
+            subtable.ValueFormat2 = value_format2
+            return subtable
+
+        first_glyphs = list(getattr(getattr(subtable, "Coverage", None), "glyphs", []) or [])
+        second_glyphs: list[str] = []
+        pair_values: dict[tuple[str, str], tuple[Any | None, Any | None]] = {}
+        for first_glyph, pair_set in zip(first_glyphs, getattr(subtable, "PairSet", []) or []):
+            for pair_record in getattr(pair_set, "PairValueRecord", []) or []:
+                second_glyph = pair_record.SecondGlyph
+                if second_glyph not in second_glyphs:
+                    second_glyphs.append(second_glyph)
+                pair_values[(first_glyph, second_glyph)] = (
+                    getattr(pair_record, "Value1", None),
+                    getattr(pair_record, "Value2", None),
+                )
+
+        class1 = {glyph: index + 1 for index, glyph in enumerate(first_glyphs)}
+        class2 = {glyph: index + 1 for index, glyph in enumerate(second_glyphs)}
+        class1_count = len(class1) + 1 if first_glyphs else 0
+        class2_count = len(class2) + 1 if second_glyphs else 0
+        class1_records = []
+        for class1_index in range(class1_count):
+            class1_record = ot.Class1Record()
+            class2_records = []
+            first_glyph = first_glyphs[class1_index - 1] if class1_index else None
+            for class2_index in range(class2_count):
+                second_glyph = second_glyphs[class2_index - 1] if class2_index else None
+                value1, value2 = pair_values.get((first_glyph, second_glyph), (None, None))
+                class2_records.append(build_class2_record(value_format1, value_format2, value1, value2))
+            class1_record.Class2Record = class2_records
+            class1_records.append(class1_record)
+
+        subtable.Format = 2
+        subtable.ValueFormat1 = value_format1
+        subtable.ValueFormat2 = value_format2
+        subtable.ClassDef1 = empty_class_def()
+        subtable.ClassDef1.classDefs = class1
+        subtable.ClassDef2 = empty_class_def()
+        subtable.ClassDef2.classDefs = class2
+        subtable.Class1Count = class1_count
+        subtable.Class2Count = class2_count
+        subtable.Class1Record = class1_records
+        if hasattr(subtable, "PairSet"):
+            delattr(subtable, "PairSet")
+        if hasattr(subtable, "PairSetCount"):
+            delattr(subtable, "PairSetCount")
+        return subtable
+
+    subtable.Format = 1
+    subtable.ValueFormat1 = value_format1
+    subtable.ValueFormat2 = value_format2
+    if hasattr(subtable, "ClassDef1"):
+        delattr(subtable, "ClassDef1")
+    if hasattr(subtable, "ClassDef2"):
+        delattr(subtable, "ClassDef2")
+    if hasattr(subtable, "Class1Count"):
+        delattr(subtable, "Class1Count")
+    if hasattr(subtable, "Class2Count"):
+        delattr(subtable, "Class2Count")
+    if hasattr(subtable, "Class1Record"):
+        delattr(subtable, "Class1Record")
+    if not hasattr(subtable, "PairSet"):
+        subtable.PairSet = []
+    subtable.PairSetCount = len(subtable.PairSet)
+    return subtable
+
+
+def align_gpos_subtable_to_reference(subtable: Any, reference_subtable: Any, lookup_type: int) -> Any:
+    if lookup_type == 9 and hasattr(reference_subtable, "ExtensionLookupType"):
+        subtable.Format = getattr(reference_subtable, "Format", 1)
+        subtable.ExtensionLookupType = reference_subtable.ExtensionLookupType
+        if not hasattr(subtable, "ExtSubTable") or subtable.ExtSubTable is None:
+            subtable.ExtSubTable = empty_gpos_subtable(reference_subtable.ExtensionLookupType)
+        subtable.ExtSubTable = align_gpos_subtable_to_reference(
+            subtable.ExtSubTable,
+            reference_subtable.ExtSubTable,
+            reference_subtable.ExtensionLookupType,
+        )
+        return subtable
+    if lookup_type == 1:
+        return align_single_pos_format(subtable, reference_subtable)
+    if lookup_type == 2:
+        return align_pair_pos_format(subtable, reference_subtable)
+    if hasattr(reference_subtable, "Format"):
+        subtable.Format = reference_subtable.Format
+    return subtable
+
+
+def empty_layout_subtable_like(reference_subtable: Any, lookup_type: int) -> Any:
+    if lookup_type == 9 and hasattr(reference_subtable, "ExtensionLookupType"):
+        extension = ot.ExtensionPos()
+        extension.Format = 1
+        extension.ExtensionLookupType = reference_subtable.ExtensionLookupType
+        extension.ExtSubTable = empty_gpos_subtable(reference_subtable.ExtensionLookupType)
+        return align_gpos_subtable_to_reference(extension, reference_subtable, lookup_type)
+    return align_gpos_subtable_to_reference(empty_gpos_subtable(lookup_type), reference_subtable, lookup_type)
+
+
+def align_layout_lookup_structure(font: TTFont, reference: TTFont, table_tag: str) -> dict[str, int]:
+    key = table_tag.lower()
+    if table_tag not in font or table_tag not in reference:
+        return {f"{key}_lookups_before_structure_template": 0, f"{key}_lookups_after_structure_template": 0}
+    table = font[table_tag].table
+    ref_table = reference[table_tag].table
+    if not table.LookupList or not ref_table.LookupList:
+        return {f"{key}_lookups_before_structure_template": 0, f"{key}_lookups_after_structure_template": 0}
+    before = len(table.LookupList.Lookup)
+    ref_lookups = ref_table.LookupList.Lookup
+    while len(table.LookupList.Lookup) < len(ref_lookups):
+        ref_lookup = ref_lookups[len(table.LookupList.Lookup)]
+        lookup = ot.Lookup()
+        lookup.LookupType = ref_lookup.LookupType
+        lookup.LookupFlag = ref_lookup.LookupFlag
+        if hasattr(ref_lookup, "MarkFilteringSet"):
+            lookup.MarkFilteringSet = copy.deepcopy(ref_lookup.MarkFilteringSet)
+        lookup.SubTable = [
+            empty_layout_subtable_like(ref_subtable, ref_lookup.LookupType) for ref_subtable in ref_lookup.SubTable
+        ]
+        lookup.SubTableCount = len(lookup.SubTable)
+        table.LookupList.Lookup.append(lookup)
+    if len(table.LookupList.Lookup) > len(ref_lookups):
+        table.LookupList.Lookup = table.LookupList.Lookup[: len(ref_lookups)]
+    for lookup, ref_lookup in zip(table.LookupList.Lookup, ref_lookups):
+        lookup.LookupType = ref_lookup.LookupType
+        lookup.LookupFlag = ref_lookup.LookupFlag
+        if hasattr(ref_lookup, "MarkFilteringSet"):
+            lookup.MarkFilteringSet = copy.deepcopy(ref_lookup.MarkFilteringSet)
+        elif hasattr(lookup, "MarkFilteringSet"):
+            delattr(lookup, "MarkFilteringSet")
+        if len(lookup.SubTable) > len(ref_lookup.SubTable):
+            lookup.SubTable = lookup.SubTable[: len(ref_lookup.SubTable)]
+        while len(lookup.SubTable) < len(ref_lookup.SubTable):
+            ref_subtable = ref_lookup.SubTable[len(lookup.SubTable)]
+            lookup.SubTable.append(empty_layout_subtable_like(ref_subtable, ref_lookup.LookupType))
+        lookup.SubTable = [
+            align_gpos_subtable_to_reference(subtable, ref_subtable, ref_lookup.LookupType)
+            for subtable, ref_subtable in zip(lookup.SubTable, ref_lookup.SubTable)
+        ]
+        lookup.SubTableCount = len(lookup.SubTable)
+    table.LookupList.LookupCount = len(table.LookupList.Lookup)
+    return {
+        f"{key}_lookups_before_structure_template": before,
+        f"{key}_lookups_after_structure_template": len(table.LookupList.Lookup),
     }
 
 
@@ -5149,8 +5455,12 @@ def postprocess_static_font(
         report.update(add_digit_colon_feature(font))
         if reference:
             report.update(align_layout_feature_template(font, reference, "GSUB"))
-            report.update(align_layout_feature_template(font, reference, "GPOS"))
+            report.update(align_layout_lookup_structure(font, reference, "GPOS"))
+            report.update(align_layout_feature_template(font, reference, "GPOS", use_reference_lookup_indices=True))
             subset_to_current_cmap(font)
+            report.update(align_layout_feature_template(font, reference, "GSUB"))
+            report.update(align_layout_lookup_structure(font, reference, "GPOS"))
+            report.update(align_layout_feature_template(font, reference, "GPOS", use_reference_lookup_indices=True))
         if hinted:
             report.update(
                 {
@@ -5715,15 +6025,16 @@ def build_all(
             "保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 "
             "Sarasa Ui 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、"
             "连续 em dash，以及与 Inter 一致的数字冒号 colon-run calt 规则。合并后会"
-            "对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB/GPOS "
-            "FeatureRecord 顺序、Script/LangSys 覆盖、基础 lookup 结构、非数字 advance "
+            "对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB "
+            "FeatureRecord 顺序、空 cv/ss FeatureRecord、Script/LangSys 覆盖顺序、GPOS "
+            "FeatureRecord lookup index 和 LookupList 结构、非数字 advance "
             "和 LSB 的权重轴规则、tnum 数字目标 hmtx、垂直指标、vmtx 默认值和变化、"
             "GDEF、VORG，以及与 Sarasa 兼容的 head/OS/2 metadata。VF 和静态输出都包含 "
             "STAT；静态 STAT 只描述单实例样式，不保留 fvar/gvar 可变表。glyph 总数不强行"
             "补齐到与上游一致：cmap 字形和布局可达的未编码字形会保留，不可达 glyph 数量"
             "差异不视为渲染缺陷。静态 TTF 从对应地区静态 Source Han Sans 和 Inter 源字体出发，"
             "经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字"
-            "和冒号 cmap remap、命名、metadata、layout、GDEF/VORG、与上游兼容的 glyf "
+            "和冒号 cmap remap、命名、metadata、layout 模板、GDEF/VORG、与上游兼容的 glyf "
             "flags/bbox/组件名、静态 post format 2 glyph names、OTS-compatible glyf repeat "
             "编码和静态 STAT 规则。hinted 静态套件会对本项目实际生成的片段重新 hint："
             "pass1 先经过 ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 "
