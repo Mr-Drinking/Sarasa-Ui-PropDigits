@@ -537,12 +537,23 @@ def reference_style_name(weight_name: str, italic: bool) -> str:
     return weight_name
 
 
+def static_reference_style_name(weight_name: str, italic: bool) -> str:
+    style = str(STATIC_STYLE_SOURCES.get(weight_name, {"sarasa": weight_name})["sarasa"])
+    if italic:
+        return "Italic" if style == "Regular" else f"{style}Italic"
+    return style
+
+
 def reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
     return region_reference_dir(region, False) / f"{sarasa_region_prefix(region)}-{reference_style_name(weight_name, italic)}.ttf"
 
 
 def hinted_reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
     return region_reference_dir(region, True) / f"{sarasa_region_prefix(region)}-{reference_style_name(weight_name, italic)}.ttf"
+
+
+def static_reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
+    return region_reference_dir(region, False) / f"{sarasa_region_prefix(region)}-{static_reference_style_name(weight_name, italic)}.ttf"
 
 
 def open_reference_font(region: str, weight_name: str, italic: bool) -> TTFont:
@@ -1554,6 +1565,27 @@ def subset_font(font: TTFont, unicodes: set[int]) -> None:
 
 def subset_to_current_cmap(font: TTFont) -> None:
     subset_font(font, set(font.getBestCmap().keys()))
+
+
+def restrict_cmap_to_reference(font: TTFont, reference: TTFont, keep_codepoints: set[int] | None = None) -> dict[str, int]:
+    if "cmap" not in font:
+        return {"reference_cmap_extra_codepoints_removed": 0, "reference_cmap_extra_entries_removed": 0}
+    keep = set(reference.getBestCmap().keys())
+    if keep_codepoints:
+        keep.update(keep_codepoints)
+    current = set(font.getBestCmap().keys())
+    remove = current - keep
+    if not remove:
+        return {"reference_cmap_extra_codepoints_removed": 0, "reference_cmap_extra_entries_removed": 0}
+    removed = 0
+    for cmap_table in font["cmap"].tables:
+        if not cmap_table.isUnicode():
+            continue
+        for codepoint in list(cmap_table.cmap):
+            if codepoint in remove:
+                del cmap_table.cmap[codepoint]
+                removed += 1
+    return {"reference_cmap_extra_codepoints_removed": len(remove), "reference_cmap_extra_entries_removed": removed}
 
 
 def get_single_substitution_mapping(font: TTFont, tag: str) -> dict[str, str]:
@@ -5086,11 +5118,16 @@ def postprocess_static_font(
     font.recalcBBoxes = False
     report: dict[str, Any] = {}
     try:
-        reference_path = reference_font_path(region, weight_name, italic)
+        reference_style = static_reference_style_name(weight_name, italic)
+        reference_path = static_reference_font_path(region, weight_name, italic)
+        report["static_reference_style"] = reference_style
+        report["static_reference_path"] = str(reference_path)
         reference: TTFont | None = None
         if reference_path.exists():
             reference = TTFont(reference_path, recalcBBoxes=False, recalcTimestamp=False)
             try:
+                report.update(restrict_cmap_to_reference(font, reference, PROPDIGITS_CODEPOINTS))
+                report.update(align_reference_advances(font, reference, PROPDIGITS_CODEPOINTS))
                 report.update(align_reference_hmtx_lsb(font, reference, PROPDIGITS_CODEPOINTS))
                 report.update(align_tnum_digit_targets(font, reference))
                 report.update(align_reference_vmtx(font, reference, PROPDIGITS_CODEPOINTS))
@@ -5110,6 +5147,10 @@ def postprocess_static_font(
         if reference:
             report.update(sync_static_glyf_from_reference(font, reference, PROPDIGITS_CODEPOINTS))
         report.update(add_digit_colon_feature(font))
+        if reference:
+            report.update(align_layout_feature_template(font, reference, "GSUB"))
+            report.update(align_layout_feature_template(font, reference, "GPOS"))
+            subset_to_current_cmap(font)
         if hinted:
             report.update(
                 {
@@ -5480,7 +5521,10 @@ def static_readme_text(region: str, hinted: bool) -> str:
     title = f"{family} TTF {SARASA_VERSION}" if hinted else f"{family} TTF Unhinted {SARASA_VERSION}"
     cl_note = (
         f"CL 地区的传统旧字形覆盖跟随 Shanggu Sans {SHANGGU_TAG} 官方 TTF：\n"
-        "汉字底稿先取 SourceHanSansK，再用 ShangguSansTC 静态 TTF 覆盖。"
+        "汉字底稿先取 SourceHanSansK，再用 ShangguSansTC 静态 TTF 覆盖。\n"
+        "最终公开 cmap、GSUB/GPOS feature 和非数字 metrics 仍按 SarasaUiCL\n"
+        "参考字体裁剪与同步；Normal、Medium、Heavy 分别沿用 Regular、\n"
+        "SemiBold、Bold 的 reference 边界。"
         if region == "CL"
         else f"{region} 地区沿用 Sarasa 上游路径：CJK 底稿来自 {shs_prefix}。"
     )
@@ -5534,6 +5578,7 @@ OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui {region} 静态字体套模板。
+静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap，并同步非数字 metrics。
 对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
 glyf bbox 和组合字形组件名。静态 TTF 使用 post format 2，让默认比例数字
 remap 到 U+0030..U+0039 后，相关 glyph names 仍能稳定保留。最终写出 glyf
@@ -5659,6 +5704,9 @@ def build_all(
             f"{SHANGGU_TAG} 的官方 TTF/VF 发布物作为传统旧字形来源：静态 TTF 的 "
             "classical override 直接使用 ShangguSansTC 静态 TTF，VF 以 "
             "SourceHanSansK-VF 为底稿并用 ShangguSansTC-VF 覆盖对应 ideograph 字形。"
+            "静态 CL 最终仍按 SarasaUiCL 参考字体裁剪公开 cmap 和 GSUB/GPOS feature，"
+            "并同步非数字 metrics；Normal、Medium、Heavy 分别使用 Regular、SemiBold、"
+            "Bold 作为 reference 边界。"
             "码位归属采用 Sarasa pass1 风格，并按 VF 源文件实际覆盖做兜底：Inter VF 以 Sarasa "
             "的 Inter 设置（ss03 和 cv10）烘焙后用于 Latin 和西文符号覆盖；CJK、"
             "Korean、Jamo 以及 Sarasa Ui 本地化标点优先来自对应地区的 Source Han Sans VF。"
@@ -5691,6 +5739,7 @@ def build_all(
             "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
             "公开字重遵循 Sarasa/CSS 口径：200、300、350、400、500、700、900；CJK 内部仍使用 Source Han ExtraLight 250 作为 public 200 的来源。",
             "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
+            "静态 CL 使用 Shanggu Sans 官方发布物作为旧字形轮廓来源，但公开 cmap、GSUB/GPOS feature 和非数字 metrics 仍按 SarasaUiCL reference 边界裁剪与同步。",
             "静态 TTF 使用 post format 2，以便 PropDigits cmap remap 后仍保留审计稳定的 glyph names；VF 保持既有 post/GID 模型。",
         ],
         "final_gsub_features": sorted(FINAL_GSUB_FEATURES),
