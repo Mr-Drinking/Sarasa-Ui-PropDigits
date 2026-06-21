@@ -37,4 +37,4 @@
 - VF、hinted 静态 TTF 和 unhinted 静态 TTF 都保留 `STAT`。静态 `STAT` 只描述单个静态实例的 weight/italic 样式，不表示静态文件仍有可变轴。
 - `OS/2.achVendID` 使用 `MRDK` 标识本仓库修改版，不沿用上游 Sarasa Ui 的 `????` 占位值，也不表示这些字体是 Source Han Sans 或 Inter 的官方版本。
 - 与上游 Sarasa Ui 的有意差异是默认 ASCII 数字为变宽数字、公开字重级别采用 Sarasa/CSS 口径 `200/300/350/400/500/700/900`，VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run `calt`，以及 CL 跟随 Shanggu Sans `1.028` 官方 TTF/VF 发布物而不是 Sarasa `1.0.39` 内置旧 subset 转换产物。其中 public ExtraLight `200` 的 CJK 来源仍是 Source Han Sans ExtraLight `250`，不会伪造 Source Han Sans 不存在的 CJK `200` 轮廓；Shanggu 比官方 SarasaUiCL 多出的码位或旧字形 feature 不会额外暴露到静态 CL 公开字体里。
-- 最终字体保留 `ccmp`、裁剪到上游 Sarasa Ui 覆盖范围的 `locl`、Hangul Jamo、`vert/vrt2` 和数字特性。静态 TTF 最终写出时保留上游 `OVERLAP_SIMPLE` 语义，并用 OTS 可接受的 repeat 编码保存重复 overlap flags；unhinted 的 OTS `maxZones/gasp` 警告继承自上游基线。
+- 最终字体保留 `ccmp`、裁剪到上游 Sarasa Ui 覆盖范围的 `locl`、Hangul Jamo、`vert/vrt2`、数字特性，以及上游 Sarasa Ui 暴露的空 `cv/ss` FeatureRecord。静态 TTF 的 GSUB Script / LangSys 顺序和 GPOS FeatureRecord/LookupList 结构按对应地区参考字体同步；GSUB lookup 内容保留本派生项目新增的 PropDigits 冒号上下文规则。静态 TTF 最终写出时保留上游 `OVERLAP_SIMPLE` 语义，并用 OTS 可接受的 repeat 编码保存重复 overlap flags；unhinted 的 OTS `maxZones/gasp` 警告继承自上游基线。
