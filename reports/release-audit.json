@@ -1,17 +1,20 @@
 {
   "title": "Sarasa Ui PropDigits 多地区发布前审计",
-  "generated_at": "2026-06-21 06:21:20 +0800",
+  "generated_at": "2026-06-21 09:53:09 +0800",
   "summary": {
     "metadata_failures": 0,
     "static_exact_failures": 0,
+    "cl_static_boundary_failures": 0,
     "vf_metric_failures": 0,
     "static_fonts_checked": 168,
     "variable_fonts_checked": 12,
     "static_exact_cases": 96,
+    "cl_static_boundary_cases": 28,
     "vf_metric_cases": 24
   },
   "metadata_failures": [],
   "static_exact_nonzero": [],
+  "cl_static_boundary_nonzero": [],
   "vf_metrics_nonzero": [],
   "static_exact": [
     {
@@ -35,7 +38,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -60,7 +63,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -85,7 +88,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -110,7 +113,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -135,7 +138,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -160,7 +163,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -185,7 +188,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -210,7 +213,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -235,7 +238,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -260,7 +263,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -285,7 +288,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -310,7 +313,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -335,7 +338,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -360,7 +363,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -385,7 +388,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -410,7 +413,7 @@
         "v_side_bearing": 0,
         "bbox": 0,
         "outline_or_flags": 0,
-        "skipped_intentional": 42882
+        "skipped_intentional": 42870
       },
       "samples": {}
     },
@@ -2095,6 +2098,484 @@
       "samples": {}
     }
   ],
+  "cl_static_boundaries": [
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "reference_style": "ExtraLight",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-ExtraLight.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "reference_style": "ExtraLightItalic",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-ExtraLightItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "reference_style": "Light",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Light.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "reference_style": "LightItalic",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-LightItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Normal",
+      "reference_style": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Normal.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Regular.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Normal",
+      "reference_style": "Italic",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-NormalItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Italic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "reference_style": "Regular",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Regular.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "reference_style": "Italic",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Italic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Medium",
+      "reference_style": "SemiBold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Medium.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-SemiBold.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Medium",
+      "reference_style": "SemiBoldItalic",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-MediumItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-SemiBoldItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "reference_style": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Bold.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "reference_style": "BoldItalic",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-BoldItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Heavy",
+      "reference_style": "Bold",
+      "italic": false,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-Heavy.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Bold.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Heavy",
+      "reference_style": "BoldItalic",
+      "italic": true,
+      "hinted": false,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-Unhinted-1.0.39\\SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-BoldItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "reference_style": "ExtraLight",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-ExtraLight.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "ExtraLight",
+      "reference_style": "ExtraLightItalic",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-ExtraLightItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "reference_style": "Light",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Light.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Light.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Light",
+      "reference_style": "LightItalic",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-LightItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-LightItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Normal",
+      "reference_style": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Normal.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Regular.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Normal",
+      "reference_style": "Italic",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-NormalItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Italic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "reference_style": "Regular",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Regular.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Regular.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Regular",
+      "reference_style": "Italic",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Italic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Italic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Medium",
+      "reference_style": "SemiBold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Medium.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-SemiBold.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Medium",
+      "reference_style": "SemiBoldItalic",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-MediumItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-SemiBoldItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "reference_style": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Bold.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Bold.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Bold",
+      "reference_style": "BoldItalic",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-BoldItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Heavy",
+      "reference_style": "Bold",
+      "italic": false,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-Heavy.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-Bold.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    },
+    {
+      "region": "CL",
+      "weight": "Heavy",
+      "reference_style": "BoldItalic",
+      "italic": true,
+      "hinted": true,
+      "target": "fonts\\static\\SarasaUiPropDigitsCL-TTF-1.0.39\\SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "reference": "C:\\Users\\ShenZehou\\Documents\\Codex\\2026-06-14\\sarasa-gothic-ui\\work\\official-sarasa-ui\\CL\\unhinted\\SarasaUiCL-BoldItalic.ttf",
+      "counts": {
+        "extra_cmap": 0,
+        "missing_cmap": 0,
+        "extra_gsub_features": 0,
+        "extra_gpos_features": 0,
+        "advance_mismatch": 0
+      },
+      "samples": {}
+    }
+  ],
   "vf_metrics": [
     {
       "region": "CL",
@@ -2627,7 +3108,7 @@
         "has_gvar": false,
         "has_stat": true,
         "has_hint_tables": true,
-        "glyph_program_count": 47069,
+        "glyph_program_count": 45595,
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,
@@ -2673,7 +3154,7 @@
         "has_gvar": false,
         "has_stat": true,
         "has_hint_tables": true,
-        "glyph_program_count": 47067,
+        "glyph_program_count": 45593,
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,
@@ -2719,7 +3200,7 @@
         "has_gvar": false,
         "has_stat": true,
         "has_hint_tables": true,
-        "glyph_program_count": 47071,
+        "glyph_program_count": 45597,
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,
@@ -2765,7 +3246,7 @@
         "has_gvar": false,
         "has_stat": true,
         "has_hint_tables": true,
-        "glyph_program_count": 47067,
+        "glyph_program_count": 45593,
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,

@@ -19,13 +19,13 @@
 - **Sarasa Ui VF PropDigits CL / SC / TC / HC / J / K**：正体和 Italic 可变字体，公开 `wght` 轴为 `200..900`。
 - **Sarasa Ui PropDigits CL / SC / TC / HC / J / K**：从静态 Source Han Sans、Inter 和必要的地区覆盖源按 Sarasa 静态片段路径构建的 TTF，包含 hinted 与 unhinted 两套，每套 7 个字重及对应 Italic。
 
-CL 的传统旧字形覆盖跟随 [Shanggu Sans](https://github.com/GuiWonder/Shanggu) `1.028` 官方发布物：静态 TTF 使用 `ShangguSansTC-*.ttf`，VF 使用 `ShangguSansTC-VF.ttf`。这样静态和 VF 使用同一 Shanggu 发布口径，而不是继续绑定 Sarasa `1.0.39` 当时内置的旧 subset 转换产物。
+CL 的传统旧字形覆盖跟随 [Shanggu Sans](https://github.com/GuiWonder/Shanggu) `1.028` 官方发布物：静态 TTF 使用 `ShangguSansTC-*.ttf`，VF 使用 `ShangguSansTC-VF.ttf`。这样静态和 VF 使用同一 Shanggu 发布口径，而不是继续绑定 Sarasa `1.0.39` 当时内置的旧 subset 转换产物。最终静态 CL 的公开 cmap、GSUB/GPOS feature 边界和非数字 metrics 仍按官方 SarasaUiCL 参考字体裁剪与同步；Shanggu 比官方 SarasaUiCL 多出的码位或旧字形 feature 不会额外暴露到本系列静态字体里。
 
 两个系列都把 ASCII 数字 `U+0030..U+0039` 设为默认变宽数字，并提供 OpenType `tnum`/`pnum` 在变宽数字和等宽数字之间切换。VF 与静态 TTF 都按 Inter 的 `calt` 冒号行为处理数字冒号串：`1:2` 会上浮，`1:a`、`a:2`、`a:b` 不会上浮，`1::2`、`1:::a`、`a:::2` 等连续冒号上下文遵循 Inter 的 colon-run 规则。
 
 ## 地区
 
-- `CL`：传统旧字形。静态 TTF 的汉字底稿先取 `SourceHanSansK`，再用 Shanggu Sans `1.028` 官方 `ShangguSansTC` 静态 TTF 覆盖传统旧字形；VF 使用 `SourceHanSansK-VF` 加 `ShangguSansTC-VF` 覆盖。
+- `CL`：传统旧字形。静态 TTF 的汉字底稿先取 `SourceHanSansK`，再用 Shanggu Sans `1.028` 官方 `ShangguSansTC` 静态 TTF 覆盖传统旧字形；VF 使用 `SourceHanSansK-VF` 加 `ShangguSansTC-VF` 覆盖。最终公开字符集、layout feature 和非数字 metrics 以 SarasaUiCL 为边界。
 - `SC`：简体中文，来源为 `SourceHanSansSC`。
 - `TC`：繁体中文台湾字形，来源为 `SourceHanSansTC`。
 - `HC`：繁体中文香港字形，来源为 `SourceHanSansHC`。
@@ -82,12 +82,13 @@ VF 不从静态字重插值生成。它直接合并对应地区的 CJK VF 与 In
 - VF、hinted 静态 TTF 和 unhinted 静态 TTF 都包含 `STAT`。VF 的 `STAT` 描述 `wght`/`ital` 轴和命名实例；静态 TTF 的 `STAT` 只用于现代应用识别 weight / italic 样式，不表示静态文件仍有 `fvar` `gvar` 可变轴。
 - `OS/2.achVendID` 使用本派生项目的 `MRDK`，不继承上游 Sarasa Ui 的 `????` 占位值，也不冒充 Source Han Sans 或 Inter 的官方 vendor。
 - 构建会按对应地区的上游 Sarasa Ui 同步非数字与非冒号 advance、横向 LSB、垂直指标、`GDEF`、`VORG`、`vmtx`、`head`/`OS/2` 中可安全继承的元数据字段；静态 exact 样式还会保留上游 simple glyph flags、glyf bbox 和组合字形组件名。数字、与 Inter 兼容的冒号上下文，以及 CL 跟随 Shanggu Sans `1.028` 官方 TTF/VF 而不是 Sarasa `1.0.39` 内置旧 subset 的轮廓来源，是本派生字体的刻意差异。
-- 静态 TTF 不从 VF 实例化。hinted 和 unhinted 两套都使用静态 Source Han Sans 与静态 Inter，按 Sarasa 上游的 `pass1`、`kanji`、`hangul`、`pass2` 片段流程构建；CL 在 `kanji` 阶段额外使用 Shanggu Sans `1.028` 官方静态 TTF 覆盖传统旧字形。最终 TTF 将默认数字和 `:` remap 到已有的 pnum glyph，清理旧冒号上下文替换后追加与 Inter shaping 样例一致的 colon-run `calt`，中文名、metadata、glyf flags / bbox、组件名和静态 `STAT` 也在最终 TTF 上同步。
+- 静态 TTF 不从 VF 实例化。hinted 和 unhinted 两套都使用静态 Source Han Sans 与静态 Inter，按 Sarasa 上游的 `pass1`、`kanji`、`hangul`、`pass2` 片段流程构建；CL 在 `kanji` 阶段额外使用 Shanggu Sans `1.028` 官方静态 TTF 覆盖传统旧字形。最终 TTF 会再按对应 Sarasa Ui 参考字体裁剪 cmap、套用 GSUB/GPOS feature 模板并同步非数字 metrics；CL 的 `Normal`、`Medium`、`Heavy` 扩展字重分别用 Sarasa 静态路径里的 `Regular`、`SemiBold`、`Bold` 作为 reference 边界。随后默认数字和 `:` remap 到已有的 pnum glyph，清理旧冒号上下文替换后追加与 Inter shaping 样例一致的 colon-run `calt`，中文名、metadata、glyf flags / bbox、组件名和静态 `STAT` 也在最终 TTF 上同步。
 - hinted 静态 TTF 会重新 hint 本项目实际生成的片段：`pass1` 先经过 `ttfautohint`，随后 `pass1`/`kanji`/`hangul` 片段用同版本 Chlorophytum `hcfg` 写入 TrueType instructions，最后由 `pass2` 合成。`Normal`/`Medium`/`Heavy` 这类项目扩展字重也按当前轮廓重新生成 hint，不冒充官方 Sarasa 已发布静态字重。
 - unhinted 静态 TTF 使用相同的静态片段路径，但跳过 `ttfautohint` 和 Chlorophytum，直接由未 hint 的 `pass1`/`kanji`/`hangul` 合成；这是一套正式输出，供需要无 TrueType instructions 版本的使用场景选择。
 - 静态 TTF 使用 `post` format 2 保存 glyph names；这是为了在默认比例数字改挂到 U+0030..U+0039 后，`glyph01332`/`glyph01334` 这类上游组件名仍能在保存、重开和审计中稳定保留。VF 仍保持原来的 `post`/GID 模型。
 - glyph 总数不作为构建目标。脚本会保留和同步 cmap 字形以及 GSUB/GPOS/GDEF 可达的未编码 glyph；不会为了让 `maxp.numGlyphs` 与上游相同而补入不可达 glyph。
 - 静态 TTF 不再为了 OTS 清除上游 `OVERLAP_SIMPLE` flags；这些 flags 会影响 FreeType rasterization，exact 样式应与上游保持一致。最终写出会强制重编译 `glyf`，并把带 `OVERLAP_SIMPLE` 的重复 flags 写成 OTS 可接受的 repeat 编码，而不是删除 bit 6。OTS 对上游 unhinted 和本派生 unhinted 可能仍打印 `maxp maxZones: 0`、`gasp` sentinel/丢表等基线警告，但返回码通过。
+
 ## 字重
 
 VF 实例和静态 TTF 都使用更接近 Sarasa / CSS 的公开字重体系：
