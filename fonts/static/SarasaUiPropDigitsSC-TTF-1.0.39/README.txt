@@ -29,7 +29,8 @@ Inter 的 colon-run 规则。
 name 表包含地区本地化显示名，例如：
 更纱黑体 Ui PropDigits SC ExtraLight.
 OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
-???? 占位值。
+???? 占位值。head.fontRevision 使用 OpenType fixed 数值 1.0392，
+对应本仓库语义版本 1.0.39.2；nameID 5 写作 Version 1.0.39.2。
 hinted 套件会对本项目实际生成的静态片段重新 hint：pass1 先经过
 ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 Chlorophytum
 hcfg 流程写入 TrueType instructions，最后由 pass2 合成最终 TTF。
@@ -41,6 +42,8 @@ colon-run calt 规则。
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui SC 静态字体套模板。
 静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap，并同步非数字 metrics。
+`palt` 下假名等已有 glyph 的定位值也按对应参考字体同步；连续长破折号（em dash）
+在 calt/vert/vrt2 相关路径下按对应上游静态 Sarasa Ui 的替换行为校验。
 对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
 glyf bbox 和组合字形组件名。静态 TTF 使用 post format 2，让默认比例数字
 remap 到 U+0030..U+0039 后，相关 glyph names 仍能稳定保留。最终写出 glyf
