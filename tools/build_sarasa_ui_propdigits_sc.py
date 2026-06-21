@@ -374,6 +374,7 @@ STATIC_FAMILY = "Sarasa Ui PropDigits SC"
 STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
 STATIC_FAMILY_ZH_HANS = "更纱黑体 Ui PropDigits SC"
 VERSION = "1.0.39.2"
+FONT_REVISION = 1.0392
 INTER_PREFIX = "inter."
 OS2_VENDOR_ID = "MRDK"
 
@@ -909,6 +910,11 @@ def sync_sarasa_metadata_from_reference(font: TTFont, reference: TTFont) -> dict
     return {"sarasa_metadata_fields_synced": 1}
 
 
+def update_head_project_revision(font: TTFont) -> dict[str, float]:
+    font["head"].fontRevision = FONT_REVISION
+    return {"head_font_revision": FONT_REVISION}
+
+
 def glyph_coordinates_match(font: TTFont, glyph_name: str, reference: TTFont, ref_glyph_name: str) -> bool:
     try:
         coordinates, end_pts, flags = font["glyf"][glyph_name].getCoordinates(font["glyf"])
@@ -1016,6 +1022,7 @@ def sync_static_glyf_from_reference(
         return {
             "reference_glyf_flags_synced": 0,
             "reference_glyf_bboxes_synced": 0,
+            "reference_component_aliases_created": 0,
             "reference_component_aliases_removed": 0,
             "reference_component_names_synced": 0,
         }
@@ -1024,12 +1031,13 @@ def sync_static_glyf_from_reference(
     reference_cmap = reference.getBestCmap()
     flags_synced = 0
     bboxes_synced = 0
+    component_aliases_created = 0
     component_names_synced = 0
     stale_aliases: set[str] = set()
     visited: set[tuple[str, str]] = set()
 
     def sync_pair(glyph_name: str, reference_glyph_name: str) -> None:
-        nonlocal flags_synced, bboxes_synced, component_names_synced
+        nonlocal flags_synced, bboxes_synced, component_aliases_created, component_names_synced
         if (glyph_name, reference_glyph_name) in visited:
             return
         visited.add((glyph_name, reference_glyph_name))
@@ -1062,13 +1070,20 @@ def sync_static_glyf_from_reference(
                 return
             for component, reference_component in zip(components, reference_components):
                 reference_component_name = reference_component.glyphName
+                if (
+                    reference_component_name not in font["glyf"].glyphs
+                    and component.glyphName in font["glyf"].glyphs
+                    and glyph_point_structure(font, component.glyphName)
+                    == glyph_point_structure(reference, reference_component_name)
+                ):
+                    cloned_name = clone_glyph(font, component.glyphName, reference_component_name)
+                    if cloned_name == reference_component_name:
+                        component_aliases_created += 1
                 if reference_component_name in font["glyf"].glyphs:
                     old_component_name = component.glyphName
                     if old_component_name != reference_component_name:
                         component.glyphName = reference_component_name
                         component_names_synced += 1
-                        if old_component_name not in reference["glyf"].glyphs:
-                            stale_aliases.add(old_component_name)
                     sync_pair(reference_component_name, reference_component_name)
                 else:
                     sync_pair(component.glyphName, reference_component_name)
@@ -1082,6 +1097,7 @@ def sync_static_glyf_from_reference(
     return {
         "reference_glyf_flags_synced": flags_synced,
         "reference_glyf_bboxes_synced": bboxes_synced,
+        "reference_component_aliases_created": component_aliases_created,
         "reference_component_aliases_removed": aliases_removed,
         "reference_component_names_synced": component_names_synced,
     }
@@ -3576,6 +3592,126 @@ def align_layout_lookup_structure(font: TTFont, reference: TTFont, table_tag: st
     }
 
 
+def feature_lookup_indices(font: TTFont, table_tag: str, feature_tags: set[str]) -> list[int]:
+    if table_tag not in font:
+        return []
+    table = font[table_tag].table
+    if not table.FeatureList:
+        return []
+    indices: list[int] = []
+    for record in table.FeatureList.FeatureRecord:
+        if record.FeatureTag not in feature_tags:
+            continue
+        for lookup_index in list(record.Feature.LookupListIndex or []):
+            if lookup_index not in indices:
+                indices.append(lookup_index)
+    return indices
+
+
+def single_pos_value_map(subtable: Any) -> dict[str, Any]:
+    if not hasattr(subtable, "Coverage") or not getattr(subtable, "Coverage", None):
+        return {}
+    glyphs = list(subtable.Coverage.glyphs or [])
+    if getattr(subtable, "Format", 1) == 2:
+        return {
+            glyph_name: copy.deepcopy(value)
+            for glyph_name, value in zip(glyphs, list(getattr(subtable, "Value", []) or []))
+        }
+    value = copy.deepcopy(getattr(subtable, "Value", None))
+    return {glyph_name: copy.deepcopy(value) for glyph_name in glyphs}
+
+
+def sync_single_pos_values_from_reference(subtable: Any, reference_subtable: Any) -> dict[str, int]:
+    if hasattr(reference_subtable, "ExtSubTable"):
+        if not hasattr(subtable, "ExtSubTable") or subtable.ExtSubTable is None:
+            return {"single_pos_values_synced": 0, "single_pos_glyphs_missing_in_reference": 0}
+        return sync_single_pos_values_from_reference(subtable.ExtSubTable, reference_subtable.ExtSubTable)
+    if not hasattr(subtable, "Coverage") or not hasattr(reference_subtable, "Coverage"):
+        return {"single_pos_values_synced": 0, "single_pos_glyphs_missing_in_reference": 0}
+    if getattr(subtable, "Format", 1) != getattr(reference_subtable, "Format", 1) or getattr(
+        subtable, "ValueFormat", 0
+    ) != getattr(reference_subtable, "ValueFormat", 0):
+        subtable = align_single_pos_format(subtable, reference_subtable)
+
+    ref_values = single_pos_value_map(reference_subtable)
+    glyphs = list(subtable.Coverage.glyphs or [])
+    missing = 0
+    synced = 0
+    if getattr(subtable, "Format", 1) == 2:
+        values = list(getattr(subtable, "Value", []) or [])
+        while len(values) < len(glyphs):
+            values.append(None)
+        for index, glyph_name in enumerate(glyphs):
+            if glyph_name not in ref_values:
+                missing += 1
+                continue
+            values[index] = copy.deepcopy(ref_values[glyph_name])
+            synced += 1
+        subtable.Value = values[: len(glyphs)]
+        subtable.ValueCount = len(subtable.Value)
+        subtable.ValueFormat = getattr(reference_subtable, "ValueFormat", getattr(subtable, "ValueFormat", 0))
+        return {"single_pos_values_synced": synced, "single_pos_glyphs_missing_in_reference": missing}
+
+    first_value = None
+    for glyph_name in glyphs:
+        if glyph_name in ref_values:
+            first_value = copy.deepcopy(ref_values[glyph_name])
+            synced += 1
+        else:
+            missing += 1
+    if first_value is not None:
+        subtable.Value = first_value
+        subtable.ValueFormat = getattr(reference_subtable, "ValueFormat", getattr(subtable, "ValueFormat", 0))
+    if hasattr(subtable, "ValueCount"):
+        delattr(subtable, "ValueCount")
+    return {"single_pos_values_synced": synced, "single_pos_glyphs_missing_in_reference": missing}
+
+
+def sync_gpos_single_pos_feature_values_from_reference(
+    font: TTFont,
+    reference: TTFont,
+    feature_tags: set[str],
+) -> dict[str, int]:
+    if "GPOS" not in font or "GPOS" not in reference:
+        return {
+            "gpos_single_pos_feature_lookups_synced": 0,
+            "gpos_single_pos_values_synced": 0,
+            "gpos_single_pos_glyphs_missing_in_reference": 0,
+        }
+    table = font["GPOS"].table
+    ref_table = reference["GPOS"].table
+    if not table.LookupList or not ref_table.LookupList:
+        return {
+            "gpos_single_pos_feature_lookups_synced": 0,
+            "gpos_single_pos_values_synced": 0,
+            "gpos_single_pos_glyphs_missing_in_reference": 0,
+        }
+    target_indices = feature_lookup_indices(font, "GPOS", feature_tags)
+    ref_indices = feature_lookup_indices(reference, "GPOS", feature_tags)
+    lookup_count = min(len(target_indices), len(ref_indices))
+    lookups_synced = 0
+    values_synced = 0
+    missing = 0
+    for target_index, ref_index in zip(target_indices[:lookup_count], ref_indices[:lookup_count]):
+        if target_index >= len(table.LookupList.Lookup) or ref_index >= len(ref_table.LookupList.Lookup):
+            continue
+        lookup = table.LookupList.Lookup[target_index]
+        ref_lookup = ref_table.LookupList.Lookup[ref_index]
+        if ref_lookup.LookupType not in {1, 9}:
+            continue
+        lookups_synced += 1
+        for subtable, ref_subtable in zip(lookup.SubTable, ref_lookup.SubTable):
+            report = sync_single_pos_values_from_reference(subtable, ref_subtable)
+            values_synced += report["single_pos_values_synced"]
+            missing += report["single_pos_glyphs_missing_in_reference"]
+    return {
+        "gpos_single_pos_feature_lookups_synced": lookups_synced,
+        "gpos_single_pos_values_synced": values_synced,
+        "gpos_single_pos_glyphs_missing_in_reference": missing,
+        "gpos_single_pos_feature_lookup_count_mismatch": abs(len(target_indices) - len(ref_indices)),
+    }
+
+
 def pad_lookup_list_to_reference_count(font: TTFont, reference: TTFont, table_tag: str) -> dict[str, int]:
     key = table_tag.lower()
     if table_tag not in font or table_tag not in reference:
@@ -3929,6 +4065,151 @@ def add_continuous_em_dash_feature(font: TTFont) -> dict[str, Any]:
         "continuous_em_dash_vert_mappings": vert_mappings,
         "continuous_em_dash_vert_aliases": vert_aliases,
     }
+
+
+def coverage_has_glyph(coverage_table: Any, glyph_name: str) -> bool:
+    return glyph_name in list(getattr(coverage_table, "glyphs", []) or [])
+
+
+def lookup_single_substitution_mapping(gsub: Any, lookup_index: int) -> dict[str, str]:
+    if not gsub.LookupList or lookup_index >= len(gsub.LookupList.Lookup):
+        return {}
+    lookup = gsub.LookupList.Lookup[lookup_index]
+    if lookup.LookupType != 1:
+        return {}
+    mapping: dict[str, str] = {}
+    for subtable in lookup.SubTable:
+        if hasattr(subtable, "mapping"):
+            mapping.update(subtable.mapping)
+    return mapping
+
+
+def chain_substitution_records(subtable: Any) -> list[Any]:
+    records = list(getattr(subtable, "SubstLookupRecord", []) or [])
+    for rule_set_attr in ("SubRuleSet", "ChainSubRuleSet", "SubClassSet", "ChainSubClassSet"):
+        for rule_set in getattr(subtable, rule_set_attr, []) or []:
+            if not rule_set:
+                continue
+            for rule_list_attr in ("SubRule", "ChainSubRule", "SubClassRule", "ChainSubClassRule"):
+                for rule in getattr(rule_set, rule_list_attr, []) or []:
+                    records.extend(list(getattr(rule, "SubstLookupRecord", []) or []))
+    return records
+
+
+def is_em_dash_chain_lookup(font: TTFont, lookup_index: int) -> bool:
+    if "GSUB" not in font:
+        return False
+    cmap = font.getBestCmap()
+    em_dash = cmap.get(0x2014)
+    if not em_dash:
+        return False
+    gsub = font["GSUB"].table
+    if not gsub.LookupList or lookup_index >= len(gsub.LookupList.Lookup):
+        return False
+    lookup = gsub.LookupList.Lookup[lookup_index]
+    if lookup.LookupType != 6:
+        return False
+    for subtable in lookup.SubTable:
+        input_matches = any(coverage_has_glyph(cov, em_dash) for cov in list(getattr(subtable, "InputCoverage", []) or []))
+        backtrack_matches = any(
+            coverage_has_glyph(cov, em_dash) for cov in list(getattr(subtable, "BacktrackCoverage", []) or [])
+        )
+        if not input_matches or not backtrack_matches:
+            continue
+        for subst_record in chain_substitution_records(subtable):
+            mapping = lookup_single_substitution_mapping(gsub, subst_record.LookupListIndex)
+            target = mapping.get(em_dash)
+            if target and target != em_dash:
+                return True
+    return False
+
+
+def em_dash_chain_lookup_indices(font: TTFont) -> set[int]:
+    if "GSUB" not in font or not font["GSUB"].table.LookupList:
+        return set()
+    return {
+        lookup_index
+        for lookup_index in range(len(font["GSUB"].table.LookupList.Lookup))
+        if is_em_dash_chain_lookup(font, lookup_index)
+    }
+
+
+def em_dash_continuation_glyphs(font: TTFont) -> list[str]:
+    if "GSUB" not in font:
+        return []
+    cmap = font.getBestCmap()
+    em_dash = cmap.get(0x2014)
+    if not em_dash:
+        return []
+    gsub = font["GSUB"].table
+    glyphs: list[str] = []
+    for lookup_index in sorted(em_dash_chain_lookup_indices(font)):
+        lookup = gsub.LookupList.Lookup[lookup_index]
+        for subtable in lookup.SubTable:
+            for subst_record in chain_substitution_records(subtable):
+                mapping = lookup_single_substitution_mapping(gsub, subst_record.LookupListIndex)
+                target = mapping.get(em_dash)
+                if target and target != em_dash and target not in glyphs:
+                    glyphs.append(target)
+    return glyphs
+
+
+def sync_em_dash_continuation_metrics_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
+    target_glyphs = em_dash_continuation_glyphs(font)
+    reference_glyphs = em_dash_continuation_glyphs(reference)
+    hmtx_synced = 0
+    vmtx_synced = 0
+    for target_glyph, reference_glyph in zip(target_glyphs, reference_glyphs):
+        if target_glyph in font["hmtx"].metrics and reference_glyph in reference["hmtx"].metrics:
+            if font["hmtx"].metrics[target_glyph] != reference["hmtx"].metrics[reference_glyph]:
+                hmtx_synced += 1
+            font["hmtx"].metrics[target_glyph] = copy.deepcopy(reference["hmtx"].metrics[reference_glyph])
+        if (
+            "vmtx" in font
+            and "vmtx" in reference
+            and target_glyph in font["vmtx"].metrics
+            and reference_glyph in reference["vmtx"].metrics
+        ):
+            if font["vmtx"].metrics[target_glyph] != reference["vmtx"].metrics[reference_glyph]:
+                vmtx_synced += 1
+            font["vmtx"].metrics[target_glyph] = copy.deepcopy(reference["vmtx"].metrics[reference_glyph])
+    return {
+        "em_dash_continuation_hmtx_synced": hmtx_synced,
+        "em_dash_continuation_vmtx_synced": vmtx_synced,
+    }
+
+
+def align_em_dash_calt_feature_records(font: TTFont, reference: TTFont) -> dict[str, int]:
+    if "GSUB" not in font or "GSUB" not in reference:
+        return {"em_dash_calt_feature_records_aligned": 0, "em_dash_calt_lookup_links_added": 0}
+    table = font["GSUB"].table
+    ref_table = reference["GSUB"].table
+    if not table.FeatureList or not ref_table.FeatureList:
+        return {"em_dash_calt_feature_records_aligned": 0, "em_dash_calt_lookup_links_added": 0}
+    target_dash_indices = sorted(em_dash_chain_lookup_indices(font))
+    ref_dash_indices = em_dash_chain_lookup_indices(reference)
+    if not target_dash_indices or not ref_dash_indices:
+        return {"em_dash_calt_feature_records_aligned": 0, "em_dash_calt_lookup_links_added": 0}
+
+    target_records = [record for record in table.FeatureList.FeatureRecord if record.FeatureTag == "calt"]
+    ref_records = [record for record in ref_table.FeatureList.FeatureRecord if record.FeatureTag == "calt"]
+    aligned = 0
+    links_added = 0
+    for target_record, ref_record in zip(target_records, ref_records):
+        if not any(index in ref_dash_indices for index in list(ref_record.Feature.LookupListIndex or [])):
+            continue
+        indices = list(target_record.Feature.LookupListIndex or [])
+        added_here = 0
+        for dash_index in target_dash_indices:
+            if dash_index not in indices:
+                indices.insert(0, dash_index)
+                added_here += 1
+        if added_here:
+            target_record.Feature.LookupListIndex = indices
+            target_record.Feature.LookupCount = len(indices)
+            aligned += 1
+            links_added += added_here
+    return {"em_dash_calt_feature_records_aligned": aligned, "em_dash_calt_lookup_links_added": links_added}
 
 
 def tnum_digit_glyphs(font: TTFont, digit_names: list[str]) -> list[str]:
@@ -4311,6 +4592,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
             "calt",
             [colon_report["digit_colon_chain_lookup_index"]] if colon_report.get("digit_colon_feature_added") else [],
         )
+        em_dash_calt_report = align_em_dash_calt_feature_records(base, reference)
         gdef_report = rebuild_gdef_from_reference(base, reference)
         vorg_report = rebuild_vorg_from_reference(base, reference)
         metadata_report = sync_sarasa_metadata_from_reference(base, reference)
@@ -4322,6 +4604,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     update_style_flags(base, italic)
     update_os2_sarasa_metadata(base)
     rebuild_stat(base, italic)
+    font_revision_report = update_head_project_revision(base)
     extra_table_report = drop_generated_extra_tables(base, keep_stat=True)
     if "DSIG" in base:
         del base["DSIG"]
@@ -4353,6 +4636,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
             align_tnum_digit_target_variations(base, reference_fonts_roundtrip),
             "roundtrip_",
         )
+        update_head_project_revision(base)
         log_step(f"variable {style_label}: save roundtrip")
         base.save(out_path, reorderTables=True)
     finally:
@@ -4413,9 +4697,11 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         **gsub_lookup_report,
         **gpos_lookup_report,
         **digit_colon_merge_report,
+        **em_dash_calt_report,
         **gdef_report,
         **vorg_report,
         **metadata_report,
+        **font_revision_report,
         **extra_table_report,
         **colon_report,
     }
@@ -5459,8 +5745,11 @@ def postprocess_static_font(
             report.update(align_layout_feature_template(font, reference, "GPOS", use_reference_lookup_indices=True))
             subset_to_current_cmap(font)
             report.update(align_layout_feature_template(font, reference, "GSUB"))
+            report.update(align_em_dash_calt_feature_records(font, reference))
+            report.update(sync_em_dash_continuation_metrics_from_reference(font, reference))
             report.update(align_layout_lookup_structure(font, reference, "GPOS"))
             report.update(align_layout_feature_template(font, reference, "GPOS", use_reference_lookup_indices=True))
+            report.update(sync_gpos_single_pos_feature_values_from_reference(font, reference, {"palt"}))
         if hinted:
             report.update(
                 {
@@ -5473,6 +5762,7 @@ def postprocess_static_font(
         report["digit_colon_source"] = "inter-compatible-calt"
         if "DSIG" in font:
             del font["DSIG"]
+        report.update(update_head_project_revision(font))
         report.update(force_recompile_glyf(font))
         font.save(path, reorderTables=True)
     finally:
@@ -5782,10 +6072,12 @@ def inspect_font(path: Path) -> dict[str, Any]:
                 "family": font_name(font, 1),
                 "subfamily": font_name(font, 2),
                 "full": font_name(font, 4),
+                "version": font_name(font, 5),
                 "postscript": font_name(font, 6),
                 "typographic_family": font_name(font, 16),
                 "typographic_subfamily": font_name(font, 17),
             },
+            "head_font_revision": float(font["head"].fontRevision),
             "glyph_count": len(font.getGlyphOrder()),
             "post_format": font["post"].formatType if "post" in font else None,
             "digit_widths_u0030_to_u0039": digits,
@@ -5883,12 +6175,15 @@ Inter 的 colon-run 规则。
 name 表包含地区本地化显示名，例如：
 {family_local} ExtraLight.
 OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
-???? 占位值。
+???? 占位值。head.fontRevision 使用 OpenType fixed 数值 1.0392，
+对应本仓库语义版本 1.0.39.2；nameID 5 写作 Version 1.0.39.2。
 {hint_note}
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui {region} 静态字体套模板。
 静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap，并同步非数字 metrics。
+`palt` 下假名等已有 glyph 的定位值也按对应参考字体同步；连续长破折号（em dash）
+在 calt/vert/vrt2 相关路径下按对应上游静态 Sarasa Ui 的替换行为校验。
 对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
 glyf bbox 和组合字形组件名。静态 TTF 使用 post format 2，让默认比例数字
 remap 到 U+0030..U+0039 后，相关 glyph names 仍能稳定保留。最终写出 glyf
@@ -6024,7 +6319,7 @@ def build_all(
             "全角归一。最终 layout 导入对应地区 Sarasa Ui 暴露的 Inter VF GSUB/GPOS 特性，"
             "保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 "
             "Sarasa Ui 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、"
-            "连续 em dash，以及与 Inter 一致的数字冒号 colon-run calt 规则。合并后会"
+            "连续长破折号（em dash），以及与 Inter 一致的数字冒号 colon-run calt 规则。合并后会"
             "对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB "
             "FeatureRecord 顺序、空 cv/ss FeatureRecord、Script/LangSys 覆盖顺序、GPOS "
             "FeatureRecord lookup index 和 LookupList 结构、非数字 advance "
@@ -6036,7 +6331,9 @@ def build_all(
             "经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字"
             "和冒号 cmap remap、命名、metadata、layout 模板、GDEF/VORG、与上游兼容的 glyf "
             "flags/bbox/组件名、静态 post format 2 glyph names、OTS-compatible glyf repeat "
-            "编码和静态 STAT 规则。hinted 静态套件会对本项目实际生成的片段重新 hint："
+            "编码、palt 取值同步、连续长破折号可达性修正和静态 STAT 规则。head.fontRevision "
+            "写为 OpenType fixed 数值 1.0392，对应本仓库语义版本 1.0.39.2。"
+            "hinted 静态套件会对本项目实际生成的片段重新 hint："
             "pass1 先经过 ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 "
             "Chlorophytum hcfg 写入 TrueType instructions，最后由 pass2 合成最终 TTF。"
             "unhinted 静态套件提供无 TrueType instructions 的正式静态输出。"
