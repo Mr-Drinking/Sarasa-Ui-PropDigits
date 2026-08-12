@@ -141,8 +141,36 @@ def log_step(message: str) -> None:
     print(f"[build {timestamp}] {message}", flush=True)
 
 
-SARASA_VERSION = "1.0.39"
+SARASA_VERSION = "1.0.40"
 SARASA_TAG = f"v{SARASA_VERSION}"
+SARASA_COMMIT = "4b908c71116a3192f7a9889bd67b1939a891e527"
+SARASA_PACKAGE_LOCK_SHA256 = "7a68020fc12728fbf58a34bbc78d1873e957ad1063aaa1f5bdc85800d3896dfe"
+SARASA_UI_ARCHIVE_SHA256 = {
+    "CL": {
+        "hinted": "3ccae6ff23487bf969b23a8cb4b409759a65c86825c180617c1ddc6a57a4cf98",
+        "unhinted": "41a604a38f1940471fe6797b0e7fac4f15c1889c00a007c6f8a2b0868a19fd85",
+    },
+    "SC": {
+        "hinted": "bb9891c8be805cd0dae942a07472b3031db2510741b7cde42e9591f74a186f6a",
+        "unhinted": "1f0e344e36947317104b686b3bbd7b96ebdc3659e11f1213e62f65e5f772ea80",
+    },
+    "TC": {
+        "hinted": "b1589c9db8ea45cf078855f02493eab845d244065b2f0289954c1554d34d8ade",
+        "unhinted": "5a3e143bcc8f2d6cb10999eba4fe04e63667c077aaa03b6d7270ab3ae20e1106",
+    },
+    "HC": {
+        "hinted": "dc884d538afe24f9c27681dc7526bfb7ea19a360d05e3098f06b8786c599e9ca",
+        "unhinted": "b0c275ec7a7afc5e60a9b03253ab8d387e4b0c4784b006ac10ec9a3a03371bac",
+    },
+    "J": {
+        "hinted": "9a3a0b23654cb102b5488e7b52d4e08c486a9d123320335e1047fabd8d6b4ff3",
+        "unhinted": "b6338812e2a27dedb8e7cb36426f9e35b2da037822c037eb15342d5dcb19523e",
+    },
+    "K": {
+        "hinted": "533e6149df19179ee25c564bc0d62bebe093139310519e7d0fc5db858b9e4637",
+        "unhinted": "1be00f7897930658e239afac79e6f5e2555b9c1f887b3654224caf7da042df35",
+    },
+}
 SOURCE_HAN_TAG = "2.005R"
 INTER_TAG = "v4.1"
 SHANGGU_TAG = "1.028"
@@ -153,9 +181,11 @@ SHANGGU_SANS_VF_SHA256 = "31b207a05332196ff444114d66de1c7b622d3a7244ec15a2485e8d
 NODE_VERSION = "v26.3.0"
 SOURCE_ARCHIVE_DIR = WORK_ROOT / "source-archives"
 NODE_DIR = Path(os.environ.get("SARASA_NODE_DIR", WORK_ROOT / "node"))
-REFERENCE_ROOT = Path(os.environ.get("REFERENCE_SARASA_ROOT", WORK_ROOT / "official-sarasa-ui"))
+REFERENCE_ROOT = Path(
+    os.environ.get("REFERENCE_SARASA_ROOT", WORK_ROOT / f"official-sarasa-ui-{SARASA_VERSION}")
+)
 REFERENCE_SC_LEGACY_ROOT = Path(
-    os.environ.get("REFERENCE_SARASA_SC_ROOT", WORK_ROOT / "official-sarasa-ui-sc")
+    os.environ.get("REFERENCE_SARASA_SC_ROOT", REFERENCE_ROOT / "SC")
 )
 
 SRC_DIR = Path(os.environ.get("VF_SOURCE_DIR", first_existing(WORK_ROOT / "vf-sources", ROOT / "work" / "vf-sources")))
@@ -337,7 +367,7 @@ REFERENCE_SARASA_HINTED_DIR = Path(
 SARASA_SOURCE_DIR = Path(
     os.environ.get(
         "SARASA_SOURCE_DIR",
-        first_existing(WORK_ROOT / "Sarasa-Gothic", WORK_ROOT / "sarasa-gothic-src", ROOT / "work" / "Sarasa-Gothic"),
+        WORK_ROOT / f"Sarasa-Gothic-{SARASA_VERSION}",
     )
 )
 SARASA_CHLOROPHYTUM = Path(
@@ -373,8 +403,8 @@ VF_FAMILY_ZH_HANS = "更纱黑体 Ui VF PropDigits SC"
 STATIC_FAMILY = "Sarasa Ui PropDigits SC"
 STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
 STATIC_FAMILY_ZH_HANS = "更纱黑体 Ui PropDigits SC"
-VERSION = "1.0.39.2"
-FONT_REVISION = 1.0392
+VERSION = "1.0.40"
+FONT_REVISION = 1.04
 INTER_PREFIX = "inter."
 OS2_VENDOR_ID = "MRDK"
 
@@ -4961,8 +4991,8 @@ def bootstrap_sarasa_source_tree() -> None:
         )
         return
     source_zip = download_file(
-        f"https://github.com/be5invis/Sarasa-Gothic/archive/refs/tags/{SARASA_TAG}.zip",
-        SOURCE_ARCHIVE_DIR / f"Sarasa-Gothic-{SARASA_TAG}.zip",
+        f"https://github.com/be5invis/Sarasa-Gothic/archive/{SARASA_COMMIT}.zip",
+        SOURCE_ARCHIVE_DIR / f"Sarasa-Gothic-{SARASA_COMMIT}.zip",
     )
     extract_zip_tree(source_zip, SARASA_SOURCE_DIR)
 
@@ -5042,16 +5072,29 @@ def ensure_reference_sarasa(regions: list[str]) -> None:
         hinted_regular = hinted_dir / f"{prefix}-Regular.ttf"
         unhinted_regular = unhinted_dir / f"{prefix}-Regular.ttf"
         if not (hinted_regular.exists() and unhinted_regular.exists()):
-            hinted_archive = download_file(
+            hinted_archive = download_file_checked(
                 f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-{SARASA_VERSION}.7z",
                 SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-{SARASA_VERSION}.7z",
+                SARASA_UI_ARCHIVE_SHA256[region]["hinted"],
             )
-            unhinted_archive = download_file(
+            unhinted_archive = download_file_checked(
                 f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
                 SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
+                SARASA_UI_ARCHIVE_SHA256[region]["unhinted"],
             )
             extract_7z_ttf_prefix(hinted_archive, hinted_dir, f"{prefix}-")
             extract_7z_ttf_prefix(unhinted_archive, unhinted_dir, f"{prefix}-")
+        for path in [hinted_regular, unhinted_regular]:
+            font = TTFont(path, lazy=True)
+            try:
+                version_name = font_name(font, 5) or ""
+            finally:
+                font.close()
+            if f"Version {SARASA_VERSION}" not in version_name:
+                raise RuntimeError(
+                    f"Sarasa reference version mismatch at {path}: "
+                    f"expected Version {SARASA_VERSION}, got {version_name!r}"
+                )
     REFERENCE_SARASA = reference_font_path("SC", "Regular", False)
     REFERENCE_SARASA_DIR = REFERENCE_SARASA.parent
     REFERENCE_SARASA_HINTED_DIR = region_reference_dir("SC", True)
@@ -5071,9 +5114,47 @@ def ensure_sarasa_source_tree() -> None:
                 f"Sarasa Gothic source tree at {SARASA_SOURCE_DIR} is incomplete; "
                 f"expected {required[0]}, {required[1]}, and {required[2]}"
             )
-    if not SARASA_CHLOROPHYTUM.exists() and os.environ.get("SARASA_SKIP_CHLOROPHYTUM") != "1":
-        log_step("install Sarasa Gothic npm dependencies")
-        run_checked([npm_executable(), "install"], cwd=SARASA_SOURCE_DIR, capture_output=False, env=local_runtime_env())
+
+    package_json = SARASA_SOURCE_DIR / "package.json"
+    package_lock = SARASA_SOURCE_DIR / "package-lock.json"
+    if not package_json.exists() or not package_lock.exists():
+        raise FileNotFoundError(f"Sarasa Gothic package metadata is missing from {SARASA_SOURCE_DIR}")
+    package_version = str(json.loads(package_json.read_text(encoding="utf-8"))["version"])
+    if package_version != SARASA_VERSION:
+        raise RuntimeError(
+            f"Sarasa Gothic source version mismatch at {SARASA_SOURCE_DIR}: "
+            f"expected {SARASA_VERSION}, got {package_version}"
+        )
+    lock_sha256 = file_sha256(package_lock)
+    if lock_sha256 != SARASA_PACKAGE_LOCK_SHA256:
+        raise RuntimeError(
+            f"Sarasa Gothic package-lock mismatch at {package_lock}: "
+            f"expected {SARASA_PACKAGE_LOCK_SHA256}, got {lock_sha256}"
+        )
+    git_dir = SARASA_SOURCE_DIR / ".git"
+    if git_dir.exists() and shutil.which("git"):
+        result = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=SARASA_SOURCE_DIR,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        actual_commit = result.stdout.strip()
+        if actual_commit != SARASA_COMMIT:
+            raise RuntimeError(
+                f"Sarasa Gothic source commit mismatch at {SARASA_SOURCE_DIR}: "
+                f"expected {SARASA_COMMIT}, got {actual_commit}"
+            )
+
+    npm_marker = SARASA_SOURCE_DIR / "node_modules" / ".sarasa-ui-propdigits-package-lock.sha256"
+    marker_value = npm_marker.read_text(encoding="ascii").strip() if npm_marker.exists() else ""
+    dependencies_current = SARASA_CHLOROPHYTUM.exists() and marker_value == lock_sha256
+    if not dependencies_current and os.environ.get("SARASA_SKIP_CHLOROPHYTUM") != "1":
+        log_step("install locked Sarasa Gothic npm dependencies")
+        run_checked([npm_executable(), "ci"], cwd=SARASA_SOURCE_DIR, capture_output=False, env=local_runtime_env())
+        npm_marker.parent.mkdir(parents=True, exist_ok=True)
+        npm_marker.write_text(lock_sha256 + "\n", encoding="ascii")
 
 
 def ensure_build_sources(static_only: bool, regions: list[str]) -> None:
@@ -5569,7 +5650,7 @@ def build_sarasa_static_fragments(
                 "subfamily": region,
                 "style": style_name,
                 "italize": italic,
-                "version": "1.0.39",
+                "version": VERSION,
                 "latinCfg": sarasa_latin_config(),
                 **flags,
             },
@@ -6175,8 +6256,8 @@ Inter 的 colon-run 规则。
 name 表包含地区本地化显示名，例如：
 {family_local} ExtraLight.
 OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
-???? 占位值。head.fontRevision 使用 OpenType fixed 数值 1.0392，
-对应本仓库语义版本 1.0.39.2；nameID 5 写作 Version 1.0.39.2。
+???? 占位值。head.fontRevision 使用 OpenType fixed 数值 1.0400，
+对应本仓库版本 1.0.40；nameID 5 写作 Version 1.0.40。
 {hint_note}
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
@@ -6332,7 +6413,7 @@ def build_all(
             "和冒号 cmap remap、命名、metadata、layout 模板、GDEF/VORG、与上游兼容的 glyf "
             "flags/bbox/组件名、静态 post format 2 glyph names、OTS-compatible glyf repeat "
             "编码、palt 取值同步、连续长破折号可达性修正和静态 STAT 规则。head.fontRevision "
-            "写为 OpenType fixed 数值 1.0392，对应本仓库语义版本 1.0.39.2。"
+            "写为 OpenType fixed 数值 1.0400，对应本仓库版本 1.0.40。"
             "hinted 静态套件会对本项目实际生成的片段重新 hint："
             "pass1 先经过 ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 "
             "Chlorophytum hcfg 写入 TrueType instructions，最后由 pass2 合成最终 TTF。"
