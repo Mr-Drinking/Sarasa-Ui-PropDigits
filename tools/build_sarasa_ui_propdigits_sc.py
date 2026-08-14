@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import argparse
+import asyncio
 import copy
+import concurrent.futures
+import functools
+import gzip
 import hashlib
 import importlib.metadata
 import importlib.util
 import json
+import logging
 import math
 import os
 import platform
@@ -27,11 +32,17 @@ from typing import Any
 
 PYTHON_DEPS = {
     "fontTools": ("fonttools", "fonttools[woff]==4.63.0", "4.63.0"),
-    "uharfbuzz": ("uharfbuzz", "uharfbuzz==0.55.0", "0.55.0"),
+    "uharfbuzz": ("uharfbuzz", "uharfbuzz==0.56.0", "0.56.0"),
     "brotli": ("Brotli", "brotli==1.2.0", "1.2.0"),
-    "ttfautohint": ("ttfautohint-py", "ttfautohint-py==0.6.0", "0.6.0"),
-    "py7zr": ("py7zr", "py7zr==1.1.0", "1.1.0"),
+    "ttfautohint": ("ttfautohint-py", "ttfautohint-py==0.6.1", "0.6.1"),
+    "py7zr": ("py7zr", "py7zr==1.1.3", "1.1.3"),
     "afdko": ("afdko", "afdko==5.0.1", "5.0.1"),
+    "chws_tool": ("chws-tool", "chws-tool==1.4.5", "1.4.5"),
+    "east_asian_spacing": (
+        "east-asian-spacing",
+        "east-asian-spacing==1.4.5",
+        "1.4.5",
+    ),
 }
 
 
@@ -67,6 +78,7 @@ from fontTools.ttLib.tables import otTables as ot
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance
 from fontTools.varLib.models import piecewiseLinearMap
 from fontTools.varLib.instancer import instantiateVariableFont
+from chws_tool import add_chws_async
 
 
 def patch_fonttools_overlap_simple_repeat_encoding() -> None:
@@ -142,6 +154,9 @@ def log_step(message: str) -> None:
 
 
 SARASA_VERSION = "1.0.40"
+VERSION = "1.0.40.2"
+FONT_REVISION = 1.0402
+OPENTYPE_VERSION = "1.0402"
 SARASA_TAG = f"v{SARASA_VERSION}"
 SARASA_COMMIT = "4b908c71116a3192f7a9889bd67b1939a891e527"
 SARASA_PACKAGE_LOCK_SHA256 = "7a68020fc12728fbf58a34bbc78d1873e957ad1063aaa1f5bdc85800d3896dfe"
@@ -178,7 +193,7 @@ SHANGGU_SANS_TTF_ARCHIVE_NAME = "ShangguSansTTFs.7z"
 SHANGGU_SANS_TTF_SHA256 = "a7fc794127270fff06224e2129e28ea917669bb3601296f219ea64fe0266b6f0"
 SHANGGU_SANS_VF_ARCHIVE_NAME = "ShangguSansVF_TTFs.7z"
 SHANGGU_SANS_VF_SHA256 = "31b207a05332196ff444114d66de1c7b622d3a7244ec15a2485e8d0844cb1984"
-NODE_VERSION = "v26.3.0"
+NODE_VERSION = "v26.7.0"
 SOURCE_ARCHIVE_DIR = WORK_ROOT / "source-archives"
 NODE_DIR = Path(os.environ.get("SARASA_NODE_DIR", WORK_ROOT / "node"))
 REFERENCE_ROOT = Path(
@@ -385,14 +400,32 @@ SARASA_HINT_CONFIGS = {
     "Bold": "Bold",
     "Heavy": "Bold",
 }
+CHLOROPHYTUM_HINT_STORE_ORDER = "numeric-gid-hcfg-shared-v3"
+STATIC_HINT_WORK_VERSION = 3
 SARASA_HINT_JOBS = int(os.environ.get("SARASA_HINT_JOBS", str(os.cpu_count() or 1)))
+SARASA_HINT_PREP_JOBS = int(
+    os.environ.get("SARASA_HINT_PREP_JOBS", str(min(4, os.cpu_count() or 1)))
+)
+SARASA_HINT_FAMILY_ORDER = [
+    "Gothic",
+    "Ui",
+    "Mono",
+    "MonoSlab",
+    "Term",
+    "TermSlab",
+    "Fixed",
+    "FixedSlab",
+]
 
 VARIABLE_DIR = ROOT / "fonts" / "variable"
 STATIC_ROOT = ROOT / "fonts" / "static"
-STATIC_DIR = STATIC_ROOT / f"SarasaUiPropDigitsSC-TTF-{SARASA_VERSION}"
-STATIC_UNHINTED_DIR = STATIC_ROOT / f"SarasaUiPropDigitsSC-TTF-Unhinted-{SARASA_VERSION}"
+STATIC_DIR = STATIC_ROOT / f"SarasaUiPropDigitsSC-TTF-{VERSION}"
+STATIC_UNHINTED_DIR = STATIC_ROOT / f"SarasaUiPropDigitsSC-TTF-Unhinted-{VERSION}"
 REPORT_DIR = ROOT / "reports"
 BUILD_CACHE_DIR = Path(os.environ.get("SARASA_BUILD_CACHE", ROOT / ".build-cache" / "sarasa-ui-propdigits"))
+STATIC_HINT_WORK_ROOT = Path(
+    os.environ.get("SARASA_HINT_WORK_ROOT", ROOT / ".build-cache" / "hint-work")
+)
 
 AXIS_LIMIT = {"wght": (250, 400, 900)}
 PUBLIC_AXIS_LIMIT = {"wght": (200, 400, 900)}
@@ -403,8 +436,6 @@ VF_FAMILY_ZH_HANS = "更纱黑体 Ui VF PropDigits SC"
 STATIC_FAMILY = "Sarasa Ui PropDigits SC"
 STATIC_PS_FAMILY = "Sarasa-Ui-PropDigits-SC"
 STATIC_FAMILY_ZH_HANS = "更纱黑体 Ui PropDigits SC"
-VERSION = "1.0.40"
-FONT_REVISION = 1.04
 INTER_PREFIX = "inter."
 OS2_VENDOR_ID = "MRDK"
 
@@ -437,7 +468,7 @@ def static_family_local(region: str) -> str:
 def static_dir(region: str, hinted: bool) -> Path:
     region = check_region(region)
     hint_part = "TTF" if hinted else "TTF-Unhinted"
-    return STATIC_ROOT / f"SarasaUiPropDigits{region}-{hint_part}-{SARASA_VERSION}"
+    return STATIC_ROOT / f"SarasaUiPropDigits{region}-{hint_part}-{VERSION}"
 
 
 def static_file_prefix(region: str) -> str:
@@ -707,7 +738,7 @@ def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
     source_label = source_han_vf_basename(region) or source_han_static_prefix(region)
     if classical_vf_override_basename(region):
         source_label += " + ShangguSansTC-VF"
-    version = f"Version {VERSION}; {source_label} + Inter VF; PropDigits"
+    version = f"Version {OPENTYPE_VERSION}; project {VERSION}; {source_label} + Inter VF; PropDigits"
     replacements = {
         1: family,
         2: subfamily,
@@ -777,7 +808,10 @@ def update_static_names(font: TTFont, region: str, weight_name: str, weight_valu
         2: legacy_style,
         3: ps + f";{VERSION}",
         4: full,
-        5: f"Version {VERSION}; static {source_han_static_prefix(region)} + static Inter; PropDigits",
+        5: (
+            f"Version {OPENTYPE_VERSION}; project {VERSION}; "
+            f"static {source_han_static_prefix(region)} + static Inter; PropDigits"
+        ),
         6: ps,
         16: typographic_family,
         17: typographic_style,
@@ -943,6 +977,79 @@ def sync_sarasa_metadata_from_reference(font: TTFont, reference: TTFont) -> dict
 def update_head_project_revision(font: TTFont) -> dict[str, float]:
     font["head"].fontRevision = FONT_REVISION
     return {"head_font_revision": FONT_REVISION}
+
+
+def layout_has_feature(font: TTFont, table_tag: str, feature_tag: str) -> bool:
+    if table_tag not in font:
+        return False
+    table = font[table_tag].table
+    return bool(
+        table.FeatureList
+        and any(record.FeatureTag == feature_tag for record in table.FeatureList.FeatureRecord)
+    )
+
+
+def add_noto_contextual_spacing(path: Path) -> dict[str, Any]:
+    before = TTFont(path, recalcTimestamp=False)
+    try:
+        modified = before["head"].modified
+        before_records = (
+            len(before["GPOS"].table.FeatureList.FeatureRecord)
+            if "GPOS" in before and before["GPOS"].table.FeatureList
+            else 0
+        )
+        before_lookups = (
+            len(before["GPOS"].table.LookupList.Lookup)
+            if "GPOS" in before and before["GPOS"].table.LookupList
+            else 0
+        )
+        had_chws = layout_has_feature(before, "GPOS", "chws")
+        had_vchw = layout_has_feature(before, "GPOS", "vchw")
+    finally:
+        before.close()
+
+    if not (had_chws and had_vchw):
+        config_logger = logging.getLogger("config")
+        previous_level = config_logger.level
+        config_logger.setLevel(logging.ERROR)
+        try:
+            result = asyncio.run(add_chws_async(path, path))
+        finally:
+            config_logger.setLevel(previous_level)
+        if result is None:
+            raise RuntimeError(f"Noto contextual spacing was not applicable to {path}")
+
+    normalized = TTFont(path, recalcTimestamp=False)
+    try:
+        normalized["head"].modified = modified
+        update_head_project_revision(normalized)
+        normalized.save(path, reorderTables=True)
+    finally:
+        normalized.close()
+
+    final = TTFont(path, recalcTimestamp=False)
+    try:
+        has_chws = layout_has_feature(final, "GPOS", "chws")
+        has_vchw = layout_has_feature(final, "GPOS", "vchw")
+        if not has_chws or not has_vchw:
+            raise RuntimeError(f"Noto contextual spacing features are incomplete in {path}")
+        after_records = len(final["GPOS"].table.FeatureList.FeatureRecord)
+        after_lookups = len(final["GPOS"].table.LookupList.Lookup)
+        modified_preserved = final["head"].modified == modified
+    finally:
+        final.close()
+
+    return {
+        "noto_contextual_spacing": True,
+        "noto_contextual_spacing_source": "Noto CJK add-chws delivery step",
+        "chws_tool_version": importlib.metadata.version("chws-tool"),
+        "east_asian_spacing_version": importlib.metadata.version("east-asian-spacing"),
+        "gpos_feature_records_added": after_records - before_records,
+        "gpos_lookups_added": after_lookups - before_lookups,
+        "chws_present": has_chws,
+        "vchw_present": has_vchw,
+        "head_modified_preserved": modified_preserved,
+    }
 
 
 def glyph_coordinates_match(font: TTFont, glyph_name: str, reference: TTFont, ref_glyph_name: str) -> bool:
@@ -4673,6 +4780,11 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         for reference_font in reference_fonts_roundtrip.values():
             reference_font.close()
 
+    base.close()
+    log_step(f"variable {style_label}: add Noto chws/vchw")
+    contextual_spacing_report = add_noto_contextual_spacing(out_path)
+    base = TTFont(out_path)
+
     cmap = base.getBestCmap()
     widths = {f"U+{cp:04X}": base["hmtx"].metrics[cmap[cp]][0] for cp in range(0x30, 0x3A)}
     key_widths = {
@@ -4734,6 +4846,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         **font_revision_report,
         **extra_table_report,
         **colon_report,
+        **contextual_spacing_report,
     }
 
 
@@ -5155,8 +5268,6 @@ def ensure_sarasa_source_tree() -> None:
         run_checked([npm_executable(), "ci"], cwd=SARASA_SOURCE_DIR, capture_output=False, env=local_runtime_env())
         npm_marker.parent.mkdir(parents=True, exist_ok=True)
         npm_marker.write_text(lock_sha256 + "\n", encoding="ascii")
-
-
 def ensure_build_sources(static_only: bool, regions: list[str]) -> None:
     if os.environ.get("SARASA_SKIP_SOURCE_BOOTSTRAP") == "1":
         return
@@ -5222,75 +5333,156 @@ def chlorophytum_package_id() -> dict[str, Any]:
     }
 
 
-def static_fe_cache_key(weight_name: str, kanji: Path, hangul: Path) -> str:
+def static_hint_group_cache_key(
+    weight_name: str,
+    group_name: str,
+    jobs: list[tuple[Path, Path, str]],
+) -> str:
     config_name, config_path = sarasa_hint_config(weight_name)
     payload = {
-        "kind": "static-fe-chlorophytum",
+        "kind": "static-full-group-chlorophytum",
         "version": 2,
         "weight": weight_name,
+        "group": group_name,
         "config_name": config_name,
         "config_sha256": file_sha256(config_path),
-        "kanji_sha256": stable_sfnt_sha256(kanji),
-        "hangul_sha256": stable_sfnt_sha256(hangul),
+        "inputs": [stable_sfnt_sha256(path) for path, _hint, _weight in jobs],
+        "chlorophytum": chlorophytum_package_id(),
+        "hint_store_order": CHLOROPHYTUM_HINT_STORE_ORDER,
+    }
+    text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
+def static_hint_work_key(weight_name: str) -> str:
+    config_name, config_path = sarasa_hint_config(weight_name)
+    style_names = [
+        sarasa_hint_source_style(weight_name, italic)
+        for italic in (False, True)
+    ]
+    source = STATIC_STYLE_SOURCES[weight_name]
+    permanent_inputs = [
+        SARASA_SOURCE_DIR / "sources" / "shs" / f"SourceHanSans-{source['shs']}.ttc",
+        config_path,
+    ]
+    for group in sorted({sarasa_hint_latin_group(family) for family in SARASA_HINT_FAMILY_ORDER}):
+        for style in style_names:
+            permanent_inputs.append(
+                SARASA_SOURCE_DIR / "sources" / group / f"{group}-{style}.ttf"
+            )
+    for italic in (False, True):
+        target_style = inter_source_style(weight_name, italic)
+        if target_style:
+            permanent_inputs.append(
+                SARASA_SOURCE_DIR / "sources" / "Inter" / f"Inter-{target_style}.ttf"
+            )
+        else:
+            permanent_inputs.append(INTER_ITALIC if italic else INTER_UPRIGHT)
+    classical = classical_static_override_path("CL", weight_name)
+    if classical:
+        permanent_inputs.append(classical)
+    missing = [path for path in permanent_inputs if not path.exists()]
+    if missing:
+        raise FileNotFoundError(missing[0])
+    payload = {
+        "kind": "static-hint-work",
+        "version": STATIC_HINT_WORK_VERSION,
+        "project_version": VERSION,
+        "weight": weight_name,
+        "config_name": config_name,
+        "inputs": [
+            [str(path.resolve()), file_sha256(path)]
+            for path in permanent_inputs
+        ],
+        "ttfautohint_py": importlib.metadata.version("ttfautohint-py"),
+        "afdko": importlib.metadata.version("afdko"),
+        "sarasa_commit": SARASA_COMMIT,
         "chlorophytum": chlorophytum_package_id(),
     }
     text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def restore_static_fe_cache(weight_name: str, kanji: Path, hangul: Path, hani_out: Path, hang_out: Path) -> dict[str, Any] | None:
+def static_hint_work_dir(weight_name: str) -> tuple[str, Path]:
+    key = static_hint_work_key(weight_name)
+    # Keep the active tree comfortably below legacy Windows MAX_PATH. The
+    # manifest stores and verifies the full key; the prefix only names the dir.
+    work_dir = STATIC_HINT_WORK_ROOT / f"{weight_name}-{key[:20]}"
+    manifest_path = work_dir / "manifest.json"
+    if manifest_path.exists():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        if manifest.get("key") != key:
+            raise RuntimeError(f"Static hint work key collision at {work_dir}")
+    return key, work_dir
+
+
+def restore_static_hint_group_cache(
+    key: str,
+    weight_name: str,
+    jobs: list[tuple[Path, Path, str]],
+) -> tuple[str, dict[Path, dict[str, Any]]] | None:
     if os.environ.get("SARASA_DISABLE_BUILD_CACHE") == "1":
         return None
-    key = static_fe_cache_key(weight_name, kanji, hangul)
-    cache_dir = BUILD_CACHE_DIR / "static-fe" / key
-    cached_hani = cache_dir / "hani.ttf"
-    cached_hang = cache_dir / "hang.ttf"
-    manifest = cache_dir / "manifest.json"
-    if not cached_hani.exists() or not cached_hang.exists() or not manifest.exists():
+    cache_dir = BUILD_CACHE_DIR / "static-hint-groups" / key
+    manifest_path = cache_dir / "manifest.json"
+    if not manifest_path.exists():
         return None
-    hani_out.parent.mkdir(parents=True, exist_ok=True)
-    hang_out.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(cached_hani, hani_out)
-    shutil.copy2(cached_hang, hang_out)
-    _config_name, config_path = sarasa_hint_config(weight_name)
-    return {
-        "hani": {
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    if manifest.get("files") != len(jobs):
+        return None
+    cached_hashes = manifest.get("sha256")
+    cached_reports = manifest.get("reports")
+    if not isinstance(cached_hashes, list) or len(cached_hashes) != len(jobs):
+        return None
+    if not isinstance(cached_reports, list) or len(cached_reports) != len(jobs):
+        return None
+    reports: dict[Path, dict[str, Any]] = {}
+    for index, (_input, hint_path, _weight) in enumerate(jobs):
+        cached = cache_dir / f"{index:03d}.hint.gz"
+        if not cached.exists() or file_sha256(cached) != cached_hashes[index]:
+            return None
+        hint_path.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(cached, hint_path)
+        reports[hint_path.resolve()] = {
+            **cached_reports[index],
             "chlorophytum_hinted": True,
             "chlorophytum_cache_hit": True,
             "chlorophytum_cache_key": key,
-            "chlorophytum_hint_config": config_path.stem,
-        },
-        "hang": {
-            "chlorophytum_hinted": True,
-            "chlorophytum_cache_hit": True,
-            "chlorophytum_cache_key": key,
-            "chlorophytum_hint_config": config_path.stem,
-        },
-    }
+            "chlorophytum_hint_config": sarasa_hint_config(weight_name)[0],
+            "chlorophytum_hint_store_order": CHLOROPHYTUM_HINT_STORE_ORDER,
+        }
+    return key, reports
 
 
-def store_static_fe_cache(
+def store_static_hint_group_cache(
+    key: str,
     weight_name: str,
-    kanji: Path,
-    hangul: Path,
-    hani_out: Path,
-    hang_out: Path,
-    report: dict[str, Any],
+    jobs: list[tuple[Path, Path, str]],
+    reports: dict[Path, dict[str, Any]],
 ) -> None:
     if os.environ.get("SARASA_DISABLE_BUILD_CACHE") == "1":
         return
-    key = static_fe_cache_key(weight_name, kanji, hangul)
-    cache_dir = BUILD_CACHE_DIR / "static-fe" / key
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(hani_out, cache_dir / "hani.ttf")
-    shutil.copy2(hang_out, cache_dir / "hang.ttf")
+    cache_dir = BUILD_CACHE_DIR / "static-hint-groups" / key
+    pending = cache_dir.with_name(cache_dir.name + ".pending")
+    if pending.exists():
+        shutil.rmtree(pending)
+    pending.mkdir(parents=True, exist_ok=True)
+    for index, (_input, hint_path, _weight) in enumerate(jobs):
+        shutil.copy2(hint_path, pending / f"{index:03d}.hint.gz")
     manifest = {
         "key": key,
         "weight": weight_name,
+        "files": len(jobs),
         "created_by": "tools/build_sarasa_ui_propdigits_sc.py",
-        "report": report,
+        "sha256": [file_sha256(pending / f"{index:03d}.hint.gz") for index in range(len(jobs))],
+        "reports": [reports[hint.resolve()] for _input, hint, _weight in jobs],
     }
-    (cache_dir / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+    (pending / "manifest.json").write_text(
+        json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    if cache_dir.exists():
+        shutil.rmtree(cache_dir)
+    pending.replace(cache_dir)
 
 
 def hint_static_font(in_path: Path, out_path: Path) -> dict[str, Any]:
@@ -5314,44 +5506,162 @@ def sarasa_hint_config(weight_name: str) -> tuple[str, Path]:
     return config_name, SARASA_SOURCE_DIR / "hcfg" / f"{config_name}.json"
 
 
-def chlorophytum_hint_static_font(
-    in_path: Path,
-    out_path: Path,
-    weight_name: str,
-    tmp_dir: Path,
-    hint_jobs: int | None = None,
+def chlorophytum_glyph_key(value: str) -> tuple[int, str]:
+    suffix = value.rsplit("#", 1)
+    if len(suffix) == 2 and suffix[1].isdigit():
+        return int(suffix[1]), value
+    return 0x7FFFFFFF, value
+
+
+def sarasa_shared_hint_group_order(config_path: Path) -> tuple[str, ...]:
+    config = json.loads(config_path.read_text(encoding="utf-8"))
+    result: list[str] = []
+    for item in config.get("hintOptions", {}).get("passes", []):
+        hint_pass = item.get("hintOptions", {}).get("pass", {})
+        if hint_pass.get("hintPlugin") != "@chlorophytum/hm-ideograph":
+            continue
+        group_name = str(hint_pass.get("hintOptions", {}).get("groupName", "Ideograph"))
+        if group_name not in result:
+            result.append(group_name)
+    if not result:
+        raise RuntimeError(f"No Chlorophytum ideograph passes found in {config_path}")
+    return tuple(result)
+
+
+def chlorophytum_shared_hint_key(value: str, group_order: tuple[str, ...]) -> int:
+    for index, group_name in enumerate(group_order):
+        if value.endswith(f"{{{group_name}}}"):
+            return index
+    return len(group_order)
+
+
+def normalize_chlorophytum_hint_store(
+    path: Path,
+    shared_group_order: tuple[str, ...],
 ) -> dict[str, Any]:
-    return chlorophytum_hint_static_fonts([(in_path, out_path, weight_name)], tmp_dir, hint_jobs=hint_jobs)[out_path]
+    with gzip.open(path, "rt", encoding="utf-8") as handle:
+        source = json.load(handle)
+    if not isinstance(source, dict):
+        raise TypeError(f"Unsupported Chlorophytum hint store at {path}")
+
+    normalized: dict[str, Any] = {}
+    for key in ("glyphs", "glyphHintCacheKeys"):
+        values = source.get(key, {})
+        if not isinstance(values, dict):
+            raise TypeError(f"Unsupported {key} section in {path}")
+        normalized[key] = {
+            name: values[name]
+            for name in sorted(values, key=chlorophytum_glyph_key)
+        }
+    shared = source.get("sharedHints", {})
+    if not isinstance(shared, dict):
+        raise TypeError(f"Unsupported sharedHints section in {path}")
+    # Shared hint insertion order is semantic: Chlorophytum compiles these
+    # models in Map order and assigns function IDs as it goes. Reproduce the
+    # hcfg pass order explicitly; alphabetic ordering changes rendered pixels.
+    normalized["sharedHints"] = {
+        name: shared[name]
+        for name in sorted(
+            shared,
+            key=lambda name: chlorophytum_shared_hint_key(name, shared_group_order),
+        )
+    }
+    known_shared_groups = [
+        next(
+            group_name
+            for group_name in shared_group_order
+            if name.endswith(f"{{{group_name}}}")
+        )
+        for name in normalized["sharedHints"]
+        if any(
+            name.endswith(f"{{{group_name}}}")
+            for group_name in shared_group_order
+        )
+    ]
+    expected_shared_groups = [
+        group_name
+            for group_name in shared_group_order
+        if any(name.endswith(f"{{{group_name}}}") for name in shared)
+    ]
+    if known_shared_groups != expected_shared_groups:
+        raise RuntimeError(
+            "Chlorophytum shared hint order does not match the Sarasa hcfg pass order: "
+            f"{known_shared_groups!r} != {expected_shared_groups!r}"
+        )
+    for key, value in source.items():
+        if key not in normalized:
+            normalized[key] = value
+
+    payload = json.dumps(normalized, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    path.write_bytes(gzip.compress(payload, compresslevel=9, mtime=0))
+    return {
+        "chlorophytum_hint_store_order": CHLOROPHYTUM_HINT_STORE_ORDER,
+        "chlorophytum_hint_store_glyphs": len(normalized["glyphs"]),
+        "chlorophytum_hint_store_shared": len(normalized["sharedHints"]),
+        "chlorophytum_hint_store_sha256": file_sha256(path),
+    }
 
 
-def chlorophytum_hint_static_fonts(
+def link_or_copy(source: Path, destination: Path) -> None:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        os.link(source, destination)
+    except OSError:
+        shutil.copy2(source, destination)
+
+
+def publish_staged_file(source: Path, destination: Path) -> None:
+    if not source.exists() or not source.stat().st_size:
+        raise FileNotFoundError(source)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    pending = destination.with_name(f"{destination.name}.{os.getpid()}.pending")
+    if pending.exists():
+        pending.unlink()
+    shutil.copy2(source, pending)
+    pending.replace(destination)
+
+
+def write_json_atomic(path: Path, value: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pending = path.with_name(f"{path.name}.{os.getpid()}.pending")
+    pending.write_text(
+        json.dumps(value, ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    pending.replace(path)
+
+
+def chlorophytum_generate_static_hints(
     jobs: list[tuple[Path, Path, str]],
     tmp_dir: Path,
     hint_jobs: int | None = None,
 ) -> dict[Path, dict[str, Any]]:
     if not jobs:
         return {}
+    tmp_dir = tmp_dir.resolve()
+    jobs = [
+        (in_path.resolve(), hint_path.resolve(), weight_name)
+        for in_path, hint_path, weight_name in jobs
+    ]
     tmp_dir.mkdir(parents=True, exist_ok=True)
-    config_names = {sarasa_hint_config(weight_name)[0] for _in_path, _out_path, weight_name in jobs}
+    config_names = {sarasa_hint_config(weight_name)[0] for _in_path, _hint_path, weight_name in jobs}
     if len(config_names) != 1:
         raise ValueError(f"Chlorophytum batch must use one hcfg, got {sorted(config_names)}")
     config_name = next(iter(config_names))
     config_path = SARASA_SOURCE_DIR / "hcfg" / f"{config_name}.json"
+    shared_group_order = sarasa_shared_hint_group_order(config_path)
 
     reports: dict[Path, dict[str, Any]] = {}
     if os.environ.get("SARASA_SKIP_CHLOROPHYTUM") == "1":
-        for in_path, out_path, _weight_name in jobs:
-            shutil.copy2(in_path, out_path)
-            reports[out_path] = {
+        for _in_path, hint_path, _weight_name in jobs:
+            reports[hint_path] = {
                 "chlorophytum_hinted": False,
                 "chlorophytum_hint_tool": "skipped",
                 "chlorophytum_hint_config": config_name,
             }
         return reports
     if not SARASA_CHLOROPHYTUM.exists() or not config_path.exists():
-        for in_path, out_path, _weight_name in jobs:
-            shutil.copy2(in_path, out_path)
-            reports[out_path] = {
+        for _in_path, hint_path, _weight_name in jobs:
+            reports[hint_path] = {
                 "chlorophytum_hinted": False,
                 "chlorophytum_hint_tool": "missing",
                 "chlorophytum_hint_config": config_name,
@@ -5359,55 +5669,127 @@ def chlorophytum_hint_static_fonts(
         return reports
 
     actual_hint_jobs = max(1, int(hint_jobs or SARASA_HINT_JOBS))
-    cache_path = tmp_dir / f"{config_name}.hc.gz"
-    node = node_executable()
-    hint_cmd = [
-        node,
-        str(SARASA_CHLOROPHYTUM),
-        "hint",
-        "-c",
-        str(config_path),
-        "-h",
-        str(cache_path),
-        "--jobs",
-        str(actual_hint_jobs),
-    ]
-    hint_paths: dict[Path, Path] = {}
-    for in_path, _out_path, _weight_name in jobs:
-        hint_path = tmp_dir / f"{in_path.stem}.hint.gz"
-        hint_paths[in_path] = hint_path
-        hint_cmd.extend([str(in_path), str(hint_path)])
-    verbose = os.environ.get("SARASA_CHLOROPHYTUM_VERBOSE") == "1"
-    result = subprocess.run(hint_cmd, cwd=SARASA_SOURCE_DIR, capture_output=not verbose)
-    if result.returncode != 0:
-        stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
-        stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
-        raise RuntimeError(stderr or stdout or f"Chlorophytum hint failed with exit code {result.returncode}")
+    with tempfile.TemporaryDirectory(prefix="sarasa-hint-") as stage_raw:
+        stage = Path(stage_raw)
+        hint_cmd = [
+            node_executable(),
+            str(SARASA_CHLOROPHYTUM),
+            "hint",
+            "-c",
+            str(config_path),
+            "-h",
+            "cache.gz",
+            "--jobs",
+            str(actual_hint_jobs),
+        ]
+        staged_outputs: list[Path] = []
+        for index, (in_path, _hint_path, _weight_name) in enumerate(jobs):
+            staged_input = stage / "i" / f"{index:03d}.ttf"
+            staged_output = stage / "h" / f"{index:03d}.gz"
+            link_or_copy(in_path, staged_input)
+            staged_output.parent.mkdir(parents=True, exist_ok=True)
+            hint_cmd.extend([str(staged_input.relative_to(stage)), str(staged_output.relative_to(stage))])
+            staged_outputs.append(staged_output)
+        verbose = os.environ.get("SARASA_CHLOROPHYTUM_VERBOSE") == "1"
+        result = subprocess.run(hint_cmd, cwd=stage, capture_output=not verbose)
+        if result.returncode != 0:
+            stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
+            stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
+            raise RuntimeError(stderr or stdout or f"Chlorophytum hint failed with exit code {result.returncode}")
+        for staged_output in staged_outputs:
+            if not staged_output.exists() or not staged_output.stat().st_size:
+                raise FileNotFoundError(staged_output)
+        for (_in_path, hint_path, _weight_name), staged_output in zip(jobs, staged_outputs):
+            normalize_report = normalize_chlorophytum_hint_store(
+                staged_output,
+                shared_group_order,
+            )
+            publish_staged_file(staged_output, hint_path)
+            reports[hint_path] = {
+                "chlorophytum_hinted": True,
+                "chlorophytum_hint_tool": str(SARASA_CHLOROPHYTUM),
+                "chlorophytum_hint_config": config_name,
+                "chlorophytum_hint_jobs": actual_hint_jobs,
+                "chlorophytum_hint_group_size": len(jobs),
+                "chlorophytum_hint_cache": "ephemeral-short-path-stage",
+                "chlorophytum_cache_hit": False,
+                **normalize_report,
+            }
+    return reports
 
-    instruct_cmd = [
-        node,
-        str(SARASA_CHLOROPHYTUM),
-        "instruct",
-        "-c",
-        str(config_path),
-    ]
-    for in_path, out_path, _weight_name in jobs:
-        instruct_cmd.extend([str(in_path), str(hint_paths[in_path]), str(out_path)])
-    result = subprocess.run(instruct_cmd, cwd=SARASA_SOURCE_DIR, capture_output=not verbose)
-    if result.returncode != 0:
-        stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
-        stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
-        raise RuntimeError(stderr or stdout or f"Chlorophytum instruct failed with exit code {result.returncode}")
 
-    for _in_path, out_path, _weight_name in jobs:
-        reports[out_path] = {
-            "chlorophytum_hinted": True,
-            "chlorophytum_hint_tool": str(SARASA_CHLOROPHYTUM),
-            "chlorophytum_hint_config": config_name,
-            "chlorophytum_hint_jobs": actual_hint_jobs,
-            "chlorophytum_hint_group_size": len(jobs),
-            "chlorophytum_hint_cache": str(cache_path),
-        }
+def chlorophytum_instruct_static_fonts(
+    jobs: list[tuple[Path, Path, Path, str]],
+) -> dict[Path, dict[str, Any]]:
+    if not jobs:
+        return {}
+    jobs = [
+        (in_path.resolve(), hint_path.resolve(), out_path.resolve(), weight_name)
+        for in_path, hint_path, out_path, weight_name in jobs
+    ]
+    config_names = {
+        sarasa_hint_config(weight_name)[0]
+        for _in_path, _hint_path, _out_path, weight_name in jobs
+    }
+    if len(config_names) != 1:
+        raise ValueError(f"Chlorophytum batch must use one hcfg, got {sorted(config_names)}")
+    config_name = next(iter(config_names))
+    config_path = SARASA_SOURCE_DIR / "hcfg" / f"{config_name}.json"
+    reports: dict[Path, dict[str, Any]] = {}
+    if os.environ.get("SARASA_SKIP_CHLOROPHYTUM") == "1" or not SARASA_CHLOROPHYTUM.exists():
+        for in_path, _hint_path, out_path, _weight_name in jobs:
+            shutil.copy2(in_path, out_path)
+            reports[out_path] = {
+                "chlorophytum_instructed": False,
+                "chlorophytum_instruct_tool": "skipped",
+                "chlorophytum_instruct_config": config_name,
+            }
+        return reports
+
+    with tempfile.TemporaryDirectory(prefix="sarasa-instruct-") as stage_raw:
+        stage = Path(stage_raw)
+        cmd = [
+            node_executable(),
+            str(SARASA_CHLOROPHYTUM),
+            "instruct",
+            "-c",
+            str(config_path),
+        ]
+        staged_outputs: list[Path] = []
+        for index, (in_path, hint_path, _out_path, _weight_name) in enumerate(jobs):
+            staged_input = stage / "i" / f"{index:03d}.ttf"
+            staged_hint = stage / "h" / f"{index:03d}.gz"
+            staged_output = stage / "o" / f"{index:03d}.ttf"
+            link_or_copy(in_path, staged_input)
+            link_or_copy(hint_path, staged_hint)
+            staged_output.parent.mkdir(parents=True, exist_ok=True)
+            cmd.extend(
+                [
+                    str(staged_input.relative_to(stage)),
+                    str(staged_hint.relative_to(stage)),
+                    str(staged_output.relative_to(stage)),
+                ]
+            )
+            staged_outputs.append(staged_output)
+        verbose = os.environ.get("SARASA_CHLOROPHYTUM_VERBOSE") == "1"
+        result = subprocess.run(cmd, cwd=stage, capture_output=not verbose)
+        if result.returncode != 0:
+            stderr = result.stderr.decode("utf-8", "replace") if result.stderr else ""
+            stdout = result.stdout.decode("utf-8", "replace") if result.stdout else ""
+            raise RuntimeError(stderr or stdout or f"Chlorophytum instruct failed with exit code {result.returncode}")
+        for staged_output in staged_outputs:
+            if not staged_output.exists() or not staged_output.stat().st_size:
+                raise FileNotFoundError(staged_output)
+        for (_in_path, _hint_path, out_path, _weight_name), staged_output in zip(jobs, staged_outputs):
+            publish_staged_file(staged_output, out_path)
+            reports[out_path] = {
+                "chlorophytum_instructed": True,
+                "chlorophytum_instruct_tool": str(SARASA_CHLOROPHYTUM),
+                "chlorophytum_instruct_config": config_name,
+                "chlorophytum_instruct_group_size": len(jobs),
+                "chlorophytum_instruct_order": "pass1-hani-hang",
+                "chlorophytum_short_path_stage": True,
+            }
     return reports
 
 
@@ -5428,6 +5810,31 @@ def sarasa_ui_flags() -> dict[str, bool]:
         "tnum": True,
         "term": False,
     }
+
+
+def sarasa_hint_family_flags(family: str) -> dict[str, bool]:
+    if family not in SARASA_HINT_FAMILY_ORDER:
+        raise ValueError(f"Unsupported Sarasa hint family {family}")
+    return {
+        "goth": family == "Gothic",
+        "mono": family in {"Mono", "MonoSlab", "Term", "TermSlab", "Fixed", "FixedSlab"},
+        "pwid": family == "Ui",
+        "tnum": family == "Ui",
+        "term": family in {"Term", "TermSlab", "Fixed", "FixedSlab"},
+    }
+
+
+def sarasa_hint_latin_group(family: str) -> str:
+    return {
+        "Gothic": "Inter",
+        "Ui": "Inter",
+        "Mono": "IosevkaN",
+        "MonoSlab": "IosevkaNSlab",
+        "Term": "IosevkaNTerm",
+        "TermSlab": "IosevkaNTermSlab",
+        "Fixed": "IosevkaNFixed",
+        "FixedSlab": "IosevkaNFixedSlab",
+    }[family]
 
 
 def sarasa_latin_config() -> dict[str, Any]:
@@ -5457,6 +5864,10 @@ def sarasa_latin_config() -> dict[str, Any]:
             "ss08",
         ],
     }
+
+
+def sarasa_hint_latin_config(family: str) -> dict[str, Any]:
+    return sarasa_latin_config() if sarasa_hint_latin_group(family) == "Inter" else {}
 
 
 def sarasa_module_runner(tmp_dir: Path) -> Path:
@@ -5581,6 +5992,204 @@ def build_inter_source(weight_name: str, weight_value: int, italic: bool, tmp_di
     if not out_path.exists():
         run_ttfautohint(["-d", str(raw_path), str(out_path)])
     return out_path
+
+
+def sarasa_hint_source_style(weight_name: str, italic: bool) -> str:
+    style = str(STATIC_STYLE_SOURCES[weight_name]["sarasa"])
+    if italic:
+        return "Italic" if style == "Regular" else f"{style}Italic"
+    return style
+
+
+def build_sarasa_hint_latin_source(
+    family: str,
+    weight_name: str,
+    weight_value: int,
+    italic: bool,
+    tmp_dir: Path,
+) -> Path:
+    group = sarasa_hint_latin_group(family)
+    style = sarasa_hint_source_style(weight_name, italic)
+    out_dir = tmp_dir / "hint-environment" / f"latin-{group}"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_path = out_dir / f"{group}-{style}.ttf"
+    if out_path.exists():
+        return out_path
+
+    if group == "Inter" and family == "Ui":
+        source = build_inter_source(weight_name, weight_value, italic, tmp_dir)
+    else:
+        source = SARASA_SOURCE_DIR / "sources" / group / f"{group}-{style}.ttf"
+        if not source.exists():
+            raise FileNotFoundError(source)
+    run_ttfautohint(["-d", str(source), str(out_path)])
+    return out_path
+
+
+def build_sarasa_hint_environment_pass1(
+    family: str,
+    region: str,
+    weight_name: str,
+    weight_value: int,
+    italic: bool,
+    tmp_dir: Path,
+    fragments: dict[tuple[str, bool], dict[str, Any]],
+) -> Path:
+    if family == "Ui":
+        return Path(fragments[(region, italic)]["pass1"])
+
+    style = sarasa_hint_source_style(weight_name, italic)
+    base_style = str(STATIC_STYLE_SOURCES[weight_name]["sarasa"])
+    flags = sarasa_hint_family_flags(family)
+    work_dir = tmp_dir / "hint-environment" / "fragments" / f"{family}-{region}-{style}"
+    work_dir.mkdir(parents=True, exist_ok=True)
+    non_kanji = tmp_dir / "hint-environment" / "non-kanji" / f"{region}-{base_style}.ttf"
+    if not non_kanji.exists():
+        raise FileNotFoundError(non_kanji)
+    latin = build_sarasa_hint_latin_source(family, weight_name, weight_value, italic, tmp_dir)
+    punct_args = {
+        "family": family,
+        "region": region,
+        "style": base_style,
+        "main": str(non_kanji),
+        "lgc": str(latin),
+        **flags,
+    }
+    ws = work_dir / "ws0.ttf"
+    as_punct = work_dir / "as0.ttf"
+    fe_misc = work_dir / "fe-misc0.ttf"
+    if not ws.exists():
+        run_sarasa_module(tmp_dir, "make/punct/ws.mjs", {**punct_args, "o": str(ws)})
+    if not as_punct.exists():
+        run_sarasa_module(tmp_dir, "make/punct/as.mjs", {**punct_args, "o": str(as_punct)})
+    if not fe_misc.exists():
+        run_sarasa_module(tmp_dir, "make/punct/fe-misc.mjs", {**punct_args, "o": str(fe_misc)})
+
+    pass1 = work_dir / "pass1.ttf"
+    if not pass1.exists():
+        run_sarasa_module(
+            tmp_dir,
+            "make/pass1/index.mjs",
+            {
+                "main": str(latin),
+                "as": str(as_punct),
+                "ws": str(ws),
+                "feMisc": str(fe_misc),
+                "o": str(pass1),
+                "family": family,
+                "subfamily": region,
+                "style": style,
+                "italize": italic,
+                "version": VERSION,
+                "latinCfg": sarasa_hint_latin_config(family),
+                **flags,
+            },
+        )
+    return pass1
+
+
+def build_sarasa_hint_environment(
+    regions: list[str],
+    weight_name: str,
+    weight_value: int,
+    tmp_dir: Path,
+    fragments: dict[tuple[str, bool], dict[str, Any]],
+) -> list[dict[str, Any]]:
+    expected_regions = list(REGION_ORDER)
+    missing = [region for region in expected_regions if (region, False) not in fragments]
+    if missing:
+        raise RuntimeError(f"Full Sarasa hint environment is missing regions: {', '.join(missing)}")
+
+    items = [
+        (family, region, italic)
+        for family in SARASA_HINT_FAMILY_ORDER
+        for region in expected_regions
+        for italic in (False, True)
+    ]
+    sarasa_module_runner(tmp_dir)
+    for region in expected_regions:
+        shs_ttf = build_shs_ttf(region, weight_name, tmp_dir)
+        non_kanji = (
+            tmp_dir
+            / "hint-environment"
+            / "non-kanji"
+            / f"{region}-{STATIC_STYLE_SOURCES[weight_name]['sarasa']}.ttf"
+        )
+        if not non_kanji.exists():
+            non_kanji.parent.mkdir(parents=True, exist_ok=True)
+            run_sarasa_module(
+                tmp_dir,
+                "make/non-kanji/build.mjs",
+                {"main": str(shs_ttf), "o": str(non_kanji)},
+            )
+    for family in SARASA_HINT_FAMILY_ORDER:
+        if family != "Ui":
+            for italic in (False, True):
+                build_sarasa_hint_latin_source(
+                    family, weight_name, weight_value, italic, tmp_dir
+                )
+
+    build_one = functools.partial(
+        build_sarasa_hint_environment_pass1,
+        weight_name=weight_name,
+        weight_value=weight_value,
+        tmp_dir=tmp_dir,
+        fragments=fragments,
+    )
+    paths: dict[tuple[str, str, bool], Path] = {}
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, SARASA_HINT_PREP_JOBS)) as executor:
+        future_map = {
+            executor.submit(build_one, family=family, region=region, italic=italic): (family, region, italic)
+            for family, region, italic in items
+        }
+        for future in concurrent.futures.as_completed(future_map):
+            key = future_map[future]
+            paths[key] = future.result()
+
+    result: list[dict[str, Any]] = []
+    for family, region, italic in items:
+        source_path = paths[(family, region, italic)]
+        hinted_dir = tmp_dir / "hint-environment" / "pass1-hinted"
+        hinted_dir.mkdir(parents=True, exist_ok=True)
+        style = sarasa_hint_source_style(weight_name, italic)
+        prepared_hint = fragments[(region, italic)].get("_pass1_hinted") if family == "Ui" else None
+        hinted_path = (
+            Path(prepared_hint)
+            if prepared_hint
+            else hinted_dir / f"{family}-{region}-{style}.ttf"
+        )
+        hint_path = tmp_dir / "hint-data" / "pass1" / f"{family}-{region}-{style}.hint.gz"
+        out_path = tmp_dir / "hinted-environment" / "pass1" / f"{family}-{region}-{style}.ttf"
+        result.append(
+            {
+                "family": family,
+                "region": region,
+                "italic": italic,
+                "source": source_path,
+                "hinted": hinted_path,
+                "hint": hint_path,
+                "output": out_path,
+            }
+        )
+    pending_hint_items = [item for item in result if not Path(item["hinted"]).exists()]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, SARASA_HINT_PREP_JOBS)) as executor:
+        future_map = {
+            executor.submit(hint_static_font, Path(item["source"]), Path(item["hinted"])): item
+            for item in pending_hint_items
+        }
+        for future in concurrent.futures.as_completed(future_map):
+            future_map[future]["ttfautohint_report"] = future.result()
+    for item in result:
+        prepared_report = (
+            fragments[(str(item["region"]), bool(item["italic"]))].get("_ttfautohint_report")
+            if item["family"] == "Ui"
+            else None
+        )
+        item.setdefault(
+            "ttfautohint_report",
+            prepared_report or {"hinted": True, "hint_tool": "reused-full-group-preparation"},
+        )
+    return result
 
 
 def build_sarasa_static_fragments(
@@ -5850,6 +6459,11 @@ def postprocess_static_font(
         if reference:
             reference.close()
         font.close()
+    log_step(
+        f"static {region} {weight_name}{' Italic' if italic else ''} "
+        f"{'hinted' if hinted else 'unhinted'}: add Noto chws/vchw"
+    )
+    report.update(add_noto_contextual_spacing(path))
     return report
 
 
@@ -5860,41 +6474,61 @@ def prepare_static_pass1_derivatives(path: Path) -> dict[str, Any]:
     }
 
 
-def build_static_weight(
+def prepare_static_style(
     region: str,
     stop: dict[str, Any],
     tmp_dir: Path,
-    hint_jobs: int,
-) -> list[dict[str, Any]]:
-    outputs: list[dict[str, Any]] = []
+    italic: bool,
+    emit_output: bool = True,
+    reuse_existing_unhinted: bool = False,
+) -> tuple[dict[str, Any], dict[str, Any] | None]:
     weight_name = str(stop["name"])
     weight_value = int(stop["value"])
-    hinted_fe_entry: dict[str, Any] | None = None
     tmp_dir.mkdir(parents=True, exist_ok=True)
+    style_label = f"{region} {weight_name}{' Italic' if italic else ''}"
+    log_step(f"static {style_label}: build Sarasa fragments")
+    fragments = build_sarasa_static_fragments(region, weight_name, weight_value, italic, tmp_dir)
+    pass1_derivative_report = prepare_static_pass1_derivatives(fragments["pass1"])
 
-    for italic in [False, True]:
-        style_label = f"{region} {weight_name}{' Italic' if italic else ''}"
-        log_step(f"static {style_label}: build Sarasa fragments")
-        fragments = build_sarasa_static_fragments(region, weight_name, weight_value, italic, tmp_dir)
-        pass1_derivative_report = prepare_static_pass1_derivatives(fragments["pass1"])
-
+    unhinted_output: dict[str, Any] | None = None
+    if emit_output:
         unhinted_tmp = tmp_dir / "unhinted" / region / static_output_name(region, weight_name, italic)
+        unhinted_report_path = unhinted_tmp.with_suffix(".report.json")
         unhinted_tmp.parent.mkdir(parents=True, exist_ok=True)
         unhinted_path = static_dir(region, False) / static_output_name(region, weight_name, italic)
-        log_step(f"static {style_label}: compose unhinted pass2")
-        build_sarasa_pass2(
-            fragments["pass1"],
-            fragments["kanji"],
-            fragments["hangul"],
-            unhinted_tmp,
-            italic,
-            tmp_dir,
-        )
-        log_step(f"static {style_label}: postprocess unhinted")
-        unhinted_report = postprocess_static_font(unhinted_tmp, region, weight_name, weight_value, italic, False)
-        shutil.copy2(unhinted_tmp, unhinted_path)
-        outputs.append(
-            {
+        if reuse_existing_unhinted and unhinted_path.exists():
+            log_step(f"static {style_label}: reuse existing unhinted output")
+            unhinted_output = {
+                "file": str(unhinted_path.relative_to(ROOT)),
+                "region": region,
+                "weight": weight_name,
+                "wght": weight_value,
+                "italic": italic,
+                "hinted_variant": False,
+                "rebuilt": False,
+                "resume_static_skipped": True,
+            }
+        elif unhinted_tmp.exists() and unhinted_report_path.exists():
+            log_step(f"static {style_label}: reuse completed unhinted output")
+            unhinted_report = json.loads(unhinted_report_path.read_text(encoding="utf-8"))
+        else:
+            log_step(f"static {style_label}: compose unhinted pass2")
+            build_sarasa_pass2(
+                fragments["pass1"],
+                fragments["kanji"],
+                fragments["hangul"],
+                unhinted_tmp,
+                italic,
+                tmp_dir,
+            )
+            log_step(f"static {style_label}: postprocess unhinted")
+            unhinted_report = postprocess_static_font(
+                unhinted_tmp, region, weight_name, weight_value, italic, False
+            )
+            write_json_atomic(unhinted_report_path, unhinted_report)
+        if unhinted_output is None:
+            shutil.copy2(unhinted_tmp, unhinted_path)
+            unhinted_output = {
                 "file": str(unhinted_path.relative_to(ROOT)),
                 "region": region,
                 "weight": weight_name,
@@ -5909,94 +6543,265 @@ def build_static_weight(
                 **pass1_derivative_report,
                 **unhinted_report,
             }
-        )
 
-        hinted_work = tmp_dir / "hinted" / region / f"{weight_name}{'Italic' if italic else ''}"
-        hinted_work.mkdir(parents=True, exist_ok=True)
-        pass1_hinted = hinted_work / "pass1.ttfautohint.ttf"
-        pass1_instructed = hinted_work / "pass1.ttf"
-        hinted_tmp = hinted_work / static_output_name(region, weight_name, italic)
-        hinted_path = static_dir(region, True) / static_output_name(region, weight_name, italic)
-
+    hinted_work = tmp_dir / "hinted" / region / f"{weight_name}{'Italic' if italic else ''}"
+    hinted_work.mkdir(parents=True, exist_ok=True)
+    pass1_hinted = hinted_work / "pass1.ttfautohint.ttf"
+    pass1_hinted_report = hinted_work / "pass1.ttfautohint.report.json"
+    if pass1_hinted.exists() and pass1_hinted_report.exists():
+        log_step(f"static {style_label}: reuse ttfautohint pass1")
+        hint_report = json.loads(pass1_hinted_report.read_text(encoding="utf-8"))
+    else:
         log_step(f"static {style_label}: ttfautohint pass1")
         hint_report = hint_static_font(fragments["pass1"], pass1_hinted)
-        log_step(f"static {style_label}: Chlorophytum pass1")
-        pass1_chlorophytum = chlorophytum_hint_static_fonts(
-            [(pass1_hinted, pass1_instructed, weight_name)],
-            hinted_work / "pass1-hints",
-            hint_jobs=hint_jobs,
-        )[pass1_instructed]
+        write_json_atomic(pass1_hinted_report, hint_report)
+    context = {
+        "style_label": style_label,
+        "region": region,
+        "weight_name": weight_name,
+        "weight_value": weight_value,
+        "italic": italic,
+        "emit_output": emit_output,
+        "fragments": fragments,
+        "pass1_derivative_report": pass1_derivative_report,
+        "hint_report": hint_report,
+        "pass1_hinted": pass1_hinted,
+        "pass1_hint": hinted_work / "pass1.hint.gz",
+        "pass1_instructed": hinted_work / "pass1.ttf",
+        "hinted_tmp": hinted_work / static_output_name(region, weight_name, italic),
+        "hinted_path": static_dir(region, True) / static_output_name(region, weight_name, italic),
+    }
+    return context, unhinted_output
 
-        if hinted_fe_entry is None:
-            fe_work = tmp_dir / "hinted-fe" / region / weight_name
-            fe_work.mkdir(parents=True, exist_ok=True)
-            hani_instructed = fe_work / "hani.ttf"
-            hang_instructed = fe_work / "hang.ttf"
-            log_step(f"static {style_label}: restore cached kanji/hangul")
-            fe_chlorophytum_report = restore_static_fe_cache(
-                weight_name,
-                fragments["kanji"],
-                fragments["hangul"],
-                hani_instructed,
-                hang_instructed,
+
+def build_static_weight_group(
+    regions: list[str],
+    stop: dict[str, Any],
+    tmp_dir: Path,
+    hint_jobs: int,
+    resume: bool = False,
+) -> list[dict[str, Any]]:
+    weight_name = str(stop["name"])
+    output_regions = set(regions)
+    contexts: list[dict[str, Any]] = []
+    outputs: list[dict[str, Any]] = []
+    for region in REGION_ORDER:
+        for italic in (False, True):
+            context, unhinted_output = prepare_static_style(
+                region,
+                stop,
+                tmp_dir,
+                italic,
+                emit_output=region in output_regions,
+                reuse_existing_unhinted=resume,
             )
-            if fe_chlorophytum_report is None:
-                log_step(f"static {style_label}: Chlorophytum kanji/hangul")
-                fe_chlorophytum = chlorophytum_hint_static_fonts(
-                    [
-                        (fragments["kanji"], hani_instructed, weight_name),
-                        (fragments["hangul"], hang_instructed, weight_name),
-                    ],
-                    fe_work / "hints",
-                    hint_jobs=hint_jobs,
-                )
-                fe_chlorophytum_report = {
-                    "hani": fe_chlorophytum[hani_instructed],
-                    "hang": fe_chlorophytum[hang_instructed],
-                }
-                store_static_fe_cache(
-                    weight_name,
-                    fragments["kanji"],
-                    fragments["hangul"],
-                    hani_instructed,
-                    hang_instructed,
-                    fe_chlorophytum_report,
-                )
-            else:
-                log_step(f"static {style_label}: cached kanji/hangul hit")
-            hinted_fe_entry = {
-                "hani": hani_instructed,
-                "hang": hang_instructed,
-                "report": fe_chlorophytum_report,
-            }
-        else:
-            log_step(f"static {style_label}: reuse Chlorophytum kanji/hangul")
+            contexts.append(context)
+            if unhinted_output is not None:
+                outputs.append(unhinted_output)
 
-        hani_instructed = hinted_fe_entry["hani"]
-        hang_instructed = hinted_fe_entry["hang"]
-        fe_chlorophytum_report = hinted_fe_entry["report"]
+    context_map = {
+        (str(context["region"]), bool(context["italic"])): context
+        for context in contexts
+    }
+    log_step(
+        f"static {weight_name}: prepare full Sarasa pass1 environment "
+        f"({len(SARASA_HINT_FAMILY_ORDER) * len(REGION_ORDER) * 2} fonts, "
+        f"prep jobs={SARASA_HINT_PREP_JOBS})"
+    )
+    hint_fragments = {
+        key: {
+            **value["fragments"],
+            "_pass1_hinted": value["pass1_hinted"],
+            "_ttfautohint_report": value["hint_report"],
+        }
+        for key, value in context_map.items()
+    }
+    pass1_environment = build_sarasa_hint_environment(
+        regions,
+        weight_name,
+        int(stop["value"]),
+        tmp_dir,
+        hint_fragments,
+    )
+    pass1_jobs = [
+        (Path(item["hinted"]), Path(item["hint"]), weight_name)
+        for item in pass1_environment
+    ]
+
+    fe_entries: dict[str, dict[str, Any]] = {}
+    for region in REGION_ORDER:
+        context = next(item for item in contexts if item["region"] == region)
+        fragments = context["fragments"]
+        fe_work = tmp_dir / "hinted-fe" / region
+        fe_work.mkdir(parents=True, exist_ok=True)
+        hani_hint = fe_work / "hani.hint.gz"
+        hang_hint = fe_work / "hang.hint.gz"
+        fe_entries[region] = {
+            "kanji": fragments["kanji"],
+            "hangul": fragments["hangul"],
+            "hani_hint": hani_hint,
+            "hang_hint": hang_hint,
+            "hani_out": fe_work / "hani.ttf",
+            "hang_out": fe_work / "hang.ttf",
+        }
+
+    hani_jobs = [
+        (Path(fe_entries[region]["kanji"]), Path(fe_entries[region]["hani_hint"]), weight_name)
+        for region in REGION_ORDER
+    ]
+    hang_jobs = [
+        (Path(fe_entries[region]["hangul"]), Path(fe_entries[region]["hang_hint"]), weight_name)
+        for region in REGION_ORDER
+    ]
+    fe_jobs = [*hani_jobs, *hang_jobs]
+    input_cache_key = static_hint_work_key(weight_name)
+    pass1_cache_key = static_hint_group_cache_key(weight_name, "pass1", pass1_jobs)
+    pass1_cache_result = restore_static_hint_group_cache(
+        pass1_cache_key, weight_name, pass1_jobs
+    )
+    if pass1_cache_result is None:
+        log_step(
+            f"static {weight_name}: Chlorophytum full pass1 group ({len(pass1_jobs)} fonts)"
+        )
+        pass1_hint_reports = chlorophytum_generate_static_hints(
+            pass1_jobs,
+            tmp_dir / "hint-data" / "pass1",
+            hint_jobs=hint_jobs,
+        )
+        store_static_hint_group_cache(
+            pass1_cache_key,
+            weight_name,
+            pass1_jobs,
+            pass1_hint_reports,
+        )
+    else:
+        pass1_cache_key, pass1_hint_reports = pass1_cache_result
+        log_step(f"static {weight_name}: cached full pass1 hint group hit")
+
+    fe_cache_key = static_hint_group_cache_key(weight_name, "fe", fe_jobs)
+    fe_cache_result = restore_static_hint_group_cache(
+        fe_cache_key, weight_name, fe_jobs
+    )
+    if fe_cache_result is None:
+        log_step(
+            f"static {weight_name}: Chlorophytum full kanji/hangul group "
+            f"({len(fe_jobs)} fonts)"
+        )
+        fe_hint_reports = chlorophytum_generate_static_hints(
+            fe_jobs,
+            tmp_dir / "hint-data" / "fe",
+            hint_jobs=hint_jobs,
+        )
+        store_static_hint_group_cache(
+            fe_cache_key,
+            weight_name,
+            fe_jobs,
+            fe_hint_reports,
+        )
+    else:
+        fe_cache_key, fe_hint_reports = fe_cache_result
+        log_step(f"static {weight_name}: cached full kanji/hangul hint group hit")
+
+    instruct_jobs: list[tuple[Path, Path, Path, str]] = [
+        (
+            Path(item["hinted"]),
+            Path(item["hint"]),
+            Path(item["output"]),
+            weight_name,
+        )
+        for item in pass1_environment
+    ]
+    instruct_jobs.extend(
+        (
+            fe_entries[region]["kanji"],
+            fe_entries[region]["hani_hint"],
+            fe_entries[region]["hani_out"],
+            weight_name,
+        )
+        for region in REGION_ORDER
+    )
+    instruct_jobs.extend(
+        (
+            fe_entries[region]["hangul"],
+            fe_entries[region]["hang_hint"],
+            fe_entries[region]["hang_out"],
+            weight_name,
+        )
+        for region in REGION_ORDER
+    )
+    log_step(f"static {weight_name}: Chlorophytum unified instruct ({len(instruct_jobs)} fonts)")
+    instruct_reports = chlorophytum_instruct_static_fonts(instruct_jobs)
+
+    environment_map = {
+        (str(item["family"]), str(item["region"]), bool(item["italic"])): item
+        for item in pass1_environment
+    }
+
+    for context in contexts:
+        region = str(context["region"])
+        italic = bool(context["italic"])
+        style_label = str(context["style_label"])
+        entry = fe_entries[region]
+        ui_environment = environment_map[("Ui", region, italic)]
+        context["pass1_instructed"] = Path(ui_environment["output"])
+        if not context["emit_output"]:
+            continue
         log_step(f"static {style_label}: compose hinted pass2")
-        build_sarasa_pass2(pass1_instructed, hani_instructed, hang_instructed, hinted_tmp, italic, tmp_dir)
+        build_sarasa_pass2(
+            context["pass1_instructed"],
+            entry["hani_out"],
+            entry["hang_out"],
+            context["hinted_tmp"],
+            italic,
+            tmp_dir,
+        )
         log_step(f"static {style_label}: postprocess hinted")
-        hinted_postprocess = postprocess_static_font(hinted_tmp, region, weight_name, weight_value, italic, True)
-        shutil.copy2(hinted_tmp, hinted_path)
+        hinted_postprocess = postprocess_static_font(
+            context["hinted_tmp"],
+            region,
+            weight_name,
+            int(context["weight_value"]),
+            italic,
+            True,
+        )
+        shutil.copy2(context["hinted_tmp"], context["hinted_path"])
+        pass1_report = {
+            **pass1_hint_reports[Path(ui_environment["hint"]).resolve()],
+            **instruct_reports[context["pass1_instructed"].resolve()],
+            "chlorophytum_full_pass1_cache_key": pass1_cache_key,
+            "chlorophytum_full_fe_cache_key": fe_cache_key,
+            "chlorophytum_full_group_input_cache_key": input_cache_key,
+            "chlorophytum_full_pass1_group_size": len(pass1_jobs),
+            "chlorophytum_full_fe_group_size": len(fe_jobs),
+        }
+        fe_report = {
+            "hani": {
+                **fe_hint_reports[entry["hani_hint"].resolve()],
+                **instruct_reports[entry["hani_out"].resolve()],
+            },
+            "hang": {
+                **fe_hint_reports[entry["hang_hint"].resolve()],
+                **instruct_reports[entry["hang_out"].resolve()],
+            },
+        }
+        fragments = context["fragments"]
         outputs.append(
             {
-                "file": str(hinted_path.relative_to(ROOT)),
+                "file": str(context["hinted_path"].relative_to(ROOT)),
                 "region": region,
                 "weight": weight_name,
-                "wght": weight_value,
+                "wght": int(context["weight_value"]),
                 "italic": italic,
                 "hinted_variant": True,
                 "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
                 **{k: v for k, v in fragments.items() if isinstance(v, str)},
-                **pass1_derivative_report,
-                **hint_report,
+                **context["pass1_derivative_report"],
+                **context["hint_report"],
                 "hinted": True,
                 "hint_tool": "ttfautohint-plus-chlorophytum",
                 "chlorophytum_hinted": True,
-                "pass1_chlorophytum": pass1_chlorophytum,
-                "fe_chlorophytum": fe_chlorophytum_report,
+                "pass1_chlorophytum": pass1_report,
+                "fe_chlorophytum": fe_report,
                 **hinted_postprocess,
             }
         )
@@ -6015,23 +6820,51 @@ def build_static_fonts(regions: list[str], resume: bool = False) -> list[dict[st
 
     outputs: list[dict[str, Any]] = []
     hint_jobs = SARASA_HINT_JOBS
-    log_step(f"static: Chlorophytum jobs={hint_jobs}")
+    log_step(
+        f"static: Chlorophytum jobs={hint_jobs}, "
+        f"hint environment prep jobs={SARASA_HINT_PREP_JOBS}"
+    )
     weight_order = {str(stop["name"]): index for index, stop in enumerate(SOURCE_HAN_WEIGHT_STOPS)}
     region_order = {region: index for index, region in enumerate(regions)}
-    with tempfile.TemporaryDirectory() as tmp_dir_raw:
-        tmp_dir = Path(tmp_dir_raw)
-        for region in regions:
-            region_tmp = tmp_dir / "weights" / region
-            stops_to_build: list[dict[str, Any]] = []
-            for stop in SOURCE_HAN_WEIGHT_STOPS:
-                weight_name = str(stop["name"])
+    with tempfile.TemporaryDirectory(prefix="sarasa-static-") as tmp_dir_raw:
+        fallback_tmp_dir = Path(tmp_dir_raw)
+        for stop in SOURCE_HAN_WEIGHT_STOPS:
+            weight_name = str(stop["name"])
+            regions_to_build: list[str] = []
+            for region in regions:
                 if resume and static_weight_complete(region, weight_name):
                     log_step(f"static {region} {weight_name}: skip existing complete weight")
                     outputs.extend(skipped_static_weight_outputs(region, stop))
                 else:
-                    stops_to_build.append(stop)
-            for stop in stops_to_build:
-                outputs.extend(build_static_weight(region, stop, region_tmp / str(stop["name"]), hint_jobs))
+                    regions_to_build.append(region)
+            if regions_to_build:
+                if os.environ.get("SARASA_DISABLE_BUILD_CACHE") == "1":
+                    weight_tmp_dir = fallback_tmp_dir / "weights" / weight_name
+                else:
+                    work_key, weight_tmp_dir = static_hint_work_dir(weight_name)
+                    weight_tmp_dir.mkdir(parents=True, exist_ok=True)
+                    (weight_tmp_dir / "manifest.json").write_text(
+                        json.dumps(
+                            {
+                                "key": work_key,
+                                "weight": weight_name,
+                                "version": STATIC_HINT_WORK_VERSION,
+                                "created_by": "tools/build_sarasa_ui_propdigits_sc.py",
+                            },
+                            ensure_ascii=False,
+                            indent=2,
+                        ),
+                        encoding="utf-8",
+                    )
+                outputs.extend(
+                    build_static_weight_group(
+                        regions_to_build,
+                        stop,
+                        weight_tmp_dir,
+                        hint_jobs,
+                        resume=resume,
+                    )
+                )
     outputs.sort(
         key=lambda item: (
             region_order.get(str(item.get("region")), 999),
@@ -6110,6 +6943,64 @@ def shape_glyph_names(path: Path, text: str, script: str | None = None, language
         font.close()
 
 
+def shape_position_signature(
+    font_data: bytes,
+    glyph_order: list[str],
+    text: str,
+    features: dict[str, bool],
+    direction: str,
+    variations: dict[str, float] | None = None,
+) -> list[dict[str, int | str]] | None:
+    try:
+        import uharfbuzz as hb
+    except ImportError:
+        return None
+    face = hb.Face(font_data)
+    hb_font = hb.Font(face)
+    hb_font.scale = (face.upem, face.upem)
+    if variations:
+        hb_font.set_variations(variations)
+    buffer = hb.Buffer()
+    buffer.add_str(text)
+    buffer.guess_segment_properties()
+    buffer.script = "Hani"
+    buffer.language = "ZHS"
+    buffer.direction = direction
+    hb.shape(hb_font, buffer, features)
+    return [
+        {
+            "glyph": glyph_order[info.codepoint],
+            "cluster": info.cluster,
+            "x_advance": position.x_advance,
+            "y_advance": position.y_advance,
+            "x_offset": position.x_offset,
+            "y_offset": position.y_offset,
+        }
+        for info, position in zip(buffer.glyph_infos, buffer.glyph_positions)
+    ]
+
+
+def contextual_spacing_shape_samples(path: Path, font: TTFont) -> dict[str, Any]:
+    font_data = path.read_bytes()
+    glyph_order = font.getGlyphOrder()
+    text = "（（天地））"
+    return {
+        "text": text,
+        "horizontal_off": shape_position_signature(
+            font_data, glyph_order, text, {"chws": False}, "ltr"
+        ),
+        "horizontal_chws": shape_position_signature(
+            font_data, glyph_order, text, {"chws": True}, "ltr"
+        ),
+        "vertical_off": shape_position_signature(
+            font_data, glyph_order, text, {"vchw": False, "vert": True}, "ttb"
+        ),
+        "vertical_vchw": shape_position_signature(
+            font_data, glyph_order, text, {"vchw": True, "vert": True}, "ttb"
+        ),
+    }
+
+
 def lsb_mismatch_count(font: TTFont) -> int | None:
     if "hmtx" not in font or "glyf" not in font:
         return None
@@ -6166,6 +7057,9 @@ def inspect_font(path: Path) -> dict[str, Any]:
             "has_tnum": has_feature(font, "tnum"),
             "has_pnum": has_feature(font, "pnum"),
             "has_digit_colon_calt": has_feature(font, "calt"),
+            "has_chws": layout_has_feature(font, "GPOS", "chws"),
+            "has_vchw": layout_has_feature(font, "GPOS", "vchw"),
+            "contextual_spacing_shapes": contextual_spacing_shape_samples(path, font),
             "has_hints": any(tag in font for tag in ("fpgm", "prep", "cvt ")),
             "glyf_overlap_simple_flags": count_simple_glyph_overlap_flags(font),
             "shape_1_colon_2": {
@@ -6201,7 +7095,7 @@ def static_readme_text(region: str, hinted: bool) -> str:
     family = static_family(region)
     family_local = static_family_local(region)
     shs_prefix = source_han_static_prefix(region)
-    title = f"{family} TTF {SARASA_VERSION}" if hinted else f"{family} TTF Unhinted {SARASA_VERSION}"
+    title = f"{family} TTF {VERSION}" if hinted else f"{family} TTF Unhinted {VERSION}"
     cl_note = (
         f"CL 地区的传统旧字形覆盖跟随 Shanggu Sans {SHANGGU_TAG} 官方 TTF：\n"
         "汉字底稿先取 SourceHanSansK，再用 ShangguSansTC 静态 TTF 覆盖。\n"
@@ -6212,11 +7106,12 @@ def static_readme_text(region: str, hinted: bool) -> str:
         else f"{region} 地区沿用 Sarasa 上游路径：CJK 底稿来自 {shs_prefix}。"
     )
     hint_note = (
-        "hinted 套件会对本项目实际生成的静态片段重新 hint：pass1 先经过\n"
-        "ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 Chlorophytum\n"
-        "hcfg 流程写入 TrueType instructions，最后由 pass2 合成最终 TTF。\n"
-        "Normal、Medium、Heavy 这类项目扩展字重也按当前轮廓重新生成 hint，\n"
-        "不会冒充官方 Sarasa 已发布静态字重。静态 PropDigits 会把 ':' remap\n"
+        "hinted 套件会对本项目实际生成的静态片段重新 hint。每个字重都固定\n"
+        "建立 Sarasa 上游顺序的完整环境：96 个 pass1 加 6 个 kanji 和 6 个\n"
+        "hangul，最后把全部 108 个输入交给一次统一 instruct。Normal、Medium、\n"
+        "Heavy 的 Ui 与 FE 使用实际 350、500、900 轮廓；辅助拉丁环境和 hcfg\n"
+        "采用 Regular、SemiBold、Bold 边界，不复制相邻成品的 glyph instructions。\n"
+        "静态 PropDigits 会把 ':' remap\n"
         "到已有的 pnum glyph，移除旧的冒号上下文替换，再追加与 Inter 一致的\n"
         "colon-run calt 规则。"
         if hinted
@@ -6253,15 +7148,23 @@ OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字�
 1:2 会上浮 ':'，1:a 和 a:2 不会上浮，1::2 等连续冒号上下文遵循
 Inter 的 colon-run 规则。
 
+最终成品还会按 Noto CJK 的官方交付流程加入 GPOS chws/vchw：chws
+用于横排连续全角标点的上下文压缩，vchw 用于对应的竖排压缩。实现固定使用
+chws_tool 1.4.5 与 east-asian-spacing 1.4.5；Source Han Sans 2.005R
+底稿本身不含这两个 FeatureRecord，因此它们在所有轮廓、hint、metrics 和
+Sarasa layout 模板处理完成后统一追加。
+
 name 表包含地区本地化显示名，例如：
 {family_local} ExtraLight.
 OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
-???? 占位值。head.fontRevision 使用 OpenType fixed 数值 1.0400，
-对应本仓库版本 1.0.40；nameID 5 写作 Version 1.0.40。
+???? 占位值。head.fontRevision 使用 OpenType fixed 数值 1.0402，
+对应本仓库版本 1.0.40.2；nameID 5 以 OpenType 数值 Version 1.0402
+开头，并在后续 project 字段保留完整版本 1.0.40.2。
 {hint_note}
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
-覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui {region} 静态字体套模板。
+覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui {region} 静态字体套模板；
+随后追加 Noto CJK chws/vchw 的 FeatureRecord 和 contextual positioning lookup。
 静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap，并同步非数字 metrics。
 `palt` 下假名等已有 glyph 的定位值也按对应参考字体同步；连续长破折号（em dash）
 在 calt/vert/vrt2 相关路径下按对应上游静态 Sarasa Ui 的替换行为校验。
@@ -6297,8 +7200,8 @@ def write_reports(build_report: dict[str, Any]) -> None:
 
     font_paths = (
         sorted(VARIABLE_DIR.glob("*.ttf"))
-        + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-{SARASA_VERSION}/*.ttf"))
-        + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-Unhinted-{SARASA_VERSION}/*.ttf"))
+        + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-{VERSION}/*.ttf"))
+        + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-Unhinted-{VERSION}/*.ttf"))
     )
     inspection = {
         "title": "Sarasa Ui VF PropDigits / Sarasa Ui PropDigits 多地区字体检查",
@@ -6369,6 +7272,15 @@ def build_all(
             "source_han_sans": SOURCE_HAN_TAG,
             "inter": INTER_TAG,
             "node": NODE_VERSION,
+            "fonttools": importlib.metadata.version("fonttools"),
+            "uharfbuzz": importlib.metadata.version("uharfbuzz"),
+            "ttfautohint_py": importlib.metadata.version("ttfautohint-py"),
+            "py7zr": importlib.metadata.version("py7zr"),
+            "afdko": importlib.metadata.version("afdko"),
+            "chws_tool": importlib.metadata.version("chws-tool"),
+            "east_asian_spacing": importlib.metadata.version("east-asian-spacing"),
+            "chlorophytum_jobs": SARASA_HINT_JOBS,
+            "hint_environment_prep_jobs": SARASA_HINT_PREP_JOBS,
         },
         "source_base_by_region": {
             region: str(source_han_vf_path(region)) for region in variable_regions(regions)
@@ -6412,11 +7324,13 @@ def build_all(
             "经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字"
             "和冒号 cmap remap、命名、metadata、layout 模板、GDEF/VORG、与上游兼容的 glyf "
             "flags/bbox/组件名、静态 post format 2 glyph names、OTS-compatible glyf repeat "
-            "编码、palt 取值同步、连续长破折号可达性修正和静态 STAT 规则。head.fontRevision "
-            "写为 OpenType fixed 数值 1.0400，对应本仓库版本 1.0.40。"
-            "hinted 静态套件会对本项目实际生成的片段重新 hint："
-            "pass1 先经过 ttfautohint，随后 pass1/kanji/hangul 片段用 Sarasa 上游 "
-            "Chlorophytum hcfg 写入 TrueType instructions，最后由 pass2 合成最终 TTF。"
+            "编码、palt 取值同步、连续长破折号可达性修正和静态 STAT 规则。"
+            "全部轮廓、hint、metrics、GSUB 和基础 GPOS 模板处理完成后，再按 Noto CJK "
+            "交付流程追加 chws/vchw contextual positioning。head.fontRevision "
+            "写为 OpenType fixed 数值 1.0402，对应本仓库版本 1.0.40.2。"
+            "hinted 静态套件会对本项目实际生成的片段重新 hint：每个字重固定建立 "
+            "Sarasa 上游顺序的 96 个 pass1 与 12 个 FE 输入，全部高层 hint 最后由一次 "
+            "统一 instruct 写入 TrueType instructions，再由 pass2 合成最终 TTF。"
             "unhinted 静态套件提供无 TrueType instructions 的正式静态输出。"
             "Normal、Medium、Heavy 分别使用上游 Regular、SemiBold、Bold 作为对齐参考，"
             "因为上游 Sarasa 没有发布对应的静态输出样式。"
@@ -6428,6 +7342,7 @@ def build_all(
             "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
             "公开字重遵循 Sarasa/CSS 口径：200、300、350、400、500、700、900；CJK 内部仍使用 Source Han ExtraLight 250 作为 public 200 的来源。",
             "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
+            "VF 与静态 TTF 都追加来自 Noto CJK 交付流程的 GPOS chws/vchw；Source Han Sans 2.005R 与 Sarasa 1.0.40 参考成品本身不含这两个 FeatureRecord。",
             "静态 CL 使用 Shanggu Sans 官方发布物作为旧字形轮廓来源，但公开 cmap、GSUB/GPOS feature 和非数字 metrics 仍按 SarasaUiCL reference 边界裁剪与同步。",
             "静态 TTF 使用 post format 2，以便 PropDigits cmap remap 后仍保留审计稳定的 glyph names；VF 保持既有 post/GID 模型。",
         ],
@@ -6445,7 +7360,7 @@ def main() -> None:
     parser.add_argument(
         "--regions",
         default=",".join(REGION_ORDER),
-        help="逗号分隔的地区列表，默认 CL,SC,TC,HC,J,K。",
+        help="逗号分隔的输出地区列表，默认 CL,SC,TC,HC,J,K；hinted 分析环境仍固定包含六地区。",
     )
     parser.add_argument(
         "--resume-static",
