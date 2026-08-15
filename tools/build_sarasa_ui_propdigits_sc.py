@@ -735,6 +735,7 @@ def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
     full = family + (" Italic" if italic else "")
     full_local = family_local + (" Italic" if italic else "")
     ps = ps_family + ("-Italic" if italic else "")
+    variations_ps_prefix = "".join(character for character in ps if character.isascii() and character.isalnum())
     source_label = source_han_vf_basename(region) or source_han_static_prefix(region)
     if classical_vf_override_basename(region):
         source_label += " + ShangguSansTC-VF"
@@ -748,7 +749,7 @@ def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
         6: ps,
         16: family,
         17: subfamily,
-        25: ps,
+        25: variations_ps_prefix,
     }
     for name_id, value in replacements.items():
         set_name_record(font, name_id, value)
@@ -2807,7 +2808,45 @@ def normalize_hangul_widths(font: TTFont) -> int:
     return len(touched)
 
 
-def shear_font(font: TTFont, angle_degrees: float) -> None:
+def materialize_gvar_deltas(font: TTFont) -> dict[str, int]:
+    if "gvar" not in font or "glyf" not in font or "hmtx" not in font:
+        return {
+            "italic_gvar_tuples_materialized": 0,
+            "italic_gvar_implied_deltas_materialized": 0,
+        }
+
+    glyf = font["glyf"]
+    h_metrics = font["hmtx"].metrics
+    v_metrics = font["vmtx"].metrics if "vmtx" in font else None
+    tuples_materialized = 0
+    implied_deltas_materialized = 0
+    for glyph_name, variations in font["gvar"].variations.items():
+        result = glyf._getCoordinatesAndControls(glyph_name, h_metrics, v_metrics)
+        if result is None:
+            continue
+        coordinates, controls = result
+        end_points = (
+            controls.endPts
+            if controls.numberOfContours >= 1
+            else list(range(len(controls.endPts)))
+        )
+        for variation in variations:
+            implied_count = sum(delta is None for delta in variation.coordinates)
+            if not implied_count:
+                continue
+            variation.calcInferredDeltas(coordinates, end_points)
+            variation.roundDeltas()
+            tuples_materialized += 1
+            implied_deltas_materialized += implied_count
+
+    return {
+        "italic_gvar_tuples_materialized": tuples_materialized,
+        "italic_gvar_implied_deltas_materialized": implied_deltas_materialized,
+    }
+
+
+def shear_font(font: TTFont, angle_degrees: float) -> dict[str, int]:
+    report = materialize_gvar_deltas(font)
     shear = math.tan(math.radians(angle_degrees))
     glyf = font["glyf"]
     for glyph_name in font.getGlyphOrder():
@@ -2823,11 +2862,15 @@ def shear_font(font: TTFont, angle_degrees: float) -> None:
     if "gvar" in font:
         for variations in font["gvar"].variations.values():
             for variation in variations:
-                for index, xy in enumerate(variation.coordinates):
+                # The final four gvar coordinates are horizontal and vertical
+                # metric phantom points, not outline points. Shearing them would
+                # couple vertical metric deltas into horizontal metrics.
+                for index, xy in enumerate(variation.coordinates[:-4]):
                     if xy is None:
                         continue
                     x, y = xy
                     variation.coordinates[index] = otRound(x + y * shear), y
+    return report
 
 
 def piecewise_map(value: float, segment: dict[float, float]) -> float:
@@ -2911,7 +2954,7 @@ def load_base(region: str, italic: bool, inter_unicodes: set[int]) -> tuple[TTFo
     sarasa_report.update(public_axis_report)
     sarasa_report["hangul_widths_normalized"] = normalize_hangul_widths(base)
     if italic:
-        shear_font(base, 9.4)
+        sarasa_report.update(shear_font(base, 9.4))
     return base, sarasa_report
 
 
@@ -3209,6 +3252,71 @@ def strip_ot_variation_devices(obj: Any, seen: set[int] | None = None) -> None:
                 strip_ot_variation_devices(value, seen)
 
 
+def import_name_id(
+    target_font: TTFont,
+    source_font: TTFont,
+    source_name_id: int,
+    remap: dict[int, int],
+) -> tuple[int, int]:
+    if source_name_id in remap:
+        return remap[source_name_id], 0
+
+    source_records = [record for record in source_font["name"].names if record.nameID == source_name_id]
+    if not source_records:
+        return source_name_id, 0
+
+    target_name = target_font["name"]
+    target_records = [record for record in target_name.names if record.nameID == source_name_id]
+    source_signature = {
+        (record.platformID, record.platEncID, record.langID, record.toUnicode()) for record in source_records
+    }
+    target_signature = {
+        (record.platformID, record.platEncID, record.langID, record.toUnicode()) for record in target_records
+    }
+    if target_records and target_signature != source_signature:
+        used_ids = {record.nameID for record in target_name.names}
+        target_name_id = 256
+        while target_name_id in used_ids:
+            target_name_id += 1
+    else:
+        target_name_id = source_name_id
+
+    existing_keys = {
+        (record.nameID, record.platformID, record.platEncID, record.langID) for record in target_name.names
+    }
+    imported = 0
+    for source_record in source_records:
+        key = (target_name_id, source_record.platformID, source_record.platEncID, source_record.langID)
+        if key in existing_keys:
+            continue
+        record = copy.deepcopy(source_record)
+        record.nameID = target_name_id
+        target_name.names.append(record)
+        existing_keys.add(key)
+        imported += 1
+    remap[source_name_id] = target_name_id
+    return target_name_id, imported
+
+
+def import_layout_feature_names(
+    target_font: TTFont,
+    source_font: TTFont,
+    feature: Any,
+    remap: dict[int, int],
+) -> int:
+    params = getattr(feature, "FeatureParams", None)
+    if params is None:
+        return 0
+    imported = 0
+    for field, value in vars(params).items():
+        if not field.endswith("NameID") or not isinstance(value, int) or value < 256:
+            continue
+        target_name_id, count = import_name_id(target_font, source_font, value, remap)
+        setattr(params, field, target_name_id)
+        imported += count
+    return imported
+
+
 def append_layout_features(
     base: TTFont,
     inter: TTFont,
@@ -3216,11 +3324,20 @@ def append_layout_features(
     feature_tags: set[str],
 ) -> dict[str, int]:
     if table_tag not in inter:
-        return {f"inter_{table_tag.lower()}_features_imported": 0, f"inter_{table_tag.lower()}_lookups_imported": 0}
+        return {
+            f"inter_{table_tag.lower()}_features_imported": 0,
+            f"inter_{table_tag.lower()}_lookups_imported": 0,
+            f"inter_{table_tag.lower()}_feature_names_imported": 0,
+        }
     if table_tag not in base:
         base[table_tag] = copy.deepcopy(inter[table_tag])
         rename = {name: prefixed(name) for name in inter.getGlyphOrder() if name != ".notdef"}
         rename_ot_glyph_references(base[table_tag].table, rename)
+        name_id_remap: dict[int, int] = {}
+        names_imported = 0
+        if base[table_tag].table.FeatureList:
+            for record in base[table_tag].table.FeatureList.FeatureRecord:
+                names_imported += import_layout_feature_names(base, inter, record.Feature, name_id_remap)
         return {
             f"inter_{table_tag.lower()}_features_imported": len(base[table_tag].table.FeatureList.FeatureRecord)
             if base[table_tag].table.FeatureList
@@ -3228,12 +3345,17 @@ def append_layout_features(
             f"inter_{table_tag.lower()}_lookups_imported": len(base[table_tag].table.LookupList.Lookup)
             if base[table_tag].table.LookupList
             else 0,
+            f"inter_{table_tag.lower()}_feature_names_imported": names_imported,
         }
 
     source = inter[table_tag].table
     target = base[table_tag].table
     if not source.FeatureList or not source.LookupList:
-        return {f"inter_{table_tag.lower()}_features_imported": 0, f"inter_{table_tag.lower()}_lookups_imported": 0}
+        return {
+            f"inter_{table_tag.lower()}_features_imported": 0,
+            f"inter_{table_tag.lower()}_lookups_imported": 0,
+            f"inter_{table_tag.lower()}_feature_names_imported": 0,
+        }
     if target.LookupList is None:
         target.LookupList = ot.LookupList()
         target.LookupList.Lookup = []
@@ -3258,8 +3380,11 @@ def append_layout_features(
     target.LookupList.LookupCount = len(target.LookupList.Lookup)
 
     imported_tags: set[str] = set()
+    name_id_remap: dict[int, int] = {}
+    names_imported = 0
     for source_record in feature_records:
         record = copy.deepcopy(source_record)
+        names_imported += import_layout_feature_names(base, inter, record.Feature, name_id_remap)
         record.Feature.LookupListIndex = [lookup_index_map[index] for index in source_record.Feature.LookupListIndex if index in lookup_index_map]
         record.Feature.LookupCount = len(record.Feature.LookupListIndex)
         if not record.Feature.LookupListIndex:
@@ -3271,6 +3396,7 @@ def append_layout_features(
     return {
         f"inter_{table_tag.lower()}_features_imported": len(imported_tags),
         f"inter_{table_tag.lower()}_lookups_imported": len(lookup_index_map),
+        f"inter_{table_tag.lower()}_feature_names_imported": names_imported,
     }
 
 
@@ -7193,7 +7319,11 @@ def write_static_readme(regions: list[str]) -> None:
 def write_reports(build_report: dict[str, Any]) -> None:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     build_text = json.dumps(build_report, ensure_ascii=False, indent=2)
-    (REPORT_DIR / "Sarasa-Ui-PropDigits-report.json").write_text(build_text, encoding="utf-8")
+    (REPORT_DIR / "Sarasa-Ui-PropDigits-report.json").write_text(
+        build_text + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     legacy_report = REPORT_DIR / "Sarasa-Ui-VF-PropDigits-SC-report.json"
     if legacy_report.exists():
         legacy_report.unlink()
@@ -7208,7 +7338,11 @@ def write_reports(build_report: dict[str, Any]) -> None:
         "note": "由 tools/build_sarasa_ui_propdigits_sc.py 使用 fontTools 生成。",
         "fonts": [inspect_font(path) for path in font_paths],
     }
-    (REPORT_DIR / "font-inspection.json").write_text(json.dumps(inspection, ensure_ascii=False, indent=2), encoding="utf-8")
+    (REPORT_DIR / "font-inspection.json").write_text(
+        json.dumps(inspection, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
 
 
 def existing_variable_outputs() -> list[dict[str, Any]]:
@@ -7313,6 +7447,10 @@ def build_all(
             "保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 "
             "Sarasa Ui 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、"
             "连续长破折号（em dash），以及与 Inter 一致的数字冒号 colon-run calt 规则。合并后会"
+            "同步或重映射 Inter layout FeatureParams 引用的 UI name record；VF nameID 25 使用"
+            "只含 ASCII 字母数字的 Variations PostScript Name Prefix。CJK Italic VF 在剪切前"
+            "先于正体坐标空间展开全部 gvar IUP 隐含增量，再剪切基础轮廓和真实轮廓 delta，"
+            "四个 metric phantom points 不参与剪切。"
             "对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB "
             "FeatureRecord 顺序、空 cv/ss FeatureRecord、Script/LangSys 覆盖顺序、GPOS "
             "FeatureRecord lookup index 和 LookupList 结构、非数字 advance "

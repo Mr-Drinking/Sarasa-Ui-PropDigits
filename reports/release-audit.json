@@ -1,6 +1,6 @@
 {
   "title": "Sarasa Ui PropDigits 多地区发布前审计",
-  "generated_at": "2026-08-14 22:56:50 +0800",
+  "generated_at": "2026-08-15 23:03:57 +0800",
   "toolchain": {
     "freetype_py": "2.5.1",
     "freetype": [
@@ -20,6 +20,7 @@
     "static_palt_shaping_failures": 0,
     "static_em_dash_shaping_failures": 0,
     "vf_metric_failures": 0,
+    "vf_cjk_stroke_failures": 0,
     "vf_contextual_spacing_failures": 0,
     "static_fonts_checked": 168,
     "variable_fonts_checked": 12,
@@ -31,6 +32,9 @@
     "static_palt_shaping_cases": 80,
     "static_em_dash_shaping_cases": 168,
     "vf_metric_cases": 24,
+    "vf_cjk_stroke_cases": 6,
+    "vf_cjk_stroke_codepoints": 184302,
+    "vf_cjk_stroke_weighted_instances": 1290114,
     "vf_contextual_spacing_cases": 60
   },
   "metadata_failures": [],
@@ -41,6 +45,7 @@
   "static_palt_shaping_nonzero": [],
   "static_em_dash_shaping_nonzero": [],
   "vf_metrics_nonzero": [],
+  "vf_cjk_strokes_nonzero": [],
   "vf_contextual_spacing_nonzero": [],
   "static_exact": [
     {
@@ -12356,6 +12361,254 @@
       "samples": {}
     }
   ],
+  "vf_cjk_strokes": [
+    {
+      "region": "CL",
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL[wght].ttf + fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+      "area_tolerance": {
+        "relative": 0.02,
+        "absolute_square_font_units": 2000.0
+      },
+      "outline_tolerance_font_units": 2.0,
+      "counts": {
+        "cjk_cmap_mismatch": 0,
+        "cjk_gvar_missing": 0,
+        "cjk_area_measurement_error": 0,
+        "italic_cjk_area_mismatch": 0,
+        "italic_cjk_outline_mismatch": 0,
+        "cjk_weight_nonmonotonic": 0,
+        "cjk_weight_span_too_small": 0
+      },
+      "samples": {},
+      "checked_codepoints": 30717,
+      "diagnostic_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_outline_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_maximum_relative_area_delta": 0.03225806,
+      "diagnostic_maximum_absolute_area_delta": 3075.898,
+      "diagnostic_maximum_outline_residual": 1.692365
+    },
+    {
+      "region": "SC",
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf + fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "area_tolerance": {
+        "relative": 0.02,
+        "absolute_square_font_units": 2000.0
+      },
+      "outline_tolerance_font_units": 2.0,
+      "counts": {
+        "cjk_cmap_mismatch": 0,
+        "cjk_gvar_missing": 0,
+        "cjk_area_measurement_error": 0,
+        "italic_cjk_area_mismatch": 0,
+        "italic_cjk_outline_mismatch": 0,
+        "cjk_weight_nonmonotonic": 0,
+        "cjk_weight_span_too_small": 0
+      },
+      "samples": {},
+      "checked_codepoints": 30717,
+      "diagnostic_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_outline_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_maximum_relative_area_delta": 0.03225806,
+      "diagnostic_maximum_absolute_area_delta": 3075.898,
+      "diagnostic_maximum_outline_residual": 1.657079
+    },
+    {
+      "region": "TC",
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC[wght].ttf + fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+      "area_tolerance": {
+        "relative": 0.02,
+        "absolute_square_font_units": 2000.0
+      },
+      "outline_tolerance_font_units": 2.0,
+      "counts": {
+        "cjk_cmap_mismatch": 0,
+        "cjk_gvar_missing": 0,
+        "cjk_area_measurement_error": 0,
+        "italic_cjk_area_mismatch": 0,
+        "italic_cjk_outline_mismatch": 0,
+        "cjk_weight_nonmonotonic": 0,
+        "cjk_weight_span_too_small": 0
+      },
+      "samples": {},
+      "checked_codepoints": 30717,
+      "diagnostic_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_outline_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_maximum_relative_area_delta": 0.03225806,
+      "diagnostic_maximum_absolute_area_delta": 3075.898,
+      "diagnostic_maximum_outline_residual": 1.657079
+    },
+    {
+      "region": "HC",
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC[wght].ttf + fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+      "area_tolerance": {
+        "relative": 0.02,
+        "absolute_square_font_units": 2000.0
+      },
+      "outline_tolerance_font_units": 2.0,
+      "counts": {
+        "cjk_cmap_mismatch": 0,
+        "cjk_gvar_missing": 0,
+        "cjk_area_measurement_error": 0,
+        "italic_cjk_area_mismatch": 0,
+        "italic_cjk_outline_mismatch": 0,
+        "cjk_weight_nonmonotonic": 0,
+        "cjk_weight_span_too_small": 0
+      },
+      "samples": {},
+      "checked_codepoints": 30717,
+      "diagnostic_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_outline_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_maximum_relative_area_delta": 0.03225806,
+      "diagnostic_maximum_absolute_area_delta": 3075.898,
+      "diagnostic_maximum_outline_residual": 1.657079
+    },
+    {
+      "region": "J",
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-J[wght].ttf + fonts\\variable\\Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+      "area_tolerance": {
+        "relative": 0.02,
+        "absolute_square_font_units": 2000.0
+      },
+      "outline_tolerance_font_units": 2.0,
+      "counts": {
+        "cjk_cmap_mismatch": 0,
+        "cjk_gvar_missing": 0,
+        "cjk_area_measurement_error": 0,
+        "italic_cjk_area_mismatch": 0,
+        "italic_cjk_outline_mismatch": 0,
+        "cjk_weight_nonmonotonic": 0,
+        "cjk_weight_span_too_small": 0
+      },
+      "samples": {},
+      "checked_codepoints": 30717,
+      "diagnostic_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_outline_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_maximum_relative_area_delta": 0.03225806,
+      "diagnostic_maximum_absolute_area_delta": 3075.898,
+      "diagnostic_maximum_outline_residual": 1.67417
+    },
+    {
+      "region": "K",
+      "target": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-K[wght].ttf + fonts\\variable\\Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+      "area_tolerance": {
+        "relative": 0.02,
+        "absolute_square_font_units": 2000.0
+      },
+      "outline_tolerance_font_units": 2.0,
+      "counts": {
+        "cjk_cmap_mismatch": 0,
+        "cjk_gvar_missing": 0,
+        "cjk_area_measurement_error": 0,
+        "italic_cjk_area_mismatch": 0,
+        "italic_cjk_outline_mismatch": 0,
+        "cjk_weight_nonmonotonic": 0,
+        "cjk_weight_span_too_small": 0
+      },
+      "samples": {},
+      "checked_codepoints": 30717,
+      "diagnostic_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_outline_mismatch_by_weight": {
+        "ExtraLight": 0,
+        "Light": 0,
+        "Normal": 0,
+        "Regular": 0,
+        "Medium": 0,
+        "Bold": 0,
+        "Heavy": 0
+      },
+      "diagnostic_maximum_relative_area_delta": 0.03225806,
+      "diagnostic_maximum_absolute_area_delta": 3075.898,
+      "diagnostic_maximum_outline_residual": 1.67417
+    }
+  ],
   "vf_contextual_spacing": [
     {
       "region": "CL",
@@ -14365,6 +14618,8 @@
         "has_fvar": true,
         "has_gvar": true,
         "has_stat": true,
+        "invalid_name_id_25": [],
+        "missing_referenced_name_ids": [],
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,
@@ -14620,6 +14875,8 @@
         "has_fvar": true,
         "has_gvar": true,
         "has_stat": true,
+        "invalid_name_id_25": [],
+        "missing_referenced_name_ids": [],
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,
@@ -14875,6 +15132,8 @@
         "has_fvar": true,
         "has_gvar": true,
         "has_stat": true,
+        "invalid_name_id_25": [],
+        "missing_referenced_name_ids": [],
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,
@@ -15130,6 +15389,8 @@
         "has_fvar": true,
         "has_gvar": true,
         "has_stat": true,
+        "invalid_name_id_25": [],
+        "missing_referenced_name_ids": [],
         "uppercase_UI_names": [],
         "colon": {
           "ok": true,
@@ -15359,5 +15620,80 @@
         }
       }
     ]
+  },
+  "external_validation": {
+    "ots": {
+      "tool": "ots-sanitize 9.2.0",
+      "fonts_checked": 180,
+      "failures": 0,
+      "baseline_warning_fonts": 84,
+      "baseline_warning_scope": "84 个 unhinted 静态 TTF；maxZones/gasp 信息与官方 unhinted Sarasa Ui 基线一致"
+    },
+    "fontbakery": {
+      "version": "1.1.0",
+      "font_version": {
+        "variable": {
+          "(not finished)": 0,
+          "PASS": 12
+        },
+        "static": {
+          "(not finished)": 0,
+          "PASS": 168
+        },
+        "pass_total": 180
+      },
+      "vf_name_characters_and_ttx_roundtrip": {
+        "(not finished)": 0,
+        "PASS": 24
+      },
+      "sc_vf_full_universal_profile": {
+        "result": {
+          "(not finished)": 0,
+          "FAIL": 16,
+          "INFO": 6,
+          "PASS": 161,
+          "SKIP": 43,
+          "WARN": 16
+        },
+        "note": "两套 SC VF 的 FAIL/WARN 对称；本项目引入的 nameID 25 与悬空 cv14 name ID 已修复，并由 24 个定向检查全部 PASS 验证。其余项目为上游亦有的基线项或文档列出的边界。"
+      }
+    },
+    "italic_vf_outline_negative_control": {
+      "source": "替换前的 v1.0.40.2 CL VF",
+      "location": {
+        "wght": 200
+      },
+      "codepoints_checked": 30717,
+      "point_tolerance_font_units": 2.0,
+      "outline_mismatches": 7968,
+      "maximum_outline_residual": 53.916855,
+      "final_output_outline_mismatches": 0,
+      "final_output_maximum_outline_residual": 1.692365
+    },
+    "visual_review": {
+      "regions": [
+        "CL",
+        "SC",
+        "TC",
+        "HC",
+        "J",
+        "K"
+      ],
+      "weights": [
+        200,
+        300,
+        350,
+        400,
+        500,
+        700,
+        900
+      ],
+      "styles": [
+        "Upright VF",
+        "Italic VF"
+      ],
+      "result": "PASS",
+      "note": "逐地区并排检查最终文件；未见局部笔画突变，粗细曲线连续。SC 另与 unhinted 静态 Italic 七字重并排核对。"
+    }
   }
 }

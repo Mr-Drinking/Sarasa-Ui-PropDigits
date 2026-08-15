@@ -6,6 +6,7 @@ import hashlib
 import importlib.metadata
 import importlib.util
 import json
+import math
 import os
 import subprocess
 import sys
@@ -39,6 +40,9 @@ ensure_audit_deps()
 
 import freetype
 import uharfbuzz as hb
+from fontTools.pens.areaPen import AreaPen
+from fontTools.pens.recordingPen import DecomposingRecordingPen
+from fontTools.pens.teePen import TeePen
 from fontTools.ttLib import TTFont
 from fontTools.varLib.instancer import instantiateVariableFont
 
@@ -57,6 +61,16 @@ FONT_REVISION_TOLERANCE = 1 / 65536
 CONTEXTUAL_SPACING_FEATURES = {"chws", "vchw"}
 CONTEXTUAL_SPACING_VF_WEIGHTS = [200, 300, 400, 700, 900]
 DEFAULT_RASTER_PPEMS = (9, 12, 16, 20, 24)
+CJK_STROKE_WEIGHTS = [(str(stop["name"]), int(stop["value"])) for stop in b.SOURCE_HAN_WEIGHT_STOPS]
+CJK_SHEAR_AREA_RELATIVE_TOLERANCE = 0.02
+CJK_SHEAR_AREA_ABSOLUTE_TOLERANCE = 2000.0
+CJK_SHEAR_POINT_TOLERANCE = 2.0
+CJK_ITALIC_ANGLE_DEGREES = 9.4
+CJK_MONOTONIC_AREA_RELATIVE_TOLERANCE = 0.012
+CJK_MONOTONIC_AREA_ABSOLUTE_TOLERANCE = 750.0
+CJK_WEIGHT_SPAN_RELATIVE_MINIMUM = 0.05
+CJK_WEIGHT_SPAN_ABSOLUTE_MINIMUM = 1000.0
+ASCII_ALPHANUMERIC = frozenset("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
 
 
 def log(message: str) -> None:
@@ -1015,6 +1029,55 @@ def audit_static_layout_templates() -> list[dict[str, Any]]:
     return out
 
 
+def referenced_name_ids(font: TTFont) -> set[int]:
+    referenced: set[int] = set()
+    if "fvar" in font:
+        referenced.update(axis.axisNameID for axis in font["fvar"].axes)
+        for instance in font["fvar"].instances:
+            referenced.add(instance.subfamilyNameID)
+            if instance.postscriptNameID != 0xFFFF:
+                referenced.add(instance.postscriptNameID)
+    if "STAT" in font:
+        stat = font["STAT"].table
+        referenced.add(stat.ElidedFallbackNameID)
+        if stat.DesignAxisRecord:
+            referenced.update(axis.AxisNameID for axis in stat.DesignAxisRecord.Axis)
+        if stat.AxisValueArray:
+            referenced.update(value.ValueNameID for value in stat.AxisValueArray.AxisValue)
+    for table_tag in ("GSUB", "GPOS"):
+        if table_tag not in font:
+            continue
+        table = font[table_tag].table
+        if not table.FeatureList:
+            continue
+        for record in table.FeatureList.FeatureRecord:
+            params = getattr(record.Feature, "FeatureParams", None)
+            if params is None:
+                continue
+            for field, value in vars(params).items():
+                if field.endswith("NameID") and isinstance(value, int) and value > 0:
+                    referenced.add(value)
+    return referenced
+
+
+def invalid_variations_ps_prefixes(font: TTFont) -> list[str]:
+    records = [record for record in font["name"].names if record.nameID == 25]
+    if not records:
+        return ["<missing>"]
+    return sorted(
+        {
+            value
+            for record in records
+            if not (value := record.toUnicode()) or any(character not in ASCII_ALPHANUMERIC for character in value)
+        }
+    )
+
+
+def missing_referenced_name_ids(font: TTFont) -> list[int]:
+    present = {record.nameID for record in font["name"].names}
+    return sorted(referenced_name_ids(font) - present)
+
+
 def audit_metadata() -> dict[str, Any]:
     log("metadata/shaping audit start")
     failures = []
@@ -1101,6 +1164,8 @@ def audit_metadata() -> dict[str, Any]:
                 name_hits = [text for text in names(font) if "UI" in text][:5]
                 version_strings = [record.toUnicode() for record in font["name"].names if record.nameID == 5]
                 instance_weights = sorted({int(instance.coordinates.get("wght")) for instance in font["fvar"].instances}) if "fvar" in font else []
+                invalid_name_id_25 = invalid_variations_ps_prefixes(font)
+                missing_name_ids = missing_referenced_name_ids(font)
                 item = {
                     "file": str(path.relative_to(ROOT)),
                     "vendor": font["OS/2"].achVendID,
@@ -1111,6 +1176,8 @@ def audit_metadata() -> dict[str, Any]:
                     "has_fvar": "fvar" in font,
                     "has_gvar": "gvar" in font,
                     "has_stat": "STAT" in font,
+                    "invalid_name_id_25": invalid_name_id_25,
+                    "missing_referenced_name_ids": missing_name_ids,
                     "uppercase_UI_names": name_hits,
                     "colon": colon_status(path),
                     "contextual_spacing": contextual_spacing_status(path, {"wght": 400}),
@@ -1137,6 +1204,10 @@ def audit_metadata() -> dict[str, Any]:
                     failures.append({"kind": "vf_instances", "file": item["file"], "got": item["instances"]})
                 if not item["has_fvar"] or not item["has_gvar"] or not item["has_stat"]:
                     failures.append({"kind": "vf_tables", "file": item["file"], "item": item})
+                if invalid_name_id_25:
+                    failures.append({"kind": "vf_name_id_25", "file": item["file"], "values": invalid_name_id_25})
+                if missing_name_ids:
+                    failures.append({"kind": "vf_missing_referenced_name_ids", "file": item["file"], "name_ids": missing_name_ids})
                 if name_hits:
                     failures.append({"kind": "uppercase_UI_name", "file": item["file"], "samples": name_hits})
                 if not item["colon"]["ok"]:
@@ -1320,6 +1391,284 @@ def audit_vf_metrics() -> list[dict[str, Any]]:
     return out
 
 
+def glyph_area_and_recording(glyph_set: Any, glyph_name: str) -> tuple[float, list[Any]]:
+    area_pen = AreaPen(glyph_set)
+    recording_pen = DecomposingRecordingPen(glyph_set)
+    glyph_set[glyph_name].draw(TeePen(area_pen, recording_pen))
+    return abs(float(area_pen.value)), recording_pen.value
+
+
+def sheared_outline_residual(
+    upright_recording: list[Any],
+    italic_recording: list[Any],
+) -> tuple[str | None, float]:
+    if len(upright_recording) != len(italic_recording):
+        return "command_count", float("inf")
+
+    point_pairs: list[tuple[tuple[float, float], tuple[float, float]]] = []
+    for (upright_command, upright_points), (italic_command, italic_points) in zip(
+        upright_recording,
+        italic_recording,
+    ):
+        if upright_command != italic_command:
+            return "command", float("inf")
+        if len(upright_points) != len(italic_points):
+            return "point_count", float("inf")
+        for upright_point, italic_point in zip(upright_points, italic_points):
+            if (upright_point is None) != (italic_point is None):
+                return "implied_point", float("inf")
+            if upright_point is not None:
+                point_pairs.append((upright_point, italic_point))
+
+    if not point_pairs:
+        return None, 0.0
+
+    shear = math.tan(math.radians(CJK_ITALIC_ANGLE_DEGREES))
+    x_offsets = [
+        italic_point[0] - (upright_point[0] + upright_point[1] * shear)
+        for upright_point, italic_point in point_pairs
+    ]
+    y_offsets = [
+        italic_point[1] - upright_point[1]
+        for upright_point, italic_point in point_pairs
+    ]
+    # Metric synchronization may translate a complete glyph. The midpoint of
+    # each observed offset range minimizes the maximum residual; anchoring to
+    # one arbitrary point can double the apparent rounding error.
+    x_shift = (min(x_offsets) + max(x_offsets)) / 2
+    y_shift = (min(y_offsets) + max(y_offsets)) / 2
+    maximum = 0.0
+    for upright_point, italic_point in point_pairs:
+        expected_x = upright_point[0] + upright_point[1] * shear + x_shift
+        expected_y = upright_point[1] + y_shift
+        maximum = max(
+            maximum,
+            abs(expected_x - italic_point[0]),
+            abs(expected_y - italic_point[1]),
+        )
+    return None, maximum
+
+
+def exceeds_cjk_area_tolerance(first: float, second: float) -> bool:
+    delta = abs(first - second)
+    return delta > max(
+        CJK_SHEAR_AREA_ABSOLUTE_TOLERANCE,
+        max(first, second) * CJK_SHEAR_AREA_RELATIVE_TOLERANCE,
+    )
+
+
+def audit_vf_cjk_stroke_consistency() -> list[dict[str, Any]]:
+    out: list[dict[str, Any]] = []
+    regions = b.variable_regions(b.REGION_ORDER)
+    for region_index, region in enumerate(regions, start=1):
+        upright_path = vf_path(region, False)
+        italic_path = vf_path(region, True)
+        log(f"VF CJK stroke audit {region_index}/{len(regions)}: {region}")
+        item: dict[str, Any] = {
+            "region": region,
+            "target": f"{display_path(upright_path)} + {display_path(italic_path)}",
+            "area_tolerance": {
+                "relative": CJK_SHEAR_AREA_RELATIVE_TOLERANCE,
+                "absolute_square_font_units": CJK_SHEAR_AREA_ABSOLUTE_TOLERANCE,
+            },
+            "outline_tolerance_font_units": CJK_SHEAR_POINT_TOLERANCE,
+            "counts": {
+                "cjk_cmap_mismatch": 0,
+                "cjk_gvar_missing": 0,
+                "cjk_area_measurement_error": 0,
+                "italic_cjk_area_mismatch": 0,
+                "italic_cjk_outline_mismatch": 0,
+                "cjk_weight_nonmonotonic": 0,
+                "cjk_weight_span_too_small": 0,
+            },
+            "samples": {},
+        }
+        if not upright_path.exists() or not italic_path.exists():
+            item["missing"] = True
+            out.append(item)
+            continue
+
+        upright = TTFont(upright_path)
+        italic = TTFont(italic_path)
+        try:
+            upright_cmap = upright.getBestCmap() or {}
+            italic_cmap = italic.getBestCmap() or {}
+            upright_codepoints = {
+                codepoint
+                for codepoint, glyph_name in upright_cmap.items()
+                if b.is_ideograph(codepoint) and not glyph_name.startswith(b.INTER_PREFIX)
+            }
+            italic_codepoints = {
+                codepoint
+                for codepoint, glyph_name in italic_cmap.items()
+                if b.is_ideograph(codepoint) and not glyph_name.startswith(b.INTER_PREFIX)
+            }
+            cmap_mismatch = sorted(upright_codepoints ^ italic_codepoints)
+            item["counts"]["cjk_cmap_mismatch"] = len(cmap_mismatch)
+            if cmap_mismatch:
+                item["samples"]["cjk_cmap_mismatch"] = [
+                    f"U+{codepoint:04X}" for codepoint in cmap_mismatch[:20]
+                ]
+            codepoints = sorted(upright_codepoints & italic_codepoints)
+            item["checked_codepoints"] = len(codepoints)
+
+            missing_gvar: list[list[str]] = []
+            for codepoint in codepoints:
+                for style, font, cmap in (
+                    ("upright", upright, upright_cmap),
+                    ("italic", italic, italic_cmap),
+                ):
+                    glyph_name = cmap[codepoint]
+                    if glyph_name not in font["gvar"].variations or not font["gvar"].variations[glyph_name]:
+                        item["counts"]["cjk_gvar_missing"] += 1
+                        if len(missing_gvar) < 12:
+                            missing_gvar.append([f"U+{codepoint:04X}", style, glyph_name])
+            if missing_gvar:
+                item["samples"]["cjk_gvar_missing"] = missing_gvar
+
+            areas = {
+                "upright": {codepoint: [] for codepoint in codepoints},
+                "italic": {codepoint: [] for codepoint in codepoints},
+            }
+            mismatch_samples: list[dict[str, Any]] = []
+            outline_mismatch_samples: list[dict[str, Any]] = []
+            measurement_errors: list[list[str]] = []
+            maximum_relative_delta = 0.0
+            maximum_absolute_delta = 0.0
+            maximum_outline_residual = 0.0
+            mismatch_by_weight: dict[str, int] = {}
+            outline_mismatch_by_weight: dict[str, int] = {}
+            for weight_name, weight_value in CJK_STROKE_WEIGHTS:
+                upright_set = upright.getGlyphSet(location={"wght": weight_value})
+                italic_set = italic.getGlyphSet(location={"wght": weight_value})
+                weight_mismatches = 0
+                weight_outline_mismatches = 0
+                for codepoint in codepoints:
+                    try:
+                        upright_area, upright_recording = glyph_area_and_recording(
+                            upright_set,
+                            upright_cmap[codepoint],
+                        )
+                        italic_area, italic_recording = glyph_area_and_recording(
+                            italic_set,
+                            italic_cmap[codepoint],
+                        )
+                    except Exception as error:
+                        item["counts"]["cjk_area_measurement_error"] += 1
+                        if len(measurement_errors) < 12:
+                            measurement_errors.append(
+                                [f"U+{codepoint:04X}", weight_name, type(error).__name__, str(error)]
+                            )
+                        continue
+                    areas["upright"][codepoint].append(upright_area)
+                    areas["italic"][codepoint].append(italic_area)
+                    relative_delta = abs(upright_area - italic_area) / max(upright_area, italic_area, 1.0)
+                    absolute_delta = abs(upright_area - italic_area)
+                    maximum_relative_delta = max(maximum_relative_delta, relative_delta)
+                    maximum_absolute_delta = max(maximum_absolute_delta, absolute_delta)
+                    if exceeds_cjk_area_tolerance(upright_area, italic_area):
+                        item["counts"]["italic_cjk_area_mismatch"] += 1
+                        weight_mismatches += 1
+                        if len(mismatch_samples) < 20:
+                            mismatch_samples.append(
+                                {
+                                    "codepoint": f"U+{codepoint:04X}",
+                                    "weight": weight_name,
+                                    "wght": weight_value,
+                                    "upright_area": round(upright_area, 3),
+                                    "italic_area": round(italic_area, 3),
+                                    "relative_delta": round(relative_delta, 6),
+                                }
+                            )
+                    outline_reason, outline_residual = sheared_outline_residual(
+                        upright_recording,
+                        italic_recording,
+                    )
+                    if math.isfinite(outline_residual):
+                        maximum_outline_residual = max(maximum_outline_residual, outline_residual)
+                    if outline_reason is not None or outline_residual > CJK_SHEAR_POINT_TOLERANCE:
+                        item["counts"]["italic_cjk_outline_mismatch"] += 1
+                        weight_outline_mismatches += 1
+                        if len(outline_mismatch_samples) < 20:
+                            outline_mismatch_samples.append(
+                                {
+                                    "codepoint": f"U+{codepoint:04X}",
+                                    "weight": weight_name,
+                                    "wght": weight_value,
+                                    "reason": outline_reason or "point_residual",
+                                    "maximum_residual": (
+                                        round(outline_residual, 6)
+                                        if math.isfinite(outline_residual)
+                                        else None
+                                    ),
+                                }
+                            )
+                mismatch_by_weight[weight_name] = weight_mismatches
+                outline_mismatch_by_weight[weight_name] = weight_outline_mismatches
+
+            if measurement_errors:
+                item["samples"]["cjk_area_measurement_error"] = measurement_errors
+            if mismatch_samples:
+                item["samples"]["italic_cjk_area_mismatch"] = mismatch_samples
+            if outline_mismatch_samples:
+                item["samples"]["italic_cjk_outline_mismatch"] = outline_mismatch_samples
+            item["diagnostic_mismatch_by_weight"] = mismatch_by_weight
+            item["diagnostic_outline_mismatch_by_weight"] = outline_mismatch_by_weight
+            item["diagnostic_maximum_relative_area_delta"] = round(maximum_relative_delta, 8)
+            item["diagnostic_maximum_absolute_area_delta"] = round(maximum_absolute_delta, 3)
+            item["diagnostic_maximum_outline_residual"] = round(maximum_outline_residual, 6)
+
+            nonmonotonic_samples: list[dict[str, Any]] = []
+            span_samples: list[dict[str, Any]] = []
+            expected_count = len(CJK_STROKE_WEIGHTS)
+            for style in ("upright", "italic"):
+                for codepoint, values in areas[style].items():
+                    if len(values) != expected_count:
+                        continue
+                    for index, (previous, current) in enumerate(zip(values, values[1:]), start=1):
+                        if current + max(
+                            CJK_MONOTONIC_AREA_ABSOLUTE_TOLERANCE,
+                            previous * CJK_MONOTONIC_AREA_RELATIVE_TOLERANCE,
+                        ) < previous:
+                            item["counts"]["cjk_weight_nonmonotonic"] += 1
+                            if len(nonmonotonic_samples) < 20:
+                                nonmonotonic_samples.append(
+                                    {
+                                        "codepoint": f"U+{codepoint:04X}",
+                                        "style": style,
+                                        "from": CJK_STROKE_WEIGHTS[index - 1][0],
+                                        "to": CJK_STROKE_WEIGHTS[index][0],
+                                        "from_area": round(previous, 3),
+                                        "to_area": round(current, 3),
+                                    }
+                                )
+                    light_area = values[0]
+                    heavy_area = values[-1]
+                    if heavy_area < light_area + max(
+                        CJK_WEIGHT_SPAN_ABSOLUTE_MINIMUM,
+                        light_area * CJK_WEIGHT_SPAN_RELATIVE_MINIMUM,
+                    ):
+                        item["counts"]["cjk_weight_span_too_small"] += 1
+                        if len(span_samples) < 20:
+                            span_samples.append(
+                                {
+                                    "codepoint": f"U+{codepoint:04X}",
+                                    "style": style,
+                                    "extra_light_area": round(light_area, 3),
+                                    "heavy_area": round(heavy_area, 3),
+                                }
+                            )
+            if nonmonotonic_samples:
+                item["samples"]["cjk_weight_nonmonotonic"] = nonmonotonic_samples
+            if span_samples:
+                item["samples"]["cjk_weight_span_too_small"] = span_samples
+        finally:
+            upright.close()
+            italic.close()
+        out.append(item)
+    return out
+
+
 def audit_vf_contextual_spacing() -> list[dict[str, Any]]:
     out = []
     regions = b.variable_regions(b.REGION_ORDER)
@@ -1441,6 +1790,7 @@ def main() -> None:
         static_palt_shaping: list[dict[str, Any]] = []
         static_em_dash_shaping: list[dict[str, Any]] = []
         vf_metrics: list[dict[str, Any]] = []
+        vf_cjk_strokes: list[dict[str, Any]] = []
         vf_contextual_spacing: list[dict[str, Any]] = []
     else:
         metadata = audit_metadata()
@@ -1450,6 +1800,7 @@ def main() -> None:
         static_palt_shaping = audit_static_palt_shaping()
         static_em_dash_shaping = audit_static_em_dash_shaping()
         vf_metrics = audit_vf_metrics()
+        vf_cjk_strokes = audit_vf_cjk_stroke_consistency()
         vf_contextual_spacing = audit_vf_contextual_spacing()
 
     static_raster = [] if args.skip_raster else audit_static_raster(
@@ -1467,6 +1818,7 @@ def main() -> None:
         "static_palt_shaping_failures": len(nonzero(static_palt_shaping)),
         "static_em_dash_shaping_failures": len(nonzero(static_em_dash_shaping)),
         "vf_metric_failures": len(nonzero(vf_metrics)),
+        "vf_cjk_stroke_failures": len(nonzero(vf_cjk_strokes)),
         "vf_contextual_spacing_failures": len(nonzero(vf_contextual_spacing)),
         "static_fonts_checked": metadata["static_count"],
         "variable_fonts_checked": metadata["variable_count"],
@@ -1478,6 +1830,12 @@ def main() -> None:
         "static_palt_shaping_cases": len(static_palt_shaping),
         "static_em_dash_shaping_cases": len(static_em_dash_shaping),
         "vf_metric_cases": len(vf_metrics),
+        "vf_cjk_stroke_cases": len(vf_cjk_strokes),
+        "vf_cjk_stroke_codepoints": sum(item.get("checked_codepoints", 0) for item in vf_cjk_strokes),
+        "vf_cjk_stroke_weighted_instances": sum(
+            item.get("checked_codepoints", 0) * len(CJK_STROKE_WEIGHTS)
+            for item in vf_cjk_strokes
+        ),
         "vf_contextual_spacing_cases": len(vf_contextual_spacing),
     }
     report = {
@@ -1498,6 +1856,7 @@ def main() -> None:
         "static_palt_shaping_nonzero": nonzero(static_palt_shaping),
         "static_em_dash_shaping_nonzero": nonzero(static_em_dash_shaping),
         "vf_metrics_nonzero": nonzero(vf_metrics),
+        "vf_cjk_strokes_nonzero": nonzero(vf_cjk_strokes),
         "vf_contextual_spacing_nonzero": nonzero(vf_contextual_spacing),
         "static_exact": static_exact,
         "static_raster": static_raster,
@@ -1506,11 +1865,16 @@ def main() -> None:
         "static_palt_shaping": static_palt_shaping,
         "static_em_dash_shaping": static_em_dash_shaping,
         "vf_metrics": vf_metrics,
+        "vf_cjk_strokes": vf_cjk_strokes,
         "vf_contextual_spacing": vf_contextual_spacing,
         "metadata_samples": metadata["samples"],
     }
     args.report.parent.mkdir(parents=True, exist_ok=True)
-    args.report.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    args.report.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     log("summary " + json.dumps(summary, ensure_ascii=False, sort_keys=True))
     failure_keys = [key for key in summary if key.endswith("_failures")]
     if any(summary[key] for key in failure_keys):

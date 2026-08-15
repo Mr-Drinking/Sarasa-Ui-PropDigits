@@ -4,7 +4,7 @@
   "fonts": [
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
-      "size": 35730396,
+      "size": 35958940,
       "names": {
         "family": "Sarasa Ui VF PropDigits CL",
         "subfamily": "Italic",
@@ -578,7 +578,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
-      "size": 34439188,
+      "size": 34439316,
       "names": {
         "family": "Sarasa Ui VF PropDigits CL",
         "subfamily": "Regular",
@@ -1153,7 +1153,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
-      "size": 36586124,
+      "size": 36791488,
       "names": {
         "family": "Sarasa Ui VF PropDigits HC",
         "subfamily": "Italic",
@@ -1727,7 +1727,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
-      "size": 35255024,
+      "size": 35255152,
       "names": {
         "family": "Sarasa Ui VF PropDigits HC",
         "subfamily": "Regular",
@@ -2302,7 +2302,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
-      "size": 35979416,
+      "size": 36190360,
       "names": {
         "family": "Sarasa Ui VF PropDigits J",
         "subfamily": "Italic",
@@ -2876,7 +2876,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-J[wght].ttf",
-      "size": 34640532,
+      "size": 34640656,
       "names": {
         "family": "Sarasa Ui VF PropDigits J",
         "subfamily": "Regular",
@@ -3451,7 +3451,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
-      "size": 35914372,
+      "size": 36124660,
       "names": {
         "family": "Sarasa Ui VF PropDigits K",
         "subfamily": "Italic",
@@ -4025,7 +4025,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-K[wght].ttf",
-      "size": 34578388,
+      "size": 34578512,
       "names": {
         "family": "Sarasa Ui VF PropDigits K",
         "subfamily": "Regular",
@@ -4600,7 +4600,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "size": 36308740,
+      "size": 36517072,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Italic",
@@ -5174,7 +5174,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "size": 34987752,
+      "size": 34987880,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Regular",
@@ -5749,7 +5749,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
-      "size": 36638100,
+      "size": 36842684,
       "names": {
         "family": "Sarasa Ui VF PropDigits TC",
         "subfamily": "Italic",
@@ -6323,7 +6323,7 @@
     },
     {
       "file": "fonts\\variable\\Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
-      "size": 35308624,
+      "size": 35308752,
       "names": {
         "family": "Sarasa Ui VF PropDigits TC",
         "subfamily": "Regular",
