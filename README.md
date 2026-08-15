@@ -12,7 +12,7 @@
 
 曾几何时，我试图使用[更纱黑体（Sarasa Gothic）](https://github.com/be5invis/sarasa-gothic)作为 Android 手机的默认字体（因为个人更喜欢 [SF Pro](https://developer.apple.com/cn/fonts/) / [Inter](https://rsms.me/inter/) 而非 [Roboto](https://fonts.google.com/specimen/Roboto)），但由于修改软件只支持一个字体，我需要一个可变字体。但可惜的是，[原版更纱并不支持](https://github.com/be5invis/Sarasa-Gothic/issues/314)，我只好自己动手，用 Codex 中的 GPT-5.5 制作了本字体的可变版本；静态版本以及比例宽数字则是源于我对其成为 [Unigram](https://github.com/unigramdev/unigram) / Windows 默认字体的需要。
 
-而到了 2026 年 8 月，随着上游、各个工具链（如 Node 版本）及我自身需求的更新，我用 GPT-5.6 Sol 将版本号刷到了 1.0.40（上游更新的是 Mono 版本，与本项目没有直接关系），同时添加了 `chws/vchw` 这两个 OpenType 特性，以方便在不能使用 CSS 的 `text-spacing-trim` 的情况下启用标点挤压。
+而到了 2026 年 8 月，随着上游、各个工具链（如 Node 版本）及我自身需求的更新，我用 GPT-5.6 Sol 将版本号刷到了 1.0.40（上游更新的是 Mono 版本，与本项目没有直接关系），同时添加了 `chws` / `vchw` 这两个 OpenType 特性，以方便在不能使用 CSS 的 `text-spacing-trim` 的情况下启用标点挤压。
 
 ## 简介
 
@@ -21,7 +21,7 @@
 - **Sarasa Ui VF PropDigits CL / SC / TC / HC / J / K**：正体和 Italic 可变字体，公开 `wght` 轴为 `200..900`。
 - **Sarasa Ui PropDigits CL / SC / TC / HC / J / K**：从静态 Source Han Sans、Inter 和必要的地区覆盖源按 Sarasa 静态片段路径构建的 TTF，包含 hinted 与 unhinted 两套，每套 7 个字重及对应 Italic。
 
-CL 的传统旧字形覆盖跟随 [Shanggu Sans](https://github.com/GuiWonder/Shanggu) `1.028` 官方发布物：静态 TTF 使用 `ShangguSansTC-*.ttf`，VF 使用 `ShangguSansTC-VF.ttf`。这样静态和 VF 使用同一 Shanggu 发布口径，而不是绑定 Sarasa `1.0.40` 内置的旧 subset 转换产物。最终静态 CL 的公开 cmap、GSUB/GPOS feature 边界和非数字 metrics 仍按官方 SarasaUiCL 参考字体裁剪与同步；Shanggu 比官方 SarasaUiCL 多出的码位或旧字形 feature 不会额外暴露到本系列静态字体里。
+CL 的传统旧字形覆盖跟随 [Shanggu Sans](https://github.com/GuiWonder/Shanggu) `1.028` 官方发布物：静态 TTF 使用 `ShangguSansTC-*.ttf`，VF 使用 `ShangguSansTC-VF.ttf`。这样静态和 VF 使用同一 Shanggu 发布口径，而不是绑定 Sarasa `1.0.40` 内置的旧 subset 转换产物。最终静态 CL 的公开 cmap、GSUB/GPOS feature 边界和非数字 metrics 仍按官方 Sarasa Ui CL 参考字体裁剪与同步；Shanggu 比官方 Sarasa Ui CL 多出的码位或旧字形 feature 不会额外暴露到本系列静态字体里。
 
 两个系列都把 ASCII 数字 `U+0030..U+0039` 设为默认变宽数字，并提供 OpenType `tnum`/`pnum` 在变宽数字和等宽数字之间切换。VF 与静态 TTF 都按 Inter 的 `calt` 冒号行为处理数字冒号串：`1:2` 会上浮，`1:a`、`a:2`、`a:b` 不会上浮，`1::2`、`1:::a`、`a:::2` 等连续冒号上下文遵循 Inter 的 colon-run 规则。
 
@@ -36,12 +36,12 @@ CL 的传统旧字形覆盖跟随 [Shanggu Sans](https://github.com/GuiWonder/Sh
 
 ## 地区
 
-- `CL`：传统旧字形。静态 TTF 的汉字底稿先取 `SourceHanSansK`，再用 Shanggu Sans `1.028` 官方 `ShangguSansTC` 静态 TTF 覆盖传统旧字形；VF 使用 `SourceHanSansK-VF` 加 `ShangguSansTC-VF` 覆盖。最终公开字符集、layout feature 和非数字 metrics 以 SarasaUiCL 为边界。
-- `SC`：简体中文，来源为 `SourceHanSansSC`。
-- `TC`：繁体中文台湾字形，来源为 `SourceHanSansTC`。
-- `HC`：繁体中文香港字形，来源为 `SourceHanSansHC`。
-- `J`：日文字形，来源为 `SourceHanSans`。
-- `K`：韩文字形，来源为 `SourceHanSansK`。
+- `CL`：传统旧字形。静态 TTF 的汉字底稿先取 `SourceHanSansK`，再用 Shanggu Sans `1.028` 官方 `ShangguSansTC` 静态 TTF 覆盖传统旧字形；VF 使用 `SourceHanSansK-VF` 加 `ShangguSansTC-VF` 覆盖。最终公开字符集、layout feature 和非数字 metrics 以 Sarasa Ui CL 为边界。
+- `SC`：简体中文，来源为 `Source Han Sans SC`。
+- `TC`：繁体中文台湾字形，来源为 `Source Han Sans TC`。
+- `HC`：繁体中文香港字形，来源为 `Source Han  Sans HC`。
+- `J`：日文字形，来源为 `Source Han Sans J`。
+- `K`：韩文字形，来源为 `Source Han Sans K`。
 
 ## 文件结构
 
@@ -89,7 +89,7 @@ VF 不从静态字重插值生成。它直接合并对应地区的 CJK VF 与 In
 - Source Han 侧烘焙 Ui 标点需要的 `pwid` 替换，并执行 Sarasa 式符号清洗，例如 `·`、弯引号、短横、省略号、`⸺/⸻` 和注音扩展符号宽度处理。
 - Hangul / Jamo 宽度归一到全角。
 - 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert` `vrt2`、`tnum` `pnum`、连续长破折号（em dash）、上游暴露的空 `cv01..cv13` / `ss01..ss08` 标签，以及与 Inter 兼容的冒号 `calt`。Italic 按上游口径不暴露 `cv11`。
-- 最终静态 `GSUB` 的 FeatureRecord 顺序和 Script / LangSys 覆盖顺序按对应地区、对应样式的上游 Sarasa Ui 静态字体套模板；基础 `GPOS` 也会同步 FeatureRecord lookup index 与 LookupList 的类型、flag、subtable 形状，并把 `palt` 下假名等已有 glyph 的 SinglePos 取值同步到参考字体。完成这一模板同步后，再统一追加来自 Noto CJK 的 `chws/vchw` FeatureRecord 与 contextual positioning lookup。GSUB lookup 内容保留本系列新增的 PropDigits 冒号上下文规则，同时会让连续长破折号的 `calt` 链接在 `hani`/`kana` 等脚本下与对应上游静态 Sarasa Ui 同样可达。
+- 最终静态 `GSUB` 的 FeatureRecord 顺序和 Script / LangSys 覆盖顺序按对应地区、对应样式的上游 Sarasa Ui 静态字体套模板；基础 `GPOS` 也会同步 FeatureRecord lookup index 与 LookupList 的类型、flag、subtable 形状，并把 `palt` 下假名等已有 glyph 的 SinglePos 取值同步到参考字体。完成这一模板同步后，再统一追加来自 Noto CJK 的 `chws` / `vchw` FeatureRecord 与 contextual positioning lookup。GSUB lookup 内容保留本系列新增的 PropDigits 冒号上下文规则，同时会让连续长破折号的 `calt` 链接在 `hani`/`kana` 等脚本下与对应上游静态 Sarasa Ui 同样可达。
 - VF 的 GPOS lookup 结构不以静态官方 Sarasa Ui 为逐项等同目标，因为 VF 由对应地区 CJK VF 与 Inter VF 合并生成；发布审计改为检查 VF 的压力实例、cmap、hmtx / vmtx、公开字重轴、数字/冒号行为，以及 exact-weight metrics。当前仅发现 `U+00B7` 在 CL / J / K 与 SC 的 side bearing 有地区标点边界差异，不属于广泛 Latin 源漂移。
 - VF、hinted 静态 TTF 和 unhinted 静态 TTF 都包含 `STAT`。VF 的 `STAT` 描述 `wght`/`ital` 轴和命名实例；静态 TTF 的 `STAT` 只用于现代应用识别 weight / italic 样式，不表示静态文件仍有 `fvar` `gvar` 可变轴。
 - `OS/2.achVendID` 使用本派生项目的 `MRDK`，不继承上游 Sarasa Ui 的 `????` 占位值，也不冒充 Source Han Sans 或 Inter 的官方 vendor。
@@ -185,7 +185,7 @@ python tools\build_sarasa_ui_propdigits_sc.py --static-only --regions SC --resum
 
 脚本会在缺失依赖或源文件时准备固定版本的构建输入：Sarasa Gothic `v1.0.40`、各地区 `SarasaUi{REGION}` TTF `1.0.40` hinted/unhinted、Source Han Sans `2.005R` VF、Shanggu Sans `1.028` 静态 TTF 与 VF、Inter `v4.1`、Node.js `v26.7.0`，以及 Sarasa 上游 npm 依赖。Python 包依赖也会自动安装并固定到本次验证的版本：`fontTools 4.63.0`、`uharfbuzz 0.56.0`、`brotli 1.2.0`、`ttfautohint-py 0.6.1`、`py7zr 1.1.3`、`afdko 5.0.1`、`chws_tool 1.4.5` 和 `east-asian-spacing 1.4.5`；正式审计工具另固定 `freetype-py 2.5.1`。静态 Source Han TTC 转换会使用 AFDKO 提供的 `otc2otf`/`otf2ttf`；CL 的 Shanggu 覆盖源直接使用 Shanggu 官方发布 TTF，不再通过本地 AFDKO 把 Sarasa 内置旧 subset OTF 转成 TTF。已有输入会按适用条件核验：Sarasa 参考字体检查 nameID 5 版本，下载或复用其 12 个六地区发布包时同时检查上游 SHA-256；Sarasa 源码检查发布 commit、`package.json` 版本与 lockfile 哈希；Shanggu 发布包检查 SHA-256。不一致的输入不会被静默接受。
 
-相对 `v1.0.40` 的构建环境，Node.js 从 `26.3.0` 升到 `26.7.0`，`uharfbuzz` 从 `0.55.0` 升到 `0.56.0`，`ttfautohint-py` 从 `0.6.0` 升到 `0.6.1`，`py7zr` 从 `1.1.0` 升到 `1.1.3`，并新增 `chws_tool/east-asian-spacing 1.4.5`。其中 `ttfautohint-py 0.6.1` 只新增 `SOURCE_DATE_EPOCH` 传递和构建兼容修复，没有更换 hint 算法；`py7zr` 只参与上游归档解包；Node 仍执行 Sarasa `1.0.40` 自己的 lockfile；`uharfbuzz 0.56.0` 下生成的 `chws/vchw` GPOS 已与旧核心结果逐表对照一致。发布审计还会检查所有成品的轮廓、hint、metrics 和 shaping，工具升级本身不作为新增字体设计差异。
+相对 `v1.0.40` 的构建环境，Node.js 从 `26.3.0` 升到 `26.7.0`，`uharfbuzz` 从 `0.55.0` 升到 `0.56.0`，`ttfautohint-py` 从 `0.6.0` 升到 `0.6.1`，`py7zr` 从 `1.1.0` 升到 `1.1.3`，并新增 `chws_tool/east-asian-spacing 1.4.5`。其中 `ttfautohint-py 0.6.1` 只新增 `SOURCE_DATE_EPOCH` 传递和构建兼容修复，没有更换 hint 算法；`py7zr` 只参与上游归档解包；Node 仍执行 Sarasa `1.0.40` 自己的 lockfile；`uharfbuzz 0.56.0` 下生成的 `chws` / `vchw` GPOS 已与旧核心结果逐表对照一致。发布审计还会检查所有成品的轮廓、hint、metrics 和 shaping，工具升级本身不作为新增字体设计差异。
 
 因此，clone 后通常只需要直接运行构建脚本。脚本会把下载缓存放在同级 `source-archives/`，把 Sarasa Gothic 上游源码放在同级 `Sarasa-Gothic-1.0.40/`，把官方 Sarasa Ui 参考字体放在同级 `official-sarasa-ui-1.0.40/`，把 VF 和 Shanggu 静态覆盖输入放在同级 `vf-sources/`，其中 CL 覆盖用的 `ShangguSansTC-VF.ttf` 会放在 `vf-sources/shanggu-1.028/`，`ShangguSansTC-*.ttf` 会放在 `vf-sources/shanggu-1.028/static/`；固定 Node.js 运行时放在同级 `node/`。Sarasa 源码会核验发布 commit、`package.json` 版本和 `package-lock.json` SHA-256；没有 Git 时也按同一固定 commit 下载源码归档。npm 依赖按 lockfile 使用 `npm ci` 安装，并以 lockfile 哈希判断能否复用。默认会使用固定 Node.js，而不是系统里碰巧安装的 Node；只有显式设置 `SARASA_NODE`、`NODE` 或 `NPM` 时才会改用外部运行时。
 
@@ -231,9 +231,9 @@ python tools\build_sarasa_ui_propdigits_sc.py --static-only --regions SC --resum
 
 静态 hinted 构建按源文件、上游提交、工具版本和 hint store 顺序规则为每个字重建立持久工作区，并缓存 96 个 `pass1`、12 个 FE 输入及完整分组的高层 hint 数据，位置是 `.build-cache/sarasa-ui-propdigits/`。持久工作区让一次完整分析意外中断后可以直接复用已准备好的 108 个字体；高层 hint 缓存则只在整个字重分析成功后以原子方式写入。缓存不会把部分地区的旧分析结果拼成一个新分组，也不保存已经 `instruct` 的半成品 TTF；命中高层 hint 缓存后仍会把同一字重的全部 108 个输入交给一次统一 `instruct`。输入、工具链、上游提交或 `sharedHints` 语义顺序变化时缓存键随之变化，不会静默复用旧工作区；需要冷构建时可设置 `SARASA_DISABLE_BUILD_CACHE=1`，或用 `SARASA_BUILD_CACHE` 指向其他缓存目录。
 
-字体检查报告见 [reports/font-inspection.json](reports/font-inspection.json)，构建报告见 [reports/Sarasa-Ui-PropDigits-report.json](reports/Sarasa-Ui-PropDigits-report.json)，发布前 exact、layout/shaping 与像素审计见 [reports/release-audit.json](reports/release-audit.json)。正式入口为 `python tools\audit_sarasa_ui_propdigits.py`。layout 模板审计会逐个静态 TTF 比对 GSUB FeatureRecord 顺序、空 `cv/ss` 标签、Script / LangSys feature 顺序，以及移除本项目明确追加的 `chws/vchw` 后的基础 GPOS FeatureRecord/LookupList 结构；同时单独验证新增 lookup 只由 `chws/vchw` 使用且基础 lookup 不被改写。shaping 审计会覆盖静态 exact `palt` 下 `かなカナ` advance、静态连续长破折号在 `calt`/`vert`/`vrt2` 下的替换路径、全部静态字体与 VF 多个公开字重实例的横排 `chws` / 竖排 `vchw` positioning，以及 `head.fontRevision` 与 nameID 5 版本一致性。FreeType 审计会对六地区四个 exact 字重的 hinted 正斜体逐码位检查 `9/12/16/20/24 ppem` 栅格结果，并排除数字、冒号和文档明确列出的 CL Shanggu 轮廓边界；默认并发数与本机逻辑 CPU 数一致，可用 `--raster-jobs` 调整。本次发布共执行 48 个 hinted exact 栅格用例、`9,388,280` 次逐码位渲染比较，差异为 `0`。
+字体检查报告见 [reports/font-inspection.json](reports/font-inspection.json)，构建报告见 [reports/Sarasa-Ui-PropDigits-report.json](reports/Sarasa-Ui-PropDigits-report.json)，发布前 exact、layout/shaping 与像素审计见 [reports/release-audit.json](reports/release-audit.json)。正式入口为 `python tools\audit_sarasa_ui_propdigits.py`。layout 模板审计会逐个静态 TTF 比对 GSUB FeatureRecord 顺序、空 `cv/ss` 标签、Script / LangSys feature 顺序，以及移除本项目明确追加的 `chws` / `vchw` 后的基础 GPOS FeatureRecord/LookupList 结构；同时单独验证新增 lookup 只由 `chws` / `vchw` 使用且基础 lookup 不被改写。shaping 审计会覆盖静态 exact `palt` 下 `かなカナ` advance、静态连续长破折号在 `calt`/`vert`/`vrt2` 下的替换路径、全部静态字体与 VF 多个公开字重实例的横排 `chws` / 竖排 `vchw` positioning，以及 `head.fontRevision` 与 nameID 5 版本一致性。FreeType 审计会对六地区四个 exact 字重的 hinted 正斜体逐码位检查 `9/12/16/20/24 ppem` 栅格结果，并排除数字、冒号和文档明确列出的 CL Shanggu 轮廓边界；默认并发数与本机逻辑 CPU 数一致，可用 `--raster-jobs` 调整。本次发布共执行 48 个 hinted exact 栅格用例、`9,388,280` 次逐码位渲染比较，差异为 `0`。
 
-外部工具复核使用 OTS `9.2.0` 和 FontBakery `1.1.0`。OTS 对全部 180 个字体均返回成功；84 个 unhinted 静态 TTF 会打印与官方 unhinted Sarasa Ui 相同的 `maxZones/gasp` 丢表信息，hinted 与 VF 没有该警告。FontBakery 的 `opentype/font_version` 对全部 180 个项目字体均为 PASS；SC Regular 代表性检查剩余的 GDEF mark、spacing mark 和 `xAvgCharWidth` 三条 WARN 在官方 SarasaUiSC 样本中同样存在。
+外部工具复核使用 OTS `9.2.0` 和 FontBakery `1.1.0`。OTS 对全部 180 个字体均返回成功；84 个 unhinted 静态 TTF 会打印与官方 unhinted Sarasa Ui 相同的 `maxZones/gasp` 丢表信息，hinted 与 VF 没有该警告。FontBakery 的 `opentype/font_version` 对全部 180 个项目字体均为 PASS；SC Regular 代表性检查剩余的 GDEF mark、spacing mark 和 `xAvgCharWidth` 三条 WARN 在官方 Sarasa Ui SC 样本中同样存在。
 
 ## 许可证
 
