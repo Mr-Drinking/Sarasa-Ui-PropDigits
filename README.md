@@ -19,22 +19,32 @@
 这个仓库包含 Sarasa Ui 的 PropDigits 多地区派生字体：
 
 - **Sarasa Ui VF PropDigits CL / SC / TC / HC / J / K**：正体和 Italic 可变字体，公开 `wght` 轴为 `200..900`。
-- **Sarasa Ui PropDigits CL / SC / TC / HC / J / K**：从静态 Source Han Sans、Inter 和必要的地区覆盖源按 Sarasa 静态片段路径构建的 TTF，包含 hinted 与 unhinted 两套，每套 7 个字重及对应 Italic。
+- **Sarasa Ui PropDigits CL / SC / TC / HC / J / K**：从静态 Source Han Sans、Inter 和必要的地区覆盖源按 Sarasa 静态片段路径构建的 TTF，包含 hinted 与 unhinted 两套，每套 6 个字重及对应 Italic。
 
 CL 的传统旧字形覆盖跟随 [Shanggu Sans](https://github.com/GuiWonder/Shanggu) `1.028` 官方发布物：静态 TTF 使用 `ShangguSansTC-*.ttf`，VF 使用 `ShangguSansTC-VF.ttf`。这样静态和 VF 使用同一 Shanggu 发布口径，而不是绑定 Sarasa `1.0.40` 内置的旧 subset 转换产物。最终静态 CL 的公开 cmap、GSUB/GPOS feature 边界和非数字 metrics 仍按官方 Sarasa Ui CL 参考字体裁剪与同步；Shanggu 比官方 Sarasa Ui CL 多出的码位或旧字形 feature 不会额外暴露到本系列静态字体里。
 
 两个系列都把 ASCII 数字 `U+0030..U+0039` 设为默认变宽数字，并提供 OpenType `tnum`/`pnum` 在变宽数字和等宽数字之间切换。VF 与静态 TTF 都按 Inter 的 `calt` 冒号行为处理数字冒号串：`1:2` 会上浮，`1:a`、`a:2`、`a:b` 不会上浮，`1::2`、`1:::a`、`a:::2` 等连续冒号上下文遵循 Inter 的 colon-run 规则。
 
-## v1.0.40.2 与上游基线的差异
+中文破折号 `——` 在静态 TTF 与 VF 中都严格占 `2em`，但两种格式采用各自有上游依据的结构。这里的“上游官方”同时包括 Sarasa Ui 与 Source Han Sans：静态 TTF 保留官方 Sarasa Ui 的 `calt` 路径，单个 U+2014 的比例宽、轮廓和 glyph 不变，成对输入时只把第二字换成无缝延续字形，并以补数 advance 补足二字宽；官方 Source Han Sans 静态字体和 VF 则会在 `ccmp` 中把两个、三个 U+2014 分别合成 `2em`、`3em` 长破折号，并由 `vert` 把横排长字形替换为竖排长字形。本项目的 VF 采用后一套单 glyph 机制，从结构上消除两个可变 advance 分别取整产生的 `1999/2001` units。VF 新增长字形的六个公开字重轮廓取自本系列对应静态 TTF 的横竖组合结果，中间位置写入 `gvar` 连续插值，因此机制来源是 Source Han，视觉基线是 Sarasa Ui 静态路径。仅显式开启 `vrt2`、同时关闭 `vert` 时仍保留两个 `uniFE31`，这与 Sarasa 和 Source Han 的上游边界一致；正常竖排会启用 `vert` 并得到一个 `2em` 竖排长字形。
 
-`v1.0.40.2` 以 Sarasa Gothic `v1.0.40` 为上游基线；最后的 `.2` 是本仓库自己的衍生版本号，不是上游 Sarasa Gothic 的官方小版本。本版在既有 PropDigits、字重映射、Inter 冒号和 CL 旧字形规则之外，恢复来自 Noto CJK 官方交付流程的 GPOS `chws` / `vchw` 特性：
+## v1.0.40.3 与上游基线的差异
+
+`v1.0.40.3` 以 Sarasa Gothic `v1.0.40` 为上游基线；最后的 `.3` 是本仓库自己的衍生版本号，不是上游 Sarasa Gothic 的官方小版本。本版保留 `v1.0.40.2` 恢复的 Noto CJK GPOS `chws` / `vchw`，并完成字重体系、命名、法律元数据和审计覆盖修正：
 
 - `chws` 用于横排连续全角标点的上下文压缩，`vchw` 用于对应的竖排压缩；单独包围正文的全角标点不会被无条件压缩。
 - Source Han Sans `2.005R` 底稿和 Sarasa Gothic `1.0.40` 参考字体本身不含这两个 FeatureRecord。Noto CJK 与 Source Han Sans 共用 CJK 字形源，但在官方交付构建中另用 `add-chws` 后处理加入这两个特性；本项目跟随的是这条 Noto CJK 交付路径。
 - 后处理固定使用 [`chws_tool 1.4.5`](https://github.com/googlefonts/chws_tool) 和 `east-asian-spacing 1.4.5`，并在所有轮廓、hint、metrics、GSUB 和 Sarasa GPOS 基础模板处理完成后执行。
 - 相对同一字体的 `v1.0.40` 成品，这一步只新增 GPOS FeatureRecord 与 contextual positioning lookup，并重算 `head.checkSumAdjustment`；不会修改 cmap、glyf/gvar 轮廓、TrueType instructions、hmtx/vmtx advance、GSUB、GDEF 或公开字重轴。
 - Italic VF 的 CJK 斜体仍由对应地区的正体 CJK VF 以 `9.4°` 仿斜生成。构建会先在原始正体坐标空间展开 `gvar` 中全部 IUP 隐含增量，再同时剪切基础轮廓与显式增量；最后四个 metric phantom points 不参与剪切。这样不会让 IUP 在剪切后的坐标系中重新解释稀疏增量，修复了旧成品在非默认字重下随机出现的 CJK 笔画过粗或过细。
-- VF 的 nameID 25 使用只含 ASCII 字母数字的 Variations PostScript Name Prefix；从 Inter 导入 `cv14` 时也会同步或重映射 FeatureParams 引用的 UI name record，保证所有布局表 name ID 引用都可解析并可完成 TTX roundtrip。
+- VF 的 nameID 25 使用只含 ASCII 字母数字的 Variations PostScript Name Prefix；从 Inter 导入 `cv14` 时也会同步或重映射 FeatureParams 引用的界面名称记录，保证所有布局表 name ID 引用都可解析并可完成 TTX roundtrip。
+- 公开字重改为 `200/300/400/600/700/900` 六档，移除 `Normal 350` 和 `Medium 500` 命名实例。`SemiBold 600` 沿用 Sarasa 静态配对：CJK 取 Source Han Sans Medium `500`，Latin 取 Inter SemiBold `600`；`350` 只作为隐藏的 `avar` 插值锚点，不再作为公开样式。
+- VF 会先把 CJK 底稿切换到 public 轴，再重映射 Inter `gvar` support。构建脚本对此调用顺序设有硬性检查；发布审计还会实例化 `wght=600`，分别与 Source Han internal `500` 和 Inter `600` 的轮廓及 metrics 对照，避免只在 600 附近出现的静默错配。
+- 静态 TTF 改回上游同样的 `post` format 3，不保存虚构或与 GID 不一致的 glyph names。VF 和静态字体都写入完整四方版权；Heavy 的 legacy 样式保持 Regular 位而不冒充 Bold；静态 `ulCodePageRange1` 保留显式 bit 31；VF 通过 MVAR 与静态字重同步下划线粗细和位置。
+- 修正连续 U+2014 只发生 `calt` 替换却仍不满中文二字宽的问题。静态 TTF 保留 Sarasa 的第二字延续结构并用补数 advance 达到 `2em`；VF 改用 Source Han 官方静态/VF 均采用的 `ccmp` 长字形和 `vert` 竖排替换结构，同时以本系列静态 TTF 校准六个公开字重的横竖轮廓。`——` / U+2E3A 与 `———` / U+2E3B 分别汇入同一个 `2em` / `3em` glyph 路径，竖排 advance 也分别为 `-2em` / `-3em`。每个 VF 在 13 个轴探针检查几何与 FreeType 位图，并以 `0.5` 字重步长遍历 `200..900` 的 1401 个位置；双连的默认横排、显式 `ccmp`、默认竖排、显式 `vert`、`vrt2-only`、`vert+vrt2` 六种路径合计执行 8406 次 shaping。
+- 修复 VF 构建末段以静态 Sarasa 模板重建 `GDEF` 时丢失 Source Han ItemVariationStore、却留下 `kern` / `palt` / `vpal` GPOS VariationIndex 引用的问题；例如 SC 正体有 1082 个悬空引用。现在模板只同步 GlyphClassDef / MarkGlyphSetsDef 等静态结构，原有 VarStore 与引用关系完整保留；破折号改为纯 GSUB/glyf/gvar 路径，不再向 GPOS/GDEF 追加自定义定位数据。
+- 修复 Noto `chws/vchw` 后处理重新序列化 `glyf` 时重算静态 Italic bbox 的问题。坐标和 instructions 虽未改变，约三万个映射码位的 1 unit bbox 偏差仍会改变 TrueType phantom points，并造成大面积 hinted FreeType 位图差异；现在后处理结束后按对应 Sarasa Ui 静态参考恢复可直接对齐字形的 bbox，60 个 exact hinted 案例、13,884,300 次位图比较全部为 0 差异，不需要重新运行 hint 分析。
+- 修复静态 `palt` 定位值按自动 glyph name 同步造成的错配。`post` format 3 的内存自动名不具备跨字体语义，目标与参考字体中同名 `glyphNNNNN` 可能对应不同 GID 和轮廓；现在按展开后的轮廓结构与横竖 metrics 建立语义映射，再复制参考 SinglePos 值。六地区 120 个 exact 样式案例的 `palt` lookup 与 `かなカナ` shaping 均为 0 差异。
+- 收紧自审计：产品差异不再以 `diagnostic_` 前缀自动降级，CL 也不再排除绝大多数 cmap；所有允许例外都必须进入具名计数并受覆盖率断言约束。最终审计覆盖 144 个静态字体和 12 个 VF，所有 failure 计数均为 0。
 
 ## 地区
 
@@ -58,10 +68,10 @@ fonts/
     Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf
     ...
   static/
-    SarasaUiPropDigitsCL-TTF-1.0.40.2/
-    SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.2/
-    SarasaUiPropDigitsSC-TTF-1.0.40.2/
-    SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.2/
+    SarasaUiPropDigitsCL-TTF-1.0.40.3/
+    SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/
+    SarasaUiPropDigitsSC-TTF-1.0.40.3/
+    SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/
     ...
 reports/
   Sarasa-Ui-PropDigits-report.json
@@ -85,24 +95,24 @@ VF 不从静态字重插值生成。它直接合并对应地区的 CJK VF 与 In
 
 构建时对齐 Sarasa Ui 的处理方式：
 
-- VF 的公开 `wght` 轴是 `200..900`，默认值 `400`。Source Han Sans VF 内部仍按 `250..900` 裁剪并参与插值；最终 `avar` 把 public `200` 映射到 Source Han 内部 `250`，其余公开实例尽量映射到同数字上游位置。Inter VF 直接按 public `200..900` 裁剪。
+- VF 的公开 `wght` 轴是 `200..900`，默认值 `400`。Source Han Sans VF 内部仍按 `250/400/900` 裁剪并参与插值；最终 `avar` 使用分段映射：public `200/300/350/400/600/700/900` 分别对应 Source Han internal `250/300/350/400/500/700/900`。Inter VF 直接按 public `200/400/900` 裁剪，Inter 的轮廓变化始终钉在同数字公开坐标，所以 public `600` 是 Source Han Medium `500` 与 Inter SemiBold `600`，而不是两边都取 Medium `500`。
 - CJK Italic VF 在合并 Inter Italic 之前由 CJK 正体 VF 仿斜生成。`gvar` tuple 的 IUP 隐含增量必须先按未剪切轮廓坐标完整展开，再做仿射剪切；直接剪切稀疏 delta 会改变后续 IUP 插值结果，虽然默认实例可能正常，其他轴位置却会出现局部笔画墨量突变。构建只变换真实轮廓点，不把四个 hmtx/vmtx phantom point 的垂直 delta 混入水平 metrics。
 - Inter 先烘焙 Sarasa 原版给 Inter 配置的 `ss03` 和 `cv10`。
 - 码位归属遵循 Sarasa pass1 的优先级，并按 VF 源文件实际覆盖做兜底：Latin 和西文符号优先来自 Inter VF；CJK、Hangul、Jamo 和 Sarasa Ui 的本地化标点优先来自对应地区的 Source Han Sans VF。
 - Source Han 侧烘焙 Ui 标点需要的 `pwid` 替换，并执行 Sarasa 式符号清洗，例如 `·`、弯引号、短横、省略号、`⸺/⸻` 和注音扩展符号宽度处理。
 - Hangul / Jamo 宽度归一到全角。
-- 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert` `vrt2`、`tnum` `pnum`、连续长破折号（em dash）、上游暴露的空 `cv01..cv13` / `ss01..ss08` 标签，以及与 Inter 兼容的冒号 `calt`。Italic 按上游口径不暴露 `cv11`。
-- 最终静态 `GSUB` 的 FeatureRecord 顺序和 Script / LangSys 覆盖顺序按对应地区、对应样式的上游 Sarasa Ui 静态字体套模板；基础 `GPOS` 也会同步 FeatureRecord lookup index 与 LookupList 的类型、flag、subtable 形状，并把 `palt` 下假名等已有 glyph 的 SinglePos 取值同步到参考字体。完成这一模板同步后，再统一追加来自 Noto CJK 的 `chws` / `vchw` FeatureRecord 与 contextual positioning lookup。GSUB lookup 内容保留本系列新增的 PropDigits 冒号上下文规则，同时会让连续长破折号的 `calt` 链接在 `hani`/`kana` 等脚本下与对应上游静态 Sarasa Ui 同样可达。
+- 最终 GSUB 保留上游 Sarasa Ui 有的 `ccmp`，并保留裁剪到上游覆盖范围的 `locl`、Hangul Jamo、`vert` `vrt2`、`tnum` `pnum`、中文二字破折号、上游暴露的空 `cv01..cv13` / `ss01..ss08` 标签，以及与 Inter 兼容的冒号 `calt`。Italic 按上游口径不暴露 `cv11`。
+- 最终静态 `GSUB` 的 FeatureRecord 顺序和 Script / LangSys 覆盖顺序按对应地区、对应样式的上游 Sarasa Ui 静态字体套模板；基础 `GPOS` 也会同步 FeatureRecord lookup index 与 LookupList 的类型、flag、subtable 形状，并把 `palt` 下假名等已有 glyph 的 SinglePos 取值同步到参考字体。VF 套用静态 GDEF class/mark 模板时保留 Source Han GDEF ItemVariationStore，使原有 `kern` / `palt` / `vpal` VariationIndex 继续落在正确的公开字重坐标。Source Han 的静态与 VF 发布物本来就可能给同一 `palt/vpal` 样本不同定位值，因此静态成品按 Sarasa 静态参考同步，VF 则忠实保留 Source Han VF 的可变定位数据；两条上游路径的这项合理差异不会被伪装成数值相同。完成模板同步后，再统一追加来自 Noto CJK 的 `chws` / `vchw` FeatureRecord 与 contextual positioning lookup。GSUB lookup 内容保留本系列新增的 PropDigits 冒号上下文规则；静态连续 U+2014 沿用 Sarasa `calt` 并使用补数 advance，VF 则在最终模板后追加 Source Han 式 `ccmp` 双/三连长字形与 `vert` 映射。VF 新增长字形使用独立的 `gvar` 轮廓变化，不修改上游 GPOS ItemVariationStore。
 - VF 的 GPOS lookup 结构不以静态官方 Sarasa Ui 为逐项等同目标，因为 VF 由对应地区 CJK VF 与 Inter VF 合并生成；发布审计改为检查 VF 的压力实例、cmap、hmtx / vmtx、公开字重轴、数字/冒号行为，以及 exact-weight metrics。当前仅发现 `U+00B7` 在 CL / J / K 与 SC 的 side bearing 有地区标点边界差异，不属于广泛 Latin 源漂移。
 - VF、hinted 静态 TTF 和 unhinted 静态 TTF 都包含 `STAT`。VF 的 `STAT` 描述 `wght`/`ital` 轴和命名实例；静态 TTF 的 `STAT` 只用于现代应用识别 weight / italic 样式，不表示静态文件仍有 `fvar` `gvar` 可变轴。
 - `OS/2.achVendID` 使用本派生项目的 `MRDK`，不继承上游 Sarasa Ui 的 `????` 占位值，也不冒充 Source Han Sans 或 Inter 的官方 vendor。
-- VF 的 Variations PostScript Name Prefix（nameID 25）不直接复用带连字符的 nameID 6，而使用 `SarasaUiVFPropDigits{REGION}[Italic]` 形式；导入 Inter `cv14` 的 FeatureParams 时保留 “Alternate capital sharp S” UI name record，避免悬空 name ID。
-- `head.fontRevision` 使用 OpenType 16.16 fixed 可表达的项目数值 `1.0402`，对应本仓库版本 `1.0.40.2`；nameID 5 以 `Version 1.0402; project 1.0.40.2; ...` 开头。OpenType 的版本字段是单个 `major.minor` 数值，不能把四段发布版本直接放在首个数字里，否则检查器只会把 `1.0.40.2` 解析为 `1.0`；完整发布版本因此保留在后续 `project` 字段、nameID 3、目录名和 Release tag 中。
-- 构建会按对应地区的上游 Sarasa Ui 同步非数字与非冒号 advance、横向 LSB、垂直指标、`GDEF`、`VORG`、`vmtx`、`head`/`OS/2` 中可安全继承的元数据字段；静态 exact 样式还会保留上游 simple glyph flags、glyf bbox 和组合字形组件名。数字、与 Inter 兼容的冒号上下文，以及 CL 跟随 Shanggu Sans `1.028` 官方 TTF / VF 而不是 Sarasa `1.0.40` 内置旧 subset 的轮廓来源，是本派生字体的刻意差异。
-- 静态 TTF 不从 VF 实例化。hinted 和 unhinted 两套都使用静态 Source Han Sans 与静态 Inter，按 Sarasa 上游的 `pass1`、`kanji`、`hangul`、`pass2` 片段流程构建；CL 在 `kanji` 阶段额外使用 Shanggu Sans `1.028` 官方静态 TTF 覆盖传统旧字形。最终 TTF 会再按对应 Sarasa Ui 参考字体裁剪 cmap、回补空 `cv/ss` FeatureRecord、套用 GSUB Script / LangSys 模板和 GPOS 结构模板，并同步非数字 metrics；CL 的 `Normal`、`Medium`、`Heavy` 扩展字重分别用 Sarasa 静态路径里的 `Regular`、`SemiBold`、`Bold` 作为 reference 边界。随后默认数字和 `:` remap 到已有的 pnum glyph，清理旧冒号上下文替换后追加与 Inter shaping 样例一致的 colon-run `calt`，中文名、metadata、glyf flags / bbox、组件名和静态 `STAT` 也在最终 TTF 上同步。
-- hinted 静态 TTF 会重新 hint 本项目实际生成的片段。每个字重固定建立与 Sarasa 上游相同顺序的完整环境：8 个家族、6 个地区、正斜体共 96 个 `pass1` 输入，再加 6 个 `kanji` 和 6 个 `hangul` 输入。`pass1` 先经过 `ttfautohint`；Chlorophytum 分别生成完整 `pass1` 组和完整 FE 组的高层 hint 数据，最后按 `pass1`、`kanji`、`hangul` 顺序把全部 108 个输入交给一次统一 `instruct`，再由 `pass2` 取出 Ui 成品需要的片段。这个流程逐项对应上游 `GroupHintSelfPass1`、`GroupHintSelfFe`、`GroupInstr`，也保证全量构建、指定地区构建和断点恢复不会因分析输入缩小而产生另一套全局 TrueType 函数。高层 hint store 中的 glyph 项按数字 GID 规范化；`sharedHints` 则严格按 Sarasa hcfg 的 `Ideograph`、`Hiragana`、`Katakana` 语义顺序写入，因为其数组位置会决定最终 TrueType 函数 ID，不能按名称重新排序。`Normal`、`Medium`、`Heavy` 没有同名 Sarasa 静态成品；它们的 Ui、`kanji`、`hangul` 始终使用本项目实际的 350、500、900 轮廓，辅助家族的拉丁样式与 hcfg 分别采用上游 `Regular`、`SemiBold`、`Bold` 边界，绝不复制相邻字重成品里的 glyph instructions。
+- VF 的 Variations PostScript Name Prefix（nameID 25）不直接复用带连字符的 nameID 6，而使用 `SarasaUiVFPropDigits{REGION}[Italic]` 形式；导入 Inter `cv14` 的 FeatureParams 时保留 “Alternate capital sharp S” 界面名称记录，避免悬空 name ID。
+- `head.fontRevision` 使用 OpenType 16.16 fixed 可表达的项目数值 `1.0403`，对应本仓库版本 `1.0.40.3`；nameID 5 以 `Version 1.0403; project 1.0.40.3; ...` 开头。OpenType 的版本字段是单个 `major.minor` 数值，不能把四段发布版本直接放在首个数字里；完整发布版本因此保留在后续 `project` 字段、nameID 3、目录名和 Release tag 中。
+- 构建会按对应地区的上游 Sarasa Ui 同步非数字与非冒号 advance、横向 LSB、垂直指标、`GDEF`、`VORG`、`vmtx`、`head`/`OS/2` 中可安全继承的元数据字段；静态 exact 样式还会保留上游 simple glyph flags、glyf bbox 和组合字形组件名。数字、与 Inter 兼容的冒号上下文、严格二字宽的中文 `——`，以及 CL 跟随 Shanggu Sans `1.028` 官方 TTF / VF 而不是 Sarasa `1.0.40` 内置旧 subset 的轮廓来源，是本派生字体的刻意差异。
+- 静态 TTF 不从 VF 实例化。hinted 和 unhinted 两套都使用静态 Source Han Sans 与静态 Inter，按 Sarasa 上游的 `pass1`、`kanji`、`hangul`、`pass2` 片段流程构建；CL 在 `kanji` 阶段额外使用 Shanggu Sans `1.028` 官方静态 TTF 覆盖传统旧字形。最终 TTF 会再按对应 Sarasa Ui 参考字体裁剪 cmap、回补空 `cv/ss` FeatureRecord、套用 GSUB Script / LangSys 模板和 GPOS 结构模板，并同步非数字 metrics；SemiBold 直接采用 Sarasa 静态路径的 `Source Han Medium + Inter SemiBold` 配对，Heavy 扩展字重以 Bold 作为 reference 边界。随后默认数字和 `:` remap 到已有的 pnum glyph，清理旧冒号上下文替换后追加与 Inter shaping 样例一致的 colon-run `calt`，中文名、metadata、glyf flags / bbox、组件结构和静态 `STAT` 也在最终 TTF 上同步。
+- hinted 静态 TTF 会重新 hint 本项目实际生成的片段。每个字重固定建立与 Sarasa 上游相同顺序的完整环境：8 个家族、6 个地区、正斜体共 96 个 `pass1` 输入，再加 6 个 `kanji` 和 6 个 `hangul` 输入。`pass1` 先经过 `ttfautohint`；Chlorophytum 分别生成完整 `pass1` 组和完整 FE 组的高层 hint 数据，最后按 `pass1`、`kanji`、`hangul` 顺序把全部 108 个输入交给一次统一 `instruct`，再由 `pass2` 取出 Ui 成品需要的片段。这个流程逐项对应上游 `GroupHintSelfPass1`、`GroupHintSelfFe`、`GroupInstr`，也保证全量构建、指定地区构建和断点恢复不会因分析输入缩小而产生另一套全局 TrueType 函数。高层 hint store 中的 glyph 项按数字 GID 规范化；`sharedHints` 则严格按 Sarasa hcfg 的 `Ideograph`、`Hiragana`、`Katakana` 语义顺序写入，因为其数组位置会决定最终 TrueType 函数 ID，不能按名称重新排序。ExtraLight、Light、Regular、SemiBold、Bold 使用上游同名 reference/hcfg 环境；只有 Heavy 没有同名 Sarasa 静态成品，其 Ui 与 FE 使用实际 900 轮廓，辅助拉丁环境和 hcfg 采用 Bold 边界，绝不复制相邻成品的 glyph instructions。
 - unhinted 静态 TTF 使用相同的静态片段路径，但跳过 `ttfautohint` 和 Chlorophytum，直接由未 hint 的 `pass1`/`kanji`/`hangul` 合成；这是一套正式输出，供需要无 TrueType instructions 版本的使用场景选择。
-- 静态 TTF 使用 `post` format 2 保存 glyph names；这是为了在默认比例数字改挂到 U+0030..U+0039 后，`glyph01332`/`glyph01334` 这类上游组件名仍能在保存、重开和审计中稳定保留。VF 仍保持原来的 `post`/GID 模型。
+- 静态 TTF 与上游一样使用 `post` format 3，不保存 glyph names。比例数字与等宽数字的关系由 cmap 和 GSUB 表达；构建不会为了显示名称改变 glyph order，也不会在 subset 前预先制造与最终 GID 不一致的自动名。
 - glyph 总数不作为构建目标。脚本会保留和同步 cmap 字形以及 GSUB/GPOS/GDEF 可达的未编码 glyph；不会为了让 `maxp.numGlyphs` 与上游相同而补入不可达 glyph。
 - 静态 TTF 不再为了 OTS 清除上游 `OVERLAP_SIMPLE` flags；这些 flags 会影响 FreeType rasterization，exact 样式应与上游保持一致。最终写出会强制重编译 `glyf`，并把带 `OVERLAP_SIMPLE` 的重复 flags 写成 OTS 可接受的 repeat 编码，而不是删除 bit 6。OTS 对上游 unhinted 和本派生 unhinted 可能仍打印 `maxp maxZones: 0`、`gasp` sentinel / 丢表等基线警告，但返回码通过。
 
@@ -112,13 +122,12 @@ VF 实例和静态 TTF 都使用更接近 Sarasa / CSS 的公开字重体系：
 
 - `ExtraLight`：`200`
 - `Light`：`300`
-- `Normal`：`350`
 - `Regular`：`400`
-- `Medium`：`500`
+- `SemiBold`：`600`
 - `Bold`：`700`
 - `Heavy`：`900`
 
-其中 `Normal`、`Medium`、`Heavy` 是本项目保留的扩展实例。`ExtraLight 200` 是公开字重口径；CJK 轮廓来源仍是 Source Han Sans 的 ExtraLight 口径 `250`，不会伪造 Source Han Sans 不存在的 CJK `200` 轮廓。VF 通过 `avar` 轴映射让 public `wght=200` 对应 Source Han 内部 `wght=250`，同时让 Inter 对应 public `wght=200`；public `300` `350` `400` `500` `700` `900` 分别映射到 Source Han 和 Inter 的同数字上游位置。
+`ExtraLight 200` 是 Sarasa/CSS 的公开口径；CJK 轮廓来源仍是 Source Han Sans ExtraLight `250`，不会伪造不存在的 Source Han CJK `200`。`SemiBold 600` 采用 Sarasa 原静态路径的跨上游语义：CJK 是 Source Han Medium `500`，Latin 是 Inter SemiBold `600`。隐藏的 public `350` 仅用于保留连续插值校正点，不出现在 fvar 命名实例、STAT 公开档位或静态文件中。Heavy `900` 是本项目保留的扩展实例，使用 Source Han Heavy `900` 与 Inter Black `900`；两者在极粗端的视觉墨量并不完全相同，这项取舍优先保持各上游的终点语义、轴单调性和未来可重建性。
 
 ## 文件
 
@@ -126,23 +135,23 @@ VF 实例和静态 TTF 都使用更接近 Sarasa / CSS 的公开字重体系：
 - hinted 静态 TTF：[fonts/static](fonts/static)
 - unhinted 静态 TTF：[fonts/static](fonts/static)
 
-每个地区、每套静态版包含 14 个文件：7 个字重，每个字重有正体和 Italic。两套静态 TTF 都从 Sarasa 静态片段路径构建；hinted 版额外经过 `ttfautohint` 和 Sarasa 上游 Chlorophytum 的 hint 流程，unhinted 版保留无 TrueType instructions 的静态输出。
+每个地区、每套静态版包含 12 个文件：6 个字重，每个字重有正体和 Italic。两套静态 TTF 都从 Sarasa 静态片段路径构建；hinted 版额外经过 `ttfautohint` 和 Sarasa 上游 Chlorophytum 的 hint 流程，unhinted 版保留无 TrueType instructions 的静态输出。
 
 发布页会提供按地区拆分和全集打包的 TTF 压缩包：
 
 每个地区有三套包，共 18 个 ZIP：
 
-- `Sarasa-Ui-VF-PropDigits-{REGION}-TTF-1.0.40.2.zip`：单个地区的正体和 Italic 可变 TTF。
-- `SarasaUiPropDigits{REGION}-TTF-1.0.40.2.zip`：单个地区的 hinted 静态 TTF。
-- `SarasaUiPropDigits{REGION}-TTF-Unhinted-1.0.40.2.zip`：单个地区的 unhinted 静态 TTF。
+- `Sarasa-Ui-VF-PropDigits-{REGION}-TTF-1.0.40.3.zip`：单个地区的正体和 Italic 可变 TTF。
+- `SarasaUiPropDigits{REGION}-TTF-1.0.40.3.zip`：单个地区的 hinted 静态 TTF。
+- `SarasaUiPropDigits{REGION}-TTF-Unhinted-1.0.40.3.zip`：单个地区的 unhinted 静态 TTF。
 
 另有三套全地区合集：
 
-- `Sarasa-Ui-VF-PropDigits-TTF-1.0.40.2.zip`：全部地区的可变 TTF。
-- `SarasaUiPropDigits-TTF-1.0.40.2.zip`：全部地区的 hinted 静态 TTF。
-- `SarasaUiPropDigits-TTF-Unhinted-1.0.40.2.zip`：全部地区的 unhinted 静态 TTF。
+- `Sarasa-Ui-VF-PropDigits-TTF-1.0.40.3.zip`：全部地区的可变 TTF。
+- `SarasaUiPropDigits-TTF-1.0.40.3.zip`：全部地区的 hinted 静态 TTF。
+- `SarasaUiPropDigits-TTF-Unhinted-1.0.40.3.zip`：全部地区的 unhinted 静态 TTF。
 
-合计 21 个 ZIP。`1.0.40` 表示 Sarasa Gothic 上游基线，最后的 `.2` 表示本仓库衍生发布。
+合计 21 个 ZIP。`1.0.40` 表示 Sarasa Gothic 上游基线，最后的 `.3` 表示本仓库衍生发布。
 
 ## 构建
 
@@ -187,7 +196,13 @@ python tools\build_sarasa_ui_propdigits_sc.py --static-only --regions SC --resum
 
 恢复模式不会清空现有静态输出目录，只会跳过已经完整存在的字重；同一字重必须同时存在 hinted 与 unhinted、正体与 Italic 四个文件才会被视为完整。只要某个字重仍需生成，hinted 路径就会恢复该字重固定的六地区完整分析环境。默认构建仍会先清理目标地区的静态 TTF 输出，以保证从零复现。
 
-脚本会在缺失依赖或源文件时准备固定版本的构建输入：Sarasa Gothic `v1.0.40`、各地区 `SarasaUi{REGION}` TTF `1.0.40` hinted/unhinted、Source Han Sans `2.005R` VF、Shanggu Sans `1.028` 静态 TTF 与 VF、Inter `v4.1`、Node.js `v26.7.0`，以及 Sarasa 上游 npm 依赖。Python 包依赖也会自动安装并固定到本次验证的版本：`fontTools 4.63.0`、`uharfbuzz 0.56.0`、`brotli 1.2.0`、`ttfautohint-py 0.6.1`、`py7zr 1.1.3`、`afdko 5.0.1`、`chws_tool 1.4.5` 和 `east-asian-spacing 1.4.5`；正式审计工具另固定 `freetype-py 2.5.1`。静态 Source Han TTC 转换会使用 AFDKO 提供的 `otc2otf`/`otf2ttf`；CL 的 Shanggu 覆盖源直接使用 Shanggu 官方发布 TTF，不再通过本地 AFDKO 把 Sarasa 内置旧 subset OTF 转成 TTF。已有输入会按适用条件核验：Sarasa 参考字体检查 nameID 5 版本，下载或复用其 12 个六地区发布包时同时检查上游 SHA-256；Sarasa 源码检查发布 commit、`package.json` 版本与 lockfile 哈希；Shanggu 发布包检查 SHA-256。不一致的输入不会被静默接受。
+VF 可用 `--resume-variable` 断点恢复。它不会仅凭文件存在或时间戳跳过，而会先读取成品并检查 public `wght` 轴、六个命名实例、完整 `avar` 锚点与 600→Source Han 500 映射、项目版本、四方版权、vendor、MVAR 以及 `chws/vchw`；任一项不符都会重建该正体或 Italic 文件。完整恢复命令为：
+
+```powershell
+python tools\build_sarasa_ui_propdigits_sc.py --resume-variable --resume-static
+```
+
+脚本会在缺失依赖或源文件时准备固定版本的构建输入：Sarasa Gothic `v1.0.40`、各地区 `SarasaUi{REGION}` TTF `1.0.40` hinted/unhinted、Source Han Sans `2.005R` VF、Shanggu Sans `1.028` 静态 TTF 与 VF、Inter `v4.1`、Node.js `v26.7.0`，以及 Sarasa 上游 npm 依赖。Python 包依赖也会自动安装并固定到本次验证的版本：`fontTools 4.63.0`、`uharfbuzz 0.56.0`、`brotli 1.2.0`、`ttfautohint-py 0.6.1`、`py7zr 1.1.3`、`afdko 5.0.1`、`chws_tool 1.4.5` 和 `east-asian-spacing 1.4.5`；正式审计工具另固定 `freetype-py 2.5.1`。静态 Source Han TTC 转换会使用 AFDKO 提供的 `otc2otf`/`otf2ttf`；CL 的 Shanggu 覆盖源直接使用 Shanggu 官方发布 TTF，不再通过本地 AFDKO 把 Sarasa 内置旧 subset OTF 转成 TTF。已有输入会按适用条件核验：Sarasa 参考字体检查 nameID 5 版本，下载或复用其 12 个六地区发布包时同时检查上游 SHA-256；Sarasa 源码检查发布 commit、`package.json` 版本与 lockfile 哈希；Source Han Sans VF、Inter VF、Shanggu 发布包和按平台选择的 Node.js 官方归档都检查固定 SHA-256。不一致的输入不会被静默接受。
 
 相对 `v1.0.40` 的构建环境，Node.js 从 `26.3.0` 升到 `26.7.0`，`uharfbuzz` 从 `0.55.0` 升到 `0.56.0`，`ttfautohint-py` 从 `0.6.0` 升到 `0.6.1`，`py7zr` 从 `1.1.0` 升到 `1.1.3`，并新增 `chws_tool/east-asian-spacing 1.4.5`。其中 `ttfautohint-py 0.6.1` 只新增 `SOURCE_DATE_EPOCH` 传递和构建兼容修复，没有更换 hint 算法；`py7zr` 只参与上游归档解包；Node 仍执行 Sarasa `1.0.40` 自己的 lockfile；`uharfbuzz 0.56.0` 下生成的 `chws` / `vchw` GPOS 已与旧核心结果逐表对照一致。发布审计还会检查所有成品的轮廓、hint、metrics 和 shaping，工具升级本身不作为新增字体设计差异。
 
@@ -235,11 +250,11 @@ python tools\build_sarasa_ui_propdigits_sc.py --static-only --regions SC --resum
 
 静态 hinted 构建按源文件、上游提交、工具版本和 hint store 顺序规则为每个字重建立持久工作区，并缓存 96 个 `pass1`、12 个 FE 输入及完整分组的高层 hint 数据，位置是 `.build-cache/sarasa-ui-propdigits/`。持久工作区让一次完整分析意外中断后可以直接复用已准备好的 108 个字体；高层 hint 缓存则只在整个字重分析成功后以原子方式写入。缓存不会把部分地区的旧分析结果拼成一个新分组，也不保存已经 `instruct` 的半成品 TTF；命中高层 hint 缓存后仍会把同一字重的全部 108 个输入交给一次统一 `instruct`。输入、工具链、上游提交或 `sharedHints` 语义顺序变化时缓存键随之变化，不会静默复用旧工作区；需要冷构建时可设置 `SARASA_DISABLE_BUILD_CACHE=1`，或用 `SARASA_BUILD_CACHE` 指向其他缓存目录。
 
-字体检查报告见 [reports/font-inspection.json](reports/font-inspection.json)，构建报告见 [reports/Sarasa-Ui-PropDigits-report.json](reports/Sarasa-Ui-PropDigits-report.json)，发布前 exact、layout/shaping 与像素审计见 [reports/release-audit.json](reports/release-audit.json)。正式入口为 `python tools\audit_sarasa_ui_propdigits.py`。layout 模板审计会逐个静态 TTF 比对 GSUB FeatureRecord 顺序、空 `cv/ss` 标签、Script / LangSys feature 顺序，以及移除本项目明确追加的 `chws` / `vchw` 后的基础 GPOS FeatureRecord/LookupList 结构；同时单独验证新增 lookup 只由 `chws` / `vchw` 使用且基础 lookup 不被改写。shaping 审计会覆盖静态 exact `palt` 下 `かなカナ` advance、静态连续长破折号在 `calt`/`vert`/`vrt2` 下的替换路径、全部静态字体与 VF 多个公开字重实例的横排 `chws` / 竖排 `vchw` positioning，以及 `head.fontRevision` 与 nameID 5 版本一致性。VF metadata 审计还会检查 nameID 25 的 ASCII 字母数字限制，以及 fvar、STAT、GSUB、GPOS 引用的 name ID 是否全部存在。CJK 笔画审计逐地区读取最终落盘的正体和 Italic VF，在七个命名字重上检查全部 ideograph cmap：本次共覆盖六地区 `184,302` 个“地区 × 码位”组合，并同时检查仿斜前后轮廓面积、字重单调性和 ExtraLight 到 Heavy 的墨量跨度，失败数为 `0`；另以七字重样张逐行对照正体 VF、Italic VF 和 unhinted 静态 Italic。FreeType 审计会对六地区四个 exact 字重的 hinted 正斜体逐码位检查 `9/12/16/20/24 ppem` 栅格结果，并排除数字、冒号和文档明确列出的 CL Shanggu 轮廓边界；默认并发数与本机逻辑 CPU 数一致，可用 `--raster-jobs` 调整。本次发布共执行 48 个 hinted exact 栅格用例、`9,388,280` 次逐码位渲染比较，差异为 `0`。
+字体检查报告见 [reports/font-inspection.json](reports/font-inspection.json)，构建报告见 [reports/Sarasa-Ui-PropDigits-report.json](reports/Sarasa-Ui-PropDigits-report.json)，发布前 exact、layout/shaping 与像素审计见 [reports/release-audit.json](reports/release-audit.json)。正式入口为 `python tools\audit_sarasa_ui_propdigits.py`。layout 模板审计会逐个静态 TTF 比对 GSUB FeatureRecord 顺序、空 `cv/ss` 标签、Script / LangSys feature 顺序，以及移除本项目明确追加的 `chws` / `vchw` 和静态竖排破折号 PairPos 后的基础 GPOS FeatureRecord/LookupList 结构；同时单独验证新增 lookup 不改写上游基础 lookup。shaping 审计会覆盖静态 exact `palt` 下 `かなカナ` advance，并实际 shape `——`：单个 U+2014 不得被上下文规则改写；静态横排第二字必须使用补数 advance 的延续字形；VF 默认横排与显式 `ccmp` 必须合成一个 `2em` glyph，默认竖排与显式 `vert` 必须合成一个 `2em` 竖排 glyph，而 `vrt2-only` 必须保留两个相同的 `uniFE31`。同一组探针还检查 `———`、U+2E3A 和 U+2E3B 的横竖替换、`2em/3em` advance、编码字符与重复输入的 glyph 等价关系及位图连通性。VF 六个公开字重还要与对应 unhinted 静态 TTF 比较组合轮廓边界、总 advance 和 9/12/16/20/24/48 ppem 的无 hint FreeType 栅格；静态两 glyph 与 VF 单 glyph 在缩放时可能于拼接端出现 1 px 独立取整差异，审计会记录实际异或像素并只允许边界单侧最多 1 px、墨量差不超过 10% 且两者都保持四邻域连通。VF 在 13 个轴位置执行完整几何与多 ppem 位图检查，并另以 `0.5` 字重步长遍历 `200..900` 的 1401 个位置，对双连的六种 feature 组合共做 8406 次 advance 与替换路径检查。同时覆盖横排 `chws` / 竖排 `vchw` positioning，以及 `head.fontRevision` 与 nameID 5 版本一致性。VF metadata 审计还会检查 nameID 25 的 ASCII 字母数字限制，fvar、STAT、GSUB、GPOS 引用的 name ID 是否全部存在，以及每个 GPOS VariationIndex 是否落在 GDEF VarStore 内；另以 72 个“地区 × 正斜体 × 公开字重”用例比较目标 VF 与对应 Source Han VF 内部实例的 `kern/palt/vpal` shaping。轴裁剪、`avar` 与 ItemVariationStore 都使用 F2Dot14 坐标，因此只容许重复定点量化产生的单项 1 unit 差异，超过即失败。最终审计完成 120 个静态 exact、144 个静态 layout、120 个 `palt`、120 个 PropDigits、144 个静态破折号、60 个 VF exact metric、12 个 VF 源配对、12 条连续字重曲线、156 个 VF 破折号和 72 个 `chws/vchw` 案例，所有 failure 计数均为 0。
 
-外部工具复核使用 OTS `9.2.0` 和 FontBakery `1.1.0`。OTS 对全部 180 个字体均返回成功；84 个 unhinted 静态 TTF 会打印与官方 unhinted Sarasa Ui 相同的 `maxZones/gasp` 丢表信息，hinted 与 VF 没有该警告。FontBakery 的 `opentype/font_version` 对全部 180 个项目字体均为 PASS；SC Regular 代表性检查剩余的 GDEF mark、spacing mark 和 `xAvgCharWidth` 三条 WARN 在官方 Sarasa Ui SC 样本中同样存在。
+外部工具复核使用 OTS `9.3.0` 和 FontBakery `1.1.0`。OTS 对全部 156 个字体均返回成功；72 个 unhinted 静态 TTF 各打印一次与官方 unhinted Sarasa Ui 相同的 `maxZones/gasp` 丢表信息，72 个 hinted 静态 TTF 与 12 个 VF 没有该信息。FontBakery 的 `opentype/font_version` 对全部 156 个项目字体均为 PASS；SC Regular 静态与正斜体 VF 的代表性完整检查均为 0 FAIL，剩余 GDEF mark、spacing mark、`post` format 3 和 `xAvgCharWidth` 四类 WARN 在官方 Sarasa Ui SC Regular 中同样存在，其中 GDEF mark 与 `post` format 3 也可在官方 Source Han Sans SC VF 基线中复现。官方 Sarasa Ui SC Regular 另有其自身继承的 `font_version` mismatch，本项目已按 `1.0.40.3` 修复，不作为可接受基线保留。
 
-逐点 CJK 审计在上述 `184,302` 个“地区 × 码位”组合的七个命名字重上共比较 `1,290,114` 个轮廓实例。检查要求正斜体 cmap 与轮廓拓扑一致；以全部轮廓点求出最小最大残差的整字平移后，每个 Italic 轮廓点必须落在对应正体 `9.4°` 剪切结果的 `2.0` font units 内。替换前的旧 CL VF 在 `wght=200` 会被该规则检出 `7,968 / 30,717` 个异常、最大残差约 `53.92` units；最终字体为 `0`，六地区最大残差为 `1.692365` units。面积守恒、字重单调性和墨量跨度仍作为独立检查保留。
+逐点 CJK 审计在上述 `184,302` 个“地区 × 码位”组合的六个命名字重上共比较 `1,105,812` 个轮廓实例。检查要求正斜体 cmap 与轮廓拓扑一致；以全部轮廓点求出最小最大残差的整字平移后，每个 Italic 轮廓点必须落在对应正体 `9.4°` 剪切结果的 `2.0` font units 内。替换前的旧 CL VF 在 `wght=200` 会被该规则检出 `7,968 / 30,717` 个异常、最大残差约 `53.92` units；最终字体为 `0`，六地区最大残差为 `1.692365` units。面积守恒、字重单调性和墨量跨度仍作为独立检查保留。
 
 ## 许可证
 
