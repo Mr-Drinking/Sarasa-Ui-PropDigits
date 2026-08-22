@@ -18,6 +18,8 @@ HC 地区沿用 Sarasa 上游路径：CJK 底稿来自 SourceHanSansHC。
 ExtraLight、Light、Regular、SemiBold、Bold 与上游 Sarasa 的公开静态样式
 一致；Heavy 900 是本项目保留的扩展实例。SemiBold 600 沿用 Sarasa 的静态
 配对：CJK 使用 Source Han Sans Medium 500，Latin 使用 Inter SemiBold 600。
+Heavy 使用 Source Han/Shanggu Heavy 900 与 Inter Black 900；Bold 只提供
+布局、命名和 hint 配置边界，不覆盖 Heavy 的 glyph 数据。
 
 公开字重采用 Sarasa/CSS 口径：ExtraLight 是 200。CJK 轮廓来源仍是
 Source Han Sans 的 ExtraLight 口径 250；VF 通过轴映射让 public
@@ -30,12 +32,14 @@ OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字�
 1:2 会上浮 ':'，1:a 和 a:2 不会上浮，1::2 等连续冒号上下文遵循
 Inter 的 colon-run 规则。
 
-单个 U+2014 保留原比例宽。连续两个 U+2014 由 calt 把第二字替换为水平
-延续字形，并以补数 advance 让横排总宽严格等于 2em。竖排时 vert/vrt2
-把两字替换为同一个 uniFE31，再由 GPOS PairPos 按实际轮廓端面和斜率设置
-第二字的 XPlacement/YPlacement 而不改变 YAdvance；正体只上移、Italic
-同时横移并上移，使竖排总 advance 也严格等于 2em。两半使用相同轮廓和
-hint 分类，calt 与竖排替换的不同 lookup 执行顺序都必须得到相同结果。
+破折号跟随 Source Han/Shanggu 的 ccmp、locl、vert/vrt2 结构。HC
+在非 CJK 语言下保留比例 U+2014 和比例 U+2E3A/U+2E3B；CJK 地区标签
+把它们切到严格 1em/2em/3em 的横竖字形。KOR 单字保留 Source Han
+较窄且位置较高的地区字形；CL 则跟随 Shanggu，把 U+2014/U+2015
+全局映射到同一全宽字形，不另造地区 locl。正常双连、三连路径各使用一个
+长 glyph；仅显式启用 vrt2 的上游边界可能保留多个相同竖排单字形。
+破折号笔画厚度、少量 side bearing 和比例 advance 会随字重变化，固定的是
+CJK 的 1em/2em/3em 语义与中宫基线。Italic 使用对应正体轮廓的 9.4 度剪切。
 
 最终成品还会按 Noto CJK 的官方交付流程加入 GPOS chws/vchw：chws
 用于横排连续全角标点的上下文压缩，vchw 用于对应的竖排压缩。实现固定使用
@@ -48,7 +52,9 @@ name 表包含地区本地化显示名，例如：
 OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
 ???? 占位值。head.fontRevision 使用 OpenType fixed 数值 1.0403，
 对应本仓库版本 1.0.40.3；nameID 5 以 OpenType 数值 Version 1.0403
-开头，并在后续 project 字段保留完整版本 1.0.40.3。
+开头，并在后续 project 字段保留完整版本 1.0.40.3。最终 name 表与官方
+Sarasa/Source Han 成品一样不保留 platform 1（Macintosh）记录；Windows/Unicode
+本地化名称和四方版权保持完整。
 unhinted 套件同样沿用上游 Sarasa 的静态片段构建路径，但直接用
 未 hint 的 pass1/kanji/hangul 片段进入 pass2。它会跳过
 ttfautohint 和 Chlorophytum，提供正式的无 TrueType instructions
@@ -57,21 +63,29 @@ ttfautohint 和 Chlorophytum，提供正式的无 TrueType instructions
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui HC 静态字体套模板；
 随后追加 Noto CJK chws/vchw 的 FeatureRecord 和 contextual positioning lookup。
-静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap，并同步非数字 metrics。
-`palt` 下假名等已有 glyph 的定位值按展开轮廓结构与横竖 metrics 建立语义
-映射后从参考字体同步，不依赖 post format 3 产生的跨字体不稳定自动名。连续 U+2014
-保留上游 calt 的脚本可达范围，横排第二字改用补足严格二字宽的延续字形；
-竖排统一使用同一个 uniFE31，并由 GPOS 定位第二字。审计同时校验 calt、
-vert、vrt2、两种 lookup 执行顺序和 FreeType 位图笔画一致性。
+静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap；五个官方同名字重同步
+非数字 metrics，Heavy 则保留同次 Sarasa pass2 Heavy/Black 的 hmtx/vmtx、
+VORG、glyf 与 bbox。`palt` 下假名等已有 glyph 的定位值按展开轮廓结构与
+横竖 metrics 建立语义映射：官方同名字重从 Sarasa 参考同步，Heavy 从同次
+pass2 来源同步，不依赖 post format 3 产生的跨字体不稳定自动名。
+破折号从对应字重的 Source Han/Shanggu 静态源复制 9 个核心语义字形，
+SC/TC/HC/J/K 另复制 KOR 单字特例；各 CJK 地区标签优先在已有 locl
+FeatureRecord 中原位扩展，模板没有对应 locl 时才补充一条，CAT 空 locl
+继续保持为空。旧 calt continuation、pair-start 与竖排 PairPos 不会保留。
+hinted 成品在相同四点矩形拓扑间替换坐标并保留已生成的 glyph program，
+无需重新运行整组高层 hint 分析；审计逐角色核对 instructions、上游轮廓、
+hmtx/vmtx、字重单调性和 FreeType 多 ppem 位图。
 对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
 glyf bbox 和组合字形结构；Noto chws/vchw 后处理结束后还会再次恢复可直接
 对齐字形的参考 bbox，避免 1 unit 重算通过 phantom points 改变 hinted 位图。
 静态 TTF 与上游一样使用 post format 3，不在
 字体中存储 glyph names；数字的默认比例宽/tnum 等宽关系由 cmap 与 GSUB
 表达，不再为显示名称改变 glyph order 或制造与 GID 不一致的自动名。最终写出 glyf
-时保留上游 OVERLAP_SIMPLE 语义，并用 OTS 可接受的 repeat 编码保存重复
-overlap flags，而不是清除 bit 6。unhinted 套件中的 OTS maxZones/gasp 警告
-继承自上游 unhinted 基线，返回码为 0。
+时保留首点 OVERLAP_SIMPLE 语义，并优先用 OTS 可接受的首 flag repeat run
+保存重复 overlap flag；坐标替换使 x/y 压缩位不同、无法共用 repeat 时，只清除
+后续点上无语义且被 OTS 禁止的显式重复 bit 6。resume 与发布审计会解析原始
+flag stream。unhinted 套件中的 OTS maxZones/gasp 信息继承自上游 unhinted
+基线，返回码为 0。
 glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未编码字形会保留，
 不可达 glyph 数量差异视为构建产物。
 这些字体是修改派生版，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。

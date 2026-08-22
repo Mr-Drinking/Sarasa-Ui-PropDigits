@@ -25,9 +25,10 @@
     "J",
     "K"
   ],
-  "static_only": false,
-  "resume_variable": true,
+  "static_only": true,
+  "resume_variable": false,
   "resume_static": true,
+  "force_static_weights": [],
   "build_script": "tools/build_sarasa_ui_propdigits_sc.py",
   "bootstrap_sources": {
     "sarasa_gothic": "v1.0.40",
@@ -69,16 +70,16 @@
     "J": "../official-sarasa-ui-1.0.40/J/unhinted/SarasaUiJ-Regular.ttf",
     "K": "../official-sarasa-ui-1.0.40/K/unhinted/SarasaUiK-Regular.ttf"
   },
-  "method": "VF 由对应地区的 CJK VF 与 Inter VF 合并而来；SC/TC/HC/J/K 使用对应 Source Han Sans VF。CL 以 Shanggu Sans 1.028 的官方 TTF/VF 发布物作为传统旧字形来源：静态 TTF 的 classical override 直接使用 ShangguSansTC 静态 TTF，VF 以 SourceHanSansK-VF 为底稿并用 ShangguSansTC-VF 覆盖对应 ideograph 字形。静态 CL 最终仍按 SarasaUiCL 参考字体裁剪公开 cmap 和 GSUB/GPOS feature，并同步非数字 metrics；Heavy 扩展字重使用 Bold 作为 reference 边界。码位归属采用 Sarasa pass1 风格，并按 VF 源文件实际覆盖做兜底：Inter VF 以 Sarasa 的 Inter 设置（ss03 和 cv10）烘焙后用于 Latin 和西文符号覆盖；CJK、Korean、Jamo 以及 Sarasa Ui 本地化标点优先来自对应地区的 Source Han Sans VF。在追加 Inter glyph 前，会先应用 Source Han 的 pwid/符号清洗和 Hangul 全角归一。最终 layout 导入对应地区 Sarasa Ui 暴露的 Inter VF GSUB/GPOS 特性，保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 Sarasa Ui 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、中文二字破折号（em dash），以及与 Inter 一致的数字冒号 colon-run calt 规则。单个 U+2014 保持比例宽；静态连续两个由第二字补数 advance 补足横排严格 2em。VF 采用 Source Han 官方静态/VF 的 ccmp 双/三连长字形与 vert 竖排替换结构，以单 glyph 避免可变 advance 独立取整得到 1999/2001 units；六个公开字重的横竖长字形控制点来自本系列对应静态 TTF，中间位置写入独立 gvar 变化。仅启用vrt2 且关闭 vert 时保留两个 uniFE31，其余正常横竖路径均为一个严格 2em glyph。破折号不向 GPOS/GDEF 追加自定义 VariationIndex。合并后会同步或重映射 Inter layout FeatureParams 引用的界面名称记录；VF nameID 25 使用只含 ASCII 字母数字的 Variations PostScript Name Prefix。CJK Italic VF 在剪切前先于正体坐标空间展开全部 gvar IUP 隐含增量，再剪切基础轮廓和真实轮廓 delta，四个 metric phantom points 不参与剪切。对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB FeatureRecord 顺序、空 cv/ss FeatureRecord、Script/LangSys 覆盖顺序、GPOS FeatureRecord lookup index 和 LookupList 结构、非数字 advance 和 LSB 的权重轴规则、tnum 数字目标 hmtx、垂直指标、vmtx 默认值和变化、GDEF、VORG，以及与 Sarasa 兼容的 head/OS/2 metadata；VF 套用静态 GDEF class/mark 模板时保留 Source Han ItemVariationStore，使 kern/palt/vpal 的 VariationIndex 继续随轴工作。Source Han 静态与 VF 的 palt/vpal 数值可能不同，因此静态输出按 Sarasa 静态参考同步，VF 输出保留 Source Han VF 可变值。VF 和静态输出都包含 STAT；静态 STAT 只描述单实例样式，不保留 fvar/gvar 可变表。glyph 总数不强行补齐到与上游一致：cmap 字形和布局可达的未编码字形会保留，不可达 glyph 数量差异不视为渲染缺陷。静态 TTF 从对应地区静态 Source Han Sans 和 Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字和冒号 cmap remap、命名、metadata、layout 模板、GDEF/VORG、与上游兼容的 glyf flags/bbox/组件结构、静态 post format 3、OTS-compatible glyf repeat 编码、palt 取值同步、中文破折号严格二字宽修正和静态 STAT 规则。全部轮廓、hint、metrics、GSUB 和基础 GPOS 模板处理完成后，再按 Noto CJK 交付流程追加 chws/vchw contextual positioning。静态 post 使用 format 3，不存储 glyph names，也不改变 glyph order。VF 使用与静态字重一致的下划线MVAR 曲线，并写入本项目四方 copyright。head.fontRevision 写为 OpenType fixed 数值 1.0403，对应本仓库版本 1.0.40.3。hinted 静态套件会对本项目实际生成的片段重新 hint：每个字重固定建立 Sarasa 上游顺序的 96 个 pass1 与 12 个 FE 输入，全部高层 hint 最后由一次 统一 instruct 写入 TrueType instructions，再由 pass2 合成最终 TTF。unhinted 静态套件提供无 TrueType instructions 的正式静态输出。ExtraLight、Light、Regular、SemiBold、Bold 直接使用上游同名 reference/hint 环境；Heavy 900 使用实际 Heavy/Black 轮廓并沿用 Bold 的辅助边界。公开字重采用 Sarasa/CSS 口径 200/300/400/600/700/900。CJK 的 public 200 来自 Source Han ExtraLight 250，public 600 来自 Source Han Medium 500；Inter 始终钉在同数字公开坐标，因此 public 600 使用 Inter SemiBold 600。",
+  "method": "VF 由对应地区的 CJK VF 与 Inter VF 合并而来；SC/TC/HC/J/K 使用对应 Source Han Sans VF。CL 以 Shanggu Sans 1.028 的官方 TTF/VF 发布物作为传统旧字形来源：静态 TTF 的 classical override 直接使用 ShangguSansTC 静态 TTF，VF 以 SourceHanSansK-VF 为底稿并用 ShangguSansTC-VF 覆盖对应 ideograph 字形。静态 CL 最终仍按 SarasaUiCL 参考字体裁剪公开 cmap 和 GSUB/GPOS feature，五个官方同名字重同步非数字 metrics；Heavy 保留 Shanggu Heavy 来源数据，Bold 只提供布局、命名和 hint 配置边界。码位归属采用 Sarasa pass1 风格，并按 VF 源文件实际覆盖做兜底：Inter VF 以 Sarasa 的 Inter 设置（ss03 和 cv10）烘焙后用于 Latin 和西文符号覆盖；CJK、Korean、Jamo 以及 Sarasa Ui 本地化标点优先来自对应地区的 Source Han Sans VF。在追加 Inter glyph 前，会先应用 Source Han 的 pwid/符号清洗和 Hangul 全角归一。最终 layout 导入对应地区 Sarasa Ui 暴露的 Inter VF GSUB/GPOS 特性，保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 Sarasa Ui 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、中文二字破折号（em dash），以及与 Inter 一致的数字冒号 colon-run calt 规则。静态与 VF 都在最终模板后重建 Source Han/Shanggu 的 ccmp、地区 locl 和 vert/vrt2 破折号路径。SC/TC/HC/J/K 的非 CJK 默认路径保留比例长字形，CJK 路径严格使用 1em/2em/3em 字形并保留 KOR 单字特例；CL 跟随 Shanggu 的全局全宽映射。静态轮廓逐字重来自对应 Source Han/Shanggu 静态源；VF 保留同一上游的 gvar 与 metric 变化。旧 Sarasa calt continuation、pair-start 和破折号 GPOS PairPos 全部删除。破折号不向 GPOS/GDEF 追加自定义 VariationIndex。合并后会同步或重映射 Inter layout FeatureParams 引用的界面名称记录；VF nameID 25 使用只含 ASCII 字母数字的 Variations PostScript Name Prefix。CJK Italic VF 在剪切前先于正体坐标空间展开全部 gvar IUP 隐含增量，再剪切基础轮廓和真实轮廓 delta，四个 metric phantom points 不参与剪切。对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB FeatureRecord 顺序、空 cv/ss FeatureRecord、Script/LangSys 覆盖顺序、GPOS FeatureRecord lookup index 和 LookupList 结构；五个官方同名字重还对齐非数字 advance 和 LSB、tnum 数字目标 hmtx、垂直指标与 vmtx。Heavy 的这些 glyph 数据保留实际 Source Han/Shanggu Heavy 和 Inter Black 的 Sarasa pass2 结果。VF 对齐对应公开点的 非数字 metric 规则及变化、GDEF、VORG，以及与 Sarasa 兼容的 head/OS/2 metadata；VF 套用静态 GDEF class/mark 模板时保留 Source Han ItemVariationStore，使 kern/palt/vpal 的 VariationIndex 继续随轴工作。Source Han 静态与 VF 的 palt/vpal 数值可能不同，因此五个官方同名字重的静态输出按 Sarasa 静态参考同步，Heavy 按同次 pass2 来源同步，VF 输出保留 Source Han VF 可变值。VF 和静态输出都包含 STAT；静态 STAT 只描述单实例样式，不保留 fvar/gvar 可变表。glyph 总数不强行补齐到与上游一致：cmap 字形和布局可达的未编码字形会保留，不可达 glyph 数量差异不视为渲染缺陷。静态 TTF 从对应地区静态 Source Han Sans 和 Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字和冒号 cmap remap、命名、metadata、layout 模板、GDEF/VORG、与上游兼容的 glyf flags/bbox/组件结构、静态 post format 3、OTS-compatible glyf repeat 编码与显式后续 OVERLAP_SIMPLE 规范化、palt 取值同步、Source Han/Shanggu 破折号同步和静态 STAT 规则。全部轮廓、hint、metrics、GSUB 和基础 GPOS 模板处理完成后，再按 Noto CJK 交付流程追加 chws/vchw contextual positioning。静态 post 使用 format 3，不存储 glyph names，也不改变 glyph order。最终 name table 删除 platform 1 记录，只保留现代 Windows/Unicode 名称；VF 使用与静态字重一致的下划线MVAR 曲线，并写入本项目四方 copyright。head.fontRevision 写为 OpenType fixed 数值 1.0403，对应本仓库版本 1.0.40.3。hinted 静态套件会对本项目实际生成的片段重新 hint：每个字重固定建立 Sarasa 上游顺序的 96 个 pass1 与 12 个 FE 输入，全部高层 hint 最后由一次 统一 instruct 写入 TrueType instructions，再由 pass2 合成最终 TTF。unhinted 静态套件提供无 TrueType instructions 的正式静态输出。ExtraLight、Light、Regular、SemiBold、Bold 直接使用上游同名 reference/hint 环境；Heavy 900 使用实际 Heavy/Black 轮廓并沿用 Bold 的辅助边界。公开字重采用 Sarasa/CSS 口径 200/300/400/600/700/900。CJK 的 public 200 来自 Source Han ExtraLight 250，public 600 来自 Source Han Medium 500；Inter 始终钉在同数字公开坐标，因此 public 600 使用 Inter SemiBold 600。",
   "intentional_differences_from_upstream_sarasa_ui": [
     "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
     "公开字重遵循 Sarasa/CSS 口径：200、300、400、600、700、900；CJK 的 public 200/600 分别来自 Source Han ExtraLight 250/Medium 500。",
     "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
-    "单个 U+2014 保持比例宽、轮廓和 glyph；静态中文破折号沿用 Sarasa calt 续接并用第二字补数 advance，VF 采用 Source Han 式 ccmp/vert 单 glyph 结构并以本系列静态轮廓作为命名字重控制点，因此正常横排和竖排均严格占 2em。",
+    "静态与 VF 都使用 Source Han/Shanggu 的 ccmp、地区 locl、vert/vrt2 破折号结构；非 CJK 比例路径、CJK 1em/2em/3em、KOR 单字特例和 CL 全局全宽映射分别跟随对应上游，轮廓与 metrics 随字重变化。",
     "VF 与静态 TTF 都追加来自 Noto CJK 交付流程的 GPOS chws/vchw；Source Han Sans 2.005R 与 Sarasa 1.0.40 参考成品本身不含这两个 FeatureRecord。",
-    "静态 CL 使用 Shanggu Sans 官方发布物作为旧字形轮廓来源，但公开 cmap、GSUB/GPOS feature 和非数字 metrics 仍按 SarasaUiCL reference 边界裁剪与同步。",
+    "静态 CL 使用 Shanggu Sans 官方发布物作为旧字形轮廓来源；公开 cmap 与 GSUB/GPOS 模板按 SarasaUiCL 边界裁剪，五个官方同名字重的非数字 metrics 同步 SarasaUiCL，Heavy 900 保留 Shanggu Heavy 来源数据。",
     "静态 TTF 与上游一样使用 post format 3，不存储 glyph names；PropDigits 关系只由 cmap/GSUB 表达，不改 glyph order。",
-    "Heavy 900 是本项目扩展实例；上游 Sarasa 公开静态系列止于 Bold 700。"
+    "Heavy 900 是本项目扩展实例；上游 Sarasa 公开静态系列止于 Bold 700。Bold 只作为 Heavy 的布局、命名和 hint 配置边界，Heavy 的 glyf、hmtx/vmtx、VORG、bbox 与 palt 保留 Source Han/Shanggu Heavy 和 Inter Black 构建结果。"
   ],
   "final_gsub_features": [
     "aalt",
@@ -129,532 +130,52 @@
   ],
   "variable_outputs": [
     {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
-      "region": "CL",
-      "italic": false,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1094,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48509"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48509",
-        "vertical_ligature": "glyph48510",
-        "vertical_three_em_ligature": "glyph48511",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
-    },
-    {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
-      "region": "CL",
-      "italic": true,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1094,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48470"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48470",
-        "vertical_ligature": "glyph48471",
-        "vertical_three_em_ligature": "glyph48472",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
+      "rebuilt": false
     },
     {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "region": "SC",
-      "italic": false,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1082,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48742"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48742",
-        "vertical_ligature": "glyph48743",
-        "vertical_three_em_ligature": "glyph48744",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
-    },
-    {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "region": "SC",
-      "italic": true,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1082,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48703"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48703",
-        "vertical_ligature": "glyph48704",
-        "vertical_three_em_ligature": "glyph48705",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
-    },
-    {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
-      "region": "TC",
-      "italic": false,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1085,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48791"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48791",
-        "vertical_ligature": "glyph48792",
-        "vertical_three_em_ligature": "glyph48793",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
-    },
-    {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
-      "region": "TC",
-      "italic": true,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1085,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48752"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48752",
-        "vertical_ligature": "glyph48753",
-        "vertical_three_em_ligature": "glyph48754",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
-    },
-    {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
-      "region": "HC",
-      "italic": false,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1085,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48774"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48774",
-        "vertical_ligature": "glyph48775",
-        "vertical_three_em_ligature": "glyph48776",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+      "rebuilt": false
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
-      "region": "HC",
-      "italic": true,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1085,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48735"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48735",
-        "vertical_ligature": "glyph48736",
-        "vertical_three_em_ligature": "glyph48737",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
+      "rebuilt": false
     },
     {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
-      "region": "J",
-      "italic": false,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1094,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48596"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48596",
-        "vertical_ligature": "glyph48597",
-        "vertical_three_em_ligature": "glyph48598",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+      "rebuilt": false
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
-      "region": "J",
-      "italic": true,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1094,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48557"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48557",
-        "vertical_ligature": "glyph48558",
-        "vertical_three_em_ligature": "glyph48559",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
+      "rebuilt": false
     },
     {
-      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
-      "region": "K",
-      "italic": false,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1094,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48512"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48512",
-        "vertical_ligature": "glyph48513",
-        "vertical_three_em_ligature": "glyph48514",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+      "rebuilt": false
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
-      "region": "K",
-      "italic": true,
-      "rebuilt": false,
-      "resume_verified": true,
-      "gpos_variation_device_count": 1094,
-      "gdef_var_store_present": true,
-      "two_em_dash": {
-        "ok": true,
-        "reasons": [],
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": [
-          [
-            0,
-            "glyph48473"
-          ]
-        ],
-        "triple_rules": [
-          [
-            0,
-            "uni2E3B"
-          ]
-        ],
-        "horizontal_ligature": "glyph48473",
-        "vertical_ligature": "glyph48474",
-        "vertical_three_em_ligature": "glyph48475",
-        "encoded_two_em": "uni2E3A",
-        "encoded_three_em": "uni2E3B",
-        "obsolete_continuations": [],
-        "obsolete_pair_starts": [],
-        "obsolete_pair_positioning": {
-          "vert": [],
-          "vrt2": []
-        }
-      },
-      "two_em_dash_axis": {
-        "ok": true,
-        "locations_checked": 1401,
-        "shapes_checked": 8406,
-        "step": 0.5,
-        "failure_samples": []
-      }
+      "rebuilt": false
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+      "rebuilt": false
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "rebuilt": false
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "rebuilt": false
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+      "rebuilt": false
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+      "rebuilt": false
     }
   ],
   "static_outputs": [

@@ -14,6 +14,7 @@ import logging
 import math
 import os
 import platform
+import re
 import site
 import shutil
 import struct
@@ -92,7 +93,7 @@ def patch_fonttools_overlap_simple_repeat_encoding() -> None:
         compressed_ys = bytearray()
         last_flag = None
         repeat = 0
-        for flag, (x, y) in zip(flags, deltas):
+        for point_index, (flag, (x, y)) in enumerate(zip(flags, deltas)):
             if x == 0:
                 flag = flag | glyf_table.flagXsame
             elif -255 <= x <= 255:
@@ -115,6 +116,19 @@ def patch_fonttools_overlap_simple_repeat_encoding() -> None:
                 compressed_ys.append(y)
             else:
                 compressed_ys.extend(struct.pack(">h", y))
+
+            can_extend_overlap_repeat = flag == last_flag and repeat != 255
+            if (
+                point_index
+                and flag & glyf_table.flagOverlapSimple
+                and not can_extend_overlap_repeat
+            ):
+                # OTS permits bit 6 after the first point only when it is
+                # represented by the first flag's repeat run.  A coordinate
+                # rewrite can make the compressed x/y bits differ and force
+                # the later flag to be emitted explicitly; keep the first
+                # point's overlap semantics but clear that invalid duplicate.
+                flag &= ~glyf_table.flagOverlapSimple
 
             if flag == last_flag and repeat != 255:
                 repeat += 1
@@ -414,7 +428,8 @@ SARASA_HINT_CONFIGS = {
     "Heavy": "Bold",
 }
 CHLOROPHYTUM_HINT_STORE_ORDER = "numeric-gid-hcfg-shared-v3"
-STATIC_HINT_WORK_VERSION = 3
+STATIC_HINT_WORK_VERSION = 4
+STATIC_POSTPROCESS_VERSION = 5
 SARASA_HINT_JOBS = int(os.environ.get("SARASA_HINT_JOBS", str(os.cpu_count() or 1)))
 SARASA_HINT_PREP_JOBS = int(
     os.environ.get("SARASA_HINT_PREP_JOBS", str(min(4, os.cpu_count() or 1)))
@@ -562,6 +577,9 @@ STATIC_STYLE_SOURCES = {
 DIGITS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"]
 DIGITS_TF = [f"{name}.tf" for name in DIGITS]
 PROPDIGITS_CODEPOINTS = set(range(0x30, 0x3A)) | {0x3A}
+DASH_CMAP_CODEPOINTS = {0x2014, 0x2015, 0x2E3A, 0x2E3B, 0xFE31}
+DASH_LOCL_CODEPOINTS = {0x2014, 0x2E3A, 0x2E3B}
+CJK_LOCL_LANGUAGES = {"JAN ", "KOR ", "ZHH ", "ZHS ", "ZHT "}
 WIDTH_FEATURES = {"aalt", "pwid", "fwid", "hwid", "twid", "qwid"}
 SOURCE_HAN_FINAL_GSUB_FEATURES = {"locl", "ccmp", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "calt", "hist"}
 UPRIGHT_EMPTY_GSUB_FEATURES = {f"cv{i:02d}" for i in range(1, 14)} | {f"ss{i:02d}" for i in range(1, 9)}
@@ -618,8 +636,6 @@ SANITIZER_TYPES_PWID = {
     0x2010: "half",
     0x2025: "ellipsis",
     0x2026: "ellipsis",
-    0x2E3A: "stretchDual",
-    0x2E3B: "stretchTri",
     0x31B4: "half",
     0x31B5: "half",
     0x31B6: "half",
@@ -647,6 +663,12 @@ def static_reference_style_name(weight_name: str, italic: bool) -> str:
     if italic:
         return "Italic" if style == "Regular" else f"{style}Italic"
     return style
+
+
+def static_uses_official_glyph_baseline(weight_name: str) -> bool:
+    """Whether Sarasa publishes an exact static style for this project weight."""
+    source = STATIC_STYLE_SOURCES.get(weight_name, {"sarasa": weight_name})
+    return str(source["sarasa"]) == weight_name
 
 
 def reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
@@ -760,6 +782,20 @@ def update_project_legal_names(font: TTFont) -> None:
     font["name"].names = [
         record for record in font["name"].names if record.nameID not in SOURCE_ONLY_LEGAL_NAME_IDS
     ]
+
+
+def remove_mac_name_records(font: TTFont) -> dict[str, int]:
+    if "name" not in font:
+        return {"mac_name_records_removed": 0, "mac_name_records_remaining": 0}
+    before = len(font["name"].names)
+    font["name"].names = [
+        record for record in font["name"].names if record.platformID != 1
+    ]
+    remaining = sum(record.platformID == 1 for record in font["name"].names)
+    return {
+        "mac_name_records_removed": before - len(font["name"].names),
+        "mac_name_records_remaining": remaining,
+    }
 
 
 def set_windows_name_record(font: TTFont, name_id: int, value: str, lang_id: int) -> None:
@@ -1284,6 +1320,45 @@ def count_simple_glyph_overlap_flags(font: TTFont) -> int:
         if getattr(glyph, "numberOfContours", 0) > 0 and hasattr(glyph, "flags"):
             count += sum(1 for flag in glyph.flags if flag & 0x40)
     return count
+
+
+def count_ots_invalid_simple_overlap_flags(font: TTFont) -> int:
+    if "glyf" not in font:
+        return 0
+    invalid = 0
+    glyf = font["glyf"]
+    for glyph in glyf.glyphs.values():
+        data = getattr(glyph, "data", None)
+        if not data:
+            continue
+        if len(data) < 12:
+            continue
+        contour_count = struct.unpack(">h", data[:2])[0]
+        if contour_count <= 0:
+            continue
+        end_points_offset = 10
+        end_points_end = end_points_offset + contour_count * 2
+        if end_points_end + 2 > len(data):
+            continue
+        point_count = struct.unpack(">H", data[end_points_end - 2 : end_points_end])[0] + 1
+        instruction_length = struct.unpack(">H", data[end_points_end : end_points_end + 2])[0]
+        offset = end_points_end + 2 + instruction_length
+        points_read = 0
+        stored_flag_index = 0
+        while points_read < point_count and offset < len(data):
+            flag = data[offset]
+            offset += 1
+            if stored_flag_index and flag & glyf_table.flagOverlapSimple:
+                invalid += 1
+            stored_flag_index += 1
+            repeat_count = 0
+            if flag & glyf_table.flagRepeat:
+                if offset >= len(data):
+                    break
+                repeat_count = data[offset]
+                offset += 1
+            points_read += repeat_count + 1
+    return invalid
 
 
 def force_recompile_glyf(font: TTFont) -> dict[str, int]:
@@ -1999,6 +2074,202 @@ def get_single_substitution_mappings(font: TTFont, tags: set[str]) -> dict[str, 
     return mapping
 
 
+def ligature_outputs_for_feature(
+    font: TTFont,
+    tag: str,
+    first_glyph: str,
+) -> dict[int, str]:
+    if "GSUB" not in font:
+        return {}
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return {}
+    outputs: dict[int, str] = {}
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag != tag:
+            continue
+        for lookup_index in record.Feature.LookupListIndex or []:
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            subtables = list(lookup.SubTable) if lookup.LookupType == 4 else [
+                subtable.ExtSubTable
+                for subtable in lookup.SubTable
+                if lookup.LookupType == 7
+                and getattr(subtable, "ExtensionLookupType", None) == 4
+                and getattr(subtable, "ExtSubTable", None)
+            ]
+            for subtable in subtables:
+                for ligature in list(getattr(subtable, "ligatures", {}).get(first_glyph, []) or []):
+                    components = [first_glyph, *list(ligature.Component or [])]
+                    if all(component == first_glyph for component in components):
+                        outputs[len(components)] = ligature.LigGlyph
+    return outputs
+
+
+def upstream_dash_roles(font: TTFont) -> dict[str, str]:
+    cmap = font.getBestCmap() or {}
+    proportional = cmap.get(0x2014)
+    fullwidth = cmap.get(0x2015)
+    encoded_two = cmap.get(0x2E3A)
+    encoded_three = cmap.get(0x2E3B)
+    vertical_single = cmap.get(0xFE31)
+    required = {
+        "proportional": proportional,
+        "fullwidth": fullwidth,
+        "encoded_two": encoded_two,
+        "encoded_three": encoded_three,
+        "vertical_single": vertical_single,
+    }
+    missing = [name for name, glyph_name in required.items() if not glyph_name]
+    if missing:
+        raise ValueError(f"upstream dash glyphs are missing: {missing}")
+
+    fullwidth_ligatures = ligature_outputs_for_feature(font, "ccmp", str(fullwidth))
+    fullwidth_two = fullwidth_ligatures.get(2)
+    fullwidth_three = fullwidth_ligatures.get(3)
+    if not fullwidth_two or not fullwidth_three:
+        # Shanggu exposes its already-localized 2em/3em forms directly.
+        if proportional == fullwidth:
+            fullwidth_two = encoded_two
+            fullwidth_three = encoded_three
+        else:
+            raise ValueError("upstream ccmp lacks fullwidth two/three-em dash ligatures")
+
+    vertical = get_single_substitution_mappings(font, {"vert", "vrt2"})
+    vertical_two = vertical.get(str(fullwidth_two))
+    vertical_three = vertical.get(str(fullwidth_three))
+    vertical_single = vertical.get(str(fullwidth)) or vertical_single
+    if not vertical_two or not vertical_three or not vertical_single:
+        raise ValueError("upstream vert/vrt2 lacks localized dash forms")
+    return {
+        **{name: str(glyph_name) for name, glyph_name in required.items()},
+        "fullwidth_two": str(fullwidth_two),
+        "fullwidth_three": str(fullwidth_three),
+        "vertical_single": str(vertical_single),
+        "vertical_two": str(vertical_two),
+        "vertical_three": str(vertical_three),
+    }
+
+
+def langsys_single_substitution_mapping(
+    font: TTFont,
+    language: str,
+    tag: str,
+) -> dict[str, str]:
+    if "GSUB" not in font or not font["GSUB"].table.FeatureList:
+        return {}
+    gsub = font["GSUB"].table
+    mappings: list[dict[str, str]] = []
+    for langsys in langsys_records_for_language(font, language):
+        mapping: dict[str, str] = {}
+        for feature_index in list(langsys.FeatureIndex or []):
+            record = gsub.FeatureList.FeatureRecord[feature_index]
+            if record.FeatureTag != tag:
+                continue
+            for lookup_index in list(record.Feature.LookupListIndex or []):
+                lookup = gsub.LookupList.Lookup[lookup_index]
+                for subtable in single_substitution_subtables(lookup):
+                    mapping.update(getattr(subtable, "mapping", {}) or {})
+        if mapping:
+            mappings.append(mapping)
+    if not mappings:
+        return {}
+    first = mappings[0]
+    if any(mapping != first for mapping in mappings[1:]):
+        raise ValueError(f"inconsistent {tag} mappings for language {language}")
+    return first
+
+
+def dash_locl_mappings_by_language(
+    font: TTFont,
+    roles: dict[str, str] | None = None,
+) -> dict[str, dict[str, str]]:
+    roles = roles or upstream_dash_roles(font)
+    dash_sources = {
+        roles["proportional"],
+        roles["encoded_two"],
+        roles["encoded_three"],
+    }
+    result: dict[str, dict[str, str]] = {}
+    for language in sorted(CJK_LOCL_LANGUAGES):
+        mapping = langsys_single_substitution_mapping(font, language, "locl")
+        filtered = {
+            source_name: target_name
+            for source_name, target_name in mapping.items()
+            if source_name in dash_sources
+        }
+        if filtered:
+            result[language] = filtered
+    return result
+
+
+def dash_locl_mapping_candidates(
+    font: TTFont,
+    roles: dict[str, str] | None = None,
+) -> list[dict[str, str]]:
+    roles = roles or upstream_dash_roles(font)
+    sources = {
+        roles["proportional"],
+        roles["encoded_two"],
+        roles["encoded_three"],
+    }
+    if "GSUB" not in font or not font["GSUB"].table.FeatureList:
+        return []
+    gsub = font["GSUB"].table
+    candidates: list[dict[str, str]] = []
+    signatures: set[tuple[tuple[str, str], ...]] = set()
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag != "locl":
+            continue
+        mapping: dict[str, str] = {}
+        for lookup_index in list(record.Feature.LookupListIndex or []):
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            for subtable in single_substitution_subtables(lookup):
+                mapping.update(getattr(subtable, "mapping", {}) or {})
+        filtered = {
+            source_name: target_name
+            for source_name, target_name in mapping.items()
+            if source_name in sources
+        }
+        signature = tuple(sorted(filtered.items()))
+        if filtered and signature not in signatures:
+            signatures.add(signature)
+            candidates.append(filtered)
+    return candidates
+
+
+def normalized_source_han_dash_locl_mappings(
+    font: TTFont,
+    roles: dict[str, str] | None = None,
+) -> dict[str, dict[str, str]]:
+    roles = roles or upstream_dash_roles(font)
+    candidates = dash_locl_mapping_candidates(font, roles)
+    korean_target = next(
+        (
+            mapping[roles["proportional"]]
+            for mapping in candidates
+            if roles["proportional"] in mapping
+            and mapping[roles["proportional"]]
+            not in {roles["proportional"], roles["fullwidth"]}
+        ),
+        None,
+    )
+    if not korean_target:
+        raise ValueError("Source Han dash locl lacks its Korean single-dash alternate")
+    standard = {
+        roles["proportional"]: roles["fullwidth"],
+        roles["encoded_two"]: roles["fullwidth_two"],
+        roles["encoded_three"]: roles["fullwidth_three"],
+    }
+    korean = {
+        **standard,
+        roles["proportional"]: korean_target,
+    }
+    return {
+        language: dict(korean if language == "KOR " else standard)
+        for language in sorted(CJK_LOCL_LANGUAGES)
+    }
+
+
 def update_single_substitution_mappings(font: TTFont, tags: set[str], replacements: dict[tuple[str, str], str]) -> int:
     if "GSUB" not in font or not replacements:
         return 0
@@ -2020,30 +2291,6 @@ def update_single_substitution_mappings(font: TTFont, tags: set[str], replacemen
                         subtable.mapping[source_name] = new_target
                         updated += 1
     return updated
-
-
-def remove_vertical_long_dash_ligature_mappings(font: TTFont) -> dict[str, int]:
-    if "GSUB" not in font or "hmtx" not in font or "vmtx" not in font:
-        return {"vertical_long_dash_ligature_mappings_removed": 0}
-    gsub = font["GSUB"].table
-    if not gsub.FeatureList or not gsub.LookupList:
-        return {"vertical_long_dash_ligature_mappings_removed": 0}
-    removed = 0
-    for record in gsub.FeatureList.FeatureRecord:
-        if record.FeatureTag not in {"vert", "vrt2"}:
-            continue
-        for lookup_index in record.Feature.LookupListIndex:
-            lookup = gsub.LookupList.Lookup[lookup_index]
-            for subtable in single_substitution_subtables(lookup):
-                if not hasattr(subtable, "mapping"):
-                    continue
-                for source_name, target_name in list(subtable.mapping.items()):
-                    source_width = font["hmtx"].metrics.get(source_name, (0, 0))[0]
-                    target_height = font["vmtx"].metrics.get(target_name, (0, 0))[0]
-                    if source_width > font["head"].unitsPerEm and target_height > font["head"].unitsPerEm:
-                        del subtable.mapping[source_name]
-                        removed += 1
-    return {"vertical_long_dash_ligature_mappings_removed": removed}
 
 
 def single_substitution_subtables(lookup: ot.Lookup) -> list[Any]:
@@ -2078,7 +2325,10 @@ def reference_locl_source_unicodes(region: str) -> set[int]:
 
 
 def prune_locl_like_reference(font: TTFont, region: str) -> dict[str, int]:
-    allowed_unicodes = reference_locl_source_unicodes(region)
+    # Keep Source Han's dash localization alive until the final layout pass.
+    # Its KOR form uses an unencoded alternate that would otherwise disappear
+    # at the next cmap subset, making an exact upstream reconstruction impossible.
+    allowed_unicodes = reference_locl_source_unicodes(region) | DASH_LOCL_CODEPOINTS
     reverse = glyph_to_unicodes(font)
     before = 0
     after = 0
@@ -2196,7 +2446,11 @@ def copy_external_glyph_data(target: TTFont, target_name: str, source: TTFont, s
 
 def apply_classical_vf_override(base: TTFont, override: TTFont, region: str) -> dict[str, int]:
     if not region_config(region)["classical"]:
-        return {"classical_vf_override_codepoints": 0, "classical_vf_override_glyphs": 0}
+        return {
+            "classical_vf_override_codepoints": 0,
+            "classical_vf_override_glyphs": 0,
+            "classical_vf_dash_glyphs": 0,
+        }
     base_cmap = base.getBestCmap() or {}
     override_cmap = override.getBestCmap() or {}
     reference_cps = reference_unicodes(region)
@@ -2210,9 +2464,29 @@ def apply_classical_vf_override(base: TTFont, override: TTFont, region: str) -> 
         copy_external_glyph_data(base, target_name, override, source_name)
         replaced_glyphs.add(target_name)
         replaced_codepoints += 1
+
+    # Shanggu localizes the dash family in the cmap instead of through locl.
+    # Copy the same semantic forms into the Source Han K base before public-axis
+    # remapping and italic shearing, including the original gvar programs.
+    base_dash = upstream_dash_roles(base)
+    override_dash = upstream_dash_roles(override)
+    dash_pairs = [
+        (base_dash["proportional"], override_dash["proportional"]),
+        (base_dash["fullwidth"], override_dash["fullwidth"]),
+        (base_dash["encoded_two"], override_dash["encoded_two"]),
+        (base_dash["encoded_three"], override_dash["encoded_three"]),
+        (base_dash["fullwidth_two"], override_dash["fullwidth_two"]),
+        (base_dash["fullwidth_three"], override_dash["fullwidth_three"]),
+        (base_dash["vertical_single"], override_dash["vertical_single"]),
+        (base_dash["vertical_two"], override_dash["vertical_two"]),
+        (base_dash["vertical_three"], override_dash["vertical_three"]),
+    ]
+    for target_name, source_name in dash_pairs:
+        copy_external_glyph_data(base, target_name, override, source_name)
     return {
         "classical_vf_override_codepoints": replaced_codepoints,
         "classical_vf_override_glyphs": len(replaced_glyphs),
+        "classical_vf_dash_glyphs": len(dash_pairs),
     }
 
 
@@ -2672,6 +2946,101 @@ def add_lsb_tuple_variation(font: TTFont, glyph_name: str, support: tuple[float,
     phantom_delta = otRound(-delta)
     coordinates[-4:] = [(phantom_delta, 0), (phantom_delta, 0), (0, 0), (0, 0)]
     font["gvar"].variations.setdefault(glyph_name, []).append(TupleVariation({"wght": support}, coordinates))
+
+
+def add_vertical_advance_tuple_variation(
+    font: TTFont,
+    glyph_name: str,
+    support: tuple[float, float, float],
+    delta: int,
+) -> None:
+    if "gvar" not in font or not delta:
+        return
+    coordinates: list[Any] = [None] * gvar_coordinate_count(font, glyph_name)
+    coordinates[-4:] = [(0, 0), (0, 0), (0, 0), (0, otRound(-delta))]
+    font["gvar"].variations.setdefault(glyph_name, []).append(
+        TupleVariation({"wght": support}, coordinates)
+    )
+
+
+def clear_glyph_metric_tuple_variations(font: TTFont, glyph_name: str) -> None:
+    if "gvar" not in font:
+        return
+    for variation in font["gvar"].variations.get(glyph_name, []):
+        if len(variation.coordinates) < 4:
+            continue
+        for index in range(len(variation.coordinates) - 4, len(variation.coordinates)):
+            if variation.coordinates[index] is not None:
+                variation.coordinates[index] = (0, 0)
+
+
+def preserve_upstream_dash_metric_variations(
+    target: TTFont,
+    source: TTFont,
+) -> dict[str, Any]:
+    if "gvar" not in target or "fvar" not in target:
+        return {"upstream_dash_metric_variations_preserved": False}
+    target_roles = upstream_dash_roles(target)
+    source_roles = upstream_dash_roles(source)
+    role_pairs = [
+        (role, target_roles[role], source_roles[role])
+        for role in target_roles
+    ]
+    control_weights = sorted(SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT)
+    default_weight = int(weight_axis(target).defaultValue)
+    controls: dict[int, dict[str, tuple[int, int]]] = {}
+    for weight in control_weights:
+        glyph_set = source.getGlyphSet(location={"wght": weight})
+        controls[weight] = {
+            role: (
+                otRound(glyph_set[source_name].width),
+                otRound(getattr(glyph_set[source_name], "height", 0)),
+            )
+            for role, _target_name, source_name in role_pairs
+        }
+
+    if default_weight not in controls:
+        raise ValueError(f"dash metric controls lack default weight {default_weight}")
+    for role, target_name, _source_name in role_pairs:
+        clear_glyph_metric_tuple_variations(target, target_name)
+        default_h, default_v = controls[default_weight][role]
+        _old_h, lsb = target["hmtx"].metrics[target_name]
+        target["hmtx"].metrics[target_name] = (default_h, lsb)
+        if "vmtx" in target and target_name in target["vmtx"].metrics:
+            _old_v, tsb = target["vmtx"].metrics[target_name]
+            target["vmtx"].metrics[target_name] = (default_v, tsb)
+
+    correction_weights = [weight for weight in control_weights if weight != default_weight]
+    supports = advance_supports(target, correction_weights)
+    horizontal_added = 0
+    vertical_added = 0
+    for weight in correction_weights:
+        support = supports[weight]
+        for role, target_name, _source_name in role_pairs:
+            default_h, default_v = controls[default_weight][role]
+            target_h, target_v = controls[weight][role]
+            if target_h != default_h:
+                add_advance_tuple_variation(
+                    target,
+                    target_name,
+                    support,
+                    target_h - default_h,
+                )
+                horizontal_added += 1
+            if target_v != default_v:
+                add_vertical_advance_tuple_variation(
+                    target,
+                    target_name,
+                    support,
+                    target_v - default_v,
+                )
+                vertical_added += 1
+    return {
+        "upstream_dash_metric_variations_preserved": True,
+        "upstream_dash_metric_control_weights": control_weights,
+        "upstream_dash_horizontal_metric_variations_added": horizontal_added,
+        "upstream_dash_vertical_metric_variations_added": vertical_added,
+    }
 
 
 def advance_supports(font: TTFont, weights: list[int]) -> dict[int, tuple[float, float, float]]:
@@ -3422,14 +3791,23 @@ def load_base(region: str, italic: bool, inter_unicodes: set[int]) -> tuple[TTFo
     base = instantiateVariableFont(base, AXIS_LIMIT, inplace=False, optimize=True)
     sarasa_report: dict[str, Any] = {}
     override_path = classical_vf_override_path(region)
-    if override_path:
-        override = TTFont(override_path)
-        try:
+    override: TTFont | None = None
+    try:
+        if override_path:
+            override = TTFont(override_path)
             override = instantiateVariableFont(override, AXIS_LIMIT, inplace=False, optimize=True)
             sarasa_report.update(apply_classical_vf_override(base, override, region))
-        finally:
+        public_axis_report = apply_public_weight_axis(base)
+        metric_source = base
+        if override is not None:
+            apply_public_weight_axis(override)
+            metric_source = override
+        sarasa_report.update(
+            preserve_upstream_dash_metric_variations(base, metric_source)
+        )
+    finally:
+        if override is not None:
             override.close()
-    public_axis_report = apply_public_weight_axis(base)
     subset_font(base, source_han_unicodes_like_sarasa(region, base, inter_unicodes))
     sarasa_report.update(bake_source_han_pwid_and_sanitize(base))
     sarasa_report.update(public_axis_report)
@@ -3975,16 +4353,19 @@ def align_layout_feature_template(
     empty_added = 0
     for ref_index, ref_record in enumerate(ref_table.FeatureList.FeatureRecord):
         candidates = current_by_tag.get(ref_record.FeatureTag)
-        if candidates:
-            use_index = min(used_by_tag.get(ref_record.FeatureTag, 0), len(candidates) - 1)
-            used_by_tag[ref_record.FeatureTag] = used_by_tag.get(ref_record.FeatureTag, 0) + 1
-            record = copy.deepcopy(candidates[use_index])
-            record.FeatureTag = ref_record.FeatureTag
-        elif not list(ref_record.Feature.LookupListIndex or []):
+        if not list(ref_record.Feature.LookupListIndex or []):
+            # Empty FeatureRecords are part of the reference contract.  Do not
+            # fill one by reusing the last non-empty record with the same tag;
+            # that previously wired latn/CAT to the ROM/MOL locl lookup.
             record = copy.deepcopy(ref_record)
             record.Feature.LookupListIndex = []
             record.Feature.LookupCount = 0
             empty_added += 1
+        elif candidates:
+            use_index = min(used_by_tag.get(ref_record.FeatureTag, 0), len(candidates) - 1)
+            used_by_tag[ref_record.FeatureTag] = used_by_tag.get(ref_record.FeatureTag, 0) + 1
+            record = copy.deepcopy(candidates[use_index])
+            record.FeatureTag = ref_record.FeatureTag
         else:
             continue
         if use_reference_lookup_indices:
@@ -5532,385 +5913,6 @@ def ensure_variable_em_dash_pair_start_feature(font: TTFont) -> dict[str, Any]:
     }
 
 
-def convex_hull(points: list[tuple[float, float]]) -> list[tuple[int, int]]:
-    ordered = sorted({(otRound(x), otRound(y)) for x, y in points})
-    if len(ordered) < 3:
-        raise ValueError(f"polygon requires at least three points: {ordered!r}")
-
-    def cross(
-        origin: tuple[int, int],
-        first: tuple[int, int],
-        second: tuple[int, int],
-    ) -> int:
-        return (
-            (first[0] - origin[0]) * (second[1] - origin[1])
-            - (first[1] - origin[1]) * (second[0] - origin[0])
-        )
-
-    lower: list[tuple[int, int]] = []
-    for point in ordered:
-        while len(lower) >= 2 and cross(lower[-2], lower[-1], point) <= 0:
-            lower.pop()
-        lower.append(point)
-    upper: list[tuple[int, int]] = []
-    for point in reversed(ordered):
-        while len(upper) >= 2 and cross(upper[-2], upper[-1], point) <= 0:
-            upper.pop()
-        upper.append(point)
-    return lower[:-1] + upper[:-1]
-
-
-def glyph_set_outline_points(
-    font: TTFont,
-    glyph_name: str,
-    location: dict[str, float] | None,
-) -> tuple[list[tuple[float, float]], int, int]:
-    glyph_set = font.getGlyphSet(location=location)
-    if glyph_name not in glyph_set:
-        raise ValueError(f"missing glyph at variable location: {glyph_name}")
-    glyph = glyph_set[glyph_name]
-    pen = RecordingPen()
-    glyph.draw(pen)
-    points: list[tuple[float, float]] = []
-    for operation, arguments in pen.value:
-        if operation not in {"moveTo", "lineTo", "curveTo", "qCurveTo"}:
-            continue
-        points.extend(
-            (float(point[0]), float(point[1]))
-            for point in arguments
-            if point is not None and len(point) == 2
-        )
-    if not points:
-        raise ValueError(f"missing outline points at variable location: {glyph_name}")
-    return (
-        points,
-        otRound(getattr(glyph, "width", 0) or 0),
-        otRound(getattr(glyph, "height", 0) or 0),
-    )
-
-
-def static_reference_em_dash_ligature_points(
-    reference: TTFont,
-) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
-    cmap = reference.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    vertical_em_dash = (
-        get_single_substitution_mapping(reference, "vert").get(em_dash)
-        if em_dash
-        else None
-    )
-    continuations = em_dash_continuation_glyphs(reference) if em_dash else []
-    if not em_dash or not vertical_em_dash or len(continuations) != 1:
-        raise ValueError("Sarasa reference lacks em dash pair data")
-
-    horizontal_source, horizontal_advance, _height = glyph_set_outline_points(
-        reference,
-        em_dash,
-        None,
-    )
-    continuation, _continuation_advance, _height = glyph_set_outline_points(
-        reference,
-        continuations[0],
-        None,
-    )
-    horizontal = horizontal_source + [
-        (x + horizontal_advance, y) for x, y in continuation
-    ]
-
-    vertical_source, _width, vertical_advance = glyph_set_outline_points(
-        reference,
-        vertical_em_dash,
-        None,
-    )
-    x_placement, y_placement = vertical_em_dash_pair_placement(
-        reference,
-        vertical_em_dash,
-    )
-    vertical = vertical_source + [
-        (
-            x + x_placement,
-            y - vertical_advance + y_placement,
-        )
-        for x, y in vertical_source
-    ]
-    return (
-        [(otRound(x), otRound(y)) for x, y in horizontal],
-        [(otRound(x), otRound(y)) for x, y in vertical],
-    )
-
-
-def horizontal_em_dash_continuation_from_outline(
-    points: list[tuple[float, float]],
-    advance_width: int,
-) -> list[tuple[float, float]]:
-    y_min = min(y for _x, y in points)
-    y_max = max(y for _x, y in points)
-    top_right = max(x for x, y in points if y == y_max)
-    bottom_right = max(x for x, y in points if y == y_min)
-    top_left = top_right - advance_width
-    bottom_left = bottom_right - advance_width
-    half_height = (y_max - y_min) / 2
-    return [
-        (top_left, y_max),
-        ((top_left + bottom_left) / 2 - half_height, (y_min + y_max) / 2),
-        (bottom_left, y_min),
-        (bottom_right, y_min),
-        (top_right, y_max),
-    ]
-
-
-def heavy_static_em_dash_ligature_points(
-    font: TTFont,
-    reference: TTFont,
-    em_dash: str,
-    vertical_em_dash: str,
-) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
-    location = {"wght": 900.0}
-    horizontal_source, natural_advance, _height = glyph_set_outline_points(
-        font,
-        em_dash,
-        location,
-    )
-    reference_cmap = reference.getBestCmap() or {}
-    reference_em_dash = reference_cmap.get(0x2014)
-    reference_continuations = (
-        em_dash_continuation_glyphs(reference) if reference_em_dash else []
-    )
-    if not reference_em_dash or len(reference_continuations) != 1:
-        raise ValueError("Sarasa Heavy metric template lacks em dash pair data")
-    target_advance, target_lsb = reference["hmtx"].metrics[reference_em_dash]
-    _target_continuation_advance, target_continuation_lsb = reference[
-        "hmtx"
-    ].metrics[reference_continuations[0]]
-    source_shift = int(target_lsb) - min(otRound(x) for x, _y in horizontal_source)
-    horizontal_source = [(x + source_shift, y) for x, y in horizontal_source]
-    if float(font["post"].italicAngle) != 0:
-        y_max = max(y for _x, y in horizontal_source)
-        horizontal_source = [
-            (x - 1 if y == y_max else x, y)
-            for x, y in horizontal_source
-        ]
-    continuation = horizontal_em_dash_continuation_from_outline(
-        horizontal_source,
-        natural_advance,
-    )
-    continuation_x_min = min(otRound(x) for x, _y in continuation)
-    continuation_shift = int(target_continuation_lsb) - continuation_x_min
-    horizontal = horizontal_source + [
-        (x + continuation_shift + int(target_advance), y)
-        for x, y in continuation
-    ]
-
-    vertical_source, _width, _natural_vertical_advance = glyph_set_outline_points(
-        font,
-        vertical_em_dash,
-        location,
-    )
-    reference_vertical_em_dash = get_single_substitution_mapping(
-        reference,
-        "vert",
-    ).get(reference_em_dash)
-    if not reference_vertical_em_dash:
-        raise ValueError("Sarasa Heavy metric template lacks vertical em dash")
-    _target_width, target_vertical_lsb = reference["hmtx"].metrics[
-        reference_vertical_em_dash
-    ]
-    target_vertical_advance = int(
-        reference["vmtx"].metrics[reference_vertical_em_dash][0]
-    )
-    vertical_x_min = min(otRound(x) for x, _y in vertical_source)
-    vertical_shift = int(target_vertical_lsb) - vertical_x_min
-    vertical_source = [(x + vertical_shift, y) for x, y in vertical_source]
-    if float(font["post"].italicAngle) != 0:
-        y_max = max(y for _x, y in vertical_source)
-        vertical_source = [
-            (x - 1 if y == y_max else x, y)
-            for x, y in vertical_source
-        ]
-
-    # Sarasa's static Heavy path keeps the Heavy outline but applies the Bold
-    # metric template before computing the connected vertical pair.
-    x_placement, y_placement = vertical_em_dash_pair_placement_from_points(
-        font,
-        vertical_source,
-        target_vertical_advance,
-    )
-    vertical = vertical_source + [
-        (
-            x + x_placement,
-            y - target_vertical_advance + y_placement,
-        )
-        for x, y in vertical_source
-    ]
-    return (
-        [(otRound(x), otRound(y)) for x, y in horizontal],
-        [(otRound(x), otRound(y)) for x, y in vertical],
-    )
-
-
-def em_dash_ligature_control_points(
-    font: TTFont,
-    em_dash: str,
-    vertical_em_dash: str,
-    weight: int,
-) -> tuple[list[tuple[int, int]], list[tuple[int, int]]]:
-    location = {"wght": float(weight)}
-    horizontal_source, horizontal_advance, _height = glyph_set_outline_points(
-        font,
-        em_dash,
-        location,
-    )
-    continuation = horizontal_em_dash_continuation_from_outline(
-        horizontal_source,
-        horizontal_advance,
-    )
-    horizontal = horizontal_source + [
-        (x + horizontal_advance, y) for x, y in continuation
-    ]
-
-    vertical_source, _width, vertical_advance = glyph_set_outline_points(
-        font,
-        vertical_em_dash,
-        location,
-    )
-    x_placement, y_placement = vertical_em_dash_pair_placement(
-        font,
-        vertical_em_dash,
-        location,
-    )
-    vertical = vertical_source + [
-        (
-            x + x_placement,
-            y - vertical_advance + y_placement,
-        )
-        for x, y in vertical_source
-    ]
-    return (
-        [(otRound(x), otRound(y)) for x, y in horizontal],
-        [(otRound(x), otRound(y)) for x, y in vertical],
-    )
-
-
-def extend_vertical_em_dash_pair(
-    points: list[tuple[int, int]],
-) -> list[tuple[int, int]]:
-    if len(points) % 2:
-        raise ValueError(f"vertical em dash pair has odd point count: {len(points)}")
-    contour_length = len(points) // 2
-    first = points[:contour_length]
-    second = points[contour_length:]
-    deltas = {
-        (second_x - first_x, second_y - first_y)
-        for (first_x, first_y), (second_x, second_y) in zip(first, second)
-    }
-    if len(deltas) != 1:
-        raise ValueError(f"vertical em dash pair is not a translated outline: {deltas}")
-    delta_x, delta_y = next(iter(deltas))
-    third = [
-        (x + 2 * delta_x, y + 2 * delta_y)
-        for x, y in first
-    ]
-    return [*points, *third]
-
-
-def add_multicontour_glyph(
-    font: TTFont,
-    glyph_name: str,
-    source_name: str,
-    points: list[tuple[int, int]],
-    contour_lengths: list[int],
-) -> None:
-    if sum(contour_lengths) != len(points) or any(length < 3 for length in contour_lengths):
-        raise ValueError(
-            f"invalid contour topology for {glyph_name}: "
-            f"{contour_lengths}, {len(points)} points"
-        )
-    pen = TTGlyphPen(None)
-    offset = 0
-    for length in contour_lengths:
-        contour = points[offset : offset + length]
-        pen.moveTo(contour[0])
-        for point in contour[1:]:
-            pen.lineTo(point)
-        pen.closePath()
-        offset += length
-    glyph = pen.glyph()
-    if getattr(glyph, "flags", None) is not None and len(glyph.flags):
-        glyph.flags[0] |= 0x40
-    glyph.recalcBounds(font["glyf"])
-    font["glyf"].glyphs[glyph_name] = glyph
-    font["hmtx"].metrics[glyph_name] = copy.deepcopy(
-        font["hmtx"].metrics[source_name]
-    )
-    if "vmtx" in font and source_name in font["vmtx"].metrics:
-        font["vmtx"].metrics[glyph_name] = copy.deepcopy(
-            font["vmtx"].metrics[source_name]
-        )
-    font["gvar"].variations[glyph_name] = []
-    order = font.getGlyphOrder()
-    if glyph_name not in order:
-        order.append(glyph_name)
-        font.setGlyphOrder(order)
-    font["maxp"].numGlyphs = len(font.getGlyphOrder())
-
-
-def add_variable_polygon_glyph(
-    font: TTFont,
-    glyph_name: str,
-    source_name: str,
-    controls: dict[int, list[tuple[int, int]]],
-    *,
-    horizontal_advance: int,
-    vertical_advance: int,
-    vertical_origin_source: str,
-    contour_lengths: list[int],
-) -> int:
-    default_weight = int(weight_axis(font).defaultValue)
-    default_points = controls[default_weight]
-    point_counts = {len(points) for points in controls.values()}
-    if len(point_counts) != 1:
-        raise ValueError(
-            f"incompatible em dash ligature topology for {glyph_name}: "
-            f"{sorted(point_counts)}"
-        )
-    add_multicontour_glyph(
-        font,
-        glyph_name,
-        source_name,
-        default_points,
-        contour_lengths,
-    )
-    x_min = min(x for x, _y in default_points)
-    y_max = max(y for _x, y in default_points)
-    font["hmtx"].metrics[glyph_name] = (int(horizontal_advance), int(x_min))
-    if "vmtx" in font:
-        font["vmtx"].metrics[glyph_name] = (
-            int(vertical_advance),
-            vertical_origin_y(font, vertical_origin_source) - int(y_max),
-        )
-    if "VORG" in font and vertical_origin_source in font["VORG"].VOriginRecords:
-        font["VORG"].VOriginRecords[glyph_name] = int(
-            font["VORG"].VOriginRecords[vertical_origin_source]
-        )
-
-    correction_weights = sorted(weight for weight in controls if weight != default_weight)
-    supports = advance_supports(font, correction_weights)
-    variations = []
-    for weight in correction_weights:
-        target_points = controls[weight]
-        deltas: list[Any] = [
-            (target_x - base_x, target_y - base_y)
-            for (base_x, base_y), (target_x, target_y) in zip(
-                default_points,
-                target_points,
-            )
-        ]
-        deltas.extend([(0, 0)] * 4)
-        variations.append(TupleVariation({"wght": supports[weight]}, deltas))
-    font["gvar"].variations[glyph_name] = variations
-    return len(variations)
-
-
 def ligature_substitution_subtables(lookup: Any) -> list[Any]:
     if lookup.LookupType == 4:
         return list(lookup.SubTable)
@@ -5924,243 +5926,656 @@ def ligature_substitution_subtables(lookup: Any) -> list[Any]:
     return []
 
 
-def prepend_gsub_lookups(font: TTFont, lookups: list[Any]) -> None:
-    gsub = font["GSUB"].table
-    shift = len(lookups)
-    if not shift:
-        return
-
-    def shift_feature(feature: Any) -> None:
-        indices = [int(index) + shift for index in feature.LookupListIndex or []]
-        feature.LookupListIndex = indices
-        feature.LookupCount = len(indices)
-
-    for record in gsub.FeatureList.FeatureRecord if gsub.FeatureList else []:
-        shift_feature(record.Feature)
-    feature_variations = getattr(gsub, "FeatureVariations", None)
-    for variation_record in (
-        getattr(feature_variations, "FeatureVariationRecord", []) or []
-    ):
-        substitution = getattr(variation_record, "FeatureTableSubstitution", None)
-        for record in getattr(substitution, "SubstitutionRecord", []) or []:
-            shift_feature(record.Feature)
-
-    for lookup in gsub.LookupList.Lookup:
-        for subtable in lookup.SubTable:
-            for record in chain_substitution_records(subtable):
-                record.LookupListIndex = int(record.LookupListIndex) + shift
-    gsub.LookupList.Lookup = [*lookups, *gsub.LookupList.Lookup]
-    gsub.LookupList.LookupCount = len(gsub.LookupList.Lookup)
+def remap_unicode_cmap(font: TTFont, codepoint: int, glyph_name: str) -> int:
+    changed = 0
+    for cmap_table in font["cmap"].tables if "cmap" in font else []:
+        if not cmap_table.isUnicode() or codepoint not in cmap_table.cmap:
+            continue
+        if cmap_table.cmap[codepoint] != glyph_name:
+            cmap_table.cmap[codepoint] = glyph_name
+            changed += 1
+    return changed
 
 
-def rebuild_variable_em_dash_ligatures(
+def rectangular_corner_indices(font: TTFont, glyph_name: str) -> dict[tuple[int, int], int]:
+    glyph = font["glyf"][glyph_name]
+    glyph.expand(font["glyf"])
+    if glyph.isComposite() or glyph.numberOfContours != 1 or len(glyph.coordinates) != 4:
+        raise ValueError(f"dash glyph is not a four-point rectangle: {glyph_name}")
+    y_values = sorted({int(y) for _x, y in glyph.coordinates})
+    if len(y_values) != 2:
+        raise ValueError(f"dash glyph does not have two edges: {glyph_name}")
+    result: dict[tuple[int, int], int] = {}
+    for y_index, y_value in enumerate(y_values):
+        row = sorted(
+            (
+                (int(x), point_index)
+                for point_index, (x, y) in enumerate(glyph.coordinates)
+                if int(y) == y_value
+            ),
+            key=lambda item: item[0],
+        )
+        if len(row) != 2:
+            raise ValueError(f"dash glyph edge is not rectangular: {glyph_name}")
+        for x_index, (_x, point_index) in enumerate(row):
+            result[(x_index, y_index)] = point_index
+    return result
+
+
+def copy_static_dash_outline(
+    target: TTFont,
+    target_name: str,
+    source: TTFont,
+    source_name: str,
+    *,
+    italic: bool,
+) -> None:
+    target_indices = rectangular_corner_indices(target, target_name)
+    source_indices = rectangular_corner_indices(source, source_name)
+    source_glyph = source["glyf"][source_name]
+    target_glyph = target["glyf"][target_name]
+    shear = math.tan(math.radians(9.4)) if italic else 0.0
+    for corner, target_index in target_indices.items():
+        source_x, source_y = source_glyph.coordinates[source_indices[corner]]
+        target_glyph.coordinates[target_index] = (
+            otRound(source_x + source_y * shear),
+            int(source_y),
+        )
+    target_glyph.recalcBounds(target["glyf"])
+    source_advance = int(source["hmtx"].metrics[source_name][0])
+    target["hmtx"].metrics[target_name] = (source_advance, int(target_glyph.xMin))
+    if "vmtx" in target and "vmtx" in source and source_name in source["vmtx"].metrics:
+        target["vmtx"].metrics[target_name] = copy.deepcopy(
+            source["vmtx"].metrics[source_name]
+        )
+    if "VORG" in target and "VORG" in source:
+        if source_name in source["VORG"].VOriginRecords:
+            target["VORG"].VOriginRecords[target_name] = int(
+                source["VORG"].VOriginRecords[source_name]
+            )
+        else:
+            target["VORG"].VOriginRecords.pop(target_name, None)
+
+
+def prepare_static_upstream_dash_glyphs(
     font: TTFont,
+    source: TTFont,
     region: str,
     italic: bool,
-) -> dict[str, Any]:
-    if "fvar" not in font or "gvar" not in font or "GSUB" not in font:
-        return {"variable_em_dash_ligatures_rebuilt": False}
+) -> tuple[dict[str, str], dict[str, dict[str, str]], dict[str, int]]:
+    source_roles = upstream_dash_roles(source)
     cmap = font.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    vertical_mapping = get_single_substitution_mappings(font, {"vert", "vrt2"})
-    vertical_em_dash = vertical_mapping.get(em_dash) if em_dash else None
-    if not vertical_em_dash:
-        # The Source Han base maps U+2015 to the same vertical dash used for
-        # U+2014.  Sarasa's static GSUB template adds the direct U+2014 entry,
-        # but a freshly merged VF can legitimately retain only the U+2015
-        # mapping at this point in the build.
-        vertical_em_dash = vertical_mapping.get(cmap.get(0x2015))
-    if not em_dash or not vertical_em_dash:
-        raise ValueError("variable em dash ligatures require horizontal and vertical glyphs")
+    roles = {
+        "proportional": cmap.get(0x2014),
+        "fullwidth": cmap.get(0x2015),
+        "encoded_two": cmap.get(0x2E3A),
+        "encoded_three": cmap.get(0x2E3B),
+        "vertical_single": cmap.get(0xFE31),
+    }
+    missing = [name for name, glyph_name in roles.items() if not glyph_name]
+    if missing:
+        raise ValueError(f"static dash glyphs are missing: {missing}")
+    roles = {name: str(glyph_name) for name, glyph_name in roles.items()}
 
-    controls = {
-        weight: em_dash_ligature_control_points(
-            font,
-            em_dash,
-            vertical_em_dash,
-            weight,
+    if region == "CL":
+        roles["fullwidth_two"] = roles["encoded_two"]
+        roles["fullwidth_three"] = roles["encoded_three"]
+    else:
+        roles["fullwidth_two"] = clone_glyph(
+            font, roles["encoded_two"], f"{roles['fullwidth']}.two-em"
         )
-        for weight in EM_DASH_PROBE_WEIGHTS
-    }
-    reference_overrides = 0
-    for stop in SOURCE_HAN_WEIGHT_STOPS:
-        weight_name = str(stop["name"])
-        weight = int(stop["value"])
-        reference = TTFont(
-            static_reference_font_path(region, weight_name, italic),
-            recalcBBoxes=False,
-            recalcTimestamp=False,
+        roles["fullwidth_three"] = clone_glyph(
+            font, roles["encoded_three"], f"{roles['fullwidth']}.three-em"
         )
-        try:
-            controls[weight] = (
-                heavy_static_em_dash_ligature_points(
-                    font,
-                    reference,
-                    em_dash,
-                    vertical_em_dash,
-                )
-                if weight == 900
-                else static_reference_em_dash_ligature_points(reference)
-            )
-            reference_overrides += 1
-        finally:
-            reference.close()
-    horizontal_controls = {weight: points[0] for weight, points in controls.items()}
-    vertical_controls = {weight: points[1] for weight, points in controls.items()}
-    vertical_three_em_controls = {
-        weight: extend_vertical_em_dash_pair(points)
-        for weight, points in vertical_controls.items()
-    }
-    two_em_dash = cmap.get(0x2E3A)
-    three_em_dash = cmap.get(0x2E3B)
-    if not two_em_dash or not three_em_dash:
-        raise ValueError("Source Han long-dash mechanism requires U+2E3A and U+2E3B")
-    glyph_order = set(font.getGlyphOrder())
-    horizontal_ligature = f"{em_dash}.two-em-liga"
-    vertical_ligature = f"{vertical_em_dash}.two-em-liga"
-    vertical_three_em_ligature = f"{vertical_em_dash}.three-em-liga"
-    for glyph_name in (
-        horizontal_ligature,
-        vertical_ligature,
-        vertical_three_em_ligature,
+    roles["vertical_two"] = clone_glyph(
+        font, roles["vertical_single"], f"{roles['vertical_single']}.two-em"
+    )
+    roles["vertical_three"] = clone_glyph(
+        font, roles["vertical_single"], f"{roles['vertical_single']}.three-em"
+    )
+    missing_clones = [
+        role
+        for role in ("fullwidth_two", "fullwidth_three", "vertical_two", "vertical_three")
+        if not roles.get(role)
+    ]
+    if missing_clones:
+        raise ValueError(f"could not clone static dash glyphs: {missing_clones}")
+    roles = {name: str(glyph_name) for name, glyph_name in roles.items()}
+
+    copied = 0
+    for role in (
+        "proportional",
+        "fullwidth",
+        "encoded_two",
+        "encoded_three",
+        "vertical_single",
+        "fullwidth_two",
+        "fullwidth_three",
+        "vertical_two",
+        "vertical_three",
     ):
-        if glyph_name in glyph_order:
-            raise ValueError(f"reserved em dash ligature glyph already exists: {glyph_name}")
+        target_name = roles[role]
+        source_name = source_roles[role]
+        copy_static_dash_outline(
+            font,
+            target_name,
+            source,
+            source_name,
+            italic=italic,
+        )
+        copied += 1
 
-    upem = int(font["head"].unitsPerEm)
-    horizontal_variations = add_variable_polygon_glyph(
-        font,
-        horizontal_ligature,
-        em_dash,
-        horizontal_controls,
-        horizontal_advance=2 * upem,
-        vertical_advance=upem,
-        vertical_origin_source=em_dash,
-        contour_lengths=[len(horizontal_controls[400]) - 5, 5],
+    source_to_target = {
+        source_roles[role]: roles[role]
+        for role in source_roles
+        if role in roles
+    }
+    localized_mappings: dict[str, dict[str, str]] = {}
+    localized_clones = 0
+    source_localized_mappings = (
+        {}
+        if region == "CL"
+        else normalized_source_han_dash_locl_mappings(source, source_roles)
     )
-    vertical_variations = add_variable_polygon_glyph(
-        font,
-        vertical_ligature,
-        vertical_em_dash,
-        vertical_controls,
-        horizontal_advance=upem,
-        vertical_advance=2 * upem,
-        vertical_origin_source=vertical_em_dash,
-        contour_lengths=[len(vertical_controls[400]) // 2] * 2,
+    for language, source_mapping in source_localized_mappings.items():
+        target_mapping: dict[str, str] = {}
+        for source_name, source_target in source_mapping.items():
+            target_name = source_to_target.get(source_name)
+            if not target_name:
+                raise ValueError(
+                    f"unrecognized static dash locl source for {language}: {source_name}"
+                )
+            target_target = source_to_target.get(source_target)
+            if not target_target:
+                target_target = clone_glyph(
+                    font,
+                    roles["proportional"],
+                    f"{roles['proportional']}.locl-{language.strip().lower()}",
+                )
+                if not target_target:
+                    raise ValueError(
+                        f"could not clone static dash locl target for {language}"
+                    )
+                copy_static_dash_outline(
+                    font,
+                    target_target,
+                    source,
+                    source_target,
+                    italic=italic,
+                )
+                source_to_target[source_target] = target_target
+                localized_clones += 1
+                copied += 1
+            target_mapping[target_name] = target_target
+        localized_mappings[language] = target_mapping
+
+    return roles, localized_mappings, {
+        "upstream_dash_static_glyphs_copied": copied,
+        "upstream_dash_static_locl_glyphs_cloned": localized_clones,
+        "upstream_dash_static_cmap_remaps": 0,
+    }
+
+
+def insert_gsub_feature_record(font: TTFont, tag: str, lookup_indices: list[int]) -> int:
+    gsub = font["GSUB"].table
+    records = gsub.FeatureList.FeatureRecord
+    insert_at = max(
+        (index + 1 for index, record in enumerate(records) if record.FeatureTag == tag),
+        default=len(records),
     )
-    vertical_three_em_variations = add_variable_polygon_glyph(
-        font,
-        vertical_three_em_ligature,
-        vertical_em_dash,
-        vertical_three_em_controls,
-        horizontal_advance=upem,
-        vertical_advance=3 * upem,
-        vertical_origin_source=vertical_em_dash,
-        contour_lengths=[len(vertical_controls[400]) // 2] * 3,
+    feature = ot.Feature()
+    feature.FeatureParams = None
+    feature.LookupListIndex = list(lookup_indices)
+    feature.LookupCount = len(lookup_indices)
+    record = ot.FeatureRecord()
+    record.FeatureTag = tag
+    record.Feature = feature
+    records.insert(insert_at, record)
+    gsub.FeatureList.FeatureCount = len(records)
+    if gsub.ScriptList:
+        for script_record in gsub.ScriptList.ScriptRecord:
+            langsys_items = []
+            if script_record.Script.DefaultLangSys:
+                langsys_items.append(script_record.Script.DefaultLangSys)
+            langsys_items.extend(
+                langsys_record.LangSys
+                for langsys_record in script_record.Script.LangSysRecord
+            )
+            for langsys in langsys_items:
+                required = int(getattr(langsys, "ReqFeatureIndex", 0xFFFF))
+                if required != 0xFFFF and required >= insert_at:
+                    langsys.ReqFeatureIndex = required + 1
+                langsys.FeatureIndex = [
+                    index + 1 if index >= insert_at else index
+                    for index in list(langsys.FeatureIndex or [])
+                ]
+                langsys.FeatureCount = len(langsys.FeatureIndex)
+    return insert_at
+
+
+def langsys_records_for_language(font: TTFont, language: str) -> list[Any]:
+    if "GSUB" not in font or not font["GSUB"].table.ScriptList:
+        return []
+    return [
+        lang_record.LangSys
+        for script_record in font["GSUB"].table.ScriptList.ScriptRecord
+        for lang_record in script_record.Script.LangSysRecord
+        if lang_record.LangSysTag == language
+    ]
+
+
+def clear_empty_catalan_locl(font: TTFont) -> int:
+    if "GSUB" not in font or not font["GSUB"].table.FeatureList:
+        return 0
+    gsub = font["GSUB"].table
+    cleared: set[int] = set()
+    for langsys in langsys_records_for_language(font, "CAT "):
+        for feature_index in list(langsys.FeatureIndex or []):
+            record = gsub.FeatureList.FeatureRecord[feature_index]
+            if record.FeatureTag != "locl":
+                continue
+            if record.Feature.LookupListIndex:
+                record.Feature.LookupListIndex = []
+                record.Feature.LookupCount = 0
+                cleared.add(feature_index)
+    return len(cleared)
+
+
+def add_lookup_to_all_features(font: TTFont, tag: str, lookup_index: int) -> int:
+    linked = 0
+    for record in font["GSUB"].table.FeatureList.FeatureRecord:
+        if record.FeatureTag != tag:
+            continue
+        indices = list(record.Feature.LookupListIndex or [])
+        if lookup_index not in indices:
+            indices.insert(0, lookup_index)
+            record.Feature.LookupListIndex = indices
+            record.Feature.LookupCount = len(indices)
+            linked += 1
+    return linked
+
+
+def make_single_substitution_lookup(mapping: dict[str, str]) -> ot.Lookup:
+    subtable = ot.SingleSubst()
+    subtable.mapping = dict(mapping)
+    lookup = ot.Lookup()
+    lookup.LookupType = 1
+    lookup.LookupFlag = 0
+    lookup.SubTable = [subtable]
+    lookup.SubTableCount = 1
+    lookup.MarkFilteringSet = None
+    return lookup
+
+
+def make_ligature_substitution_lookup(
+    rules: dict[str, list[tuple[list[str], str]]],
+) -> ot.Lookup:
+    subtable = ot.LigatureSubst()
+    subtable.ligatures = {}
+    for first_name, first_rules in rules.items():
+        ligatures = []
+        for components, output_name in sorted(
+            first_rules,
+            key=lambda item: len(item[0]),
+            reverse=True,
+        ):
+            ligature = ot.Ligature()
+            ligature.Component = list(components)
+            ligature.CompCount = len(components) + 1
+            ligature.LigGlyph = output_name
+            ligatures.append(ligature)
+        subtable.ligatures[first_name] = ligatures
+    lookup = ot.Lookup()
+    lookup.LookupType = 4
+    lookup.LookupFlag = 0
+    lookup.SubTable = [subtable]
+    lookup.SubTableCount = 1
+    lookup.MarkFilteringSet = None
+    return lookup
+
+
+def remove_dash_pair_positioning(
+    font: TTFont,
+    dash_glyphs: set[str],
+) -> int:
+    if "GPOS" not in font or not font["GPOS"].table.FeatureList:
+        return 0
+    gpos = font["GPOS"].table
+    lookup_indices = {
+        int(lookup_index)
+        for record in gpos.FeatureList.FeatureRecord
+        if record.FeatureTag in {"vert", "vrt2"}
+        for lookup_index in list(record.Feature.LookupListIndex or [])
+    }
+    removed = 0
+    for lookup_index in lookup_indices:
+        if not gpos.LookupList or lookup_index >= len(gpos.LookupList.Lookup):
+            continue
+        lookup = gpos.LookupList.Lookup[lookup_index]
+        if lookup.LookupType != 2:
+            continue
+        for subtable in lookup.SubTable:
+            if getattr(subtable, "Format", None) != 1:
+                continue
+            coverage_glyphs = list(getattr(subtable.Coverage, "glyphs", []) or [])
+            pair_sets = list(getattr(subtable, "PairSet", []) or [])
+            kept_coverage = []
+            kept_pair_sets = []
+            for first_name, pair_set in zip(coverage_glyphs, pair_sets):
+                records = list(pair_set.PairValueRecord or [])
+                kept_records = [
+                    record
+                    for record in records
+                    if not (
+                        first_name in dash_glyphs
+                        and record.SecondGlyph in dash_glyphs
+                    )
+                ]
+                removed += len(records) - len(kept_records)
+                if kept_records:
+                    pair_set.PairValueRecord = kept_records
+                    pair_set.PairValueCount = len(kept_records)
+                    kept_coverage.append(first_name)
+                    kept_pair_sets.append(pair_set)
+            subtable.Coverage.glyphs = glyph_order_sorted(font, kept_coverage)
+            pair_by_first = dict(zip(kept_coverage, kept_pair_sets))
+            subtable.PairSet = [pair_by_first[name] for name in subtable.Coverage.glyphs]
+            subtable.PairSetCount = len(subtable.PairSet)
+    return removed
+
+
+def strip_legacy_dash_layout(
+    font: TTFont,
+    roles: dict[str, str],
+) -> tuple[set[str], dict[str, int]]:
+    if "GSUB" not in font or not font["GSUB"].table.FeatureList:
+        return set(), {"upstream_dash_legacy_gsub_lookups_removed": 0}
+    obsolete_glyphs = set(em_dash_continuation_glyphs(font)) | set(
+        em_dash_pair_start_glyphs(font)
     )
+    chain_indices = set(em_dash_calt_chain_lookup_indices(font))
+    lookup_report = remove_gsub_lookups(font, chain_indices)
 
     gsub = font["GSUB"].table
-    existing_pair_rules_removed = 0
-    ccmp_lookup_indices = {
-        int(index)
-        for record in gsub.FeatureList.FeatureRecord if gsub.FeatureList
-        if record.FeatureTag == "ccmp"
-        for index in record.Feature.LookupListIndex or []
+    ccmp_sources = {roles["proportional"], roles["fullwidth"]}
+    locl_sources = {
+        roles["proportional"],
+        roles["encoded_two"],
+        roles["encoded_three"],
     }
-    for lookup_index in ccmp_lookup_indices:
-        lookup = gsub.LookupList.Lookup[lookup_index]
-        for subtable in ligature_substitution_subtables(lookup):
-            ligatures = list(subtable.ligatures.get(em_dash, []) or [])
-            kept = [
-                ligature
-                for ligature in ligatures
-                if not (
-                    len(ligature.Component) in {1, 2}
-                    and all(component == em_dash for component in ligature.Component)
-                )
+    vertical_sources = {
+        roles["proportional"],
+        roles["fullwidth"],
+        roles["encoded_two"],
+        roles["encoded_three"],
+        roles["fullwidth_two"],
+        roles["fullwidth_three"],
+        *obsolete_glyphs,
+    }
+    removed_single = 0
+    removed_ligatures = 0
+    visited: set[tuple[str, int]] = set()
+    for record in gsub.FeatureList.FeatureRecord:
+        if record.FeatureTag not in {"ccmp", "locl", "vert", "vrt2"}:
+            continue
+        for lookup_index in list(record.Feature.LookupListIndex or []):
+            key = (record.FeatureTag, int(lookup_index))
+            if key in visited or lookup_index >= len(gsub.LookupList.Lookup):
+                continue
+            visited.add(key)
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            if record.FeatureTag == "ccmp":
+                for subtable in ligature_substitution_subtables(lookup):
+                    for first_name in list(subtable.ligatures):
+                        if first_name not in ccmp_sources:
+                            continue
+                        ligatures = list(subtable.ligatures[first_name] or [])
+                        kept = [
+                            ligature
+                            for ligature in ligatures
+                            if not (
+                                len(ligature.Component) in {1, 2}
+                                and all(
+                                    component == first_name
+                                    for component in ligature.Component
+                                )
+                            )
+                        ]
+                        removed_ligatures += len(ligatures) - len(kept)
+                        if kept:
+                            subtable.ligatures[first_name] = kept
+                        else:
+                            del subtable.ligatures[first_name]
+                continue
+            sources = locl_sources if record.FeatureTag == "locl" else vertical_sources
+            for subtable in single_substitution_subtables(lookup):
+                mapping = getattr(subtable, "mapping", None)
+                if not mapping:
+                    continue
+                for source_name in list(mapping):
+                    if source_name in sources or mapping[source_name] in obsolete_glyphs:
+                        del mapping[source_name]
+                        removed_single += 1
+
+    dash_glyphs = set(roles.values()) | obsolete_glyphs
+    removed_pair_positions = remove_dash_pair_positioning(font, dash_glyphs)
+    return obsolete_glyphs, {
+        "upstream_dash_legacy_gsub_lookups_removed": int(
+            lookup_report.get("gsub_lookups_removed", 0)
+        ),
+        "upstream_dash_legacy_single_mappings_removed": removed_single,
+        "upstream_dash_legacy_ligatures_removed": removed_ligatures,
+        "upstream_dash_legacy_pair_positions_removed": removed_pair_positions,
+    }
+
+
+def link_lookup_to_all_gsub_features(font: TTFont, tag: str, lookup_index: int) -> int:
+    linked = add_lookup_to_all_features(font, tag, lookup_index)
+    if linked:
+        return linked
+    feature_index = insert_gsub_feature_record(font, tag, [lookup_index])
+    if not font["GSUB"].table.ScriptList:
+        return 1
+    for script_record in font["GSUB"].table.ScriptList.ScriptRecord:
+        langsys_items = []
+        if script_record.Script.DefaultLangSys:
+            langsys_items.append(script_record.Script.DefaultLangSys)
+        langsys_items.extend(
+            record.LangSys for record in script_record.Script.LangSysRecord
+        )
+        for langsys in langsys_items:
+            indices = sorted(set(list(langsys.FeatureIndex or []) + [feature_index]))
+            langsys.FeatureIndex = indices
+            langsys.FeatureCount = len(indices)
+    return 1
+
+
+def add_language_specific_dash_locl(
+    font: TTFont,
+    mappings: dict[str, dict[str, str]],
+) -> dict[str, int]:
+    gsub = font["GSUB"].table
+    lookup_by_mapping: dict[tuple[tuple[str, str], ...], int] = {}
+    feature_mappings: dict[int, tuple[tuple[str, str], ...]] = {}
+    missing: dict[tuple[tuple[str, str], ...], list[Any]] = {}
+    linked_features: set[int] = set()
+    langsys_linked = 0
+    for language, mapping in mappings.items():
+        records = langsys_records_for_language(font, language)
+        if not records:
+            raise ValueError(f"missing GSUB LangSys for dash locl language {language}")
+        mapping_signature = tuple(sorted(mapping.items()))
+        for langsys in records:
+            feature_indices = [
+                int(feature_index)
+                for feature_index in list(langsys.FeatureIndex or [])
+                if gsub.FeatureList.FeatureRecord[feature_index].FeatureTag == "locl"
             ]
-            existing_pair_rules_removed += len(ligatures) - len(kept)
-            if kept:
-                subtable.ligatures[em_dash] = kept
-            else:
-                subtable.ligatures.pop(em_dash, None)
+            if not feature_indices:
+                missing.setdefault(mapping_signature, []).append(langsys)
+                continue
+            feature_index = feature_indices[0]
+            previous_mapping = feature_mappings.setdefault(
+                feature_index,
+                mapping_signature,
+            )
+            if previous_mapping != mapping_signature:
+                raise ValueError(
+                    "one GSUB locl FeatureRecord is shared by incompatible "
+                    "dash language mappings"
+                )
+            linked_features.add(feature_index)
+            langsys_linked += 1
 
-    pair = ot.Ligature()
-    pair.CompCount = 2
-    pair.Component = [em_dash]
-    pair.LigGlyph = horizontal_ligature
-    ligatures = [pair]
-    triple = ot.Ligature()
-    triple.CompCount = 3
-    triple.Component = [em_dash, em_dash]
-    triple.LigGlyph = three_em_dash
-    ligatures.insert(0, triple)
-    ligature_subtable = ot.LigatureSubst()
-    ligature_subtable.ligatures = {em_dash: ligatures}
-    ligature_lookup = ot.Lookup()
-    ligature_lookup.LookupType = 4
-    ligature_lookup.LookupFlag = 0
-    ligature_lookup.SubTable = [ligature_subtable]
-    ligature_lookup.SubTableCount = 1
+    lookups_added = 0
+    features_added = 0
 
-    ccmp_single_subtable = ot.SingleSubst()
-    ccmp_single_subtable.mapping = {two_em_dash: horizontal_ligature}
-    ccmp_single_lookup = ot.Lookup()
-    ccmp_single_lookup.LookupType = 1
-    ccmp_single_lookup.LookupFlag = 0
-    ccmp_single_lookup.SubTable = [ccmp_single_subtable]
-    ccmp_single_lookup.SubTableCount = 1
+    def lookup_for(mapping_signature: tuple[tuple[str, str], ...]) -> int:
+        nonlocal lookups_added
+        lookup_index = lookup_by_mapping.get(mapping_signature)
+        if lookup_index is None:
+            lookup_index = append_gsub_lookup(
+                font,
+                make_single_substitution_lookup(dict(mapping_signature)),
+            )
+            lookup_by_mapping[mapping_signature] = lookup_index
+            lookups_added += 1
+        return lookup_index
 
-    vertical_subtable = ot.SingleSubst()
-    vertical_subtable.mapping = {
-        horizontal_ligature: vertical_ligature,
-        three_em_dash: vertical_three_em_ligature,
+    for feature_index, mapping_signature in feature_mappings.items():
+        feature = gsub.FeatureList.FeatureRecord[feature_index].Feature
+        lookup_index = lookup_for(mapping_signature)
+        old_lookups = list(feature.LookupListIndex or [])
+        feature.LookupListIndex = list(dict.fromkeys([lookup_index, *old_lookups]))
+        feature.LookupCount = len(feature.LookupListIndex)
+
+    for mapping_signature, langsys_items in missing.items():
+        lookup_index = lookup_for(mapping_signature)
+        feature_index = insert_gsub_feature_record(font, "locl", [lookup_index])
+        features_added += 1
+        for langsys in langsys_items:
+            indices = list(langsys.FeatureIndex or [])
+            tags = [
+                gsub.FeatureList.FeatureRecord[index].FeatureTag
+                for index in indices
+            ]
+            insert_at = max(
+                (index + 1 for index, tag in enumerate(tags) if tag == "hist"),
+                default=len(indices),
+            )
+            indices.insert(insert_at, feature_index)
+            langsys.FeatureIndex = indices
+            langsys.FeatureCount = len(langsys.FeatureIndex)
+            langsys_linked += 1
+    return {
+        "upstream_dash_locl_lookups_added": lookups_added,
+        "upstream_dash_locl_features_added": features_added,
+        "upstream_dash_locl_existing_features_linked": len(linked_features),
+        "upstream_dash_locl_langsys_linked": langsys_linked,
     }
-    vertical_lookup = ot.Lookup()
-    vertical_lookup.LookupType = 1
-    vertical_lookup.LookupFlag = 0
-    vertical_lookup.SubTable = [vertical_subtable]
-    vertical_lookup.SubTableCount = 1
-    prepend_gsub_lookups(
+
+
+def apply_upstream_dash_behavior(
+    font: TTFont,
+    region: str,
+    *,
+    static_source: TTFont | None = None,
+    italic: bool = False,
+) -> dict[str, Any]:
+    if "GSUB" not in font or "glyf" not in font:
+        return {"upstream_dash_behavior_applied": False}
+    report: dict[str, Any] = {}
+    if static_source is not None:
+        roles, localized_mappings, static_report = prepare_static_upstream_dash_glyphs(
+            font,
+            static_source,
+            region,
+            italic,
+        )
+        report.update(static_report)
+    else:
+        roles = upstream_dash_roles(font)
+        localized_mappings = (
+            {}
+            if region == "CL"
+            else normalized_source_han_dash_locl_mappings(font, roles)
+        )
+
+    _obsolete_glyphs, cleanup_report = strip_legacy_dash_layout(font, roles)
+    report.update(cleanup_report)
+    if region == "CL":
+        cmap_remaps = 0
+        for codepoint, glyph_name in (
+            (0x2014, roles["fullwidth"]),
+            (0x2E3A, roles["fullwidth_two"]),
+            (0x2E3B, roles["fullwidth_three"]),
+        ):
+            cmap_remaps += remap_unicode_cmap(font, codepoint, glyph_name)
+        report["upstream_dash_static_cmap_remaps"] = cmap_remaps
+        roles["proportional"] = roles["fullwidth"]
+        roles["encoded_two"] = roles["fullwidth_two"]
+        roles["encoded_three"] = roles["fullwidth_three"]
+        localized_mappings = {}
+    else:
+        missing_languages = CJK_LOCL_LANGUAGES - set(localized_mappings)
+        if missing_languages:
+            raise ValueError(
+                "missing upstream dash locl mappings for: "
+                + ", ".join(sorted(missing_languages))
+            )
+
+    ccmp_rules: dict[str, list[tuple[list[str], str]]] = {}
+    ccmp_rules[roles["proportional"]] = [
+        ([roles["proportional"], roles["proportional"]], roles["encoded_three"]),
+        ([roles["proportional"]], roles["encoded_two"]),
+    ]
+    if roles["fullwidth"] != roles["proportional"]:
+        ccmp_rules[roles["fullwidth"]] = [
+            ([roles["fullwidth"], roles["fullwidth"]], roles["fullwidth_three"]),
+            ([roles["fullwidth"]], roles["fullwidth_two"]),
+        ]
+    ccmp_lookup = append_gsub_lookup(
         font,
-        [ligature_lookup, ccmp_single_lookup, vertical_lookup],
+        make_ligature_substitution_lookup(ccmp_rules),
+    )
+    report["upstream_dash_ccmp_feature_records_linked"] = link_lookup_to_all_gsub_features(
+        font,
+        "ccmp",
+        ccmp_lookup,
     )
 
-    linked = {"ccmp": 0, "vert": 0, "vrt2": 0}
-    for record in gsub.FeatureList.FeatureRecord if gsub.FeatureList else []:
-        if record.FeatureTag not in linked:
-            continue
-        custom_lookups = [0, 1] if record.FeatureTag == "ccmp" else [2]
-        indices = [*custom_lookups, *record.Feature.LookupListIndex]
-        record.Feature.LookupListIndex = list(dict.fromkeys(indices))
-        record.Feature.LookupCount = len(record.Feature.LookupListIndex)
-        linked[record.FeatureTag] += 1
-    missing_tags = {tag for tag, count in linked.items() if not count}
-    for tag in sorted(missing_tags):
-        append_gsub_feature(font, tag, [0, 1] if tag == "ccmp" else [2])
-    enable_features_for_all_scripts(font, set(linked))
-
-    if "GDEF" in font and getattr(font["GDEF"].table, "GlyphClassDef", None):
-        class_defs = font["GDEF"].table.GlyphClassDef.classDefs
-        class_defs[horizontal_ligature] = 2
-        class_defs[vertical_ligature] = 2
-        class_defs[vertical_three_em_ligature] = 2
-
-    return {
-        "variable_em_dash_ligatures_rebuilt": True,
-        "variable_em_dash_ligature_mechanism": "Source Han ccmp plus vert",
-        "variable_em_dash_horizontal_ligature": horizontal_ligature,
-        "variable_em_dash_vertical_ligature": vertical_ligature,
-        "variable_em_dash_vertical_three_em_ligature": vertical_three_em_ligature,
-        "variable_em_dash_horizontal_variations_added": horizontal_variations,
-        "variable_em_dash_vertical_variations_added": vertical_variations,
-        "variable_em_dash_vertical_three_em_variations_added": vertical_three_em_variations,
-        "variable_em_dash_existing_pair_rules_removed": existing_pair_rules_removed,
-        "variable_em_dash_feature_records_linked": linked,
-        "variable_em_dash_triple_rule_preserved": True,
-        "variable_em_dash_encoded_two_em_redirected": two_em_dash,
-        "variable_em_dash_static_control_overrides": reference_overrides,
+    report.update(add_language_specific_dash_locl(font, localized_mappings))
+    vertical_mapping = {
+        roles["fullwidth"]: roles["vertical_single"],
+        roles["fullwidth_two"]: roles["vertical_two"],
+        roles["fullwidth_three"]: roles["vertical_three"],
     }
+    vertical_lookup = append_gsub_lookup(
+        font,
+        make_single_substitution_lookup(vertical_mapping),
+    )
+    for tag in ("vert", "vrt2"):
+        report[f"upstream_dash_{tag}_feature_records_linked"] = (
+            link_lookup_to_all_gsub_features(font, tag, vertical_lookup)
+        )
+
+    gdef = font["GDEF"].table if "GDEF" in font else None
+    class_defs = getattr(getattr(gdef, "GlyphClassDef", None), "classDefs", None)
+    if class_defs is not None:
+        for glyph_name in {
+            roles["encoded_two"],
+            roles["encoded_three"],
+            roles["fullwidth_two"],
+            roles["fullwidth_three"],
+            roles["vertical_two"],
+            roles["vertical_three"],
+        }:
+            class_defs[glyph_name] = 2
+    report["upstream_dash_catalan_locl_records_cleared"] = clear_empty_catalan_locl(font)
+    report["upstream_dash_behavior_applied"] = True
+    report["upstream_dash_mechanism"] = "Source Han ccmp/locl/vert-vrt2"
+    report["upstream_dash_weight_dependent_outlines"] = True
+    return report
 
 
 def sync_em_dash_continuation_metrics_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
@@ -7183,39 +7598,138 @@ def two_em_dash_structure_status(font: TTFont, variable: bool) -> dict[str, Any]
     }
 
 
-def align_em_dash_calt_feature_records(font: TTFont, reference: TTFont) -> dict[str, int]:
-    if "GSUB" not in font or "GSUB" not in reference:
-        return {"em_dash_calt_feature_records_aligned": 0, "em_dash_calt_lookup_links_added": 0}
-    table = font["GSUB"].table
-    ref_table = reference["GSUB"].table
-    if not table.FeatureList or not ref_table.FeatureList:
-        return {"em_dash_calt_feature_records_aligned": 0, "em_dash_calt_lookup_links_added": 0}
-    target_dash_indices = em_dash_calt_chain_lookup_indices(font)
-    ref_dash_indices = em_dash_chain_lookup_indices(reference)
-    if not target_dash_indices or not ref_dash_indices:
-        return {"em_dash_calt_feature_records_aligned": 0, "em_dash_calt_lookup_links_added": 0}
+def upstream_dash_structure_status(font: TTFont, region: str) -> dict[str, Any]:
+    reasons: list[str] = []
+    try:
+        roles = upstream_dash_roles(font)
+    except Exception as error:
+        return {
+            "ok": False,
+            "reasons": [f"could not resolve upstream dash roles: {error}"],
+        }
 
-    target_records = [record for record in table.FeatureList.FeatureRecord if record.FeatureTag == "calt"]
-    ref_records = [record for record in ref_table.FeatureList.FeatureRecord if record.FeatureTag == "calt"]
-    aligned = 0
-    links_added = 0
-    for target_record, ref_record in zip(target_records, ref_records):
-        if not any(index in ref_dash_indices for index in list(ref_record.Feature.LookupListIndex or [])):
-            continue
-        indices = list(target_record.Feature.LookupListIndex or [])
-        missing_dash_indices = [
-            dash_index
-            for dash_index in target_dash_indices
-            if dash_index not in indices
-        ]
-        added_here = len(missing_dash_indices)
-        indices = missing_dash_indices + indices
-        if added_here:
-            target_record.Feature.LookupListIndex = indices
-            target_record.Feature.LookupCount = len(indices)
-            aligned += 1
-            links_added += added_here
-    return {"em_dash_calt_feature_records_aligned": aligned, "em_dash_calt_lookup_links_added": links_added}
+    pair_rules = ligature_outputs_for_feature(
+        font,
+        "ccmp",
+        roles["proportional"],
+    )
+    if pair_rules.get(2) != roles["encoded_two"]:
+        reasons.append("ccmp pair does not produce encoded two-em dash")
+    if pair_rules.get(3) != roles["encoded_three"]:
+        reasons.append("ccmp triple does not produce encoded three-em dash")
+    if roles["fullwidth"] != roles["proportional"]:
+        fullwidth_rules = ligature_outputs_for_feature(
+            font,
+            "ccmp",
+            roles["fullwidth"],
+        )
+        if fullwidth_rules.get(2) != roles["fullwidth_two"]:
+            reasons.append("ccmp fullwidth pair does not produce hidden two-em dash")
+        if fullwidth_rules.get(3) != roles["fullwidth_three"]:
+            reasons.append("ccmp fullwidth triple does not produce hidden three-em dash")
+
+    actual_locl = dash_locl_mappings_by_language(font, roles)
+    if region == "CL":
+        if roles["proportional"] != roles["fullwidth"]:
+            reasons.append("CL U+2014 and U+2015 do not share the Shanggu glyph")
+        if actual_locl:
+            reasons.append(f"CL unexpectedly localizes dash through locl: {actual_locl!r}")
+    else:
+        korean_target = None
+        for language in sorted(CJK_LOCL_LANGUAGES):
+            mapping = actual_locl.get(language, {})
+            expected_single = roles["fullwidth"]
+            if language == "KOR ":
+                expected_single = mapping.get(roles["proportional"])
+                korean_target = expected_single
+                if not expected_single or expected_single in {
+                    roles["proportional"],
+                    roles["fullwidth"],
+                }:
+                    reasons.append("KOR locl lacks Source Han's narrow single-dash alternate")
+            expected = {
+                roles["proportional"]: expected_single,
+                roles["encoded_two"]: roles["fullwidth_two"],
+                roles["encoded_three"]: roles["fullwidth_three"],
+            }
+            if mapping != expected:
+                reasons.append(
+                    f"{language} dash locl mapping {mapping!r} != {expected!r}"
+                )
+
+    vertical = get_single_substitution_mappings(font, {"vert", "vrt2"})
+    expected_vertical = {
+        roles["fullwidth"]: roles["vertical_single"],
+        roles["fullwidth_two"]: roles["vertical_two"],
+        roles["fullwidth_three"]: roles["vertical_three"],
+    }
+    for source_name, target_name in expected_vertical.items():
+        if vertical.get(source_name) != target_name:
+            reasons.append(
+                f"vert/vrt2 mapping {source_name}->{vertical.get(source_name)!r}, "
+                f"expected {target_name}"
+            )
+
+    upem = int(font["head"].unitsPerEm)
+    expected_metrics = {
+        roles["fullwidth_two"]: ("hmtx", 2 * upem),
+        roles["fullwidth_three"]: ("hmtx", 3 * upem),
+        roles["vertical_two"]: ("vmtx", 2 * upem),
+        roles["vertical_three"]: ("vmtx", 3 * upem),
+    }
+    for glyph_name, (table_tag, expected_advance) in expected_metrics.items():
+        actual = int(font[table_tag].metrics[glyph_name][0])
+        if actual != expected_advance:
+            reasons.append(
+                f"{glyph_name} {table_tag} advance {actual} != {expected_advance}"
+            )
+
+    obsolete_states = {
+        "continuations": em_dash_continuation_glyphs(font),
+        "pair_starts": em_dash_pair_start_glyphs(font),
+    }
+    if any(obsolete_states.values()):
+        reasons.append(f"legacy calt dash states remain: {obsolete_states!r}")
+    obsolete_positioning = vertical_em_dash_positioning_records(font)
+    if any(obsolete_positioning.values()):
+        reasons.append("legacy vertical dash PairPos remains")
+
+    catalan_nonempty = 0
+    if "GSUB" in font and font["GSUB"].table.FeatureList:
+        gsub = font["GSUB"].table
+        for langsys in langsys_records_for_language(font, "CAT "):
+            for feature_index in list(langsys.FeatureIndex or []):
+                record = gsub.FeatureList.FeatureRecord[feature_index]
+                if record.FeatureTag == "locl" and record.Feature.LookupListIndex:
+                    catalan_nonempty += 1
+    if catalan_nonempty:
+        reasons.append(f"CAT has {catalan_nonempty} non-empty locl FeatureRecords")
+
+    gdef_classes = (
+        font["GDEF"].table.GlyphClassDef.classDefs
+        if "GDEF" in font and getattr(font["GDEF"].table, "GlyphClassDef", None)
+        else {}
+    )
+    for glyph_name in {
+        roles["encoded_two"],
+        roles["encoded_three"],
+        roles["fullwidth_two"],
+        roles["fullwidth_three"],
+        roles["vertical_two"],
+        roles["vertical_three"],
+    }:
+        if gdef_classes.get(glyph_name) != 2:
+            reasons.append(f"{glyph_name} is not a GDEF ligature")
+    return {
+        "ok": not reasons,
+        "reasons": reasons,
+        "mechanism": "Source Han ccmp/locl/vert-vrt2",
+        "roles": roles,
+        "locl": actual_locl,
+        "legacy_states": obsolete_states,
+        "legacy_pair_positioning": obsolete_positioning,
+        "catalan_nonempty_locl_records": catalan_nonempty,
+    }
 
 
 def tnum_digit_glyphs(font: TTFont, digit_names: list[str]) -> list[str]:
@@ -7559,7 +8073,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     subset_to_current_cmap(base)
     colon_report = add_digit_colon_feature(base)
     reference = reference_fonts[400]
-    skip_metric_codepoints = set(range(0x30, 0x3A)) | {0x3A}
+    skip_metric_codepoints = set(range(0x30, 0x3A)) | {0x3A} | DASH_CMAP_CODEPOINTS
     try:
         alias_report = split_reference_cmap_aliases(base, reference)
         alias_mapping_report = align_reference_cmap_alias_mappings(base, reference, skip_metric_codepoints)
@@ -7669,11 +8183,12 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     log_step(f"variable {style_label}: add Noto chws/vchw")
     contextual_spacing_report = add_noto_contextual_spacing(out_path)
     base = TTFont(out_path)
-    final_em_dash_ligature_report = rebuild_variable_em_dash_ligatures(
+    final_em_dash_ligature_report = apply_upstream_dash_behavior(
         base,
         region,
-        italic,
+        italic=italic,
     )
+    final_mac_name_report = remove_mac_name_records(base)
     base.save(out_path, reorderTables=True)
     base.close()
     base = TTFont(out_path)
@@ -7754,6 +8269,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         **colon_report,
         **contextual_spacing_report,
         **final_em_dash_ligature_report,
+        **final_mac_name_report,
     }
 
 
@@ -8204,14 +8720,6 @@ def run_ttfautohint(args: list[str]) -> str:
         return "ttfautohint-py"
     except ImportError:
         raise FileNotFoundError("ttfautohint executable or Python module is required")
-
-
-def file_sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
 
 
 def optional_file_sha256(path: Path) -> str | None:
@@ -9119,6 +9627,11 @@ def build_sarasa_static_fragments(
     inter_ttf = build_inter_source(weight_name, weight_value, italic, tmp_dir)
     style_name = sarasa_style_name(weight_name, italic)
     flags = sarasa_ui_flags()
+    classical_override = (
+        build_classical_override_ttf(region, weight_name, tmp_dir)
+        if region_config(region)["classical"]
+        else None
+    )
 
     kanji = fe_dir / "kanji0.ttf"
     hangul = fe_dir / "hangul0.ttf"
@@ -9129,7 +9642,6 @@ def build_sarasa_static_fragments(
     pass1 = work_dir / "pass1.ttf"
 
     if not kanji.exists():
-        classical_override = build_classical_override_ttf(region, weight_name, tmp_dir) if region_config(region)["classical"] else None
         run_sarasa_module(
             tmp_dir,
             "make/kanji/build.mjs",
@@ -9178,6 +9690,7 @@ def build_sarasa_static_fragments(
         "pass1": pass1,
         "kanji": kanji,
         "hangul": hangul,
+        "dash_source_path": classical_override or shs_ttf,
         "region": region,
         "sarasa_static_style": style_name,
         "sarasa_source_han_style": str(STATIC_STYLE_SOURCES[weight_name]["shs"]),
@@ -9291,8 +9804,19 @@ def static_weight_resume_status(region: str, stop: dict[str, Any]) -> tuple[bool
             } if "name" in font else set()
             if copyrights != {PROJECT_COPYRIGHT} or source_only_legal_ids:
                 reasons.append(f"{label}: incomplete legal names")
+            mac_name_records = sum(
+                record.platformID == 1 for record in font["name"].names
+            ) if "name" in font else 0
+            if mac_name_records:
+                reasons.append(f"{label}: {mac_name_records} Macintosh name records")
             if "post" not in font or float(font["post"].formatType) != 3.0:
                 reasons.append(f"{label}: post is not format 3")
+            invalid_overlap_flags = count_ots_invalid_simple_overlap_flags(font)
+            if invalid_overlap_flags:
+                reasons.append(
+                    f"{label}: {invalid_overlap_flags} OTS-invalid explicit "
+                    "OVERLAP_SIMPLE flags"
+                )
             if "STAT" not in font or "fvar" in font or "gvar" in font:
                 reasons.append(f"{label}: wrong static variation tables")
             hint_tables = any(tag in font for tag in ("fpgm", "prep", "cvt "))
@@ -9305,7 +9829,7 @@ def static_weight_resume_status(region: str, stop: dict[str, Any]) -> tuple[bool
                 reasons.append(f"{label}: missing GPOS chws")
             if not layout_has_feature(font, "GPOS", "vchw"):
                 reasons.append(f"{label}: missing GPOS vchw")
-            dash_status = two_em_dash_structure_status(font, variable=False)
+            dash_status = upstream_dash_structure_status(font, region)
             if not dash_status["ok"]:
                 reasons.append(
                     f"{label}: invalid two-em dash behavior: "
@@ -9351,10 +9875,24 @@ def postprocess_static_font(
     weight_value: int,
     italic: bool,
     hinted: bool,
+    dash_source_path: Path,
 ) -> dict[str, Any]:
     font = TTFont(path, recalcBBoxes=False, recalcTimestamp=False)
     font.recalcBBoxes = False
-    report: dict[str, Any] = {}
+    uses_official_glyph_baseline = static_uses_official_glyph_baseline(weight_name)
+    source_value_reference = (
+        None
+        if uses_official_glyph_baseline
+        else TTFont(path, recalcBBoxes=False, recalcTimestamp=False)
+    )
+    report: dict[str, Any] = {
+        "static_postprocess_version": STATIC_POSTPROCESS_VERSION,
+        "static_glyph_data_policy": (
+            "official-sarasa-exact"
+            if uses_official_glyph_baseline
+            else "source-weight-extension"
+        ),
+    }
     try:
         reference_style = static_reference_style_name(weight_name, italic)
         reference_path = static_reference_font_path(region, weight_name, italic)
@@ -9365,12 +9903,26 @@ def postprocess_static_font(
             reference = TTFont(reference_path, recalcBBoxes=False, recalcTimestamp=False)
             try:
                 report.update(restrict_cmap_to_reference(font, reference, PROPDIGITS_CODEPOINTS))
-                report.update(align_reference_advances(font, reference, PROPDIGITS_CODEPOINTS))
-                report.update(align_reference_hmtx_lsb(font, reference, PROPDIGITS_CODEPOINTS))
-                report.update(align_tnum_digit_targets(font, reference))
-                report.update(align_reference_vmtx(font, reference, PROPDIGITS_CODEPOINTS))
+                if uses_official_glyph_baseline:
+                    report.update(align_reference_advances(font, reference, PROPDIGITS_CODEPOINTS))
+                    report.update(align_reference_hmtx_lsb(font, reference, PROPDIGITS_CODEPOINTS))
+                    report.update(align_tnum_digit_targets(font, reference))
+                    report.update(align_reference_vmtx(font, reference, PROPDIGITS_CODEPOINTS))
+                else:
+                    report.update(
+                        {
+                            "reference_advances_aligned": 0,
+                            "reference_lsb_aligned": 0,
+                            "tnum_digit_target_hmtx_aligned": 0,
+                            "reference_vmtx_aligned": 0,
+                            "extension_source_metrics_preserved": True,
+                        }
+                    )
                 report.update(rebuild_gdef_from_reference(font, reference))
-                report.update(rebuild_vorg_from_reference(font, reference))
+                if uses_official_glyph_baseline:
+                    report.update(rebuild_vorg_from_reference(font, reference))
+                else:
+                    report["extension_source_vorg_preserved"] = True
                 report.update(sync_sarasa_metadata_from_reference(font, reference))
             except Exception:
                 reference.close()
@@ -9381,8 +9933,10 @@ def postprocess_static_font(
         rebuild_static_stat(font, weight_name, weight_value, italic)
         report.update(drop_generated_extra_tables(font, keep_stat=True))
         report.update(apply_static_propdigits(font))
-        if reference:
+        if reference and uses_official_glyph_baseline:
             report.update(sync_static_glyf_from_reference(font, reference, PROPDIGITS_CODEPOINTS))
+        elif reference:
+            report["extension_source_glyf_preserved"] = True
         report.update(add_digit_colon_feature(font))
         if reference:
             report.update(align_layout_feature_template(font, reference, "GSUB"))
@@ -9390,11 +9944,23 @@ def postprocess_static_font(
             report.update(align_layout_feature_template(font, reference, "GPOS", use_reference_lookup_indices=True))
             subset_to_current_cmap(font)
             report.update(align_layout_feature_template(font, reference, "GSUB"))
-            report.update(align_em_dash_calt_feature_records(font, reference))
-            report.update(apply_static_two_em_dash_behavior(font))
             report.update(align_layout_lookup_structure(font, reference, "GPOS"))
             report.update(align_layout_feature_template(font, reference, "GPOS", use_reference_lookup_indices=True))
-            report.update(sync_gpos_single_pos_feature_values_from_reference(font, reference, {"palt"}))
+            palt_reference = reference if uses_official_glyph_baseline else source_value_reference
+            if palt_reference is None:
+                raise RuntimeError("missing extension source palt reference")
+            report.update(
+                sync_gpos_single_pos_feature_values_from_reference(
+                    font,
+                    palt_reference,
+                    {"palt"},
+                )
+            )
+            report["static_palt_value_source"] = (
+                "official-sarasa-exact"
+                if uses_official_glyph_baseline
+                else "source-weight-extension"
+            )
         if hinted:
             report.update(
                 {
@@ -9417,6 +9983,8 @@ def postprocess_static_font(
     finally:
         if reference:
             reference.close()
+        if source_value_reference is not None:
+            source_value_reference.close()
         font.close()
     log_step(
         f"static {region} {weight_name}{' Italic' if italic else ''} "
@@ -9427,7 +9995,7 @@ def postprocess_static_font(
     font.recalcBBoxes = False
     post_layout_reference: TTFont | None = None
     try:
-        if reference_path.exists():
+        if uses_official_glyph_baseline and reference_path.exists():
             post_layout_reference = TTFont(
                 reference_path,
                 recalcBBoxes=False,
@@ -9440,7 +10008,23 @@ def postprocess_static_font(
                     PROPDIGITS_CODEPOINTS,
                 )
             )
-        report.update(add_vertical_em_dash_positioning(font))
+        dash_source = TTFont(
+            dash_source_path,
+            recalcBBoxes=False,
+            recalcTimestamp=False,
+        )
+        try:
+            report.update(
+                apply_upstream_dash_behavior(
+                    font,
+                    region,
+                    static_source=dash_source,
+                    italic=italic,
+                )
+            )
+        finally:
+            dash_source.close()
+        report.update(remove_mac_name_records(font))
         font.save(path, reorderTables=True)
     finally:
         if post_layout_reference is not None:
@@ -9462,7 +10046,6 @@ def prepare_static_style(
     tmp_dir: Path,
     italic: bool,
     emit_output: bool = True,
-    reuse_existing_unhinted: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Any] | None]:
     weight_name = str(stop["name"])
     weight_value = int(stop["value"])
@@ -9478,22 +10061,22 @@ def prepare_static_style(
         unhinted_report_path = unhinted_tmp.with_suffix(".report.json")
         unhinted_tmp.parent.mkdir(parents=True, exist_ok=True)
         unhinted_path = static_dir(region, False) / static_output_name(region, weight_name, italic)
-        if reuse_existing_unhinted and unhinted_path.exists():
-            log_step(f"static {style_label}: reuse existing unhinted output")
-            unhinted_output = {
-                "file": portable_report_path(unhinted_path),
-                "region": region,
-                "weight": weight_name,
-                "wght": weight_value,
-                "italic": italic,
-                "hinted_variant": False,
-                "rebuilt": False,
-                "resume_static_skipped": True,
-            }
-        elif unhinted_tmp.exists() and unhinted_report_path.exists():
+        unhinted_report = (
+            json.loads(unhinted_report_path.read_text(encoding="utf-8"))
+            if unhinted_tmp.exists() and unhinted_report_path.exists()
+            else None
+        )
+        if (
+            unhinted_report is not None
+            and unhinted_report.get("static_postprocess_version")
+            == STATIC_POSTPROCESS_VERSION
+        ):
             log_step(f"static {style_label}: reuse completed unhinted output")
-            unhinted_report = json.loads(unhinted_report_path.read_text(encoding="utf-8"))
         else:
+            if unhinted_report is not None:
+                log_step(f"static {style_label}: invalidate stale unhinted postprocess cache")
+                unhinted_tmp.unlink(missing_ok=True)
+                unhinted_report_path.unlink(missing_ok=True)
             log_step(f"static {style_label}: compose unhinted pass2")
             build_sarasa_pass2(
                 fragments["pass1"],
@@ -9505,26 +10088,31 @@ def prepare_static_style(
             )
             log_step(f"static {style_label}: postprocess unhinted")
             unhinted_report = postprocess_static_font(
-                unhinted_tmp, region, weight_name, weight_value, italic, False
+                unhinted_tmp,
+                region,
+                weight_name,
+                weight_value,
+                italic,
+                False,
+                Path(fragments["dash_source_path"]),
             )
             write_json_atomic(unhinted_report_path, unhinted_report)
-        if unhinted_output is None:
-            shutil.copy2(unhinted_tmp, unhinted_path)
-            unhinted_output = {
-                "file": portable_report_path(unhinted_path),
-                "region": region,
-                "weight": weight_name,
-                "wght": weight_value,
-                "italic": italic,
-                "hinted_variant": False,
-                "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
-                "hinted": False,
-                "hint_tool": "unhinted",
-                "chlorophytum_hinted": False,
-                **{k: v for k, v in fragments.items() if isinstance(v, str)},
-                **pass1_derivative_report,
-                **unhinted_report,
-            }
+        shutil.copy2(unhinted_tmp, unhinted_path)
+        unhinted_output = {
+            "file": portable_report_path(unhinted_path),
+            "region": region,
+            "weight": weight_name,
+            "wght": weight_value,
+            "italic": italic,
+            "hinted_variant": False,
+            "source_static_build": "sarasa-pass1-kanji-hangul-pass2",
+            "hinted": False,
+            "hint_tool": "unhinted",
+            "chlorophytum_hinted": False,
+            **{k: v for k, v in fragments.items() if isinstance(v, str)},
+            **pass1_derivative_report,
+            **unhinted_report,
+        }
 
     hinted_work = tmp_dir / "hinted" / region / f"{weight_name}{'Italic' if italic else ''}"
     hinted_work.mkdir(parents=True, exist_ok=True)
@@ -9561,7 +10149,6 @@ def build_static_weight_group(
     stop: dict[str, Any],
     tmp_dir: Path,
     hint_jobs: int,
-    resume: bool = False,
 ) -> list[dict[str, Any]]:
     weight_name = str(stop["name"])
     output_regions = set(regions)
@@ -9575,7 +10162,6 @@ def build_static_weight_group(
                 tmp_dir,
                 italic,
                 emit_output=region in output_regions,
-                reuse_existing_unhinted=resume,
             )
             contexts.append(context)
             if unhinted_output is not None:
@@ -9745,6 +10331,7 @@ def build_static_weight_group(
             int(context["weight_value"]),
             italic,
             True,
+            Path(context["fragments"]["dash_source_path"]),
         )
         shutil.copy2(context["hinted_tmp"], context["hinted_path"])
         pass1_report = {
@@ -9790,7 +10377,12 @@ def build_static_weight_group(
     return outputs
 
 
-def build_static_fonts(regions: list[str], resume: bool = False) -> list[dict[str, Any]]:
+def build_static_fonts(
+    regions: list[str],
+    resume: bool = False,
+    force_weights: set[str] | None = None,
+) -> list[dict[str, Any]]:
+    force_weights = set(force_weights or ())
     log_step("static: prepare output directories")
     for region in regions:
         expected_names = {
@@ -9819,7 +10411,7 @@ def build_static_fonts(regions: list[str], resume: bool = False) -> list[dict[st
             weight_name = str(stop["name"])
             regions_to_build: list[str] = []
             for region in regions:
-                if resume:
+                if resume and weight_name not in force_weights:
                     complete, reasons = static_weight_resume_status(region, stop)
                     if complete:
                         log_step(f"static {region} {weight_name}: verified complete; skip")
@@ -9855,7 +10447,6 @@ def build_static_fonts(regions: list[str], resume: bool = False) -> list[dict[st
                         stop,
                         weight_tmp_dir,
                         hint_jobs,
-                        resume=resume,
                     )
                 )
     outputs.sort(
@@ -10058,6 +10649,12 @@ def inspect_font(path: Path) -> dict[str, Any]:
             "contextual_spacing_shapes": contextual_spacing_shape_samples(path, font),
             "has_hints": any(tag in font for tag in ("fpgm", "prep", "cvt ")),
             "glyf_overlap_simple_flags": count_simple_glyph_overlap_flags(font),
+            "glyf_ots_invalid_explicit_overlap_flags": (
+                count_ots_invalid_simple_overlap_flags(font)
+            ),
+            "mac_name_records": sum(
+                record.platformID == 1 for record in font["name"].names
+            ) if "name" in font else 0,
             "shape_1_colon_2": {
                 "default": shape_glyph_names(path, "1:2"),
                 "latn": shape_glyph_names(path, "1:2", "Latn"),
@@ -10095,8 +10692,8 @@ def static_readme_text(region: str, hinted: bool) -> str:
     cl_note = (
         f"CL 地区的传统旧字形覆盖跟随 Shanggu Sans {SHANGGU_TAG} 官方 TTF：\n"
         "汉字底稿先取 SourceHanSansK，再用 ShangguSansTC 静态 TTF 覆盖。\n"
-        "最终公开 cmap、GSUB/GPOS feature 和非数字 metrics 仍按 SarasaUiCL\n"
-        "参考字体裁剪与同步；Heavy 扩展字重沿用 Bold 的 reference 边界。"
+        "最终公开 cmap 和 GSUB/GPOS 模板按 SarasaUiCL 参考字体裁剪；五个\n"
+        "官方同名字重同步非数字 metrics，Heavy 保留 Shanggu Heavy 来源数据。"
         if region == "CL"
         else f"{region} 地区沿用 Sarasa 上游路径：CJK 底稿来自 {shs_prefix}。"
     )
@@ -10135,6 +10732,8 @@ Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 构建路径生�
 ExtraLight、Light、Regular、SemiBold、Bold 与上游 Sarasa 的公开静态样式
 一致；Heavy 900 是本项目保留的扩展实例。SemiBold 600 沿用 Sarasa 的静态
 配对：CJK 使用 Source Han Sans Medium 500，Latin 使用 Inter SemiBold 600。
+Heavy 使用 Source Han/Shanggu Heavy 900 与 Inter Black 900；Bold 只提供
+布局、命名和 hint 配置边界，不覆盖 Heavy 的 glyph 数据。
 
 公开字重采用 Sarasa/CSS 口径：ExtraLight 是 200。CJK 轮廓来源仍是
 Source Han Sans 的 ExtraLight 口径 250；VF 通过轴映射让 public
@@ -10147,12 +10746,14 @@ OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字�
 1:2 会上浮 ':'，1:a 和 a:2 不会上浮，1::2 等连续冒号上下文遵循
 Inter 的 colon-run 规则。
 
-单个 U+2014 保留原比例宽。连续两个 U+2014 由 calt 把第二字替换为水平
-延续字形，并以补数 advance 让横排总宽严格等于 2em。竖排时 vert/vrt2
-把两字替换为同一个 uniFE31，再由 GPOS PairPos 按实际轮廓端面和斜率设置
-第二字的 XPlacement/YPlacement 而不改变 YAdvance；正体只上移、Italic
-同时横移并上移，使竖排总 advance 也严格等于 2em。两半使用相同轮廓和
-hint 分类，calt 与竖排替换的不同 lookup 执行顺序都必须得到相同结果。
+破折号跟随 Source Han/Shanggu 的 ccmp、locl、vert/vrt2 结构。{region}
+在非 CJK 语言下保留比例 U+2014 和比例 U+2E3A/U+2E3B；CJK 地区标签
+把它们切到严格 1em/2em/3em 的横竖字形。KOR 单字保留 Source Han
+较窄且位置较高的地区字形；CL 则跟随 Shanggu，把 U+2014/U+2015
+全局映射到同一全宽字形，不另造地区 locl。正常双连、三连路径各使用一个
+长 glyph；仅显式启用 vrt2 的上游边界可能保留多个相同竖排单字形。
+破折号笔画厚度、少量 side bearing 和比例 advance 会随字重变化，固定的是
+CJK 的 1em/2em/3em 语义与中宫基线。Italic 使用对应正体轮廓的 9.4 度剪切。
 
 最终成品还会按 Noto CJK 的官方交付流程加入 GPOS chws/vchw：chws
 用于横排连续全角标点的上下文压缩，vchw 用于对应的竖排压缩。实现固定使用
@@ -10165,27 +10766,37 @@ name 表包含地区本地化显示名，例如：
 OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
 ???? 占位值。head.fontRevision 使用 OpenType fixed 数值 {OPENTYPE_VERSION}，
 对应本仓库版本 {VERSION}；nameID 5 以 OpenType 数值 Version {OPENTYPE_VERSION}
-开头，并在后续 project 字段保留完整版本 {VERSION}。
+开头，并在后续 project 字段保留完整版本 {VERSION}。最终 name 表与官方
+Sarasa/Source Han 成品一样不保留 platform 1（Macintosh）记录；Windows/Unicode
+本地化名称和四方版权保持完整。
 {hint_note}
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
 覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui {region} 静态字体套模板；
 随后追加 Noto CJK chws/vchw 的 FeatureRecord 和 contextual positioning lookup。
-静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap，并同步非数字 metrics。
-`palt` 下假名等已有 glyph 的定位值按展开轮廓结构与横竖 metrics 建立语义
-映射后从参考字体同步，不依赖 post format 3 产生的跨字体不稳定自动名。连续 U+2014
-保留上游 calt 的脚本可达范围，横排第二字改用补足严格二字宽的延续字形；
-竖排统一使用同一个 uniFE31，并由 GPOS 定位第二字。审计同时校验 calt、
-vert、vrt2、两种 lookup 执行顺序和 FreeType 位图笔画一致性。
+静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap；五个官方同名字重同步
+非数字 metrics，Heavy 则保留同次 Sarasa pass2 Heavy/Black 的 hmtx/vmtx、
+VORG、glyf 与 bbox。`palt` 下假名等已有 glyph 的定位值按展开轮廓结构与
+横竖 metrics 建立语义映射：官方同名字重从 Sarasa 参考同步，Heavy 从同次
+pass2 来源同步，不依赖 post format 3 产生的跨字体不稳定自动名。
+破折号从对应字重的 Source Han/Shanggu 静态源复制 9 个核心语义字形，
+SC/TC/HC/J/K 另复制 KOR 单字特例；各 CJK 地区标签优先在已有 locl
+FeatureRecord 中原位扩展，模板没有对应 locl 时才补充一条，CAT 空 locl
+继续保持为空。旧 calt continuation、pair-start 与竖排 PairPos 不会保留。
+hinted 成品在相同四点矩形拓扑间替换坐标并保留已生成的 glyph program，
+无需重新运行整组高层 hint 分析；审计逐角色核对 instructions、上游轮廓、
+hmtx/vmtx、字重单调性和 FreeType 多 ppem 位图。
 对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
 glyf bbox 和组合字形结构；Noto chws/vchw 后处理结束后还会再次恢复可直接
 对齐字形的参考 bbox，避免 1 unit 重算通过 phantom points 改变 hinted 位图。
 静态 TTF 与上游一样使用 post format 3，不在
 字体中存储 glyph names；数字的默认比例宽/tnum 等宽关系由 cmap 与 GSUB
 表达，不再为显示名称改变 glyph order 或制造与 GID 不一致的自动名。最终写出 glyf
-时保留上游 OVERLAP_SIMPLE 语义，并用 OTS 可接受的 repeat 编码保存重复
-overlap flags，而不是清除 bit 6。unhinted 套件中的 OTS maxZones/gasp 警告
-继承自上游 unhinted 基线，返回码为 0。
+时保留首点 OVERLAP_SIMPLE 语义，并优先用 OTS 可接受的首 flag repeat run
+保存重复 overlap flag；坐标替换使 x/y 压缩位不同、无法共用 repeat 时，只清除
+后续点上无语义且被 OTS 禁止的显式重复 bit 6。resume 与发布审计会解析原始
+flag stream。unhinted 套件中的 OTS maxZones/gasp 信息继承自上游 unhinted
+基线，返回码为 0。
 glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未编码字形会保留，
 不可达 glyph 数量差异视为构建产物。
 这些字体是修改派生版，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。
@@ -10218,12 +10829,38 @@ def sanitize_report_data(value: Any) -> Any:
         return portable_report_path(value)
     if isinstance(value, str) and Path(value).is_absolute():
         return portable_report_path(Path(value))
+    if isinstance(value, str):
+        replacements = (
+            (str(ROOT.resolve()), "."),
+            (ROOT.resolve().as_posix(), "."),
+            (str(WORK_ROOT.resolve()), "<work>"),
+            (WORK_ROOT.resolve().as_posix(), "<work>"),
+            (str(Path.home().resolve()), "~"),
+            (Path.home().resolve().as_posix(), "~"),
+        )
+        for source, replacement in replacements:
+            value = value.replace(source, replacement)
+        return value
     return value
+
+
+def assert_portable_report_text(text: str) -> None:
+    leaks = sorted(
+        set(
+            re.findall(
+                r"(?i)(?:(?<![a-z])[a-z]:[\\/]|/users/|\\users\\)[^\"\r\n]*",
+                text,
+            )
+        )
+    )
+    if leaks:
+        raise ValueError(f"report contains local absolute paths: {leaks[:8]}")
 
 
 def write_reports(build_report: dict[str, Any]) -> None:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
     build_text = json.dumps(sanitize_report_data(build_report), ensure_ascii=False, indent=2)
+    assert_portable_report_text(build_text)
     (REPORT_DIR / "Sarasa-Ui-PropDigits-report.json").write_text(
         build_text + "\n",
         encoding="utf-8",
@@ -10243,8 +10880,14 @@ def write_reports(build_report: dict[str, Any]) -> None:
         "note": "由 tools/build_sarasa_ui_propdigits_sc.py 使用 fontTools 生成。",
         "fonts": [inspect_font(path) for path in font_paths],
     }
+    inspection_text = json.dumps(
+        sanitize_report_data(inspection),
+        ensure_ascii=False,
+        indent=2,
+    )
+    assert_portable_report_text(inspection_text)
     (REPORT_DIR / "font-inspection.json").write_text(
-        json.dumps(inspection, ensure_ascii=False, indent=2) + "\n",
+        inspection_text + "\n",
         encoding="utf-8",
         newline="\n",
     )
@@ -10257,97 +10900,175 @@ def existing_variable_outputs() -> list[dict[str, Any]]:
     ]
 
 
-def variable_two_em_dash_axis_status(path: Path) -> dict[str, Any]:
+def variable_two_em_dash_axis_status(
+    path: Path,
+    region: str,
+    italic: bool,
+) -> dict[str, Any]:
     try:
         import uharfbuzz as hb
     except ImportError as error:
-        raise RuntimeError("variable em dash axis validation requires uharfbuzz") from error
-    data = path.read_bytes()
-    face = hb.Face(data)
-    hb_font = hb.Font(face)
-    hb_font.scale = (face.upem, face.upem)
-    expected = 2 * int(face.upem)
-    cases = [
-        ("default", "ltr", {}, (expected, 0), "single"),
-        (
-            "ccmp",
-            "ltr",
-            {"ccmp": True, "calt": False, "vert": False, "vrt2": False},
-            (expected, 0),
-            "single",
-        ),
-        ("vertical-default", "ttb", {}, (0, -expected), "single"),
-        (
-            "vert",
-            "ttb",
-            {"ccmp": True, "calt": False, "vert": True, "vrt2": False},
-            (0, -expected),
-            "single",
-        ),
-        (
-            "vrt2-only",
-            "ttb",
-            {"ccmp": True, "calt": False, "vert": False, "vrt2": True},
-            (0, -expected),
-            "same-pair",
-        ),
-        (
-            "vert-plus-vrt2",
-            "ttb",
-            {"ccmp": True, "calt": False, "vert": True, "vrt2": True},
-            (0, -expected),
-            "single",
-        ),
-    ]
+        raise RuntimeError("variable dash axis validation requires uharfbuzz") from error
+
+    target_data = path.read_bytes()
+    target_face = hb.Face(target_data)
+    target_font = hb.Font(target_face)
+    target_font.scale = (target_face.upem, target_face.upem)
+    upem = int(target_face.upem)
+    source_path = classical_vf_override_path(region) or source_han_vf_path(region)
+    source_face = hb.Face(source_path.read_bytes())
+    source_font = hb.Font(source_face)
+    source_font.scale = (source_face.upem, source_face.upem)
+
+    def shape(
+        hb_font: Any,
+        text: str,
+        language: str,
+        direction: str,
+        features: dict[str, bool] | None = None,
+    ) -> tuple[list[int], tuple[int, int]]:
+        buffer = hb.Buffer()
+        buffer.add_str(text)
+        buffer.script = "Hani"
+        buffer.language = language
+        buffer.direction = direction
+        hb.shape(hb_font, buffer, features or {})
+        return (
+            [int(info.codepoint) for info in buffer.glyph_infos],
+            (
+                sum(int(position.x_advance) for position in buffer.glyph_positions),
+                sum(int(position.y_advance) for position in buffer.glyph_positions),
+            ),
+        )
+
     failures: list[dict[str, Any]] = []
+
+    def fail(weight: float, case: str, actual: Any, expected: Any) -> None:
+        if len(failures) < 64:
+            failures.append(
+                {
+                    "wght": weight,
+                    "case": case,
+                    "actual": actual,
+                    "expected": expected,
+                }
+            )
+
+    cjk_languages = ["zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"]
     locations_checked = 0
+    shapes_checked = 0
+    previous_default_advances: tuple[int, int] | None = None
     for half_step in range(400, 1801):
         weight = half_step / 2
         locations_checked += 1
-        hb_font.set_variations({"wght": weight})
-        for name, direction, features, expected_advance, glyph_pattern in cases:
-            buffer = hb.Buffer()
-            buffer.add_str("——")
-            buffer.guess_segment_properties()
-            buffer.script = "hani"
-            buffer.language = "ZHS"
-            buffer.direction = direction
-            hb.shape(hb_font, buffer, features)
-            glyphs = [int(info.codepoint) for info in buffer.glyph_infos]
-            advance = (
-                sum(int(position.x_advance) for position in buffer.glyph_positions),
-                sum(int(position.y_advance) for position in buffer.glyph_positions),
+        target_font.set_variations({"wght": weight})
+        default_pair = shape(target_font, "——", "en", "ltr")
+        default_triple = shape(target_font, "———", "en", "ltr")
+        shapes_checked += 2
+        if len(default_pair[0]) != 1 or len(default_triple[0]) != 1:
+            fail(
+                weight,
+                "default-ccmp-glyph-count",
+                [len(default_pair[0]), len(default_triple[0])],
+                [1, 1],
             )
-            glyph_pattern_ok = (
-                len(glyphs) == 1
-                if glyph_pattern == "single"
-                else len(glyphs) == 2 and glyphs[0] == glyphs[1]
+        default_advances = (default_pair[1][0], default_triple[1][0])
+        if region == "CL" and default_advances != (2 * upem, 3 * upem):
+            fail(weight, "CL-default-advance", default_advances, (2 * upem, 3 * upem))
+        if previous_default_advances and any(
+            current < previous
+            for current, previous in zip(default_advances, previous_default_advances)
+        ):
+            fail(
+                weight,
+                "default-advance-monotonicity",
+                default_advances,
+                previous_default_advances,
             )
-            if not glyph_pattern_ok or advance != expected_advance:
-                if len(failures) < 32:
-                    failures.append(
-                        {
-                            "wght": weight,
-                            "case": name,
-                            "glyph_ids": glyphs,
-                            "advance": list(advance),
-                            "expected_advance": list(expected_advance),
-                        }
-                    )
-                else:
-                    return {
-                        "ok": False,
-                        "locations_checked": locations_checked,
-                        "step": 0.5,
-                        "failure_samples": failures,
-                        "truncated": True,
-                    }
+        previous_default_advances = default_advances
+
+        for language in cjk_languages:
+            horizontal = shape(target_font, "——", language, "ltr")
+            vertical = shape(target_font, "——", language, "ttb")
+            vrt2_only = shape(
+                target_font,
+                "——",
+                language,
+                "ttb",
+                {
+                    "ccmp": True,
+                    "locl": True,
+                    "vert": False,
+                    "vrt2": True,
+                    "calt": False,
+                },
+            )
+            shapes_checked += 3
+            if len(horizontal[0]) != 1 or horizontal[1] != (2 * upem, 0):
+                fail(
+                    weight,
+                    f"{language}-horizontal",
+                    [horizontal[0], horizontal[1]],
+                    ["one glyph", (2 * upem, 0)],
+                )
+            if len(vertical[0]) != 1 or vertical[1] != (0, -2 * upem):
+                fail(
+                    weight,
+                    f"{language}-vertical",
+                    [vertical[0], vertical[1]],
+                    ["one glyph", (0, -2 * upem)],
+                )
+            vrt2_pattern_ok = len(vrt2_only[0]) == 1 or (
+                len(vrt2_only[0]) == 2
+                and vrt2_only[0][0] == vrt2_only[0][1]
+            )
+            if not vrt2_pattern_ok or vrt2_only[1] != (0, -2 * upem):
+                fail(
+                    weight,
+                    f"{language}-vrt2-only",
+                    [vrt2_only[0], vrt2_only[1]],
+                    ["one glyph or Source Han's identical pair", (0, -2 * upem)],
+                )
+
+    source_parity: dict[str, Any] = {}
+    for public_weight, internal_weight in SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT.items():
+        target_font.set_variations({"wght": public_weight})
+        source_font.set_variations({"wght": internal_weight})
+        cases = {
+            "default-pair": ("——", "en", "ltr"),
+            "default-triple": ("———", "en", "ltr"),
+            "zh-Hans-pair": ("——", "zh-Hans", "ltr"),
+            "ko-single": ("—", "ko", "ltr"),
+            "zh-Hans-vertical-pair": ("——", "zh-Hans", "ttb"),
+        }
+        weight_report = {}
+        for case_name, (text, language, direction) in cases.items():
+            target_result = shape(target_font, text, language, direction)
+            source_result = shape(source_font, text, language, direction)
+            target_signature = (len(target_result[0]), target_result[1])
+            source_signature = (len(source_result[0]), source_result[1])
+            weight_report[case_name] = {
+                "target": [target_signature[0], list(target_signature[1])],
+                "source": [source_signature[0], list(source_signature[1])],
+            }
+            if target_signature != source_signature:
+                fail(
+                    float(public_weight),
+                    f"source-parity-{case_name}",
+                    target_signature,
+                    source_signature,
+                )
+        source_parity[str(public_weight)] = weight_report
     return {
         "ok": not failures,
         "locations_checked": locations_checked,
-        "shapes_checked": locations_checked * len(cases),
+        "shapes_checked": shapes_checked,
         "step": 0.5,
+        "source_path": portable_report_path(source_path),
+        "source_parity": source_parity,
+        "italic_advance_invariant": bool(italic),
         "failure_samples": failures,
+        "truncated": len(failures) >= 64,
     }
 
 
@@ -10446,6 +11167,12 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
         copyright_name = font["name"].getDebugName(0) if "name" in font else None
         if copyright_name != PROJECT_COPYRIGHT:
             reasons.append("nameID 0 is not the complete four-party copyright")
+        mac_name_records = sum(
+            record.platformID == 1 for record in font["name"].names
+        ) if "name" in font else 0
+        details["mac_name_records"] = mac_name_records
+        if mac_name_records:
+            reasons.append(f"{mac_name_records} Macintosh name records remain")
         if "OS/2" not in font or font["OS/2"].achVendID != OS2_VENDOR_ID:
             reasons.append(f"OS/2.achVendID is not {OS2_VENDOR_ID}")
         if "head" not in font or not math.isclose(
@@ -10494,12 +11221,16 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
                     + ", ".join(str(index) for index in sorted(set(invalid_var_indices))[:16])
                 )
         if variation_store_valid:
-            dash_status = two_em_dash_structure_status(font, variable=True)
+            dash_status = upstream_dash_structure_status(font, region)
             details["two_em_dash"] = dash_status
             if not dash_status["ok"]:
                 reasons.append("invalid two-em dash behavior: " + "; ".join(dash_status["reasons"]))
             else:
-                dash_axis_status = variable_two_em_dash_axis_status(path)
+                dash_axis_status = variable_two_em_dash_axis_status(
+                    path,
+                    region,
+                    italic,
+                )
                 details["two_em_dash_axis"] = dash_axis_status
                 if not dash_axis_status["ok"]:
                     reasons.append(
@@ -10531,11 +11262,32 @@ def parse_regions(value: str | None) -> list[str]:
     return list(dict.fromkeys(result))
 
 
+def parse_static_weights(value: str | None) -> set[str]:
+    if not value:
+        return set()
+    valid = {str(stop["name"]) for stop in SOURCE_HAN_WEIGHT_STOPS}
+    requested = {
+        part.strip()
+        for part in value.replace(";", ",").split(",")
+        if part.strip()
+    }
+    unknown = sorted(requested - valid)
+    if unknown:
+        raise ValueError(
+            "unknown static weights: "
+            + ", ".join(unknown)
+            + "; expected any of "
+            + ", ".join(str(stop["name"]) for stop in SOURCE_HAN_WEIGHT_STOPS)
+        )
+    return requested
+
+
 def build_all(
     static_only: bool = False,
     regions: list[str] | None = None,
     resume_variable: bool = False,
     resume_static: bool = False,
+    force_static_weights: set[str] | None = None,
 ) -> dict[str, Any]:
     regions = list(REGION_ORDER if regions is None else dict.fromkeys(check_region(region) for region in regions))
     ensure_build_sources(static_only, regions)
@@ -10572,7 +11324,12 @@ def build_all(
                 result["rebuilt"] = True
                 variable_outputs.append(result)
     log_step("static: build hinted and unhinted")
-    static_outputs = build_static_fonts(regions, resume=resume_static)
+    force_static_weights = set(force_static_weights or ())
+    static_outputs = build_static_fonts(
+        regions,
+        resume=resume_static,
+        force_weights=force_static_weights,
+    )
     write_static_readme(regions)
     report = {
         "family": "Sarasa Ui PropDigits",
@@ -10583,6 +11340,7 @@ def build_all(
         "static_only": static_only,
         "resume_variable": resume_variable,
         "resume_static": resume_static,
+        "force_static_weights": sorted(force_static_weights),
         "build_script": "tools/build_sarasa_ui_propdigits_sc.py",
         "bootstrap_sources": {
             "sarasa_gothic": SARASA_TAG,
@@ -10624,7 +11382,8 @@ def build_all(
             "classical override 直接使用 ShangguSansTC 静态 TTF，VF 以 "
             "SourceHanSansK-VF 为底稿并用 ShangguSansTC-VF 覆盖对应 ideograph 字形。"
             "静态 CL 最终仍按 SarasaUiCL 参考字体裁剪公开 cmap 和 GSUB/GPOS feature，"
-            "并同步非数字 metrics；Heavy 扩展字重使用 Bold 作为 reference 边界。"
+            "五个官方同名字重同步非数字 metrics；Heavy 保留 Shanggu Heavy 来源数据，"
+            "Bold 只提供布局、命名和 hint 配置边界。"
             "码位归属采用 Sarasa pass1 风格，并按 VF 源文件实际覆盖做兜底：Inter VF 以 Sarasa "
             "的 Inter 设置（ss03 和 cv10）烘焙后用于 Latin 和西文符号覆盖；CJK、"
             "Korean、Jamo 以及 Sarasa Ui 本地化标点优先来自对应地区的 Source Han Sans VF。"
@@ -10633,34 +11392,39 @@ def build_all(
             "保留 Sarasa 的空 cv01-cv13/ss01-ss08 标签，并保留 cv14、ccmp、按上游 "
             "Sarasa Ui 覆盖裁剪的 locl、Hangul Jamo 特性、vert/vrt2、tnum/pnum、"
             "中文二字破折号（em dash），以及与 Inter 一致的数字冒号 colon-run calt 规则。"
-            "单个 U+2014 保持比例宽；静态连续两个由第二字补数 advance 补足横排严格 2em。"
-            "VF 采用 Source Han 官方静态/VF 的 ccmp 双/三连长字形与 vert 竖排替换结构，"
-            "以单 glyph 避免可变 advance 独立取整得到 1999/2001 units；六个公开字重的"
-            "横竖长字形控制点来自本系列对应静态 TTF，中间位置写入独立 gvar 变化。仅启用"
-            "vrt2 且关闭 vert 时保留两个 uniFE31，其余正常横竖路径均为一个严格 2em glyph。"
-            "破折号不向 GPOS/GDEF 追加自定义 VariationIndex。合并后会"
+            "静态与 VF 都在最终模板后重建 Source Han/Shanggu 的 ccmp、地区 locl 和 "
+            "vert/vrt2 破折号路径。SC/TC/HC/J/K 的非 CJK 默认路径保留比例长字形，CJK "
+            "路径严格使用 1em/2em/3em 字形并保留 KOR 单字特例；CL 跟随 Shanggu 的全局"
+            "全宽映射。静态轮廓逐字重来自对应 Source Han/Shanggu 静态源；VF 保留同一上游"
+            "的 gvar 与 metric 变化。旧 Sarasa calt continuation、pair-start 和破折号 GPOS "
+            "PairPos 全部删除。破折号不向 GPOS/GDEF 追加自定义 VariationIndex。合并后会"
             "同步或重映射 Inter layout FeatureParams 引用的界面名称记录；VF nameID 25 使用"
             "只含 ASCII 字母数字的 Variations PostScript Name Prefix。CJK Italic VF 在剪切前"
             "先于正体坐标空间展开全部 gvar IUP 隐含增量，再剪切基础轮廓和真实轮廓 delta，"
             "四个 metric phantom points 不参与剪切。"
             "对齐对应地区参考 Sarasa Ui 的 cmap alias split 和 alias mapping、GSUB "
             "FeatureRecord 顺序、空 cv/ss FeatureRecord、Script/LangSys 覆盖顺序、GPOS "
-            "FeatureRecord lookup index 和 LookupList 结构、非数字 advance "
-            "和 LSB 的权重轴规则、tnum 数字目标 hmtx、垂直指标、vmtx 默认值和变化、"
+            "FeatureRecord lookup index 和 LookupList 结构；五个官方同名字重还对齐非数字 advance "
+            "和 LSB、tnum 数字目标 hmtx、垂直指标与 vmtx。Heavy 的这些 glyph 数据保留实际 "
+            "Source Han/Shanggu Heavy 和 Inter Black 的 Sarasa pass2 结果。VF 对齐对应公开点的 "
+            "非数字 metric 规则及变化、"
             "GDEF、VORG，以及与 Sarasa 兼容的 head/OS/2 metadata；VF 套用静态 GDEF "
             "class/mark 模板时保留 Source Han ItemVariationStore，使 kern/palt/vpal 的 "
             "VariationIndex 继续随轴工作。Source Han 静态与 VF 的 palt/vpal 数值可能不同，"
-            "因此静态输出按 Sarasa 静态参考同步，VF 输出保留 Source Han VF 可变值。VF 和静态输出都包含 "
+            "因此五个官方同名字重的静态输出按 Sarasa 静态参考同步，Heavy 按同次 pass2 来源同步，"
+            "VF 输出保留 Source Han VF 可变值。VF 和静态输出都包含 "
             "STAT；静态 STAT 只描述单实例样式，不保留 fvar/gvar 可变表。glyph 总数不强行"
             "补齐到与上游一致：cmap 字形和布局可达的未编码字形会保留，不可达 glyph 数量"
             "差异不视为渲染缺陷。静态 TTF 从对应地区静态 Source Han Sans 和 Inter 源字体出发，"
             "经 Sarasa 的 pass1/kanji/hangul/pass2 片段路径构建，再补上 PropDigits 的数字"
             "和冒号 cmap remap、命名、metadata、layout 模板、GDEF/VORG、与上游兼容的 glyf "
             "flags/bbox/组件结构、静态 post format 3、OTS-compatible glyf repeat "
-            "编码、palt 取值同步、中文破折号严格二字宽修正和静态 STAT 规则。"
+            "编码与显式后续 OVERLAP_SIMPLE 规范化、palt 取值同步、Source Han/Shanggu "
+            "破折号同步和静态 STAT 规则。"
             "全部轮廓、hint、metrics、GSUB 和基础 GPOS 模板处理完成后，再按 Noto CJK "
             "交付流程追加 chws/vchw contextual positioning。静态 post 使用 format 3，"
-            "不存储 glyph names，也不改变 glyph order。VF 使用与静态字重一致的下划线"
+            "不存储 glyph names，也不改变 glyph order。最终 name table 删除 platform 1 "
+            "记录，只保留现代 Windows/Unicode 名称；VF 使用与静态字重一致的下划线"
             "MVAR 曲线，并写入本项目四方 copyright。head.fontRevision "
             f"写为 OpenType fixed 数值 {OPENTYPE_VERSION}，对应本仓库版本 {VERSION}。"
             "hinted 静态套件会对本项目实际生成的片段重新 hint：每个字重固定建立 "
@@ -10677,11 +11441,11 @@ def build_all(
             "默认 ASCII 数字和 ':' 使用比例 glyph；tnum 会恢复等宽 glyph。",
             "公开字重遵循 Sarasa/CSS 口径：200、300、400、600、700、900；CJK 的 public 200/600 分别来自 Source Han ExtraLight 250/Medium 500。",
             "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
-            "单个 U+2014 保持比例宽、轮廓和 glyph；静态中文破折号沿用 Sarasa calt 续接并用第二字补数 advance，VF 采用 Source Han 式 ccmp/vert 单 glyph 结构并以本系列静态轮廓作为命名字重控制点，因此正常横排和竖排均严格占 2em。",
+            "静态与 VF 都使用 Source Han/Shanggu 的 ccmp、地区 locl、vert/vrt2 破折号结构；非 CJK 比例路径、CJK 1em/2em/3em、KOR 单字特例和 CL 全局全宽映射分别跟随对应上游，轮廓与 metrics 随字重变化。",
             "VF 与静态 TTF 都追加来自 Noto CJK 交付流程的 GPOS chws/vchw；Source Han Sans 2.005R 与 Sarasa 1.0.40 参考成品本身不含这两个 FeatureRecord。",
-            "静态 CL 使用 Shanggu Sans 官方发布物作为旧字形轮廓来源，但公开 cmap、GSUB/GPOS feature 和非数字 metrics 仍按 SarasaUiCL reference 边界裁剪与同步。",
+            "静态 CL 使用 Shanggu Sans 官方发布物作为旧字形轮廓来源；公开 cmap 与 GSUB/GPOS 模板按 SarasaUiCL 边界裁剪，五个官方同名字重的非数字 metrics 同步 SarasaUiCL，Heavy 900 保留 Shanggu Heavy 来源数据。",
             "静态 TTF 与上游一样使用 post format 3，不存储 glyph names；PropDigits 关系只由 cmap/GSUB 表达，不改 glyph order。",
-            "Heavy 900 是本项目扩展实例；上游 Sarasa 公开静态系列止于 Bold 700。",
+            "Heavy 900 是本项目扩展实例；上游 Sarasa 公开静态系列止于 Bold 700。Bold 只作为 Heavy 的布局、命名和 hint 配置边界，Heavy 的 glyf、hmtx/vmtx、VORG、bbox 与 palt 保留 Source Han/Shanggu Heavy 和 Inter Black 构建结果。",
         ],
         "final_gsub_features": sorted(FINAL_GSUB_FEATURES),
         "variable_outputs": variable_outputs,
@@ -10707,14 +11471,23 @@ def main() -> None:
     parser.add_argument(
         "--resume-static",
         action="store_true",
-        help="保留现有静态输出，只重建缺失的完整字重；同一字重的 hinted/unhinted 正体与 Italic 都存在时跳过。",
+        help="逐文件验证静态输出的版本、metadata、hint、layout 与破折号结构；同一地区字重的四个文件全部通过时跳过，否则成组重建。",
+    )
+    parser.add_argument(
+        "--force-static-weights",
+        default="",
+        help="与 --resume-static 配合，逗号分隔并强制重建指定静态字重；其他完整字重继续跳过。",
     )
     args = parser.parse_args()
+    force_static_weights = parse_static_weights(args.force_static_weights)
+    if force_static_weights and not args.resume_static:
+        parser.error("--force-static-weights requires --resume-static")
     report = build_all(
         static_only=args.static_only,
         regions=parse_regions(args.regions),
         resume_variable=args.resume_variable,
         resume_static=args.resume_static,
+        force_static_weights=force_static_weights,
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
