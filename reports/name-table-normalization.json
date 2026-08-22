@@ -1,0 +1,2616 @@
+{
+  "kind": "official-upstream-compatible name table normalization",
+  "summary": {
+    "fonts": 156,
+    "fonts_changed": 156,
+    "records_removed": 732,
+    "remaining": 0,
+    "unexpected_changed_tables": 0
+  },
+  "cases": [
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Bold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Heavy.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Italic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Light.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Regular.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "records_removed": 4,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1,
+        "259": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "records_removed": 3,
+      "removed_name_ids": {
+        "256": 1,
+        "257": 1,
+        "258": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+      "records_removed": 21,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "297": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1,
+        "313": 1,
+        "314": 1,
+        "315": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+      "records_removed": 17,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+      "records_removed": 21,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "297": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1,
+        "313": 1,
+        "314": 1,
+        "315": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+      "records_removed": 17,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+      "records_removed": 21,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "297": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1,
+        "313": 1,
+        "314": 1,
+        "315": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+      "records_removed": 17,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+      "records_removed": 21,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "297": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1,
+        "313": 1,
+        "314": 1,
+        "315": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+      "records_removed": 17,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "records_removed": 21,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "297": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1,
+        "313": 1,
+        "314": 1,
+        "315": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "records_removed": 17,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+      "records_removed": 21,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "297": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1,
+        "313": 1,
+        "314": 1,
+        "315": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    },
+    {
+      "font": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+      "records_removed": 17,
+      "removed_name_ids": {
+        "16": 1,
+        "25": 1,
+        "298": 1,
+        "299": 1,
+        "300": 1,
+        "301": 1,
+        "302": 1,
+        "303": 1,
+        "304": 1,
+        "305": 1,
+        "306": 1,
+        "307": 1,
+        "308": 1,
+        "309": 1,
+        "310": 1,
+        "311": 1,
+        "312": 1
+      },
+      "remaining": 0,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "unexpected_changed_tables": []
+    }
+  ]
+}

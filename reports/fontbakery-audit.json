@@ -1,0 +1,366 @@
+{
+  "title": "Sarasa Ui PropDigits FontBakery 审计",
+  "generated_at": "2026-08-23 05:46:17 +0800",
+  "toolchain": {
+    "fontbakery": "1.1.0",
+    "fontbakery_bundled_opentype_sanitizer": "9.2.0",
+    "independent_ots": "9.3.0"
+  },
+  "release_gate": {
+    "font_version": {
+      "fonts": 156,
+      "result_counts": {
+        "PASS": 156
+      }
+    },
+    "post_fix_no_mac_and_font_version_representatives": {
+      "checks": 10,
+      "result_counts": {
+        "PASS": 10
+      }
+    },
+    "upright_italic_stat_pair": {
+      "checks": 1,
+      "result_counts": {
+        "PASS": 1
+      }
+    },
+    "all_font_mac_name_records": {
+      "fonts": 156,
+      "fonts_changed": 156,
+      "records_removed": 732,
+      "remaining": 0,
+      "unexpected_changed_tables": 0
+    },
+    "independent_ots": {
+      "fonts": 156,
+      "successful": 156,
+      "failures": 0
+    },
+    "unexplained_project_specific_failures": []
+  },
+  "representative_full_profiles": [
+    {
+      "case": "SC Regular hinted static",
+      "checks": 127,
+      "original_result_counts": {
+        "FAIL": 4,
+        "INFO": 3,
+        "PASS": 73,
+        "SKIP": 39,
+        "WARN": 8
+      },
+      "warnings": [
+        "contour_count",
+        "math_signs_width",
+        "opentype/gdef_mark_chars",
+        "opentype/gdef_spacing_marks",
+        "opentype/post_table_version",
+        "opentype/xavgcharwidth",
+        "overlapping_path_segments",
+        "stylisticset_description"
+      ],
+      "failures_found": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "no_mac_entries"
+      ],
+      "corrected_after_profile": [
+        "no_mac_entries"
+      ],
+      "single-file_invocation_artifacts": [],
+      "expected_upstream_or_profile_limit_failures_remaining": [
+        "base_has_width",
+        "case_mapping",
+        "file_size"
+      ]
+    },
+    {
+      "case": "SC Regular unhinted static",
+      "checks": 127,
+      "original_result_counts": {
+        "FAIL": 5,
+        "INFO": 3,
+        "PASS": 70,
+        "SKIP": 40,
+        "WARN": 9
+      },
+      "warnings": [
+        "contour_count",
+        "math_signs_width",
+        "opentype/gdef_mark_chars",
+        "opentype/gdef_spacing_marks",
+        "opentype/post_table_version",
+        "opentype/xavgcharwidth",
+        "ots",
+        "overlapping_path_segments",
+        "stylisticset_description"
+      ],
+      "failures_found": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "no_mac_entries",
+        "smart_dropout"
+      ],
+      "corrected_after_profile": [
+        "no_mac_entries"
+      ],
+      "single-file_invocation_artifacts": [],
+      "expected_upstream_or_profile_limit_failures_remaining": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "smart_dropout"
+      ]
+    },
+    {
+      "case": "SC Heavy Italic hinted static",
+      "checks": 127,
+      "original_result_counts": {
+        "FAIL": 5,
+        "INFO": 3,
+        "PASS": 68,
+        "SKIP": 43,
+        "WARN": 8
+      },
+      "warnings": [
+        "contour_count",
+        "math_signs_width",
+        "opentype/gdef_mark_chars",
+        "opentype/gdef_spacing_marks",
+        "opentype/post_table_version",
+        "opentype/xavgcharwidth",
+        "overlapping_path_segments",
+        "stylisticset_description"
+      ],
+      "failures_found": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "no_mac_entries",
+        "opentype/STAT/ital_axis"
+      ],
+      "corrected_after_profile": [
+        "no_mac_entries"
+      ],
+      "single-file_invocation_artifacts": [
+        "opentype/STAT/ital_axis"
+      ],
+      "expected_upstream_or_profile_limit_failures_remaining": [
+        "base_has_width",
+        "case_mapping",
+        "file_size"
+      ]
+    },
+    {
+      "case": "SC upright VF",
+      "checks": 127,
+      "original_result_counts": {
+        "FAIL": 6,
+        "INFO": 3,
+        "PASS": 88,
+        "SKIP": 22,
+        "WARN": 8
+      },
+      "warnings": [
+        "math_signs_width",
+        "opentype/gdef_mark_chars",
+        "opentype/gdef_spacing_marks",
+        "opentype/post_table_version",
+        "opentype/xavgcharwidth",
+        "overlapping_path_segments",
+        "stylisticset_description",
+        "unreachable_glyphs"
+      ],
+      "failures_found": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "name/family_and_style_max_length",
+        "no_mac_entries",
+        "smart_dropout"
+      ],
+      "corrected_after_profile": [
+        "no_mac_entries"
+      ],
+      "single-file_invocation_artifacts": [],
+      "expected_upstream_or_profile_limit_failures_remaining": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "name/family_and_style_max_length",
+        "smart_dropout"
+      ]
+    },
+    {
+      "case": "SC Italic VF",
+      "checks": 127,
+      "original_result_counts": {
+        "FAIL": 7,
+        "INFO": 3,
+        "PASS": 88,
+        "SKIP": 21,
+        "WARN": 8
+      },
+      "warnings": [
+        "math_signs_width",
+        "opentype/gdef_mark_chars",
+        "opentype/gdef_spacing_marks",
+        "opentype/post_table_version",
+        "opentype/xavgcharwidth",
+        "overlapping_path_segments",
+        "stylisticset_description",
+        "unreachable_glyphs"
+      ],
+      "failures_found": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "name/family_and_style_max_length",
+        "no_mac_entries",
+        "opentype/STAT/ital_axis",
+        "smart_dropout"
+      ],
+      "corrected_after_profile": [
+        "no_mac_entries"
+      ],
+      "single-file_invocation_artifacts": [
+        "opentype/STAT/ital_axis"
+      ],
+      "expected_upstream_or_profile_limit_failures_remaining": [
+        "base_has_width",
+        "case_mapping",
+        "file_size",
+        "name/family_and_style_max_length",
+        "smart_dropout"
+      ]
+    }
+  ],
+  "upstream_selected_check_baselines": {
+    "official_sarasa_ui_sc_regular_hinted_and_unhinted": {
+      "checks": 28,
+      "result_counts": {
+        "FAIL": 7,
+        "PASS": 6,
+        "WARN": 15
+      },
+      "results_by_check": {
+        "base_has_width": [
+          "FAIL"
+        ],
+        "case_mapping": [
+          "FAIL"
+        ],
+        "file_size": [
+          "FAIL"
+        ],
+        "math_signs_width": [
+          "WARN"
+        ],
+        "name/family_and_style_max_length": [
+          "PASS"
+        ],
+        "no_mac_entries": [
+          "PASS"
+        ],
+        "opentype/gdef_mark_chars": [
+          "WARN"
+        ],
+        "opentype/gdef_spacing_marks": [
+          "WARN"
+        ],
+        "opentype/post_table_version": [
+          "WARN"
+        ],
+        "opentype/xavgcharwidth": [
+          "WARN"
+        ],
+        "ots": [
+          "PASS",
+          "WARN"
+        ],
+        "smart_dropout": [
+          "FAIL",
+          "PASS"
+        ],
+        "stylisticset_description": [
+          "WARN"
+        ],
+        "unreachable_glyphs": [
+          "WARN"
+        ]
+      }
+    },
+    "source_han_sans_sc_vf": {
+      "checks": 14,
+      "result_counts": {
+        "FAIL": 4,
+        "PASS": 6,
+        "WARN": 4
+      },
+      "results_by_check": {
+        "base_has_width": [
+          "FAIL"
+        ],
+        "case_mapping": [
+          "PASS"
+        ],
+        "file_size": [
+          "FAIL"
+        ],
+        "math_signs_width": [
+          "WARN"
+        ],
+        "name/family_and_style_max_length": [
+          "FAIL"
+        ],
+        "no_mac_entries": [
+          "PASS"
+        ],
+        "opentype/gdef_mark_chars": [
+          "WARN"
+        ],
+        "opentype/gdef_spacing_marks": [
+          "PASS"
+        ],
+        "opentype/post_table_version": [
+          "WARN"
+        ],
+        "opentype/xavgcharwidth": [
+          "PASS"
+        ],
+        "ots": [
+          "PASS"
+        ],
+        "smart_dropout": [
+          "FAIL"
+        ],
+        "stylisticset_description": [
+          "PASS"
+        ],
+        "unreachable_glyphs": [
+          "WARN"
+        ]
+      }
+    }
+  },
+  "classification": {
+    "fixed_project_regression": {
+      "no_mac_entries": "STAT/fvar 新名称曾带入 platform 1 记录；最终 156 个字体共删除 732 条，与官方 Sarasa/Source Han 成品一致。"
+    },
+    "invocation_artifact": {
+      "opentype/STAT/ital_axis": "单独检查 Italic 文件时 FontBakery 无法找到 Roman 配对；将静态 Heavy 正斜体和 VF 正斜体成对传入后为 PASS。"
+    },
+    "expected_failures": {
+      "base_has_width": "U+0488/U+0489 的零 advance 继承官方 Sarasa 与 Source Han。",
+      "case_mapping": "Sarasa 公开 cmap 没有补齐 FontBakery 所列 Unicode 大小写配对。",
+      "file_size": "通用 profile 的 9 MiB 上限不适用于完整 CJK 字体。",
+      "name/family_and_style_max_length": "Source Han VF 同样触发 31 字符限制；保留公开家族名。",
+      "smart_dropout": "正式 unhinted TTF 与未 hint 的 VF 没有 prep smart-dropout 指令。"
+    },
+    "expected_warnings": "GDEF mark/spacing、post format 3、xAvgCharWidth、数学符号宽度、空 ss 描述和 VF 不可达保留 glyph 可在官方 Sarasa 或 Source Han 基线复现；contour_count 与 overlapping_path_segments 所指轮廓已由主审计的静态 exact/Heavy 来源/VF 来源配对证明与相应上游来源一致。"
+  },
+  "policy": "不把通用 FontBakery profile 的 FAIL 总数伪装成 0；发布门槛是项目新增回归为 0，并把可复现的上游基线、通用 profile 限制和单文件调用假失败分别列出。"
+}

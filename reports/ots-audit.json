@@ -1,0 +1,44 @@
+{
+  "generated_at": "2026-08-23T05:40:55+08:00",
+  "tool": "OpenType Sanitizer",
+  "version": "9.3.0",
+  "distribution": "khaledhosny/ots v9.3.0 Windows release",
+  "archive_sha256": "3e6c16678a0cb5c2401755bf13d7f7371d09e7f3348468b57da04b0ff23af01f",
+  "fonts_checked": 156,
+  "successful": 156,
+  "failures": [],
+  "message_profiles": [
+    {
+      "count": 84,
+      "messages": [
+        "File sanitized successfully!"
+      ],
+      "samples": [
+        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf"
+      ]
+    },
+    {
+      "count": 72,
+      "messages": [
+        "WARNING: maxp: Bad maxZones: 0",
+        "ERROR: gasp: The last record should be 0xFFFF as a sentinel value for rangeMaxPPEM",
+        "ERROR: Table discarded",
+        "File sanitized successfully!"
+      ],
+      "samples": [
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf"
+      ]
+    }
+  ],
+  "expected_unhinted_baseline": {
+    "expected": 72,
+    "count": 72
+  },
+  "unexpected_messages": []
+}
