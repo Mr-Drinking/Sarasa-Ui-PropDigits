@@ -41,6 +41,14 @@ Inter 的 colon-run 规则。
 破折号笔画厚度、少量 side bearing 和比例 advance 会随字重变化，固定的是
 CJK 的 1em/2em/3em 语义与中宫基线。Italic 使用对应正体轮廓的 9.4 度剪切。
 
+省略号保留 Source Han/Shanggu 的语言语义：拉丁文字上下文（Latn/en）下，
+U+2026 是下沉的比例字形；CJK 文字上下文中的 JAN/KOR/ZHH/ZHS/ZHT
+locl 把它切换为居中的 1em 全宽字形，因此连续两个 U+2026 保持两个 glyph
+并严格占 2em；vert/vrt2 再切换到现成的竖排字形。中文应传入 Hani/zh-Hans、
+Hani/zh-Hant 或 Hani/zh-HK，日文与韩文分别使用 Hani/ja、Hani/ko；缺少
+对应 CJK script/language 上下文时使用非 CJK 默认路径。该路由不新造轮廓、
+不合成连字，也不重新 hint。
+
 最终成品还会按 Noto CJK 的官方交付流程加入 GPOS chws/vchw：chws
 用于横排连续全角标点的上下文压缩，vchw 用于对应的竖排压缩。实现固定使用
 chws_tool 1.4.5 与 east-asian-spacing 1.4.5；Source Han Sans 2.005R
@@ -54,7 +62,9 @@ OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
 对应本仓库版本 1.0.40.3；nameID 5 以 OpenType 数值 Version 1.0403
 开头，并在后续 project 字段保留完整版本 1.0.40.3。最终 name 表与官方
 Sarasa/Source Han 成品一样不保留 platform 1（Macintosh）记录；Windows/Unicode
-本地化名称和四方版权保持完整。
+本地化名称以及 Sarasa、Inter、Adobe、Google 的版权保持完整，CL 另保留
+Shanggu Fonts 的原版权声明。nameID 3/5 还会明确区分 hinted 与 unhinted，
+避免系统把两套文件视为重复字体。
 hinted 套件会对本项目实际生成的静态片段重新 hint。每个字重都固定
 建立 Sarasa 上游顺序的完整环境：96 个 pass1 加 6 个 kanji 和 6 个
 hangul，最后把全部 108 个输入交给一次统一 instruct。SemiBold 直接采用
@@ -88,8 +98,8 @@ glyf bbox 和组合字形结构；Noto chws/vchw 后处理结束后还会再次�
 时保留首点 OVERLAP_SIMPLE 语义，并优先用 OTS 可接受的首 flag repeat run
 保存重复 overlap flag；坐标替换使 x/y 压缩位不同、无法共用 repeat 时，只清除
 后续点上无语义且被 OTS 禁止的显式重复 bit 6。resume 与发布审计会解析原始
-flag stream。unhinted 套件中的 OTS maxZones/gasp 信息继承自上游 unhinted
-基线，返回码为 0。
+flag stream。unhinted 套件将 maxp.maxZones 规范为 1，并把 gasp 的最后范围
+规范为 0xFFFF sentinel；这不会加入 TrueType instructions，也不会改变 glyf。
 glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未编码字形会保留，
 不可达 glyph 数量差异视为构建产物。
 这些字体是修改派生版，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。

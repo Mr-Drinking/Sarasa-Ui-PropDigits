@@ -17,6 +17,7 @@ import platform
 import re
 import site
 import shutil
+import stat
 import struct
 import subprocess
 import sys
@@ -25,10 +26,13 @@ import tarfile
 import tempfile
 import urllib.request
 import zipfile
+from collections.abc import Iterable
 from datetime import datetime
 from io import BytesIO
-from pathlib import Path
+from pathlib import Path, PurePosixPath, PureWindowsPath
 from typing import Any
+
+from python_env_bootstrap import ensure_project_python
 
 
 PYTHON_DEPS = {
@@ -48,21 +52,11 @@ PYTHON_DEPS = {
 
 
 def ensure_python_deps() -> None:
-    if os.environ.get("SARASA_SKIP_PYTHON_DEPS") == "1":
-        return
-    needed = []
-    for module, (distribution, package_spec, expected_version) in PYTHON_DEPS.items():
-        installed_version = None
-        try:
-            installed_version = importlib.metadata.version(distribution)
-        except importlib.metadata.PackageNotFoundError:
-            pass
-        if importlib.util.find_spec(module) is None or installed_version != expected_version:
-            needed.append(package_spec)
-    if not needed:
-        return
-    print(f"[build] install Python build dependencies: {' '.join(needed)}", flush=True)
-    subprocess.check_call([sys.executable, "-m", "pip", "install", *needed])
+    ensure_project_python(
+        PYTHON_DEPS,
+        project_root=Path(__file__).resolve().parents[1],
+        label="build",
+    )
 
 
 ensure_python_deps()
@@ -70,9 +64,9 @@ ensure_python_deps()
 from fontTools import subset
 from fontTools.misc.fixedTools import floatToFixedToFloat, otRound
 from fontTools.pens.boundsPen import BoundsPen
-from fontTools.pens.recordingPen import RecordingPen
+from fontTools.pens.recordingPen import DecomposingRecordingPen, RecordingPen
 from fontTools.pens.ttGlyphPen import TTGlyphPen
-from fontTools.ttLib import TTFont, newTable
+from fontTools.ttLib import TTFont, TTLibError, newTable
 from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables.TupleVariation import TupleVariation
 from fontTools.ttLib.tables.ttProgram import Program
@@ -81,9 +75,10 @@ from fontTools.ttLib.tables import otTables as ot
 from fontTools.ttLib.tables._f_v_a_r import NamedInstance
 from fontTools.varLib.models import VariationModel, normalizeValue, piecewiseLinearMap
 from fontTools.varLib.instancer import AxisLimits, instantiateAvar, instantiateVariableFont
+from fontTools.varLib import builder as var_builder
 from fontTools.varLib.builder import buildVarDevTable
 from fontTools.varLib.varStore import OnlineVarStoreBuilder, VarStoreInstancer
-from chws_tool import add_chws_async
+import uharfbuzz as hb
 
 
 def patch_fonttools_overlap_simple_repeat_encoding() -> None:
@@ -177,6 +172,7 @@ FONT_REVISION = 1.0403
 OPENTYPE_VERSION = "1.0403"
 SARASA_TAG = f"v{SARASA_VERSION}"
 SARASA_COMMIT = "4b908c71116a3192f7a9889bd67b1939a891e527"
+SARASA_SOURCE_ARCHIVE_SHA256 = "4ef493207030d9bd811695a71b9edeabff498f27b03d515f8f393445afc14ea9"
 SARASA_PACKAGE_LOCK_SHA256 = "7a68020fc12728fbf58a34bbc78d1873e957ad1063aaa1f5bdc85800d3896dfe"
 SARASA_UI_ARCHIVE_SHA256 = {
     "CL": {
@@ -428,8 +424,15 @@ SARASA_HINT_CONFIGS = {
     "Heavy": "Bold",
 }
 CHLOROPHYTUM_HINT_STORE_ORDER = "numeric-gid-hcfg-shared-v3"
-STATIC_HINT_WORK_VERSION = 4
-STATIC_POSTPROCESS_VERSION = 5
+STATIC_HINT_WORK_VERSION = 5
+STATIC_POSTPROCESS_VERSION = 6
+STATIC_HINT_RECIPE = {
+    "version": STATIC_HINT_WORK_VERSION,
+    "fragments": "sarasa-pass1-kanji-hangul",
+    "pass1_autohint": "ttfautohint-before-chlorophytum",
+    "environment": "all-sarasa-families-all-regions",
+    "hint_store_order": CHLOROPHYTUM_HINT_STORE_ORDER,
+}
 SARASA_HINT_JOBS = int(os.environ.get("SARASA_HINT_JOBS", str(os.cpu_count() or 1)))
 SARASA_HINT_PREP_JOBS = int(
     os.environ.get("SARASA_HINT_PREP_JOBS", str(min(4, os.cpu_count() or 1)))
@@ -470,10 +473,23 @@ OS2_CODEPAGE_RANGE_1 = 2147746207
 PROJECT_COPYRIGHT = (
     "Copyright (c) 2015-2025, Renzhi Li (aka. Belleve Invis, belleve@typeof.net). "
     "Portions Copyright (c) 2016 The Inter Project Authors. "
-    "Portions Copyright (c) 2014-2021 Adobe Systems Incorporated (http://www.adobe.com/). "
+    "Portions Copyright (c) 2014-2021 Adobe Systems Incorporated (http://www.adobe.com/), "
+    "with Reserved Font Name 'Source'. "
     "Portions Copyright (c) 2012 Google Inc."
 )
+SHANGGU_COPYRIGHT = "© 2022-2026 Shanggu Fonts."
+PROJECT_LICENSE_DESCRIPTION = (
+    "This Font Software is licensed under the SIL Open Font License, Version 1.1."
+)
+PROJECT_LICENSE_URL = "https://openfontlicense.org"
 SOURCE_ONLY_LEGAL_NAME_IDS = {7, 8, 9, 10, 11}
+
+
+def project_copyright(region: str) -> str:
+    value = PROJECT_COPYRIGHT
+    if check_region(region) == "CL":
+        value += " " + SHANGGU_COPYRIGHT
+    return value
 
 def vf_family(region: str) -> str:
     return f"Sarasa Ui VF PropDigits {check_region(region)}"
@@ -564,6 +580,13 @@ EM_DASH_PROBE_WEIGHTS = (
     900,
 )
 INTER_OUTLINE_CORRECTION_WEIGHTS = [300, 350, 600, 700]
+INTER_OUTLINE_TRANSLATION_TOLERANCE = 2.0
+INTER_OUTLINE_AUDIT_WEIGHTS = list(EM_DASH_PROBE_WEIGHTS)
+INTER_COMPOSITE_CONTROL_WEIGHTS = list(INTER_OUTLINE_AUDIT_WEIGHTS)
+INTER_COMPOSITE_NAMED_CONTROL_WEIGHTS = [200, 300, 350, 400, 600, 700, 900]
+INTER_COMPOSITE_VARIATION_WEIGHTS = [
+    weight for weight in INTER_COMPOSITE_CONTROL_WEIGHTS if weight != 400
+]
 
 STATIC_STYLE_SOURCES = {
     "ExtraLight": {"shs": "ExtraLight", "inter": "ExtraLight", "sarasa": "ExtraLight", "hcfg": "ExtraLight"},
@@ -579,6 +602,8 @@ DIGITS_TF = [f"{name}.tf" for name in DIGITS]
 PROPDIGITS_CODEPOINTS = set(range(0x30, 0x3A)) | {0x3A}
 DASH_CMAP_CODEPOINTS = {0x2014, 0x2015, 0x2E3A, 0x2E3B, 0xFE31}
 DASH_LOCL_CODEPOINTS = {0x2014, 0x2E3A, 0x2E3B}
+ELLIPSIS_CODEPOINT = 0x2026
+CJK_ELLIPSIS_CODEPOINT = 0x22EF
 CJK_LOCL_LANGUAGES = {"JAN ", "KOR ", "ZHH ", "ZHS ", "ZHT "}
 WIDTH_FEATURES = {"aalt", "pwid", "fwid", "hwid", "twid", "qwid"}
 SOURCE_HAN_FINAL_GSUB_FEATURES = {"locl", "ccmp", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "calt", "hist"}
@@ -615,6 +640,7 @@ REFERENCE_ADVANCE_STOPS = [
     ("SemiBold", 600),
     ("Bold", 700),
 ]
+VF_METRIC_REFERENCE_STOPS = [*REFERENCE_ADVANCE_STOPS, ("Heavy", 900)]
 SARASA_VERTICAL_METRICS = {
     "hhea_ascent": 969,
     "hhea_descent": -241,
@@ -687,6 +713,34 @@ def open_reference_font(region: str, weight_name: str, italic: bool) -> TTFont:
     path = reference_font_path(region, weight_name, italic)
     if not path.exists():
         raise FileNotFoundError(path)
+    return TTFont(path)
+
+
+def open_vf_metric_reference_font(
+    region: str,
+    weight_name: str,
+    italic: bool,
+) -> TTFont:
+    if weight_name != "Heavy":
+        return open_reference_font(region, weight_name, italic)
+    path = static_dir(region, False) / static_output_name(region, weight_name, italic)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"Heavy VF metric reference requires the static output first: {path}"
+        )
+    return TTFont(path)
+
+
+def open_project_static_metric_reference_font(
+    region: str,
+    weight_name: str,
+    italic: bool,
+) -> TTFont:
+    path = static_dir(region, False) / static_output_name(region, weight_name, italic)
+    if not path.exists():
+        raise FileNotFoundError(
+            f"VF metric reference requires the static output first: {path}"
+        )
     return TTFont(path)
 
 
@@ -777,8 +831,17 @@ def set_name_record(font: TTFont, name_id: int, value: str) -> None:
         record.string = value.encode(record.getEncoding())
 
 
-def update_project_legal_names(font: TTFont) -> None:
-    set_name_record(font, 0, PROJECT_COPYRIGHT)
+def set_unique_identifier_record(font: TTFont, value: str) -> None:
+    font["name"].names = [
+        record for record in font["name"].names if record.nameID != 3
+    ]
+    set_windows_name_record(font, 3, value, 0x0409)
+
+
+def update_project_legal_names(font: TTFont, region: str) -> None:
+    set_name_record(font, 0, project_copyright(region))
+    set_name_record(font, 13, PROJECT_LICENSE_DESCRIPTION)
+    set_name_record(font, 14, PROJECT_LICENSE_URL)
     font["name"].names = [
         record for record in font["name"].names if record.nameID not in SOURCE_ONLY_LEGAL_NAME_IDS
     ]
@@ -829,7 +892,6 @@ def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
     replacements = {
         1: family,
         2: subfamily,
-        3: ps + f";{VERSION}",
         4: full,
         5: version,
         6: ps,
@@ -839,14 +901,14 @@ def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
     }
     for name_id, value in replacements.items():
         set_name_record(font, name_id, value)
-    update_project_legal_names(font)
+    set_unique_identifier_record(font, ps + f";{VERSION}")
+    update_project_legal_names(font, region)
     set_localized_name_records(
         font,
         region,
         {
             1: family_local,
             2: subfamily,
-            3: f"{family_local} {subfamily}",
             4: full_local,
             16: family_local,
             17: subfamily,
@@ -868,7 +930,14 @@ def legacy_static_family_local(region: str, weight_name: str) -> str:
     return f"{family} {weight_name}"
 
 
-def update_static_names(font: TTFont, region: str, weight_name: str, weight_value: int, italic: bool) -> None:
+def update_static_names(
+    font: TTFont,
+    region: str,
+    weight_name: str,
+    weight_value: int,
+    italic: bool,
+    hinted: bool,
+) -> None:
     family = legacy_static_family(region, weight_name)
     family_local = legacy_static_family_local(region, weight_name)
     typographic_family = static_family(region)
@@ -894,11 +963,11 @@ def update_static_names(font: TTFont, region: str, weight_name: str, weight_valu
     replacements = {
         1: family,
         2: legacy_style,
-        3: ps + f";{VERSION}",
         4: full,
         5: (
             f"Version {OPENTYPE_VERSION}; project {VERSION}; "
-            f"static {source_han_static_prefix(region)} + static Inter; PropDigits"
+            f"static {source_han_static_prefix(region)} + static Inter; PropDigits; "
+            f"{'hinted' if hinted else 'unhinted'}"
         ),
         6: ps,
         16: typographic_family,
@@ -906,14 +975,17 @@ def update_static_names(font: TTFont, region: str, weight_name: str, weight_valu
     }
     for name_id, value in replacements.items():
         set_name_record(font, name_id, value)
-    update_project_legal_names(font)
+    set_unique_identifier_record(
+        font,
+        ps + f";{VERSION};{'hinted' if hinted else 'unhinted'}",
+    )
+    update_project_legal_names(font, region)
     set_localized_name_records(
         font,
         region,
         {
             1: family_local,
             2: legacy_style,
-            3: full_local,
             4: full_local,
             16: typographic_family_local,
             17: typographic_style,
@@ -965,6 +1037,28 @@ def update_os2_sarasa_metadata(font: TTFont) -> None:
     os2.ulCodePageRange2 = 0
     apply_sarasa_vertical_metrics(font)
     update_caret_slope(font)
+
+
+def normalize_static_raster_metadata(font: TTFont, hinted: bool) -> dict[str, Any]:
+    report: dict[str, Any] = {
+        "unhinted_max_zones_normalized": False,
+        "unhinted_gasp_sentinel_normalized": False,
+    }
+    if hinted:
+        return report
+    if "maxp" in font and int(font["maxp"].tableVersion) == 0x00010000:
+        if int(font["maxp"].maxZones) != 1:
+            font["maxp"].maxZones = 1
+            report["unhinted_max_zones_normalized"] = True
+    if "gasp" in font and font["gasp"].gaspRange:
+        ranges = dict(font["gasp"].gaspRange)
+        if 0xFFFF not in ranges:
+            final_key = max(ranges)
+            final_behavior = ranges.pop(final_key)
+            ranges[0xFFFF] = final_behavior
+            font["gasp"].gaspRange = dict(sorted(ranges.items()))
+            report["unhinted_gasp_sentinel_normalized"] = True
+    return report
 
 
 def vf_mapped_normalized_weight(font: TTFont, weight: float) -> float:
@@ -1208,6 +1302,8 @@ def add_noto_contextual_spacing(path: Path) -> dict[str, Any]:
         before.close()
 
     if not (had_chws and had_vchw):
+        from chws_tool import add_chws_async
+
         config_logger = logging.getLogger("config")
         previous_level = config_logger.level
         config_logger.setLevel(logging.ERROR)
@@ -1311,54 +1407,132 @@ def sync_hinting_from_reference(font: TTFont, reference: TTFont) -> dict[str, in
     }
 
 
-def count_simple_glyph_overlap_flags(font: TTFont) -> int:
+def parse_raw_simple_glyph_flags(data: bytes) -> dict[str, int] | None:
+    """Parse the encoded simple-glyph flag stream without expanding a glyph."""
+    if len(data) < 10:
+        raise ValueError("truncated glyf header")
+    contour_count = struct.unpack(">h", data[:2])[0]
+    if contour_count <= 0:
+        return None
+    end_points_end = 10 + contour_count * 2
+    if end_points_end + 2 > len(data):
+        raise ValueError("truncated simple-glyph end points")
+    point_count = struct.unpack(">H", data[end_points_end - 2 : end_points_end])[0] + 1
+    instruction_length = struct.unpack(">H", data[end_points_end : end_points_end + 2])[0]
+    offset = end_points_end + 2 + instruction_length
+    if offset > len(data):
+        raise ValueError("truncated simple-glyph instructions")
+
+    points_read = 0
+    stored_flag_count = 0
+    overlap_point_flags = 0
+    invalid_explicit_overlap_flags = 0
+    while points_read < point_count:
+        if offset >= len(data):
+            raise ValueError("truncated simple-glyph flag stream")
+        flag = data[offset]
+        offset += 1
+        repeat_count = 0
+        if flag & glyf_table.flagRepeat:
+            if offset >= len(data):
+                raise ValueError("truncated simple-glyph flag repeat")
+            repeat_count = data[offset]
+            offset += 1
+        run_length = repeat_count + 1
+        if points_read + run_length > point_count:
+            raise ValueError("simple-glyph flag repeat exceeds point count")
+        if flag & glyf_table.flagOverlapSimple:
+            overlap_point_flags += run_length
+            if stored_flag_count:
+                invalid_explicit_overlap_flags += 1
+        points_read += run_length
+        stored_flag_count += 1
+    return {
+        "points": point_count,
+        "stored_flags": stored_flag_count,
+        "overlap_point_flags": overlap_point_flags,
+        "invalid_explicit_overlap_flags": invalid_explicit_overlap_flags,
+    }
+
+
+def raw_glyf_table_data(font: TTFont) -> tuple[bytes, list[int]]:
+    reader = getattr(font, "reader", None)
+    if reader is None or "glyf" not in reader.tables or "loca" not in reader.tables:
+        buffer = BytesIO()
+        font.save(buffer, reorderTables=True)
+        buffer.seek(0)
+        roundtrip = TTFont(buffer, lazy=True, recalcTimestamp=False)
+        try:
+            return raw_glyf_table_data(roundtrip)
+        finally:
+            roundtrip.close()
+
+    glyf_data = bytes(reader["glyf"])
+    loca_data = bytes(reader["loca"])
+    glyph_count = int(font["maxp"].numGlyphs)
+    long_loca = int(font["head"].indexToLocFormat) == 1
+    entry_size = 4 if long_loca else 2
+    expected_size = (glyph_count + 1) * entry_size
+    if len(loca_data) < expected_size:
+        raise ValueError(
+            f"truncated loca table: {len(loca_data)} bytes for {glyph_count} glyphs"
+        )
+    if long_loca:
+        offsets = list(struct.unpack(f">{glyph_count + 1}I", loca_data[:expected_size]))
+    else:
+        offsets = [
+            value * 2
+            for value in struct.unpack(f">{glyph_count + 1}H", loca_data[:expected_size])
+        ]
+    if offsets != sorted(offsets) or offsets[-1] > len(glyf_data):
+        raise ValueError("invalid loca offsets")
+    return glyf_data, offsets
+
+
+def raw_simple_glyph_flag_stats(font: TTFont) -> dict[str, int]:
     if "glyf" not in font:
-        return 0
-    count = 0
-    for glyph_name in font.getGlyphOrder():
-        glyph = font["glyf"][glyph_name]
-        if getattr(glyph, "numberOfContours", 0) > 0 and hasattr(glyph, "flags"):
-            count += sum(1 for flag in glyph.flags if flag & 0x40)
-    return count
+        return {
+            "glyphs_checked": 0,
+            "overlap_point_flags": 0,
+            "invalid_explicit_overlap_flags": 0,
+            "malformed_glyphs": 0,
+        }
+    glyf_data, offsets = raw_glyf_table_data(font)
+    stats = {
+        "glyphs_checked": 0,
+        "overlap_point_flags": 0,
+        "invalid_explicit_overlap_flags": 0,
+        "malformed_glyphs": 0,
+    }
+    for start, end in zip(offsets, offsets[1:]):
+        if start == end:
+            continue
+        try:
+            glyph_stats = parse_raw_simple_glyph_flags(glyf_data[start:end])
+        except ValueError:
+            stats["malformed_glyphs"] += 1
+            continue
+        if glyph_stats is None:
+            continue
+        stats["glyphs_checked"] += 1
+        stats["overlap_point_flags"] += glyph_stats["overlap_point_flags"]
+        stats["invalid_explicit_overlap_flags"] += glyph_stats[
+            "invalid_explicit_overlap_flags"
+        ]
+    return stats
+
+
+def count_simple_glyph_overlap_flags(font: TTFont) -> int:
+    return raw_simple_glyph_flag_stats(font)["overlap_point_flags"]
 
 
 def count_ots_invalid_simple_overlap_flags(font: TTFont) -> int:
-    if "glyf" not in font:
-        return 0
-    invalid = 0
-    glyf = font["glyf"]
-    for glyph in glyf.glyphs.values():
-        data = getattr(glyph, "data", None)
-        if not data:
-            continue
-        if len(data) < 12:
-            continue
-        contour_count = struct.unpack(">h", data[:2])[0]
-        if contour_count <= 0:
-            continue
-        end_points_offset = 10
-        end_points_end = end_points_offset + contour_count * 2
-        if end_points_end + 2 > len(data):
-            continue
-        point_count = struct.unpack(">H", data[end_points_end - 2 : end_points_end])[0] + 1
-        instruction_length = struct.unpack(">H", data[end_points_end : end_points_end + 2])[0]
-        offset = end_points_end + 2 + instruction_length
-        points_read = 0
-        stored_flag_index = 0
-        while points_read < point_count and offset < len(data):
-            flag = data[offset]
-            offset += 1
-            if stored_flag_index and flag & glyf_table.flagOverlapSimple:
-                invalid += 1
-            stored_flag_index += 1
-            repeat_count = 0
-            if flag & glyf_table.flagRepeat:
-                if offset >= len(data):
-                    break
-                repeat_count = data[offset]
-                offset += 1
-            points_read += repeat_count + 1
-    return invalid
+    stats = raw_simple_glyph_flag_stats(font)
+    if stats["malformed_glyphs"]:
+        raise ValueError(
+            f"{stats['malformed_glyphs']} malformed raw simple-glyph flag streams"
+        )
+    return stats["invalid_explicit_overlap_flags"]
 
 
 def force_recompile_glyf(font: TTFont) -> dict[str, int]:
@@ -2074,6 +2248,28 @@ def get_single_substitution_mappings(font: TTFont, tags: set[str]) -> dict[str, 
     return mapping
 
 
+def single_substitution_mappings_by_feature_record(
+    font: TTFont,
+    tag: str,
+) -> list[tuple[int, dict[str, str]]]:
+    if "GSUB" not in font:
+        return []
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return []
+    records: list[tuple[int, dict[str, str]]] = []
+    for feature_index, record in enumerate(gsub.FeatureList.FeatureRecord):
+        if record.FeatureTag != tag:
+            continue
+        mapping: dict[str, str] = {}
+        for lookup_index in list(record.Feature.LookupListIndex or []):
+            lookup = gsub.LookupList.Lookup[lookup_index]
+            for subtable in single_substitution_subtables(lookup):
+                mapping.update(getattr(subtable, "mapping", {}) or {})
+        records.append((feature_index, mapping))
+    return records
+
+
 def ligature_outputs_for_feature(
     font: TTFont,
     tag: str,
@@ -2147,6 +2343,23 @@ def upstream_dash_roles(font: TTFont) -> dict[str, str]:
         "vertical_single": str(vertical_single),
         "vertical_two": str(vertical_two),
         "vertical_three": str(vertical_three),
+    }
+
+
+def cjk_ellipsis_roles(font: TTFont) -> dict[str, str]:
+    cmap = font.getBestCmap() or {}
+    proportional = cmap.get(ELLIPSIS_CODEPOINT)
+    fullwidth = cmap.get(CJK_ELLIPSIS_CODEPOINT)
+    if not proportional or not fullwidth:
+        raise ValueError("font lacks U+2026 or U+22EF ellipsis glyph")
+    vertical = get_single_substitution_mappings(font, {"vert", "vrt2"})
+    vertical_target = vertical.get(fullwidth) or vertical.get(proportional)
+    if not vertical_target:
+        raise ValueError("font lacks a vertical Source Han ellipsis glyph")
+    return {
+        "proportional": str(proportional),
+        "fullwidth": str(fullwidth),
+        "vertical": str(vertical_target),
     }
 
 
@@ -2793,10 +3006,102 @@ def split_reference_lsb_profiles(
 
 
 def gvar_coordinate_count(font: TTFont, glyph_name: str) -> int:
-    variations = font["gvar"].variations.get(glyph_name, [])
-    if variations:
-        return len(variations[0].coordinates)
-    return len(font["glyf"][glyph_name].getCoordinates(font["glyf"])[0]) + 4
+    control = glyph_variation_control_coordinates(font, glyph_name)
+    return (0 if control is None else len(control[1])) + 4
+
+
+def materialize_gvar_variations(font: TTFont) -> dict[str, Any]:
+    if "gvar" not in font or "glyf" not in font:
+        return {
+            "gvar_materialized_glyphs": 0,
+            "gvar_raw_point_warning_count": 0,
+            "gvar_raw_point_warning_glyphs": [],
+            "gvar_coordinate_length_mismatches": 0,
+            "gvar_coordinate_length_mismatch_samples": [],
+        }
+
+    class WarningCapture(logging.Handler):
+        def __init__(self) -> None:
+            super().__init__(logging.WARNING)
+            self.messages: list[str] = []
+
+        def emit(self, record: logging.LogRecord) -> None:
+            self.messages.append(record.getMessage())
+
+    logger = logging.getLogger("fontTools.ttLib.tables.TupleVariation")
+    capture = WarningCapture()
+    previous_level = logger.level
+    previous_propagate = logger.propagate
+    logger.addHandler(capture)
+    logger.setLevel(logging.WARNING)
+    logger.propagate = False
+    materialized: dict[str, list[TupleVariation]] = {}
+    warning_glyphs: list[dict[str, Any]] = []
+    mismatch_samples: list[dict[str, Any]] = []
+    warning_count = 0
+    mismatch_count = 0
+    try:
+        variations = font["gvar"].variations
+        for glyph_name in font.getGlyphOrder():
+            capture.messages.clear()
+            glyph_variations = list(variations.get(glyph_name, []))
+            materialized[glyph_name] = glyph_variations
+            if capture.messages:
+                warning_count += len(capture.messages)
+                if len(warning_glyphs) < 32:
+                    warning_glyphs.append(
+                        {
+                            "glyph": glyph_name,
+                            "messages": list(capture.messages),
+                        }
+                    )
+            expected_count = gvar_coordinate_count(font, glyph_name)
+            bad_lengths = sorted(
+                {
+                    len(variation.coordinates)
+                    for variation in glyph_variations
+                    if len(variation.coordinates) != expected_count
+                }
+            )
+            if bad_lengths:
+                mismatch_count += 1
+                if len(mismatch_samples) < 32:
+                    mismatch_samples.append(
+                        {
+                            "glyph": glyph_name,
+                            "expected": expected_count,
+                            "actual": bad_lengths,
+                        }
+                    )
+    finally:
+        logger.removeHandler(capture)
+        logger.setLevel(previous_level)
+        logger.propagate = previous_propagate
+
+    # Replacing LazyDict with an ordinary mapping forces every tuple to be
+    # recompiled. FontTools then omits any out-of-range raw point numbers it
+    # reported while decoding instead of copying their original bytes through.
+    font["gvar"].variations = materialized
+    return {
+        "gvar_materialized_glyphs": len(materialized),
+        "gvar_raw_point_warning_count": warning_count,
+        "gvar_raw_point_warning_glyphs": warning_glyphs,
+        "gvar_coordinate_length_mismatches": mismatch_count,
+        "gvar_coordinate_length_mismatch_samples": mismatch_samples,
+    }
+
+
+def raw_gvar_integrity_status(path: Path) -> dict[str, Any]:
+    font = TTFont(path, lazy=True, recalcTimestamp=False)
+    try:
+        report = materialize_gvar_variations(font)
+    finally:
+        font.close()
+    report["ok"] = not (
+        report["gvar_raw_point_warning_count"]
+        or report["gvar_coordinate_length_mismatches"]
+    )
+    return report
 
 
 def simple_glyph_coordinates(font: TTFont, glyph_name: str) -> list[tuple[int, int]] | None:
@@ -2912,7 +3217,10 @@ def add_inter_outline_correction_variations(
                 current_coordinates = current_control[1]
                 target_coordinates = target_control[1]
                 deltas = [
-                    (otRound(target_x - current_x), otRound(target_y - current_y))
+                    (
+                        otRound(target_x - current_x),
+                        otRound(target_y - current_y),
+                    )
                     for (current_x, current_y), (target_x, target_y) in zip(current_coordinates, target_coordinates)
                 ]
                 if not any(dx or dy for dx, dy in deltas):
@@ -2928,6 +3236,821 @@ def add_inter_outline_correction_variations(
     return {
         "inter_outline_correction_variations_added": added,
         "inter_outline_correction_glyphs": len(touched_glyphs),
+    }
+
+
+def decomposed_glyph_recording(glyph_set: Any, glyph_name: str) -> list[Any]:
+    pen = DecomposingRecordingPen(glyph_set)
+    glyph_set[glyph_name].draw(pen)
+    return pen.value
+
+
+def translation_invariant_outline_residual(
+    source_recording: list[Any],
+    target_recording: list[Any],
+) -> tuple[str | None, float]:
+    if len(source_recording) != len(target_recording):
+        return "command_count", float("inf")
+
+    point_pairs: list[tuple[tuple[float, float], tuple[float, float]]] = []
+    for (source_command, source_points), (target_command, target_points) in zip(
+        source_recording,
+        target_recording,
+    ):
+        if source_command != target_command:
+            return "command", float("inf")
+        if len(source_points) != len(target_points):
+            return "point_count", float("inf")
+        for source_point, target_point in zip(source_points, target_points):
+            if (source_point is None) != (target_point is None):
+                return "implied_point", float("inf")
+            if source_point is not None:
+                point_pairs.append((source_point, target_point))
+
+    if not point_pairs:
+        return None, 0.0
+    x_offsets = [target[0] - source[0] for source, target in point_pairs]
+    y_offsets = [target[1] - source[1] for source, target in point_pairs]
+    x_shift = (min(x_offsets) + max(x_offsets)) / 2
+    y_shift = (min(y_offsets) + max(y_offsets)) / 2
+    residual = max(
+        max(
+            abs(source[0] + x_shift - target[0]),
+            abs(source[1] + y_shift - target[1]),
+        )
+        for source, target in point_pairs
+    )
+    return None, residual
+
+
+def component_transform(component: Any) -> tuple[float, float, float, float, float, float]:
+    _glyph_name, transform = component.getComponentInfo()
+    return tuple(float(value) for value in transform)
+
+
+def inter_composite_corrections_at_weight(
+    font: TTFont,
+    inter: TTFont,
+    pairs: list[tuple[str, str]],
+    weight_value: int,
+) -> tuple[
+    list[tuple[str, list[tuple[int, int]]]],
+    dict[str, tuple[int, int, int, int]],
+    dict[str, Any],
+    list[dict[str, Any]],
+]:
+    current = instantiateVariableFont(
+        font,
+        {"wght": weight_value},
+        inplace=False,
+        optimize=True,
+    )
+    source = instantiateVariableFont(
+        inter,
+        {"wght": weight_value},
+        inplace=False,
+        optimize=True,
+    )
+    pending: list[tuple[str, list[tuple[int, int]]]] = []
+    bounds: dict[str, tuple[int, int, int, int]] = {}
+    unsupported: list[dict[str, Any]] = []
+    mismatches = 0
+    maximum_residual = 0.0
+    try:
+        current_set = current.getGlyphSet()
+        source_set = source.getGlyphSet()
+        for source_name, target_name in pairs:
+            reason, residual = translation_invariant_outline_residual(
+                decomposed_glyph_recording(source_set, source_name),
+                decomposed_glyph_recording(current_set, target_name),
+            )
+            if reason is None and math.isfinite(residual):
+                maximum_residual = max(maximum_residual, residual)
+            if reason is None and residual <= INTER_OUTLINE_TRANSLATION_TOLERANCE:
+                continue
+
+            mismatches += 1
+            current_glyph = current["glyf"][target_name]
+            source_glyph = source["glyf"][source_name]
+            current_glyph.expand(current["glyf"])
+            source_glyph.expand(source["glyf"])
+            problem: str | None = None
+            if not current_glyph.isComposite() or not source_glyph.isComposite():
+                problem = "non_composite"
+            elif len(current_glyph.components) != len(source_glyph.components):
+                problem = "component_count"
+
+            current_bounds = glyph_bbox(current, target_name)
+            source_bounds = glyph_bbox(source, source_name)
+            if problem is None and (current_bounds is None or source_bounds is None):
+                problem = "missing_parent_bounds"
+
+            deltas: list[tuple[int, int]] = []
+            if problem is None:
+                parent_shift_x = current_bounds[0] - source_bounds[0]
+                parent_shift_y = current_bounds[3] - source_bounds[3]
+                for component_index, (current_component, source_component) in enumerate(
+                    zip(current_glyph.components, source_glyph.components)
+                ):
+                    current_transform = component_transform(current_component)
+                    source_transform = component_transform(source_component)
+                    if (
+                        current_transform[:4] != (1.0, 0.0, 0.0, 1.0)
+                        or source_transform[:4] != (1.0, 0.0, 0.0, 1.0)
+                    ):
+                        problem = f"non_identity_component_{component_index}"
+                        break
+                    current_child = current_component.glyphName
+                    source_child = source_component.glyphName
+                    current_child_bounds = glyph_bbox(current, current_child)
+                    source_child_bounds = glyph_bbox(source, source_child)
+                    if current_child_bounds is None or source_child_bounds is None:
+                        problem = f"missing_child_bounds_{component_index}"
+                        break
+                    child_reason, child_residual = translation_invariant_outline_residual(
+                        decomposed_glyph_recording(current_set, current_child),
+                        decomposed_glyph_recording(source_set, source_child),
+                    )
+                    if (
+                        child_reason is not None
+                        or child_residual > INTER_OUTLINE_TRANSLATION_TOLERANCE
+                    ):
+                        problem = f"child_outline_{component_index}"
+                        break
+                    child_shift_x = current_child_bounds[0] - source_child_bounds[0]
+                    child_shift_y = current_child_bounds[3] - source_child_bounds[3]
+                    desired_x = source_transform[4] + parent_shift_x - child_shift_x
+                    desired_y = source_transform[5] + parent_shift_y - child_shift_y
+                    deltas.append(
+                        (
+                            otRound(desired_x - current_transform[4]),
+                            otRound(desired_y - current_transform[5]),
+                        )
+                    )
+
+            if problem is not None or not any(dx or dy for dx, dy in deltas):
+                unsupported.append(
+                    {
+                        "weight": weight_value,
+                        "source_glyph": source_name,
+                        "target_glyph": target_name,
+                        "reason": problem or "zero_component_delta",
+                        "outline_reason": reason,
+                        "residual": residual,
+                    }
+                )
+                continue
+            pending.append((target_name, deltas))
+            bounds[target_name] = current_bounds
+    finally:
+        current.close()
+        source.close()
+    return (
+        pending,
+        bounds,
+        {
+            "mismatches": mismatches,
+            "maximum_residual": maximum_residual,
+        },
+        unsupported,
+    )
+
+
+def restore_default_inter_composite_metric_bounds(
+    font: TTFont,
+    targets: dict[str, tuple[int, int, int, int]],
+) -> dict[str, int]:
+    ordered, maximum_depth = glyph_component_dependency_order(font, targets)
+    translations = 0
+    maximum_translation = 0
+    for glyph_name in ordered:
+        expected = targets[glyph_name]
+        actual = glyph_bbox(font, glyph_name)
+        if actual is None:
+            raise RuntimeError(f"missing default Inter composite bounds for {glyph_name}")
+        dx = expected[0] - actual[0]
+        dy = expected[3] - actual[3]
+        if not dx and not dy:
+            continue
+        glyph = font["glyf"][glyph_name]
+        glyph.expand(font["glyf"])
+        for component in glyph.components:
+            component.x += dx
+            component.y += dy
+        glyph.recalcBounds(font["glyf"])
+        translations += 1
+        maximum_translation = max(maximum_translation, abs(dx), abs(dy))
+
+    mismatches = []
+    for glyph_name, expected in targets.items():
+        actual = glyph_bbox(font, glyph_name)
+        if actual is None or actual[0] != expected[0] or actual[3] != expected[3]:
+            mismatches.append((glyph_name, expected, actual))
+    if mismatches:
+        raise RuntimeError(
+            "default Inter composite metric-bound restoration failed: "
+            + repr(mismatches[:8])
+        )
+    return {
+        "inter_composite_default_bound_targets": len(targets),
+        "inter_composite_default_bound_translations": translations,
+        "inter_composite_default_bound_maximum_translation": maximum_translation,
+        "inter_composite_default_bound_maximum_dependency_depth": maximum_depth,
+        "inter_composite_default_metric_bound_mismatches_after": 0,
+    }
+
+
+def add_translation_invariant_inter_composite_corrections(
+    font: TTFont,
+    inter: TTFont,
+) -> tuple[dict[str, Any], dict[int, dict[str, tuple[int, int, int, int]]]]:
+    if "gvar" not in font or "glyf" not in font or "fvar" not in font:
+        raise ValueError("Inter composite correction requires glyf/gvar/fvar")
+
+    pairs = final_cmap_inter_outline_correction_pairs(font, inter)
+    default_weight = int(weight_axis(font).defaultValue)
+    if default_weight not in INTER_COMPOSITE_CONTROL_WEIGHTS:
+        raise ValueError(f"unsupported Inter composite default weight: {default_weight}")
+    supports = advance_supports(font, INTER_COMPOSITE_VARIATION_WEIGHTS)
+    bounds_by_weight: dict[int, dict[str, tuple[int, int, int, int]]] = {}
+    mismatches_by_weight: dict[int, int] = {}
+    maximum_residual_by_weight: dict[int, float] = {}
+    touched_glyphs: set[str] = set()
+
+    default_pending, default_bounds, default_status, unsupported = (
+        inter_composite_corrections_at_weight(
+            font,
+            inter,
+            pairs,
+            default_weight,
+        )
+    )
+    if unsupported:
+        raise RuntimeError(
+            "unsupported default Inter composite corrections: "
+            + repr(unsupported[:8])
+        )
+    for target_name, deltas in default_pending:
+        glyph = font["glyf"][target_name]
+        glyph.expand(font["glyf"])
+        if len(glyph.components) != len(deltas):
+            raise ValueError(f"invalid default component count for {target_name}")
+        for component, (dx, dy) in zip(glyph.components, deltas):
+            component.x += dx
+            component.y += dy
+        glyph.recalcBounds(font["glyf"])
+        touched_glyphs.add(target_name)
+    default_bound_report = restore_default_inter_composite_metric_bounds(
+        font,
+        default_bounds,
+    )
+    mismatches_by_weight[default_weight] = default_status["mismatches"]
+    maximum_residual_by_weight[default_weight] = default_status[
+        "maximum_residual"
+    ]
+
+    variations_added = 0
+    for weight_value in INTER_COMPOSITE_VARIATION_WEIGHTS:
+        pending, bounds, status, unsupported = inter_composite_corrections_at_weight(
+            font,
+            inter,
+            pairs,
+            weight_value,
+        )
+        if unsupported:
+            raise RuntimeError(
+                "unsupported translation-invariant Inter composite corrections: "
+                + repr(unsupported[:8])
+            )
+        mismatches_by_weight[weight_value] = status["mismatches"]
+        maximum_residual_by_weight[weight_value] = status["maximum_residual"]
+        if bounds:
+            bounds_by_weight[weight_value] = bounds
+        for target_name, deltas in pending:
+            coordinate_count = gvar_coordinate_count(font, target_name)
+            if coordinate_count != len(deltas) + 4:
+                raise ValueError(
+                    f"invalid composite gvar point count for {target_name}: "
+                    f"{coordinate_count} != {len(deltas) + 4}"
+                )
+            coordinates: list[Any] = list(deltas) + [(0, 0)] * 4
+            font["gvar"].variations.setdefault(target_name, []).append(
+                TupleVariation({"wght": supports[weight_value]}, coordinates)
+            )
+            variations_added += 1
+            touched_glyphs.add(target_name)
+
+    return (
+        {
+            "inter_composite_control_weights": list(
+                INTER_COMPOSITE_CONTROL_WEIGHTS
+            ),
+            "inter_composite_pairs_checked_per_weight": len(pairs),
+            "inter_composite_mismatches_before_by_weight": mismatches_by_weight,
+            "inter_composite_maximum_residual_before_by_weight": (
+                maximum_residual_by_weight
+            ),
+            "inter_composite_default_glyph_corrections": len(default_pending),
+            "inter_composite_variations_added": variations_added,
+            "inter_composite_glyphs": len(touched_glyphs),
+            "inter_composite_unsupported": 0,
+            **default_bound_report,
+        },
+        bounds_by_weight,
+    )
+
+
+def add_uniform_composite_translation_variation(
+    font: TTFont,
+    glyph_name: str,
+    support: tuple[float, float, float],
+    dx: int,
+    dy: int,
+) -> None:
+    glyf = font["glyf"]
+    glyph = glyf[glyph_name]
+    glyph.expand(glyf)
+    if not glyph.isComposite():
+        raise ValueError(f"expected composite glyph for translation: {glyph_name}")
+    coordinates: list[Any] = [(otRound(dx), otRound(dy))] * len(glyph.components)
+    coordinates.extend([(0, 0)] * 4)
+    if len(coordinates) != gvar_coordinate_count(font, glyph_name):
+        raise ValueError(f"invalid composite translation point count for {glyph_name}")
+    font["gvar"].variations.setdefault(glyph_name, []).append(
+        TupleVariation({"wght": support}, coordinates)
+    )
+
+
+def restore_inter_composite_control_bounds(
+    font: TTFont,
+    bounds_by_weight: dict[int, dict[str, tuple[int, int, int, int]]],
+) -> dict[str, Any]:
+    supports = advance_supports(font, list(bounds_by_weight))
+    corrections = 0
+    maximum_shift = 0
+    maximum_depth = 0
+
+    for weight_value, targets in sorted(bounds_by_weight.items()):
+        ordered, depth = glyph_component_dependency_order(font, targets)
+        maximum_depth = max(maximum_depth, depth)
+        current = instantiateVariableFont(
+            font,
+            {"wght": weight_value},
+            inplace=False,
+            optimize=True,
+        )
+        try:
+            for glyph_name in ordered:
+                expected = targets[glyph_name]
+                actual = glyph_bbox(current, glyph_name)
+                if actual is None:
+                    raise RuntimeError(
+                        f"missing corrected composite bounds for {glyph_name} at {weight_value}"
+                    )
+                dx = expected[0] - actual[0]
+                dy = expected[3] - actual[3]
+                if not dx and not dy:
+                    continue
+                add_uniform_composite_translation_variation(
+                    font,
+                    glyph_name,
+                    supports[weight_value],
+                    dx,
+                    dy,
+                )
+                instance_glyph = current["glyf"][glyph_name]
+                instance_glyph.expand(current["glyf"])
+                for component in instance_glyph.components:
+                    component.x += dx
+                    component.y += dy
+                instance_glyph.recalcBounds(current["glyf"])
+                corrections += 1
+                maximum_shift = max(maximum_shift, abs(dx), abs(dy))
+        finally:
+            current.close()
+
+    mismatches: list[dict[str, Any]] = []
+    outline_dimension_changes = 0
+    maximum_outline_dimension_change = 0
+    for weight_value, targets in sorted(bounds_by_weight.items()):
+        current = instantiateVariableFont(
+            font,
+            {"wght": weight_value},
+            inplace=False,
+            optimize=True,
+        )
+        try:
+            for glyph_name, expected in targets.items():
+                actual = glyph_bbox(current, glyph_name)
+                if actual is None or actual[0] != expected[0] or actual[3] != expected[3]:
+                    mismatches.append(
+                        {
+                            "weight": weight_value,
+                            "glyph": glyph_name,
+                            "expected": expected,
+                            "actual": actual,
+                        }
+                    )
+                    continue
+                expected_size = (expected[2] - expected[0], expected[3] - expected[1])
+                actual_size = (actual[2] - actual[0], actual[3] - actual[1])
+                if actual_size != expected_size:
+                    outline_dimension_changes += 1
+                    maximum_outline_dimension_change = max(
+                        maximum_outline_dimension_change,
+                        abs(actual_size[0] - expected_size[0]),
+                        abs(actual_size[1] - expected_size[1]),
+                    )
+        finally:
+            current.close()
+    if mismatches:
+        raise RuntimeError(
+            "Inter composite metric-bound restoration failed: "
+            + repr(mismatches[:8])
+        )
+    return {
+        "inter_composite_bound_control_weights": sorted(bounds_by_weight),
+        "inter_composite_bound_targets": sum(len(targets) for targets in bounds_by_weight.values()),
+        "inter_composite_bound_translation_variations_added": corrections,
+        "inter_composite_bound_maximum_translation": maximum_shift,
+        "inter_composite_bound_maximum_dependency_depth": maximum_depth,
+        "inter_composite_metric_bound_mismatches_after": 0,
+        "inter_composite_outline_dimension_changes": outline_dimension_changes,
+        "inter_composite_maximum_outline_dimension_change": (
+            maximum_outline_dimension_change
+        ),
+    }
+
+
+def align_inter_composite_harfbuzz_metrics(
+    font: TTFont,
+    region: str,
+    italic: bool,
+) -> dict[str, Any]:
+    default_weight = int(weight_axis(font).defaultValue)
+    supports = advance_supports(font, INTER_COMPOSITE_VARIATION_WEIGHTS)
+    glyph_order = font.getGlyphOrder()
+    rounds = 0
+    corrections = 0
+    maximum_translation = 0
+    initial_mismatches: dict[int, dict[str, int]] = {}
+
+    while True:
+        data = serialized_font_bytes(font)
+        face = hb.Face(data)
+        hb_font = hb.Font(face)
+        hb_font.scale = (face.upem, face.upem)
+        pending: dict[tuple[int, str], tuple[int, int]] = {}
+        mismatches_by_weight: dict[int, dict[str, int]] = {}
+        hard_failures: list[dict[str, Any]] = []
+        for weight_name, weight_value in VF_METRIC_REFERENCE_STOPS:
+            expected = open_project_static_metric_reference_font(
+                region,
+                weight_name,
+                italic,
+            )
+            hb_font.set_variations({"wght": weight_value})
+            counts = {
+                "horizontal_side_bearing": 0,
+                "vertical_side_bearing": 0,
+            }
+            try:
+                for codepoint, expected_glyph in (expected.getBestCmap() or {}).items():
+                    glyph_id = hb_font.get_nominal_glyph(codepoint)
+                    if glyph_id is None:
+                        hard_failures.append(
+                            {
+                                "weight": weight_value,
+                                "codepoint": f"U+{codepoint:04X}",
+                                "reason": "missing_glyph",
+                            }
+                        )
+                        continue
+                    target_name = glyph_order[glyph_id]
+                    expected_h_advance, expected_lsb = expected["hmtx"].metrics[
+                        expected_glyph
+                    ]
+                    actual_h_advance = hb_font.get_glyph_h_advance(glyph_id)
+                    if actual_h_advance != expected_h_advance:
+                        hard_failures.append(
+                            {
+                                "weight": weight_value,
+                                "codepoint": f"U+{codepoint:04X}",
+                                "glyph": target_name,
+                                "reason": "horizontal_advance",
+                                "actual": actual_h_advance,
+                                "expected": expected_h_advance,
+                            }
+                        )
+                        continue
+                    extents = hb_font.get_glyph_extents(glyph_id)
+                    dx = 0
+                    dy = 0
+                    if extents is not None and extents.x_bearing != expected_lsb:
+                        dx = int(expected_lsb) - int(extents.x_bearing)
+                        counts["horizontal_side_bearing"] += 1
+                    if "vmtx" in expected and expected_glyph in expected["vmtx"].metrics:
+                        expected_v_advance, expected_tsb = expected["vmtx"].metrics[
+                            expected_glyph
+                        ]
+                        actual_v_advance = hb_font.get_glyph_v_advance(glyph_id)
+                        if actual_v_advance != -expected_v_advance:
+                            hard_failures.append(
+                                {
+                                    "weight": weight_value,
+                                    "codepoint": f"U+{codepoint:04X}",
+                                    "glyph": target_name,
+                                    "reason": "vertical_advance",
+                                    "actual": actual_v_advance,
+                                    "expected": -expected_v_advance,
+                                }
+                            )
+                            continue
+                        if extents is not None:
+                            _origin_x, origin_y = hb_font.get_glyph_v_origin(glyph_id)
+                            actual_tsb = int(origin_y) - int(extents.y_bearing)
+                            if actual_tsb != expected_tsb:
+                                dy = actual_tsb - int(expected_tsb)
+                                counts["vertical_side_bearing"] += 1
+                    if not dx and not dy:
+                        continue
+                    glyph = font["glyf"][target_name]
+                    glyph.expand(font["glyf"])
+                    if not glyph.isComposite():
+                        hard_failures.append(
+                            {
+                                "weight": weight_value,
+                                "codepoint": f"U+{codepoint:04X}",
+                                "glyph": target_name,
+                                "reason": "non_composite_side_bearing_mismatch",
+                                "delta": (dx, dy),
+                            }
+                        )
+                        continue
+                    key = (weight_value, target_name)
+                    previous = pending.get(key)
+                    if previous is not None and previous != (dx, dy):
+                        hard_failures.append(
+                            {
+                                "weight": weight_value,
+                                "glyph": target_name,
+                                "reason": "conflicting_alias_metric_targets",
+                                "targets": [previous, (dx, dy)],
+                            }
+                        )
+                        continue
+                    pending[key] = (dx, dy)
+            finally:
+                expected.close()
+            mismatches_by_weight[weight_value] = counts
+
+        if hard_failures:
+            raise RuntimeError(
+                "Inter composite HarfBuzz metric alignment found unsupported failures: "
+                + repr(hard_failures[:8])
+            )
+        if rounds == 0:
+            initial_mismatches = mismatches_by_weight
+        if not pending:
+            return {
+                "inter_composite_harfbuzz_metric_rounds": rounds,
+                "inter_composite_harfbuzz_mismatches_before_by_weight": (
+                    initial_mismatches
+                ),
+                "inter_composite_harfbuzz_translations_added": (
+                    corrections
+                ),
+                "inter_composite_harfbuzz_maximum_translation": (
+                    maximum_translation
+                ),
+                "inter_composite_harfbuzz_metric_mismatches_after": 0,
+            }
+        rounds += 1
+        if rounds > 4:
+            raise RuntimeError(
+                "Inter composite HarfBuzz metric alignment did not converge: "
+                + repr(mismatches_by_weight)
+            )
+        log_step(
+            "VF Inter composite metrics: correction round "
+            f"{rounds}, glyphs={len(pending)}"
+        )
+
+        default_targets = {
+            glyph_name: delta
+            for (weight_value, glyph_name), delta in pending.items()
+            if weight_value == default_weight
+        }
+        if default_targets:
+            ordered, _depth = glyph_component_dependency_order(
+                font,
+                default_targets,
+            )
+            for glyph_name in ordered:
+                dx, dy = default_targets[glyph_name]
+                glyph = font["glyf"][glyph_name]
+                glyph.expand(font["glyf"])
+                for component in glyph.components:
+                    component.x += dx
+                    component.y += dy
+                glyph.recalcBounds(font["glyf"])
+                corrections += 1
+                maximum_translation = max(
+                    maximum_translation,
+                    abs(dx),
+                    abs(dy),
+                )
+        for (weight_value, glyph_name), (dx, dy) in pending.items():
+            if weight_value == default_weight:
+                continue
+            add_uniform_composite_translation_variation(
+                font,
+                glyph_name,
+                supports[weight_value],
+                dx,
+                dy,
+            )
+            corrections += 1
+            maximum_translation = max(maximum_translation, abs(dx), abs(dy))
+
+
+def inter_outline_control_status(font: TTFont, inter: TTFont) -> dict[str, Any]:
+    pairs = final_cmap_inter_outline_correction_pairs(font, inter)
+    mismatches_by_weight: dict[int, int] = {}
+    maximum_residual_by_weight: dict[int, float] = {}
+    samples: list[dict[str, Any]] = []
+    for weight_value in INTER_OUTLINE_AUDIT_WEIGHTS:
+        current = instantiateVariableFont(
+            font,
+            {"wght": weight_value},
+            inplace=False,
+            optimize=True,
+        )
+        source = instantiateVariableFont(
+            inter,
+            {"wght": weight_value},
+            inplace=False,
+            optimize=True,
+        )
+        mismatches = 0
+        maximum_residual = 0.0
+        try:
+            current_set = current.getGlyphSet()
+            source_set = source.getGlyphSet()
+            for source_name, target_name in pairs:
+                reason, residual = translation_invariant_outline_residual(
+                    decomposed_glyph_recording(source_set, source_name),
+                    decomposed_glyph_recording(current_set, target_name),
+                )
+                if reason is None and math.isfinite(residual):
+                    maximum_residual = max(maximum_residual, residual)
+                if reason is None and residual <= INTER_OUTLINE_TRANSLATION_TOLERANCE:
+                    continue
+                mismatches += 1
+                if len(samples) < 16:
+                    samples.append(
+                        {
+                            "weight": weight_value,
+                            "source_glyph": source_name,
+                            "target_glyph": target_name,
+                            "reason": reason,
+                            "residual": residual,
+                        }
+                    )
+        finally:
+            current.close()
+            source.close()
+        mismatches_by_weight[weight_value] = mismatches
+        maximum_residual_by_weight[weight_value] = maximum_residual
+    return {
+        "ok": bool(pairs) and not any(mismatches_by_weight.values()),
+        "control_weights": list(INTER_OUTLINE_AUDIT_WEIGHTS),
+        "pairs_checked_per_weight": len(pairs),
+        "mismatches_by_weight": mismatches_by_weight,
+        "maximum_translation_invariant_residual_by_weight": (
+            maximum_residual_by_weight
+        ),
+        "failure_samples": samples,
+    }
+
+
+def harfbuzz_named_metric_status(
+    path: Path,
+    region: str,
+    italic: bool,
+) -> dict[str, Any]:
+    data = path.read_bytes()
+    face = hb.Face(data)
+    hb_font = hb.Font(face)
+    hb_font.scale = (face.upem, face.upem)
+    counts_by_weight: dict[int, dict[str, int]] = {}
+    samples: list[dict[str, Any]] = []
+    compared_by_weight: dict[int, int] = {}
+    for weight_name, weight_value in VF_METRIC_REFERENCE_STOPS:
+        expected = open_project_static_metric_reference_font(
+            region,
+            weight_name,
+            italic,
+        )
+        counts = {
+            "missing_glyph": 0,
+            "horizontal_advance": 0,
+            "horizontal_side_bearing": 0,
+            "vertical_advance": 0,
+            "vertical_side_bearing": 0,
+        }
+        compared = 0
+        hb_font.set_variations({"wght": weight_value})
+        try:
+            for codepoint, expected_glyph in (expected.getBestCmap() or {}).items():
+                glyph_id = hb_font.get_nominal_glyph(codepoint)
+                if glyph_id is None:
+                    counts["missing_glyph"] += 1
+                    if len(samples) < 16:
+                        samples.append(
+                            {
+                                "weight": weight_value,
+                                "codepoint": f"U+{codepoint:04X}",
+                                "metric": "missing_glyph",
+                            }
+                        )
+                    continue
+                compared += 1
+                expected_h_advance, expected_lsb = expected["hmtx"].metrics[
+                    expected_glyph
+                ]
+                actual_h_advance = hb_font.get_glyph_h_advance(glyph_id)
+                if actual_h_advance != expected_h_advance:
+                    counts["horizontal_advance"] += 1
+                    if len(samples) < 16:
+                        samples.append(
+                            {
+                                "weight": weight_value,
+                                "codepoint": f"U+{codepoint:04X}",
+                                "metric": "horizontal_advance",
+                                "actual": actual_h_advance,
+                                "expected": expected_h_advance,
+                            }
+                        )
+                extents = hb_font.get_glyph_extents(glyph_id)
+                if extents is not None and extents.x_bearing != expected_lsb:
+                    counts["horizontal_side_bearing"] += 1
+                    if len(samples) < 16:
+                        samples.append(
+                            {
+                                "weight": weight_value,
+                                "codepoint": f"U+{codepoint:04X}",
+                                "metric": "horizontal_side_bearing",
+                                "actual": extents.x_bearing,
+                                "expected": expected_lsb,
+                            }
+                        )
+                if "vmtx" not in expected or expected_glyph not in expected["vmtx"].metrics:
+                    continue
+                expected_v_advance, expected_tsb = expected["vmtx"].metrics[
+                    expected_glyph
+                ]
+                actual_v_advance = hb_font.get_glyph_v_advance(glyph_id)
+                if actual_v_advance != -expected_v_advance:
+                    counts["vertical_advance"] += 1
+                    if len(samples) < 16:
+                        samples.append(
+                            {
+                                "weight": weight_value,
+                                "codepoint": f"U+{codepoint:04X}",
+                                "metric": "vertical_advance",
+                                "actual": actual_v_advance,
+                                "expected": -expected_v_advance,
+                            }
+                        )
+                if extents is not None:
+                    _origin_x, origin_y = hb_font.get_glyph_v_origin(glyph_id)
+                    actual_tsb = origin_y - extents.y_bearing
+                    if actual_tsb != expected_tsb:
+                        counts["vertical_side_bearing"] += 1
+                        if len(samples) < 16:
+                            samples.append(
+                                {
+                                    "weight": weight_value,
+                                    "codepoint": f"U+{codepoint:04X}",
+                                    "metric": "vertical_side_bearing",
+                                    "actual": actual_tsb,
+                                    "expected": expected_tsb,
+                                }
+                            )
+        finally:
+            expected.close()
+        counts_by_weight[weight_value] = counts
+        compared_by_weight[weight_value] = compared
+    return {
+        "ok": all(
+            not any(counts.values())
+            for counts in counts_by_weight.values()
+        ),
+        "reference_mode": "project-static-unhinted",
+        "counts_by_weight": counts_by_weight,
+        "codepoints_compared_by_weight": compared_by_weight,
+        "failure_samples": samples,
     }
 
 
@@ -4273,6 +5396,1005 @@ def remove_metric_variation_maps(font: TTFont) -> None:
     for tag in ("HVAR", "VVAR"):
         if tag in font:
             del font[tag]
+
+
+def metric_variation_control_locations(
+    font: TTFont,
+) -> tuple[list[int], list[dict[str, float]]]:
+    weights = sorted(int(weight) for weight in SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT)
+    locations: list[dict[str, float]] = []
+    for weight in weights:
+        normalized = floatToFixedToFloat(vf_mapped_normalized_weight(font, weight), 14)
+        locations.append({} if normalized == 0 else {"wght": normalized})
+    return weights, locations
+
+
+def build_direct_hvar(
+    font: TTFont,
+    model: VariationModel,
+    master_metrics: list[list[tuple[int, int, int]]],
+    base_metrics: list[tuple[int, int, int]],
+) -> dict[str, Any]:
+    glyph_order = font.getGlyphOrder()
+    supports = model.supports[1:]
+    region_list = var_builder.buildVarRegionList(supports, ["wght"])
+    var_data_by_metric = {
+        metric: var_builder.buildVarData(
+            list(range(len(supports))),
+            [],
+            optimize=False,
+        )
+        for metric in ("advance", "lsb", "rsb")
+    }
+    default_master_index = model.reverseMapping[0]
+    for glyph_id, glyph_name in enumerate(glyph_order):
+        glyph_master_metrics = [metrics[glyph_id] for metrics in master_metrics]
+        if base_metrics[glyph_id] != master_metrics[default_master_index][glyph_id]:
+            raise ValueError(
+                f"HVAR default metric mismatch for {glyph_name}: "
+                f"{base_metrics[glyph_id]} != "
+                f"{master_metrics[default_master_index][glyph_id]}"
+            )
+        for metric_index, metric in enumerate(("advance", "lsb", "rsb")):
+            values = [values[metric_index] for values in glyph_master_metrics]
+            deltas, glyph_supports = model.getDeltasAndSupports(values, round=round)
+            if glyph_supports[1:] != supports:
+                raise ValueError(f"HVAR support model mismatch for {glyph_name} {metric}")
+            var_data_by_metric[metric].addItem(deltas[1:], round=round)
+
+    table = font["HVAR"] = newTable("HVAR")
+    hvar = table.table = ot.HVAR()
+    hvar.Version = 0x00010000
+    hvar.VarStore = var_builder.buildVarStore(
+        region_list,
+        [var_data_by_metric[metric] for metric in ("advance", "lsb", "rsb")],
+    )
+    # One direct item per GID avoids shared-map ambiguity during exact-weight
+    # calibration and remains compact for this single-axis family.
+    hvar.AdvWidthMap = None
+    hvar.LsbMap = var_builder.buildVarIdxMap(
+        [(1 << 16) | glyph_id for glyph_id in range(len(glyph_order))],
+        glyph_order,
+    )
+    hvar.RsbMap = var_builder.buildVarIdxMap(
+        [(2 << 16) | glyph_id for glyph_id in range(len(glyph_order))],
+        glyph_order,
+    )
+    return var_data_by_metric
+
+
+def horizontal_glyph_metrics(font: TTFont, glyph_name: str) -> tuple[int, int, int]:
+    advance, lsb = font["hmtx"].metrics[glyph_name]
+    bounds = glyph_bbox(font, glyph_name)
+    outline_width = 0 if bounds is None else bounds[2] - bounds[0]
+    rsb = int(advance) - int(lsb) - int(outline_width)
+    return int(advance), int(lsb), rsb
+
+
+def translate_default_glyph_outline(font: TTFont, glyph_name: str, dx: int) -> None:
+    if not dx:
+        return
+    glyf = font["glyf"]
+    glyph = glyf[glyph_name]
+    glyph.expand(glyf)
+    if glyph.isComposite():
+        for component in glyph.components:
+            component.x += dx
+    else:
+        glyph.coordinates.translate((dx, 0))
+    glyph.recalcBounds(glyf)
+
+
+def glyph_component_dependency_order(
+    font: TTFont,
+    glyph_names: Iterable[str],
+) -> tuple[list[str], int]:
+    glyf = font["glyf"]
+    depths: dict[str, int] = {}
+    active: set[str] = set()
+
+    def component_depth(glyph_name: str) -> int:
+        if glyph_name in depths:
+            return depths[glyph_name]
+        if glyph_name in active:
+            raise ValueError(f"cyclic composite glyph dependency at {glyph_name}")
+        active.add(glyph_name)
+        glyph = glyf.glyphs[glyph_name]
+        if hasattr(glyph, "expand"):
+            glyph.expand(glyf)
+        if glyph.isComposite():
+            depth = 1 + max(
+                (
+                    component_depth(component.glyphName)
+                    for component in glyph.components
+                    if component.glyphName in glyf.glyphs
+                ),
+                default=-1,
+            )
+        else:
+            depth = 0
+        active.remove(glyph_name)
+        depths[glyph_name] = depth
+        return depth
+
+    glyph_order = font.getGlyphOrder()
+    order_index = {glyph_name: index for index, glyph_name in enumerate(glyph_order)}
+    requested = list(glyph_names)
+    ordered = sorted(
+        requested,
+        key=lambda glyph_name: (component_depth(glyph_name), order_index[glyph_name]),
+    )
+    return ordered, max((depths[glyph_name] for glyph_name in requested), default=0)
+
+
+def align_default_outlines_to_lsb_targets(
+    font: TTFont,
+    targets: dict[str, int],
+) -> tuple[dict[str, int], dict[str, int]]:
+    before = control_lsb_xmin_mismatches(font, targets)
+    ordered_glyphs, max_component_depth = glyph_component_dependency_order(font, targets)
+    translated = 0
+    induced_compensations = 0
+    for glyph_name in ordered_glyphs:
+        bounds = glyph_bbox(font, glyph_name)
+        if bounds is None:
+            continue
+        delta = int(targets[glyph_name]) - int(bounds[0])
+        if not delta:
+            continue
+        translated += 1
+        induced_compensations += int(glyph_name not in before)
+        translate_default_glyph_outline(font, glyph_name, delta)
+
+    after = control_lsb_xmin_mismatches(font, targets)
+    return before, {
+        "vf_default_outline_translations": translated,
+        "vf_default_component_dependency_compensations": induced_compensations,
+        "vf_default_component_max_depth": max_component_depth,
+        "vf_default_lsb_xmin_mismatches_after": len(after),
+    }
+
+
+def add_outline_translation_variation(
+    font: TTFont,
+    glyph_name: str,
+    support: tuple[float, float, float],
+    dx: int,
+) -> None:
+    if not dx:
+        return
+    control = glyph_variation_control_coordinates(font, glyph_name)
+    if control is None:
+        return
+    real_point_count = len(control[1])
+    coordinate_count = gvar_coordinate_count(font, glyph_name)
+    if coordinate_count < real_point_count + 4:
+        raise ValueError(f"invalid gvar point count for {glyph_name}")
+    coordinates: list[Any] = [(dx, 0)] * real_point_count
+    coordinates.extend([None] * (coordinate_count - real_point_count - 4))
+    # HVAR carries the intended advance and side bearings. Moving horizontal
+    # phantom points here would move the glyph origin with the outline and
+    # cancel the x-bearing correction in shaping engines.
+    coordinates.extend([(0, 0), (0, 0), (0, 0), (0, 0)])
+    font["gvar"].variations.setdefault(glyph_name, []).append(
+        TupleVariation({"wght": support}, coordinates)
+    )
+
+
+def lsb_xmin_mismatches(font: TTFont) -> dict[str, int]:
+    mismatches: dict[str, int] = {}
+    for glyph_name in font.getGlyphOrder():
+        bounds = glyph_bbox(font, glyph_name)
+        if bounds is None:
+            continue
+        lsb = int(font["hmtx"].metrics[glyph_name][1])
+        if lsb != int(bounds[0]):
+            mismatches[glyph_name] = lsb - int(bounds[0])
+    return mismatches
+
+
+def reference_cmap_metric_targets(
+    font: TTFont,
+    reference: TTFont,
+    table_tag: str,
+) -> dict[str, tuple[int, int]]:
+    if table_tag not in font or table_tag not in reference:
+        return {}
+    cmap = font.getBestCmap() or {}
+    reference_cmap = reference.getBestCmap() or {}
+    targets: dict[str, tuple[int, int]] = {}
+    for codepoint in sorted(set(cmap) & set(reference_cmap)):
+        glyph_name = cmap[codepoint]
+        reference_name = reference_cmap[codepoint]
+        if reference_name not in reference[table_tag].metrics:
+            continue
+        metrics = tuple(int(value) for value in reference[table_tag].metrics[reference_name])
+        previous = targets.get(glyph_name)
+        if previous is not None and previous != metrics:
+            raise ValueError(
+                f"conflicting {table_tag} reference metrics for {glyph_name} at "
+                f"U+{codepoint:04X}: {previous} != {metrics}"
+            )
+        targets[glyph_name] = metrics
+    return targets
+
+
+def glyph_vertical_origin(font: TTFont, glyph_name: str) -> int:
+    bounds = glyph_bbox(font, glyph_name)
+    if "VORG" in font:
+        return int(
+            font["VORG"].VOriginRecords.get(
+                glyph_name,
+                font["VORG"].defaultVertOriginY,
+            )
+        )
+    y_max = 0 if bounds is None else int(bounds[3])
+    return y_max + int(font["vmtx"].metrics[glyph_name][1])
+
+
+def set_glyph_vertical_origin(font: TTFont, glyph_name: str, value: int) -> None:
+    if "VORG" not in font:
+        vorg = newTable("VORG")
+        vorg.majorVersion = 1
+        vorg.minorVersion = 0
+        vorg.defaultVertOriginY = 880
+        vorg.VOriginRecords = {}
+        font["VORG"] = vorg
+    vorg = font["VORG"]
+    if int(value) == int(vorg.defaultVertOriginY):
+        vorg.VOriginRecords.pop(glyph_name, None)
+    else:
+        vorg.VOriginRecords[glyph_name] = int(value)
+
+
+def apply_default_vf_metric_reference(
+    font: TTFont,
+    reference: TTFont,
+) -> dict[str, int]:
+    h_targets = reference_cmap_metric_targets(font, reference, "hmtx")
+    v_targets = reference_cmap_metric_targets(font, reference, "vmtx")
+    hmtx_updated = 0
+    vmtx_updated = 0
+    vorg_updated = 0
+    for glyph_name in font.getGlyphOrder():
+        bounds = glyph_bbox(font, glyph_name)
+        if bounds is not None:
+            target_lsb = h_targets.get(
+                glyph_name,
+                (font["hmtx"].metrics[glyph_name][0], int(bounds[0])),
+            )[1]
+            advance = h_targets.get(glyph_name, font["hmtx"].metrics[glyph_name])[0]
+            target_hmtx = (int(advance), int(target_lsb))
+            if tuple(font["hmtx"].metrics[glyph_name]) != target_hmtx:
+                font["hmtx"].metrics[glyph_name] = target_hmtx
+                hmtx_updated += 1
+
+        if "vmtx" not in font:
+            continue
+        if glyph_name in v_targets:
+            target_vmtx = v_targets[glyph_name]
+        elif bounds is not None:
+            advance = int(font["vmtx"].metrics[glyph_name][0])
+            target_vmtx = (advance, glyph_vertical_origin(font, glyph_name) - int(bounds[3]))
+        else:
+            target_vmtx = tuple(font["vmtx"].metrics[glyph_name])
+        if tuple(font["vmtx"].metrics[glyph_name]) != target_vmtx:
+            font["vmtx"].metrics[glyph_name] = target_vmtx
+            vmtx_updated += 1
+
+    origins: dict[str, int] = {}
+    for glyph_name, (_advance, target_tsb) in v_targets.items():
+        bounds = glyph_bbox(font, glyph_name)
+        origins[glyph_name] = (
+            glyph_vertical_origin(font, glyph_name)
+            if bounds is None
+            else int(bounds[3]) + int(target_tsb)
+        )
+    for glyph_name, origin in origins.items():
+        if glyph_vertical_origin(font, glyph_name) != origin:
+            set_glyph_vertical_origin(font, glyph_name, origin)
+            vorg_updated += 1
+    return {
+        "vf_default_hmtx_reference_updates": hmtx_updated,
+        "vf_default_vmtx_reference_updates": vmtx_updated,
+        "vf_default_vorg_reference_updates": vorg_updated,
+        "vf_default_reference_glyphs": len(h_targets),
+    }
+
+
+def target_lsb_for_control(
+    instance: TTFont,
+    reference: TTFont | None,
+) -> dict[str, int]:
+    targets = {
+        glyph_name: int(bounds[0])
+        for glyph_name in instance.getGlyphOrder()
+        if (bounds := glyph_bbox(instance, glyph_name)) is not None
+    }
+    if reference is not None:
+        targets.update(
+            {
+                glyph_name: int(metrics[1])
+                for glyph_name, metrics in reference_cmap_metric_targets(
+                    instance,
+                    reference,
+                    "hmtx",
+                ).items()
+            }
+        )
+    return targets
+
+
+def control_lsb_xmin_mismatches(
+    instance: TTFont,
+    targets: dict[str, int],
+) -> dict[str, int]:
+    mismatches: dict[str, int] = {}
+    for glyph_name, target_lsb in targets.items():
+        bounds = glyph_bbox(instance, glyph_name)
+        if bounds is not None and int(bounds[0]) != int(target_lsb):
+            mismatches[glyph_name] = int(target_lsb) - int(bounds[0])
+    return mismatches
+
+
+def align_variable_outlines_to_lsb(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+) -> dict[str, Any]:
+    if "fvar" not in font or "gvar" not in font or "glyf" not in font:
+        raise ValueError("variable LSB/xMin alignment requires fvar, gvar and glyf")
+    default_weight = int(weight_axis(font).defaultValue)
+    default_reference = reference_fonts.get(default_weight)
+    default_metric_report = (
+        apply_default_vf_metric_reference(font, default_reference)
+        if default_reference is not None
+        else {}
+    )
+    default_targets = target_lsb_for_control(font, default_reference)
+    before, default_outline_report = align_default_outlines_to_lsb_targets(
+        font,
+        default_targets,
+    )
+    if default_outline_report["vf_default_lsb_xmin_mismatches_after"]:
+        raise RuntimeError(
+            "VF default LSB/xMin dependency alignment failed for "
+            f"{default_outline_report['vf_default_lsb_xmin_mismatches_after']} glyphs"
+        )
+
+    correction_weights = [
+        weight
+        for weight in sorted(SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT)
+        if weight != default_weight
+    ]
+    supports = advance_supports(font, correction_weights)
+    variation_corrections = 0
+    rounds = 0
+    while True:
+        pending: list[tuple[int, str, int]] = []
+        control_mismatches: dict[int, int] = {}
+        log_step(
+            f"VF LSB/xMin: inspect control points after {rounds} correction round(s)"
+        )
+        for weight in correction_weights:
+            instance = instantiateVariableFont(
+                font,
+                {"wght": weight},
+                inplace=False,
+                optimize=True,
+            )
+            try:
+                targets = target_lsb_for_control(
+                    instance,
+                    reference_fonts.get(weight),
+                )
+                mismatches = control_lsb_xmin_mismatches(instance, targets)
+            finally:
+                instance.close()
+            control_mismatches[weight] = len(mismatches)
+            pending.extend((weight, glyph_name, delta) for glyph_name, delta in mismatches.items())
+        if not pending:
+            break
+        rounds += 1
+        if rounds > 4:
+            raise RuntimeError(
+                "VF LSB/xMin control-point alignment did not converge: "
+                + json.dumps(control_mismatches, sort_keys=True)
+            )
+        for weight, glyph_name, delta in pending:
+            add_outline_translation_variation(
+                font,
+                glyph_name,
+                supports[weight],
+                delta,
+            )
+        variation_corrections += len(pending)
+        log_step(
+            f"VF LSB/xMin: applied {len(pending)} corrections in round {rounds}"
+        )
+
+    final_default = control_lsb_xmin_mismatches(font, default_targets)
+    if final_default:
+        raise RuntimeError(
+            f"VF default LSB/xMin alignment failed for {len(final_default)} glyphs"
+        )
+    previous_flags = int(font["head"].flags)
+    font["head"].flags = (previous_flags | 0x0002) & ~0x0020
+    return {
+        "vf_default_lsb_xmin_mismatches_before": len(before),
+        "vf_control_lsb_xmin_variation_corrections": variation_corrections,
+        "vf_lsb_xmin_alignment_rounds": rounds,
+        "vf_head_flags_before_lsb_alignment": previous_flags,
+        "vf_head_flags_after_lsb_alignment": int(font["head"].flags),
+        **default_outline_report,
+        **default_metric_report,
+    }
+
+
+def hvar_metrics_at_weight(
+    font: TTFont,
+    weight: int,
+    base_metrics: list[tuple[int, int, int]] | None = None,
+) -> dict[str, list[int]]:
+    hvar = font["HVAR"].table
+    normalized = vf_mapped_normalized_weight(font, weight)
+    location = {} if normalized == 0 else {"wght": normalized}
+    instancer = VarStoreInstancer(hvar.VarStore, font["fvar"].axes, location)
+    glyph_order = font.getGlyphOrder()
+    if base_metrics is None:
+        base_metrics = [
+            horizontal_glyph_metrics(font, glyph_name) for glyph_name in glyph_order
+        ]
+    result: dict[str, list[int]] = {}
+    for metric_index, metric in enumerate(("advance", "lsb", "rsb")):
+        var_data = hvar.VarStore.VarData[metric_index]
+        scalars = [instancer._getScalar(index) for index in var_data.VarRegionIndex]
+        result[metric] = [
+            base_metrics[glyph_id][metric_index]
+            + otRound(VarStoreInstancer.interpolateFromDeltasAndScalars(deltas, scalars))
+            for glyph_id, deltas in enumerate(var_data.Item)
+        ]
+    return result
+
+
+def vertical_glyph_metrics(font: TTFont, glyph_name: str) -> tuple[int, int, int, int]:
+    advance, tsb = font["vmtx"].metrics[glyph_name]
+    bounds = glyph_bbox(font, glyph_name)
+    outline_height = 0 if bounds is None else bounds[3] - bounds[1]
+    bsb = int(advance) - int(tsb) - int(outline_height)
+    vorg = glyph_vertical_origin(font, glyph_name)
+    return int(advance), int(tsb), bsb, vorg
+
+
+def combined_control_metrics(
+    font: TTFont,
+    reference: TTFont | None,
+) -> tuple[list[tuple[int, int, int]], list[tuple[int, int, int, int]]]:
+    h_targets = (
+        reference_cmap_metric_targets(font, reference, "hmtx")
+        if reference is not None
+        else {}
+    )
+    v_targets = (
+        reference_cmap_metric_targets(font, reference, "vmtx")
+        if reference is not None
+        else {}
+    )
+    horizontal: list[tuple[int, int, int]] = []
+    vertical: list[tuple[int, int, int, int]] = []
+    for glyph_name in font.getGlyphOrder():
+        bounds = glyph_bbox(font, glyph_name)
+
+        h_advance, stored_lsb = font["hmtx"].metrics[glyph_name]
+        lsb = int(stored_lsb) if bounds is None else int(bounds[0])
+        if glyph_name in h_targets:
+            h_advance, lsb = h_targets[glyph_name]
+        outline_width = 0 if bounds is None else int(bounds[2]) - int(bounds[0])
+        horizontal.append(
+            (
+                int(h_advance),
+                int(lsb),
+                int(h_advance) - int(lsb) - outline_width,
+            )
+        )
+
+        v_advance, stored_tsb = font["vmtx"].metrics[glyph_name]
+        if bounds is None:
+            tsb = int(stored_tsb)
+            outline_height = 0
+            vorg = glyph_vertical_origin(font, glyph_name)
+        else:
+            tsb = glyph_vertical_origin(font, glyph_name) - int(bounds[3])
+            outline_height = int(bounds[3]) - int(bounds[1])
+            vorg = int(bounds[3]) + tsb
+        if glyph_name in v_targets:
+            v_advance, tsb = v_targets[glyph_name]
+            if bounds is not None:
+                vorg = int(bounds[3]) + int(tsb)
+        vertical.append(
+            (
+                int(v_advance),
+                int(tsb),
+                int(v_advance) - int(tsb) - outline_height,
+                int(vorg),
+            )
+        )
+    return horizontal, vertical
+
+
+def build_direct_vvar(
+    font: TTFont,
+    model: VariationModel,
+    master_metrics: list[list[tuple[int, int, int, int]]],
+    base_metrics: list[tuple[int, int, int, int]],
+) -> dict[str, Any]:
+    glyph_order = font.getGlyphOrder()
+    supports = model.supports[1:]
+    region_list = var_builder.buildVarRegionList(supports, ["wght"])
+    metrics = ("advance", "tsb", "bsb", "vorg")
+    var_data_by_metric = {
+        metric: var_builder.buildVarData(
+            list(range(len(supports))),
+            [],
+            optimize=False,
+        )
+        for metric in metrics
+    }
+    default_master_index = model.reverseMapping[0]
+    for glyph_id, glyph_name in enumerate(glyph_order):
+        glyph_master_metrics = [values[glyph_id] for values in master_metrics]
+        if base_metrics[glyph_id] != master_metrics[default_master_index][glyph_id]:
+            raise ValueError(
+                f"VVAR default metric mismatch for {glyph_name}: "
+                f"{base_metrics[glyph_id]} != "
+                f"{master_metrics[default_master_index][glyph_id]}"
+            )
+        for metric_index, metric in enumerate(metrics):
+            values = [values[metric_index] for values in glyph_master_metrics]
+            deltas, glyph_supports = model.getDeltasAndSupports(values, round=round)
+            if glyph_supports[1:] != supports:
+                raise ValueError(f"VVAR support model mismatch for {glyph_name} {metric}")
+            var_data_by_metric[metric].addItem(deltas[1:], round=round)
+
+    table = font["VVAR"] = newTable("VVAR")
+    vvar = table.table = ot.VVAR()
+    vvar.Version = 0x00010000
+    vvar.VarStore = var_builder.buildVarStore(
+        region_list,
+        [var_data_by_metric[metric] for metric in metrics],
+    )
+    vvar.AdvHeightMap = None
+    vvar.TsbMap = var_builder.buildVarIdxMap(
+        [(1 << 16) | glyph_id for glyph_id in range(len(glyph_order))],
+        glyph_order,
+    )
+    vvar.BsbMap = var_builder.buildVarIdxMap(
+        [(2 << 16) | glyph_id for glyph_id in range(len(glyph_order))],
+        glyph_order,
+    )
+    vvar.VOrgMap = var_builder.buildVarIdxMap(
+        [(3 << 16) | glyph_id for glyph_id in range(len(glyph_order))],
+        glyph_order,
+    )
+    return var_data_by_metric
+
+
+def vvar_metrics_at_weight(
+    font: TTFont,
+    weight: int,
+    base_metrics: list[tuple[int, int, int, int]] | None = None,
+) -> dict[str, list[int]]:
+    vvar = font["VVAR"].table
+    normalized = vf_mapped_normalized_weight(font, weight)
+    location = {} if normalized == 0 else {"wght": normalized}
+    instancer = VarStoreInstancer(vvar.VarStore, font["fvar"].axes, location)
+    glyph_order = font.getGlyphOrder()
+    if base_metrics is None:
+        base_metrics = [
+            vertical_glyph_metrics(font, glyph_name) for glyph_name in glyph_order
+        ]
+    result: dict[str, list[int]] = {}
+    for metric_index, metric in enumerate(("advance", "tsb", "bsb", "vorg")):
+        var_data = vvar.VarStore.VarData[metric_index]
+        scalars = [instancer._getScalar(index) for index in var_data.VarRegionIndex]
+        result[metric] = [
+            base_metrics[glyph_id][metric_index]
+            + otRound(VarStoreInstancer.interpolateFromDeltasAndScalars(deltas, scalars))
+            for glyph_id, deltas in enumerate(var_data.Item)
+        ]
+    return result
+
+
+def optimize_direct_metric_var_store(
+    font: TTFont,
+    table_tag: str,
+    map_attributes: tuple[str, ...],
+) -> dict[str, int]:
+    table = font[table_tag].table
+    glyph_order = font.getGlyphOrder()
+    old_var_data_count = len(table.VarStore.VarData)
+    old_row_count = sum(len(var_data.Item) for var_data in table.VarStore.VarData)
+    mapping = table.VarStore.optimize(use_NO_VARIATION_INDEX=False)
+    for major, attribute in enumerate(map_attributes):
+        setattr(
+            table,
+            attribute,
+            var_builder.buildVarIdxMap(
+                [mapping[(major << 16) | glyph_id] for glyph_id in range(len(glyph_order))],
+                glyph_order,
+            ),
+        )
+    return {
+        f"{table_tag.lower()}_var_data_before_optimization": old_var_data_count,
+        f"{table_tag.lower()}_var_data_after_optimization": len(table.VarStore.VarData),
+        f"{table_tag.lower()}_rows_before_optimization": old_row_count,
+        f"{table_tag.lower()}_rows_after_optimization": sum(
+            len(var_data.Item) for var_data in table.VarStore.VarData
+        ),
+    }
+
+
+def serialized_font_bytes(font: TTFont) -> bytes:
+    stream = BytesIO()
+    recalc_timestamp = font.recalcTimestamp
+    font.recalcTimestamp = False
+    try:
+        font.save(stream, reorderTables=True)
+    finally:
+        font.recalcTimestamp = recalc_timestamp
+    return stream.getvalue()
+
+
+def refresh_metric_var_data_integer_widths(font: TTFont) -> int:
+    refreshed = 0
+    for table_tag in ("HVAR", "VVAR"):
+        if table_tag not in font:
+            continue
+        for var_data in font[table_tag].table.VarStore.VarData:
+            # Direct calibration mutates Item values after buildVarData chose
+            # their int8/int16 columns. Recompute only the storage widths here;
+            # reordering columns would invalidate peak_columns below.
+            var_data.calculateNumShorts(optimize=False)
+            refreshed += 1
+    return refreshed
+
+
+def calibrate_harfbuzz_metric_controls(
+    font: TTFont,
+    weights: list[int],
+    target_horizontal: dict[int, dict[str, list[int]]],
+    target_vertical: dict[int, dict[str, list[int]]],
+    vvar_data_by_metric: dict[str, Any],
+    peak_columns: dict[int, int],
+) -> dict[str, Any]:
+    default_weight = int(weight_axis(font).defaultValue)
+    supports = advance_supports(
+        font,
+        [weight for weight in weights if weight != default_weight],
+    )
+    glyph_order = font.getGlyphOrder()
+    rounds = 0
+    horizontal_corrections = 0
+    vertical_corrections = 0
+    maximum_horizontal_correction = 0
+    maximum_vertical_correction = 0
+    initial_mismatches_by_weight: dict[int, dict[str, int]] = {}
+    horizontal_correction_history: dict[tuple[int, str], list[int]] = {}
+    vertical_correction_history: dict[tuple[int, int], list[int]] = {}
+    while True:
+        refresh_metric_var_data_integer_widths(font)
+        data = serialized_font_bytes(font)
+        face = hb.Face(data)
+        hb_font = hb.Font(face)
+        hb_font.scale = (face.upem, face.upem)
+        horizontal_pending: list[tuple[int, str, int]] = []
+        vertical_pending: list[tuple[int, int, int]] = []
+        mismatches_by_weight: dict[int, tuple[int, int]] = {}
+        for weight in weights:
+            hb_font.set_variations({"wght": weight})
+            horizontal_count = 0
+            vertical_count = 0
+            for glyph_id, glyph_name in enumerate(glyph_order):
+                extents = hb_font.get_glyph_extents(glyph_id)
+                if extents is None:
+                    continue
+                expected_lsb = target_horizontal[weight]["lsb"][glyph_id]
+                if int(extents.x_bearing) != int(expected_lsb):
+                    horizontal_count += 1
+                    horizontal_pending.append(
+                        (
+                            weight,
+                            glyph_name,
+                            int(expected_lsb) - int(extents.x_bearing),
+                        )
+                    )
+                _origin_x, origin_y = hb_font.get_glyph_v_origin(glyph_id)
+                actual_tsb = int(origin_y) - int(extents.y_bearing)
+                expected_tsb = target_vertical[weight]["tsb"][glyph_id]
+                if actual_tsb != int(expected_tsb):
+                    vertical_count += 1
+                    vertical_pending.append(
+                        (
+                            weight,
+                            glyph_id,
+                            int(expected_tsb) - actual_tsb,
+                        )
+                    )
+            mismatches_by_weight[weight] = (horizontal_count, vertical_count)
+        if rounds == 0:
+            initial_mismatches_by_weight = {
+                weight: {
+                    "horizontal_side_bearing": counts[0],
+                    "vertical_side_bearing": counts[1],
+                }
+                for weight, counts in mismatches_by_weight.items()
+            }
+        if not horizontal_pending and not vertical_pending:
+            return {
+                "harfbuzz_metric_calibration_rounds": rounds,
+                "harfbuzz_metric_mismatches_before": sum(
+                    sum(counts.values())
+                    for counts in initial_mismatches_by_weight.values()
+                ),
+                "harfbuzz_metric_mismatches_before_by_weight": (
+                    initial_mismatches_by_weight
+                ),
+                "harfbuzz_horizontal_side_bearing_corrections": horizontal_corrections,
+                "harfbuzz_vertical_side_bearing_corrections": vertical_corrections,
+                "harfbuzz_maximum_horizontal_correction": maximum_horizontal_correction,
+                "harfbuzz_maximum_vertical_correction": maximum_vertical_correction,
+                "harfbuzz_metric_control_mismatches": 0,
+            }
+        if any(weight == default_weight for weight, _name, _delta in horizontal_pending):
+            raise RuntimeError(
+                "HarfBuzz default horizontal side bearing disagrees with glyf bounds"
+            )
+        if any(weight == default_weight for weight, _gid, _delta in vertical_pending):
+            raise RuntimeError(
+                "HarfBuzz default vertical side bearing disagrees with VORG/glyf bounds"
+            )
+        rounds += 1
+        if rounds > 4:
+            oscillation_samples = {
+                f"{weight}:{glyph_name}": history
+                for (weight, glyph_name), history in horizontal_correction_history.items()
+                if len(history) > 1
+            }
+            raise RuntimeError(
+                "HarfBuzz metric control calibration did not converge: "
+                + json.dumps(
+                    {
+                        "mismatches": mismatches_by_weight,
+                        "horizontal_correction_history": dict(
+                            list(oscillation_samples.items())[:24]
+                        ),
+                    },
+                    sort_keys=True,
+                )
+            )
+        log_step(
+            "VF metrics: HarfBuzz correction round "
+            f"{rounds}, horizontal={len(horizontal_pending)}, "
+            f"vertical={len(vertical_pending)}"
+        )
+        for weight, glyph_name, correction in horizontal_pending:
+            horizontal_correction_history.setdefault(
+                (weight, glyph_name),
+                [],
+            ).append(correction)
+            add_outline_translation_variation(
+                font,
+                glyph_name,
+                supports[weight],
+                correction,
+            )
+            maximum_horizontal_correction = max(
+                maximum_horizontal_correction,
+                abs(correction),
+            )
+        for weight, glyph_id, correction in vertical_pending:
+            vertical_correction_history.setdefault((weight, glyph_id), []).append(
+                correction
+            )
+            vvar_data_by_metric["vorg"].Item[glyph_id][peak_columns[weight]] += correction
+            maximum_vertical_correction = max(
+                maximum_vertical_correction,
+                abs(correction),
+            )
+        horizontal_corrections += len(horizontal_pending)
+        vertical_corrections += len(vertical_pending)
+
+
+def rebuild_vf_metric_variation_tables(
+    font: TTFont,
+    reference_fonts: dict[int, TTFont],
+) -> dict[str, Any]:
+    if "fvar" not in font or "gvar" not in font:
+        raise ValueError("VF metric variation rebuild requires fvar and gvar")
+    remove_metric_variation_maps(font)
+    weights, locations = metric_variation_control_locations(font)
+    model = VariationModel(locations, axisOrder=["wght"])
+    masters: list[TTFont] = []
+    try:
+        log_step("VF metrics: instantiate seven control points")
+        for weight in weights:
+            masters.append(
+                instantiateVariableFont(
+                    font,
+                    {"wght": weight},
+                    inplace=False,
+                    optimize=True,
+                )
+            )
+        glyph_order = font.getGlyphOrder()
+        log_step("VF metrics: scan horizontal and vertical control geometry")
+        base_metrics = [horizontal_glyph_metrics(font, name) for name in glyph_order]
+        combined_master_metrics = [
+            combined_control_metrics(master, reference_fonts.get(weight))
+            for weight, master in zip(weights, masters)
+        ]
+        master_metrics = [metrics[0] for metrics in combined_master_metrics]
+        target_metrics = {
+            weight: {
+                metric: [values[metric_index] for values in metrics]
+                for metric_index, metric in enumerate(("advance", "lsb", "rsb"))
+            }
+            for weight, metrics in zip(weights, master_metrics)
+        }
+        var_data_by_metric = build_direct_hvar(
+            font,
+            model,
+            master_metrics,
+            base_metrics,
+        )
+        peak_columns = {
+            weight: next(
+                index
+                for index, support in enumerate(model.supports[1:])
+                if support["wght"][1]
+                == floatToFixedToFloat(vf_mapped_normalized_weight(font, weight), 14)
+            )
+            for weight in weights
+            if weight != int(weight_axis(font).defaultValue)
+        }
+        calibration_rounds = 0
+        calibration_corrections = 0
+        log_step("VF metrics: calibrate HVAR control values")
+        while True:
+            errors: dict[tuple[str, int, int], int] = {}
+            for weight in weights:
+                if weight == int(weight_axis(font).defaultValue):
+                    continue
+                actual_metrics = hvar_metrics_at_weight(font, weight, base_metrics)
+                for metric in ("advance", "lsb", "rsb"):
+                    for glyph_id, (actual_value, expected_value) in enumerate(
+                        zip(actual_metrics[metric], target_metrics[weight][metric])
+                    ):
+                        if actual_value != expected_value:
+                            errors[(metric, glyph_id, peak_columns[weight])] = (
+                                expected_value - actual_value
+                            )
+            if not errors:
+                break
+            calibration_rounds += 1
+            calibration_corrections += len(errors)
+            if calibration_rounds > 8:
+                raise RuntimeError(
+                    f"HVAR exact-weight calibration did not converge: {len(errors)} errors"
+                )
+            for (metric, glyph_id, column), correction in errors.items():
+                var_data_by_metric[metric].Item[glyph_id][column] += correction
+        vvar_calibration_rounds = 0
+        vvar_calibration_corrections = 0
+        vvar_optimization_report: dict[str, int] = {}
+        engine_metric_report: dict[str, int] = {}
+        if "vmtx" in font:
+            base_vertical_metrics = [
+                vertical_glyph_metrics(font, name) for name in glyph_order
+            ]
+            master_vertical_metrics = [
+                metrics[1] for metrics in combined_master_metrics
+            ]
+            target_vertical_metrics = {
+                weight: {
+                    metric: [values[metric_index] for values in metrics]
+                    for metric_index, metric in enumerate(
+                        ("advance", "tsb", "bsb", "vorg")
+                    )
+                }
+                for weight, metrics in zip(weights, master_vertical_metrics)
+            }
+            vvar_data_by_metric = build_direct_vvar(
+                font,
+                model,
+                master_vertical_metrics,
+                base_vertical_metrics,
+            )
+            log_step("VF metrics: calibrate VVAR control values")
+            while True:
+                errors: dict[tuple[str, int, int], int] = {}
+                for weight in weights:
+                    if weight == int(weight_axis(font).defaultValue):
+                        continue
+                    actual_metrics = vvar_metrics_at_weight(
+                        font,
+                        weight,
+                        base_vertical_metrics,
+                    )
+                    for metric in ("advance", "tsb", "bsb", "vorg"):
+                        for glyph_id, (actual_value, expected_value) in enumerate(
+                            zip(
+                                actual_metrics[metric],
+                                target_vertical_metrics[weight][metric],
+                            )
+                        ):
+                            if actual_value != expected_value:
+                                errors[(metric, glyph_id, peak_columns[weight])] = (
+                                    expected_value - actual_value
+                                )
+                if not errors:
+                    break
+                vvar_calibration_rounds += 1
+                vvar_calibration_corrections += len(errors)
+                if vvar_calibration_rounds > 8:
+                    raise RuntimeError(
+                        "VVAR exact-weight calibration did not converge: "
+                        f"{len(errors)} errors"
+                    )
+                for (metric, glyph_id, column), correction in errors.items():
+                    vvar_data_by_metric[metric].Item[glyph_id][column] += correction
+            log_step("VF metrics: calibrate serialized HarfBuzz side bearings")
+            engine_metric_report = calibrate_harfbuzz_metric_controls(
+                font,
+                weights,
+                target_metrics,
+                target_vertical_metrics,
+                vvar_data_by_metric,
+                peak_columns,
+            )
+            log_step("VF metrics: optimize HVAR/VVAR stores")
+            for var_data in var_data_by_metric.values():
+                var_data.optimize()
+            hvar_optimization_report = optimize_direct_metric_var_store(
+                font,
+                "HVAR",
+                ("AdvWidthMap", "LsbMap", "RsbMap"),
+            )
+            for var_data in vvar_data_by_metric.values():
+                var_data.optimize()
+            vvar_optimization_report = optimize_direct_metric_var_store(
+                font,
+                "VVAR",
+                ("AdvHeightMap", "TsbMap", "BsbMap", "VOrgMap"),
+            )
+        else:
+            for var_data in var_data_by_metric.values():
+                var_data.optimize()
+            hvar_optimization_report = optimize_direct_metric_var_store(
+                font,
+                "HVAR",
+                ("AdvWidthMap", "LsbMap", "RsbMap"),
+            )
+        return {
+            "metric_variation_control_weights": weights,
+            "hvar_explicit_optimized_mapping": True,
+            "hvar_calibration_rounds": calibration_rounds,
+            "hvar_calibration_corrections": calibration_corrections,
+            "hvar_lsb_map": True,
+            "hvar_rsb_map": True,
+            "vvar_rebuilt": "VVAR" in font,
+            "vvar_tsb_map": "VVAR" in font,
+            "vvar_bsb_map": "VVAR" in font,
+            "vvar_vorg_map": "VVAR" in font,
+            "vvar_calibration_rounds": vvar_calibration_rounds,
+            "vvar_calibration_corrections": vvar_calibration_corrections,
+            "vvar_exact_weight_advance_mismatches": 0,
+            **hvar_optimization_report,
+            **vvar_optimization_report,
+            **engine_metric_report,
+        }
+    finally:
+        for master in masters:
+            master.close()
 
 
 def drop_feature_records(table: Any, tags: set[str]) -> int:
@@ -6390,9 +8512,12 @@ def link_lookup_to_all_gsub_features(font: TTFont, tag: str, lookup_index: int) 
     return 1
 
 
-def add_language_specific_dash_locl(
+def add_language_specific_locl(
     font: TTFont,
     mappings: dict[str, dict[str, str]],
+    *,
+    report_prefix: str,
+    purpose: str,
 ) -> dict[str, int]:
     gsub = font["GSUB"].table
     lookup_by_mapping: dict[tuple[tuple[str, str], ...], int] = {}
@@ -6403,7 +8528,7 @@ def add_language_specific_dash_locl(
     for language, mapping in mappings.items():
         records = langsys_records_for_language(font, language)
         if not records:
-            raise ValueError(f"missing GSUB LangSys for dash locl language {language}")
+            raise ValueError(f"missing GSUB LangSys for {purpose} locl language {language}")
         mapping_signature = tuple(sorted(mapping.items()))
         for langsys in records:
             feature_indices = [
@@ -6422,7 +8547,7 @@ def add_language_specific_dash_locl(
             if previous_mapping != mapping_signature:
                 raise ValueError(
                     "one GSUB locl FeatureRecord is shared by incompatible "
-                    "dash language mappings"
+                    f"{purpose} language mappings"
                 )
             linked_features.add(feature_index)
             langsys_linked += 1
@@ -6468,10 +8593,114 @@ def add_language_specific_dash_locl(
             langsys.FeatureCount = len(langsys.FeatureIndex)
             langsys_linked += 1
     return {
-        "upstream_dash_locl_lookups_added": lookups_added,
-        "upstream_dash_locl_features_added": features_added,
-        "upstream_dash_locl_existing_features_linked": len(linked_features),
-        "upstream_dash_locl_langsys_linked": langsys_linked,
+        f"{report_prefix}_locl_lookups_added": lookups_added,
+        f"{report_prefix}_locl_features_added": features_added,
+        f"{report_prefix}_locl_existing_features_linked": len(linked_features),
+        f"{report_prefix}_locl_langsys_linked": langsys_linked,
+    }
+
+
+def apply_cjk_ellipsis_behavior(font: TTFont) -> dict[str, Any]:
+    if "GSUB" not in font or "glyf" not in font:
+        return {"cjk_ellipsis_behavior_applied": False}
+    current_status = cjk_ellipsis_structure_status(font)
+    if current_status["ok"]:
+        return {
+            "cjk_ellipsis_behavior_applied": False,
+            "cjk_ellipsis_already_valid": True,
+            "cjk_ellipsis_mechanism": current_status["mechanism"],
+            "cjk_ellipsis_roles": current_status["roles"],
+        }
+    roles = cjk_ellipsis_roles(font)
+    localized_mappings: dict[str, dict[str, str]] = {}
+    for language in sorted(CJK_LOCL_LANGUAGES):
+        existing = langsys_single_substitution_mapping(font, language, "locl")
+        if existing.get(roles["proportional"]) != roles["fullwidth"]:
+            localized_mappings[language] = {
+                roles["proportional"]: roles["fullwidth"],
+            }
+    report: dict[str, Any] = add_language_specific_locl(
+        font,
+        localized_mappings,
+        report_prefix="cjk_ellipsis",
+        purpose="CJK ellipsis",
+    )
+    for tag in ("vert", "vrt2"):
+        vertical_mapping = {
+            source_name: roles["vertical"]
+            for source_name in (roles["proportional"], roles["fullwidth"])
+        }
+        lookup_index = append_gsub_lookup(
+            font,
+            make_single_substitution_lookup(vertical_mapping),
+        )
+        linked = link_lookup_to_all_gsub_features(font, tag, lookup_index)
+        report[f"cjk_ellipsis_{tag}_mappings_added"] = len(vertical_mapping)
+        report[f"cjk_ellipsis_{tag}_feature_records_linked"] = linked
+    report.update(
+        {
+            "cjk_ellipsis_behavior_applied": True,
+            "cjk_ellipsis_mechanism": "Ui proportional default; CJK locl fullwidth; vert/vrt2 vertical",
+            "cjk_ellipsis_roles": roles,
+        }
+    )
+    return report
+
+
+def cjk_ellipsis_structure_status(font: TTFont) -> dict[str, Any]:
+    reasons: list[str] = []
+    try:
+        roles = cjk_ellipsis_roles(font)
+    except Exception as error:
+        return {
+            "ok": False,
+            "reasons": [f"could not resolve CJK ellipsis roles: {error}"],
+        }
+    if roles["proportional"] == roles["fullwidth"]:
+        reasons.append("U+2026 proportional and U+22EF CJK ellipsis are not distinct")
+    locl: dict[str, dict[str, str]] = {}
+    for language in sorted(CJK_LOCL_LANGUAGES):
+        mapping = langsys_single_substitution_mapping(font, language, "locl")
+        actual = mapping.get(roles["proportional"])
+        locl[language] = {roles["proportional"]: actual} if actual else {}
+        if actual != roles["fullwidth"]:
+            reasons.append(
+                f"{language} ellipsis locl maps to {actual!r}, "
+                f"expected {roles['fullwidth']!r}"
+            )
+    vertical_records: dict[str, list[int]] = {}
+    for tag in ("vert", "vrt2"):
+        records = single_substitution_mappings_by_feature_record(font, tag)
+        vertical_records[tag] = [feature_index for feature_index, _mapping in records]
+        if not records:
+            reasons.append(f"no {tag} FeatureRecord is available for CJK ellipsis")
+        for feature_index, mapping in records:
+            for source_name in (roles["proportional"], roles["fullwidth"]):
+                if mapping.get(source_name) != roles["vertical"]:
+                    reasons.append(
+                        f"{tag} FeatureRecord {feature_index} maps {source_name}->"
+                        f"{mapping.get(source_name)!r}, expected {roles['vertical']!r}"
+                    )
+    upem = int(font["head"].unitsPerEm)
+    fullwidth_advance = int(font["hmtx"].metrics[roles["fullwidth"]][0])
+    if fullwidth_advance != upem:
+        reasons.append(
+            f"CJK ellipsis horizontal advance {fullwidth_advance} != {upem}"
+        )
+    vertical_advance = int(font["vmtx"].metrics[roles["vertical"]][0])
+    if vertical_advance != upem:
+        reasons.append(
+            f"CJK ellipsis vertical advance {vertical_advance} != {upem}"
+        )
+    return {
+        "ok": not reasons,
+        "reasons": reasons,
+        "mechanism": "Ui proportional default; CJK locl fullwidth; vert/vrt2 vertical",
+        "roles": roles,
+        "locl": locl,
+        "vertical_feature_records": vertical_records,
+        "fullwidth_advance": fullwidth_advance,
+        "vertical_advance": vertical_advance,
     }
 
 
@@ -6544,7 +8773,14 @@ def apply_upstream_dash_behavior(
         ccmp_lookup,
     )
 
-    report.update(add_language_specific_dash_locl(font, localized_mappings))
+    report.update(
+        add_language_specific_locl(
+            font,
+            localized_mappings,
+            report_prefix="upstream_dash",
+            purpose="dash",
+        )
+    )
     vertical_mapping = {
         roles["fullwidth"]: roles["vertical_single"],
         roles["fullwidth_two"]: roles["vertical_two"],
@@ -6558,6 +8794,7 @@ def apply_upstream_dash_behavior(
         report[f"upstream_dash_{tag}_feature_records_linked"] = (
             link_lookup_to_all_gsub_features(font, tag, vertical_lookup)
         )
+    report.update(apply_cjk_ellipsis_behavior(font))
 
     gdef = font["GDEF"].table if "GDEF" in font else None
     class_defs = getattr(getattr(gdef, "GlyphClassDef", None), "classDefs", None)
@@ -7720,6 +9957,10 @@ def upstream_dash_structure_status(font: TTFont, region: str) -> dict[str, Any]:
     }:
         if gdef_classes.get(glyph_name) != 2:
             reasons.append(f"{glyph_name} is not a GDEF ligature")
+    ellipsis_status = cjk_ellipsis_structure_status(font)
+    reasons.extend(
+        f"ellipsis: {reason}" for reason in ellipsis_status.get("reasons", [])
+    )
     return {
         "ok": not reasons,
         "reasons": reasons,
@@ -7729,6 +9970,7 @@ def upstream_dash_structure_status(font: TTFont, region: str) -> dict[str, Any]:
         "legacy_states": obsolete_states,
         "legacy_pair_positioning": obsolete_positioning,
         "catalan_nonempty_locl_records": catalan_nonempty,
+        "ellipsis": ellipsis_status,
     }
 
 
@@ -8052,8 +10294,12 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     base, sarasa_report = load_base(region, italic, set(inter.getBestCmap().keys()))
     reference_fonts: dict[int, TTFont] = {}
     try:
-        for weight_name, weight_value in REFERENCE_ADVANCE_STOPS:
-            reference_fonts[weight_value] = open_reference_font(region, weight_name, italic)
+        for weight_name, weight_value in VF_METRIC_REFERENCE_STOPS:
+            reference_fonts[weight_value] = open_vf_metric_reference_font(
+                region,
+                weight_name,
+                italic,
+            )
         log_step(f"variable {style_label}: merge outlines and layout")
         merge_report = append_inter_glyphs(base, inter, unicodes)
         remove_metric_variation_maps(base)
@@ -8138,8 +10384,12 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     base = TTFont(out_path)
     reference_fonts_roundtrip: dict[int, TTFont] = {}
     try:
-        for weight_name, weight_value in REFERENCE_ADVANCE_STOPS:
-            reference_fonts_roundtrip[weight_value] = open_reference_font(region, weight_name, italic)
+        for weight_name, weight_value in VF_METRIC_REFERENCE_STOPS:
+            reference_fonts_roundtrip[weight_value] = open_vf_metric_reference_font(
+                region,
+                weight_name,
+                italic,
+            )
         target_inter_roundtrip = load_inter(italic)
         try:
             log_step(f"variable {style_label}: roundtrip Inter outlines")
@@ -8189,6 +10439,116 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         italic=italic,
     )
     final_mac_name_report = remove_mac_name_records(base)
+
+    # Recompile every inherited tuple before the final outline and metric
+    # calibration.  Recompiling raw upstream gvar data after calibration can
+    # change composite interpolation by a few units and invalidate the control
+    # points that were just made exact.
+    log_step(f"variable {style_label}: materialize inherited gvar")
+    inherited_gvar_materialization_report = prefix_count_report(
+        materialize_gvar_variations(base),
+        "inherited_",
+    )
+    if inherited_gvar_materialization_report[
+        "inherited_gvar_coordinate_length_mismatches"
+    ]:
+        raise RuntimeError(
+            "VF inherited gvar coordinate lengths do not match glyf: "
+            + repr(
+                inherited_gvar_materialization_report[
+                    "inherited_gvar_coordinate_length_mismatch_samples"
+                ][:8]
+            )
+        )
+    base.save(out_path, reorderTables=True)
+    base.close()
+    base = TTFont(out_path)
+
+    final_metric_references: dict[int, TTFont] = {}
+    try:
+        for weight_name, weight_value in VF_METRIC_REFERENCE_STOPS:
+            final_metric_references[weight_value] = (
+                open_project_static_metric_reference_font(
+                    region,
+                    weight_name,
+                    italic,
+                )
+            )
+        log_step(f"variable {style_label}: align LSB/xMin control points")
+        lsb_xmin_alignment_report = align_variable_outlines_to_lsb(
+            base,
+            final_metric_references,
+        )
+        log_step(f"variable {style_label}: rebuild HVAR/VVAR")
+        metric_variation_report = rebuild_vf_metric_variation_tables(
+            base,
+            final_metric_references,
+        )
+    finally:
+        for metric_reference in final_metric_references.values():
+            metric_reference.close()
+
+    # Freeze the calibrated metric tuples before the last source-outline pass.
+    # That pass changes only relative component positions in composite Inter
+    # glyphs. A dependency-ordered follow-up restores xMin/yMax, then uniform
+    # whole-glyph translations make serialized HarfBuzz side bearings exact
+    # without changing the translation-invariant Inter outline match.
+    base.save(out_path, reorderTables=True)
+    base.close()
+    base = TTFont(out_path)
+    log_step(f"variable {style_label}: final Inter outline controls")
+    final_inter = load_inter(italic)
+    try:
+        (
+            final_inter_composite_report,
+            final_inter_composite_bounds,
+        ) = add_translation_invariant_inter_composite_corrections(
+            base,
+            final_inter,
+        )
+    finally:
+        final_inter.close()
+
+    log_step(f"variable {style_label}: freeze final outline geometry")
+    post_metric_gvar_report = prefix_count_report(
+        materialize_gvar_variations(base),
+        "post_metric_",
+    )
+    if post_metric_gvar_report["post_metric_gvar_coordinate_length_mismatches"]:
+        raise RuntimeError(
+            "VF post-metric gvar coordinate lengths do not match glyf: "
+            + repr(
+                post_metric_gvar_report[
+                    "post_metric_gvar_coordinate_length_mismatch_samples"
+                ][:8]
+            )
+        )
+    base.save(out_path, reorderTables=True)
+    base.close()
+    base = TTFont(out_path)
+
+    log_step(f"variable {style_label}: restore Inter composite metric bounds")
+    final_inter_bound_report = restore_inter_composite_control_bounds(
+        base,
+        final_inter_composite_bounds,
+    )
+    log_step(f"variable {style_label}: align Inter composite HarfBuzz metrics")
+    final_inter_engine_metric_report = align_inter_composite_harfbuzz_metrics(
+        base,
+        region,
+        italic,
+    )
+    log_step(f"variable {style_label}: materialize and validate final gvar")
+    gvar_finalization_report = materialize_gvar_variations(base)
+    if gvar_finalization_report["gvar_coordinate_length_mismatches"]:
+        raise RuntimeError(
+            "VF gvar coordinate lengths do not match the final glyf table: "
+            + repr(
+                gvar_finalization_report[
+                    "gvar_coordinate_length_mismatch_samples"
+                ][:8]
+            )
+        )
     base.save(out_path, reorderTables=True)
     base.close()
     base = TTFont(out_path)
@@ -8270,6 +10630,14 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         **contextual_spacing_report,
         **final_em_dash_ligature_report,
         **final_mac_name_report,
+        **inherited_gvar_materialization_report,
+        **lsb_xmin_alignment_report,
+        **metric_variation_report,
+        **final_inter_composite_report,
+        **post_metric_gvar_report,
+        **final_inter_bound_report,
+        **final_inter_engine_metric_report,
+        **gvar_finalization_report,
     }
 
 
@@ -8359,11 +10727,75 @@ def download_file_checked(url: str, path: Path, sha256: str) -> Path:
     return result
 
 
+def validate_archive_member_paths(names: list[str], destination: Path) -> None:
+    destination = destination.resolve()
+    for raw_name in names:
+        normalized = raw_name.replace("\\", "/")
+        posix_path = PurePosixPath(normalized)
+        windows_path = PureWindowsPath(raw_name)
+        if (
+            not normalized
+            or posix_path.is_absolute()
+            or windows_path.is_absolute()
+            or bool(windows_path.drive)
+            or ".." in posix_path.parts
+        ):
+            raise RuntimeError(f"unsafe archive member path: {raw_name!r}")
+        candidate = destination.joinpath(*posix_path.parts).resolve()
+        try:
+            candidate.relative_to(destination)
+        except ValueError as error:
+            raise RuntimeError(f"archive member escapes destination: {raw_name!r}") from error
+
+
+def validate_zip_archive(zf: zipfile.ZipFile, destination: Path) -> None:
+    infos = zf.infolist()
+    validate_archive_member_paths([info.filename for info in infos], destination)
+    symlinks = [
+        info.filename
+        for info in infos
+        if stat.S_IFMT(info.external_attr >> 16) == stat.S_IFLNK
+    ]
+    if symlinks:
+        raise RuntimeError(f"ZIP symlink members are not supported: {symlinks[0]!r}")
+
+
+def safe_extract_zip_all(zf: zipfile.ZipFile, destination: Path) -> None:
+    validate_zip_archive(zf, destination)
+    zf.extractall(destination)
+
+
+def safe_extract_tar_all(tf: tarfile.TarFile, destination: Path) -> None:
+    members = tf.getmembers()
+    validate_archive_member_paths([member.name for member in members], destination)
+    destination = destination.resolve()
+    for member in members:
+        if not (member.issym() or member.islnk()):
+            continue
+        member_path = PurePosixPath(member.name.replace("\\", "/"))
+        link_path = PurePosixPath(member.linkname.replace("\\", "/"))
+        windows_link = PureWindowsPath(member.linkname)
+        if link_path.is_absolute() or windows_link.is_absolute() or windows_link.drive:
+            raise RuntimeError(
+                f"unsafe archive link target: {member.name!r} -> {member.linkname!r}"
+            )
+        base = destination.joinpath(*member_path.parent.parts) if member.issym() else destination
+        target = base.joinpath(*link_path.parts).resolve()
+        try:
+            target.relative_to(destination)
+        except ValueError as error:
+            raise RuntimeError(
+                f"archive link escapes destination: {member.name!r} -> {member.linkname!r}"
+            ) from error
+    tf.extractall(destination, members=members, filter="data")
+
+
 def extract_zip_basename(archive: Path, basename: str, out_path: Path) -> Path:
     if out_path.exists():
         return out_path
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(archive) as zf:
+        validate_zip_archive(zf, out_path.parent)
         members = [name for name in zf.namelist() if Path(name).name == basename]
         if not members:
             raise FileNotFoundError(f"{basename} not found in {archive}")
@@ -8376,6 +10808,7 @@ def extract_zip_basename(archive: Path, basename: str, out_path: Path) -> Path:
 
 def extract_zip_first_basename(archive: Path, basenames: list[str], out_dir: Path) -> Path:
     with zipfile.ZipFile(archive) as zf:
+        validate_zip_archive(zf, out_dir)
         names = zf.namelist()
         for basename in basenames:
             members = [name for name in names if Path(name).name == basename]
@@ -8402,6 +10835,7 @@ def extract_7z_ttf_prefix(archive: Path, out_dir: Path, prefix: str) -> None:
         tmp_dir = Path(tmp_name)
         log_step(f"extract {archive.name}")
         with py7zr.SevenZipFile(archive) as zf:
+            validate_archive_member_paths(zf.getnames(), tmp_dir)
             zf.extractall(tmp_dir)
         for path in tmp_dir.rglob(f"{prefix}*.ttf"):
             shutil.copy2(path, out_dir / path.name)
@@ -8417,6 +10851,7 @@ def extract_7z_basename(archive: Path, basename: str, out_path: Path) -> Path:
         tmp_dir = Path(tmp_name)
         log_step(f"extract {basename}")
         with py7zr.SevenZipFile(archive) as zf:
+            validate_archive_member_paths(zf.getnames(), tmp_dir)
             members = [name for name in zf.getnames() if Path(name).name == basename]
             if not members:
                 raise FileNotFoundError(f"{basename} not found in {archive}")
@@ -8478,10 +10913,10 @@ def ensure_node_runtime() -> None:
     log_step(f"extract {archive_name}")
     if ext == "zip":
         with zipfile.ZipFile(archive) as zf:
-            zf.extractall(NODE_DIR)
+            safe_extract_zip_all(zf, NODE_DIR)
     else:
         with tarfile.open(archive, "r:xz") as tf:
-            tf.extractall(NODE_DIR)
+            safe_extract_tar_all(tf, NODE_DIR)
 
 
 def local_runtime_env() -> dict[str, str]:
@@ -8505,7 +10940,7 @@ def extract_zip_tree(archive: Path, out_dir: Path) -> None:
         tmp_dir = Path(tmp_name)
         log_step(f"extract {archive.name}")
         with zipfile.ZipFile(archive) as zf:
-            zf.extractall(tmp_dir)
+            safe_extract_zip_all(zf, tmp_dir)
         roots = [path for path in tmp_dir.iterdir() if path.is_dir()]
         source_root = roots[0] if len(roots) == 1 else tmp_dir
         shutil.copytree(source_root, out_dir, dirs_exist_ok=True)
@@ -8527,9 +10962,10 @@ def bootstrap_sarasa_source_tree() -> None:
             capture_output=False,
         )
         return
-    source_zip = download_file(
+    source_zip = download_file_checked(
         f"https://github.com/be5invis/Sarasa-Gothic/archive/{SARASA_COMMIT}.zip",
         SOURCE_ARCHIVE_DIR / f"Sarasa-Gothic-{SARASA_COMMIT}.zip",
+        SARASA_SOURCE_ARCHIVE_SHA256,
     )
     extract_zip_tree(source_zip, SARASA_SOURCE_DIR)
 
@@ -8726,7 +11162,7 @@ def optional_file_sha256(path: Path) -> str | None:
     return file_sha256(path) if path.exists() else None
 
 
-def stable_sfnt_sha256(path: Path) -> str:
+def stable_sfnt_fingerprint(path: Path) -> str:
     try:
         font = TTFont(path, recalcTimestamp=False)
         try:
@@ -8735,11 +11171,28 @@ def stable_sfnt_sha256(path: Path) -> str:
                 font["head"].modified = 0
             buffer = BytesIO()
             font.save(buffer, reorderTables=True)
-            return hashlib.sha256(buffer.getvalue()).hexdigest()
+            return "canonical-sfnt:" + hashlib.sha256(buffer.getvalue()).hexdigest()
         finally:
             font.close()
-    except Exception:
-        return file_sha256(path)
+    except (
+        TTLibError,
+        OSError,
+        EOFError,
+        KeyError,
+        ValueError,
+        AssertionError,
+        struct.error,
+    ) as error:
+        log_step(
+            f"cache fingerprint falls back to raw bytes for {path}: "
+            f"{type(error).__name__}: {error}"
+        )
+        return "raw-file:" + file_sha256(path)
+
+
+def static_hint_recipe_fingerprint() -> str:
+    payload = json.dumps(STATIC_HINT_RECIPE, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
 def chlorophytum_package_id() -> dict[str, Any]:
@@ -8764,9 +11217,10 @@ def static_hint_group_cache_key(
         "group": group_name,
         "config_name": config_name,
         "config_sha256": file_sha256(config_path),
-        "inputs": [stable_sfnt_sha256(path) for path, _hint, _weight in jobs],
+        "inputs": [stable_sfnt_fingerprint(path) for path, _hint, _weight in jobs],
         "chlorophytum": chlorophytum_package_id(),
         "hint_store_order": CHLOROPHYTUM_HINT_STORE_ORDER,
+        "hint_recipe_sha256": static_hint_recipe_fingerprint(),
     }
     text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -8805,17 +11259,21 @@ def static_hint_work_key(weight_name: str) -> str:
     payload = {
         "kind": "static-hint-work",
         "version": STATIC_HINT_WORK_VERSION,
-        "project_version": VERSION,
         "weight": weight_name,
         "config_name": config_name,
         "inputs": [
-            [str(path.resolve()), file_sha256(path)]
-            for path in permanent_inputs
+            {
+                "slot": index,
+                "name": path.name,
+                "sha256": file_sha256(path),
+            }
+            for index, path in enumerate(permanent_inputs)
         ],
         "ttfautohint_py": importlib.metadata.version("ttfautohint-py"),
         "afdko": importlib.metadata.version("afdko"),
         "sarasa_commit": SARASA_COMMIT,
         "chlorophytum": chlorophytum_package_id(),
+        "hint_recipe_sha256": static_hint_recipe_fingerprint(),
     }
     text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
@@ -9763,6 +12221,32 @@ def static_output_name(region: str, weight_name: str, italic: bool) -> str:
     return f"{prefix}-{weight_name}{'Italic' if italic else ''}.ttf"
 
 
+def static_postprocess_cache_key(
+    region: str,
+    weight_name: str,
+    weight_value: int,
+    italic: bool,
+    hinted: bool,
+) -> str:
+    payload = {
+        "kind": "static-postprocess",
+        "version": STATIC_POSTPROCESS_VERSION,
+        "project_version": VERSION,
+        "region": check_region(region),
+        "weight_name": weight_name,
+        "weight_value": int(weight_value),
+        "italic": bool(italic),
+        "hinted": bool(hinted),
+        "copyright": project_copyright(region),
+        "license_description": PROJECT_LICENSE_DESCRIPTION,
+        "license_url": PROJECT_LICENSE_URL,
+        "vendor_id": OS2_VENDOR_ID,
+        "codepage_range_1": OS2_CODEPAGE_RANGE_1,
+    }
+    text = json.dumps(payload, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
+
+
 def static_weight_output_paths(region: str, weight_name: str) -> list[tuple[Path, bool, bool]]:
     return [
         (static_dir(region, hinted) / static_output_name(region, weight_name, italic), hinted, italic)
@@ -9790,19 +12274,48 @@ def static_weight_resume_status(region: str, stop: dict[str, Any]) -> tuple[bool
             if "OS/2" not in font or int(font["OS/2"].ulCodePageRange1) != OS2_CODEPAGE_RANGE_1:
                 reasons.append(f"{label}: wrong codepage range")
             version_name = font["name"].getDebugName(5) if "name" in font else None
-            if not version_name or f"project {VERSION}" not in version_name:
+            variant_label = "hinted" if hinted else "unhinted"
+            if (
+                not version_name
+                or f"project {VERSION}" not in version_name
+                or not version_name.endswith(f"; {variant_label}")
+            ):
                 reasons.append(f"{label}: wrong project version")
+            unique_ids = {
+                record.toUnicode()
+                for record in font["name"].names
+                if record.nameID == 3
+            } if "name" in font else set()
+            if len(unique_ids) != 1 or not next(iter(unique_ids), "").endswith(
+                f";{variant_label}"
+            ):
+                reasons.append(f"{label}: wrong unique identifier")
             copyrights = {
                 record.toUnicode()
                 for record in font["name"].names
                 if record.nameID == 0
+            } if "name" in font else set()
+            license_descriptions = {
+                record.toUnicode()
+                for record in font["name"].names
+                if record.nameID == 13
+            } if "name" in font else set()
+            license_urls = {
+                record.toUnicode()
+                for record in font["name"].names
+                if record.nameID == 14
             } if "name" in font else set()
             source_only_legal_ids = {
                 record.nameID
                 for record in font["name"].names
                 if record.nameID in SOURCE_ONLY_LEGAL_NAME_IDS
             } if "name" in font else set()
-            if copyrights != {PROJECT_COPYRIGHT} or source_only_legal_ids:
+            if (
+                copyrights != {project_copyright(region)}
+                or license_descriptions != {PROJECT_LICENSE_DESCRIPTION}
+                or license_urls != {PROJECT_LICENSE_URL}
+                or source_only_legal_ids
+            ):
                 reasons.append(f"{label}: incomplete legal names")
             mac_name_records = sum(
                 record.platformID == 1 for record in font["name"].names
@@ -9811,7 +12324,15 @@ def static_weight_resume_status(region: str, stop: dict[str, Any]) -> tuple[bool
                 reasons.append(f"{label}: {mac_name_records} Macintosh name records")
             if "post" not in font or float(font["post"].formatType) != 3.0:
                 reasons.append(f"{label}: post is not format 3")
-            invalid_overlap_flags = count_ots_invalid_simple_overlap_flags(font)
+            raw_flag_stats = raw_simple_glyph_flag_stats(font)
+            if not raw_flag_stats["glyphs_checked"]:
+                reasons.append(f"{label}: raw glyf flag audit checked no simple glyphs")
+            if raw_flag_stats["malformed_glyphs"]:
+                reasons.append(
+                    f"{label}: {raw_flag_stats['malformed_glyphs']} malformed raw "
+                    "simple-glyph flag streams"
+                )
+            invalid_overlap_flags = raw_flag_stats["invalid_explicit_overlap_flags"]
             if invalid_overlap_flags:
                 reasons.append(
                     f"{label}: {invalid_overlap_flags} OTS-invalid explicit "
@@ -9825,6 +12346,12 @@ def static_weight_resume_status(region: str, stop: dict[str, Any]) -> tuple[bool
                 reasons.append(f"{label}: missing hints")
             if not hinted and (hint_tables or glyph_programs):
                 reasons.append(f"{label}: unexpected hints")
+            if not hinted:
+                if "maxp" not in font or int(font["maxp"].maxZones) != 1:
+                    reasons.append(f"{label}: unhinted maxp.maxZones is not 1")
+                gasp_ranges = dict(font["gasp"].gaspRange) if "gasp" in font else {}
+                if not gasp_ranges or max(gasp_ranges) != 0xFFFF:
+                    reasons.append(f"{label}: unhinted gasp lacks 0xFFFF sentinel")
             if not layout_has_feature(font, "GPOS", "chws"):
                 reasons.append(f"{label}: missing GPOS chws")
             if not layout_has_feature(font, "GPOS", "vchw"):
@@ -9868,6 +12395,131 @@ def skipped_static_weight_outputs(region: str, stop: dict[str, Any]) -> list[dic
     ]
 
 
+def sfnt_table_hashes(
+    path: Path,
+    excluded_tags: set[str] | None = None,
+) -> dict[str, str]:
+    excluded = set(excluded_tags or ())
+    font = TTFont(path, lazy=True, recalcTimestamp=False)
+    try:
+        return {
+            tag: hashlib.sha256(bytes(font.reader[tag])).hexdigest()
+            for tag in sorted(font.reader.tables)
+            if tag not in excluded
+        }
+    finally:
+        font.close()
+
+
+def refresh_static_finalization_font(
+    path: Path,
+    region: str,
+    weight_name: str,
+    weight_value: int,
+    italic: bool,
+    hinted: bool,
+) -> dict[str, Any]:
+    if not path.exists():
+        raise FileNotFoundError(path)
+    intentionally_changed = {"head", "maxp", "OS/2", "name", "gasp", "GSUB"}
+    before = sfnt_table_hashes(path, intentionally_changed)
+    tmp_path = path.with_name(path.name + ".finalization.tmp")
+    tmp_path.unlink(missing_ok=True)
+    font = TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False)
+    font.recalcBBoxes = False
+    try:
+        update_static_names(
+            font,
+            region,
+            weight_name,
+            weight_value,
+            italic,
+            hinted,
+        )
+        update_os2_sarasa_metadata(font)
+        raster_report = normalize_static_raster_metadata(font, hinted)
+        revision_report = update_head_project_revision(font)
+        mac_report = remove_mac_name_records(font)
+        ellipsis_before = cjk_ellipsis_structure_status(font)
+        ellipsis_report = apply_cjk_ellipsis_behavior(font)
+        font.save(tmp_path, reorderTables=True)
+    finally:
+        font.close()
+    try:
+        after = sfnt_table_hashes(tmp_path, intentionally_changed)
+        if before != after:
+            changed = sorted(
+                tag
+                for tag in set(before) | set(after)
+                if before.get(tag) != after.get(tag)
+            )
+            raise RuntimeError(
+                "finalization-only refresh changed protected SFNT tables: "
+                + ", ".join(changed)
+            )
+        verified = TTFont(tmp_path, lazy=False, recalcTimestamp=False)
+        try:
+            ellipsis_after = cjk_ellipsis_structure_status(verified)
+            layout_after = upstream_dash_structure_status(verified, region)
+        finally:
+            verified.close()
+        if not ellipsis_after["ok"]:
+            raise RuntimeError(
+                "finalization-only refresh failed CJK ellipsis validation: "
+                + "; ".join(ellipsis_after["reasons"])
+            )
+        if not layout_after["ok"]:
+            raise RuntimeError(
+                "finalization-only refresh failed punctuation layout validation: "
+                + "; ".join(layout_after["reasons"])
+            )
+        tmp_path.replace(path)
+    except Exception:
+        tmp_path.unlink(missing_ok=True)
+        raise
+    return {
+        "file": portable_report_path(path),
+        "region": region,
+        "weight": weight_name,
+        "wght": weight_value,
+        "italic": italic,
+        "hinted_variant": hinted,
+        "finalization_only_refresh": True,
+        "protected_table_count": len(before),
+        "cjk_ellipsis_before": ellipsis_before,
+        "cjk_ellipsis_after": ellipsis_after,
+        "punctuation_layout_after": layout_after,
+        **ellipsis_report,
+        **raster_report,
+        **revision_report,
+        **mac_report,
+    }
+
+
+def refresh_static_finalization_outputs(regions: list[str]) -> list[dict[str, Any]]:
+    outputs: list[dict[str, Any]] = []
+    for region in regions:
+        for stop in SOURCE_HAN_WEIGHT_STOPS:
+            weight_name = str(stop["name"])
+            weight_value = int(stop["value"])
+            for path, hinted, italic in static_weight_output_paths(region, weight_name):
+                log_step(
+                    f"static {region} {weight_name}{' Italic' if italic else ''} "
+                    f"{'hinted' if hinted else 'unhinted'}: finalization-only refresh"
+                )
+                outputs.append(
+                    refresh_static_finalization_font(
+                        path,
+                        region,
+                        weight_name,
+                        weight_value,
+                        italic,
+                        hinted,
+                    )
+                )
+    return outputs
+
+
 def postprocess_static_font(
     path: Path,
     region: str,
@@ -9887,6 +12539,13 @@ def postprocess_static_font(
     )
     report: dict[str, Any] = {
         "static_postprocess_version": STATIC_POSTPROCESS_VERSION,
+        "static_postprocess_cache_key": static_postprocess_cache_key(
+            region,
+            weight_name,
+            weight_value,
+            italic,
+            hinted,
+        ),
         "static_glyph_data_policy": (
             "official-sarasa-exact"
             if uses_official_glyph_baseline
@@ -9928,7 +12587,14 @@ def postprocess_static_font(
                 reference.close()
                 reference = None
                 raise
-        update_static_names(font, region, weight_name, weight_value, italic)
+        update_static_names(
+            font,
+            region,
+            weight_name,
+            weight_value,
+            italic,
+            hinted,
+        )
         update_os2_sarasa_metadata(font)
         rebuild_static_stat(font, weight_name, weight_value, italic)
         report.update(drop_generated_extra_tables(font, keep_stat=True))
@@ -9976,6 +12642,7 @@ def postprocess_static_font(
         # fontTools' subsetter recalculates ulCodePageRange1; restore Sarasa's
         # explicit metadata only after the final cmap subset has completed.
         update_os2_sarasa_metadata(font)
+        report.update(normalize_static_raster_metadata(font, hinted))
         report.update(normalize_static_post_table(font))
         report.update(update_head_project_revision(font))
         report.update(force_recompile_glyf(font))
@@ -10068,8 +12735,14 @@ def prepare_static_style(
         )
         if (
             unhinted_report is not None
-            and unhinted_report.get("static_postprocess_version")
-            == STATIC_POSTPROCESS_VERSION
+            and unhinted_report.get("static_postprocess_cache_key")
+            == static_postprocess_cache_key(
+                region,
+                weight_name,
+                weight_value,
+                italic,
+                False,
+            )
         ):
             log_step(f"static {style_label}: reuse completed unhinted output")
         else:
@@ -10434,6 +13107,7 @@ def build_static_fonts(
                                 "key": work_key,
                                 "weight": weight_name,
                                 "version": STATIC_HINT_WORK_VERSION,
+                                "hint_recipe_sha256": static_hint_recipe_fingerprint(),
                                 "created_by": "tools/build_sarasa_ui_propdigits_sc.py",
                             },
                             ensure_ascii=False,
@@ -10755,6 +13429,14 @@ Inter 的 colon-run 规则。
 破折号笔画厚度、少量 side bearing 和比例 advance 会随字重变化，固定的是
 CJK 的 1em/2em/3em 语义与中宫基线。Italic 使用对应正体轮廓的 9.4 度剪切。
 
+省略号保留 Source Han/Shanggu 的语言语义：拉丁文字上下文（Latn/en）下，
+U+2026 是下沉的比例字形；CJK 文字上下文中的 JAN/KOR/ZHH/ZHS/ZHT
+locl 把它切换为居中的 1em 全宽字形，因此连续两个 U+2026 保持两个 glyph
+并严格占 2em；vert/vrt2 再切换到现成的竖排字形。中文应传入 Hani/zh-Hans、
+Hani/zh-Hant 或 Hani/zh-HK，日文与韩文分别使用 Hani/ja、Hani/ko；缺少
+对应 CJK script/language 上下文时使用非 CJK 默认路径。该路由不新造轮廓、
+不合成连字，也不重新 hint。
+
 最终成品还会按 Noto CJK 的官方交付流程加入 GPOS chws/vchw：chws
 用于横排连续全角标点的上下文压缩，vchw 用于对应的竖排压缩。实现固定使用
 chws_tool 1.4.5 与 east-asian-spacing 1.4.5；Source Han Sans 2.005R
@@ -10768,7 +13450,9 @@ OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
 对应本仓库版本 {VERSION}；nameID 5 以 OpenType 数值 Version {OPENTYPE_VERSION}
 开头，并在后续 project 字段保留完整版本 {VERSION}。最终 name 表与官方
 Sarasa/Source Han 成品一样不保留 platform 1（Macintosh）记录；Windows/Unicode
-本地化名称和四方版权保持完整。
+本地化名称以及 Sarasa、Inter、Adobe、Google 的版权保持完整，CL 另保留
+Shanggu Fonts 的原版权声明。nameID 3/5 还会明确区分 hinted 与 unhinted，
+避免系统把两套文件视为重复字体。
 {hint_note}
 静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
 静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
@@ -10795,8 +13479,8 @@ glyf bbox 和组合字形结构；Noto chws/vchw 后处理结束后还会再次�
 时保留首点 OVERLAP_SIMPLE 语义，并优先用 OTS 可接受的首 flag repeat run
 保存重复 overlap flag；坐标替换使 x/y 压缩位不同、无法共用 repeat 时，只清除
 后续点上无语义且被 OTS 禁止的显式重复 bit 6。resume 与发布审计会解析原始
-flag stream。unhinted 套件中的 OTS maxZones/gasp 信息继承自上游 unhinted
-基线，返回码为 0。
+flag stream。unhinted 套件将 maxp.maxZones 规范为 1，并把 gasp 的最后范围
+规范为 0xFFFF sentinel；这不会加入 TrueType instructions，也不会改变 glyf。
 glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未编码字形会保留，
 不可达 glyph 数量差异视为构建产物。
 这些字体是修改派生版，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。
@@ -10809,8 +13493,16 @@ def write_static_readme(regions: list[str]) -> None:
         unhinted_dir = static_dir(region, False)
         hinted_dir.mkdir(parents=True, exist_ok=True)
         unhinted_dir.mkdir(parents=True, exist_ok=True)
-        (hinted_dir / "README.txt").write_text(static_readme_text(region, True), encoding="utf-8")
-        (unhinted_dir / "README.txt").write_text(static_readme_text(region, False), encoding="utf-8")
+        (hinted_dir / "README.txt").write_text(
+            static_readme_text(region, True),
+            encoding="utf-8",
+            newline="\n",
+        )
+        (unhinted_dir / "README.txt").write_text(
+            static_readme_text(region, False),
+            encoding="utf-8",
+            newline="\n",
+        )
 
 
 def portable_report_path(path: Path) -> str:
@@ -10845,14 +13537,11 @@ def sanitize_report_data(value: Any) -> Any:
 
 
 def assert_portable_report_text(text: str) -> None:
-    leaks = sorted(
-        set(
-            re.findall(
-                r"(?i)(?:(?<![a-z])[a-z]:[\\/]|/users/|\\users\\)[^\"\r\n]*",
-                text,
-            )
-        )
+    patterns = (
+        r"(?i)(?:(?<![a-z])[a-z]:[\\/]|/users/|\\users\\)[^\"\r\n]*",
+        r"(?i)(?<![a-z0-9:])/(?:home/[^/]+|root|mnt/[a-z])/(?:[^\"\r\n]*)",
     )
+    leaks = sorted({match for pattern in patterns for match in re.findall(pattern, text)})
     if leaks:
         raise ValueError(f"report contains local absolute paths: {leaks[:8]}")
 
@@ -10926,19 +13615,31 @@ def variable_two_em_dash_axis_status(
         language: str,
         direction: str,
         features: dict[str, bool] | None = None,
-    ) -> tuple[list[int], tuple[int, int]]:
+    ) -> tuple[list[int], tuple[int, int], list[tuple[int, int, int, int] | None]]:
         buffer = hb.Buffer()
         buffer.add_str(text)
-        buffer.script = "Hani"
+        buffer.script = "Latn" if language == "en" else "Hani"
         buffer.language = language
         buffer.direction = direction
         hb.shape(hb_font, buffer, features or {})
+        glyph_ids = [int(info.codepoint) for info in buffer.glyph_infos]
         return (
-            [int(info.codepoint) for info in buffer.glyph_infos],
+            glyph_ids,
             (
                 sum(int(position.x_advance) for position in buffer.glyph_positions),
                 sum(int(position.y_advance) for position in buffer.glyph_positions),
             ),
+            [
+                None
+                if (extent := hb_font.get_glyph_extents(glyph_id)) is None
+                else (
+                    int(extent.x_bearing),
+                    int(extent.y_bearing),
+                    int(extent.width),
+                    int(extent.height),
+                )
+                for glyph_id in glyph_ids
+            ],
         )
 
     failures: list[dict[str, Any]] = []
@@ -10964,7 +13665,9 @@ def variable_two_em_dash_axis_status(
         target_font.set_variations({"wght": weight})
         default_pair = shape(target_font, "——", "en", "ltr")
         default_triple = shape(target_font, "———", "en", "ltr")
-        shapes_checked += 2
+        english_ellipsis_single = shape(target_font, "…", "en", "ltr")
+        english_ellipsis = shape(target_font, "……", "en", "ltr")
+        shapes_checked += 4
         if len(default_pair[0]) != 1 or len(default_triple[0]) != 1:
             fail(
                 weight,
@@ -10987,6 +13690,27 @@ def variable_two_em_dash_axis_status(
             )
         previous_default_advances = default_advances
 
+        english_ellipsis_ok = (
+            len(english_ellipsis_single[0]) == 1
+            and len(english_ellipsis[0]) == 2
+            and english_ellipsis[0][0] == english_ellipsis[0][1]
+            and english_ellipsis[0][0] == english_ellipsis_single[0][0]
+            and english_ellipsis[1]
+            == (
+                2 * english_ellipsis_single[1][0],
+                2 * english_ellipsis_single[1][1],
+            )
+            and english_ellipsis[2][0] is not None
+            and english_ellipsis[2][1] is not None
+        )
+        if not english_ellipsis_ok:
+            fail(
+                weight,
+                "ellipsis-en-proportional-pair",
+                english_ellipsis,
+                "two identical lower proportional glyphs",
+            )
+
         for language in cjk_languages:
             horizontal = shape(target_font, "——", language, "ltr")
             vertical = shape(target_font, "——", language, "ttb")
@@ -11003,7 +13727,16 @@ def variable_two_em_dash_axis_status(
                     "calt": False,
                 },
             )
-            shapes_checked += 3
+            cjk_ellipsis = shape(target_font, "……", language, "ltr")
+            cjk_ellipsis_reference = shape(target_font, "⋯⋯", language, "ltr")
+            vertical_ellipsis = shape(target_font, "……", language, "ttb")
+            vertical_ellipsis_reference = shape(
+                target_font,
+                "⋯⋯",
+                language,
+                "ttb",
+            )
+            shapes_checked += 7
             if len(horizontal[0]) != 1 or horizontal[1] != (2 * upem, 0):
                 fail(
                     weight,
@@ -11028,6 +13761,48 @@ def variable_two_em_dash_axis_status(
                     f"{language}-vrt2-only",
                     [vrt2_only[0], vrt2_only[1]],
                     ["one glyph or Source Han's identical pair", (0, -2 * upem)],
+                )
+            cjk_ellipsis_ok = (
+                cjk_ellipsis == cjk_ellipsis_reference
+                and len(cjk_ellipsis[0]) == 2
+                and cjk_ellipsis[0][0] == cjk_ellipsis[0][1]
+                and cjk_ellipsis[1] == (2 * upem, 0)
+            )
+            if not cjk_ellipsis_ok:
+                fail(
+                    weight,
+                    f"{language}-ellipsis-horizontal",
+                    cjk_ellipsis,
+                    cjk_ellipsis_reference,
+                )
+            if (
+                vertical_ellipsis != vertical_ellipsis_reference
+                or len(vertical_ellipsis[0]) != 2
+                or vertical_ellipsis[0][0] != vertical_ellipsis[0][1]
+                or vertical_ellipsis[1] != (0, -2 * upem)
+            ):
+                fail(
+                    weight,
+                    f"{language}-ellipsis-vertical",
+                    vertical_ellipsis,
+                    vertical_ellipsis_reference,
+                )
+            if english_ellipsis_ok and cjk_ellipsis[2][0] is not None:
+                english_y = int(english_ellipsis[2][0][1])
+                cjk_y = int(cjk_ellipsis[2][0][1])
+                if english_y >= cjk_y:
+                    fail(
+                        weight,
+                        f"{language}-ellipsis-vertical-position",
+                        [english_y, cjk_y],
+                        "English U+2026 lower than CJK U+2026",
+                    )
+            else:
+                fail(
+                    weight,
+                    f"{language}-ellipsis-vertical-position",
+                    [english_ellipsis[2], cjk_ellipsis[2]],
+                    "measurable English and CJK U+2026 extents",
                 )
 
     source_parity: dict[str, Any] = {}
@@ -11089,7 +13864,17 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
     reasons: list[str] = []
     font: TTFont | None = None
     source: TTFont | None = None
+    inter_source: TTFont | None = None
     try:
+        raw_gvar = raw_gvar_integrity_status(path)
+        details["raw_gvar_integrity"] = raw_gvar
+        if not raw_gvar["ok"]:
+            reasons.append(
+                "invalid raw gvar point data: "
+                f"warnings={raw_gvar['gvar_raw_point_warning_count']}, "
+                "coordinate_length_mismatches="
+                f"{raw_gvar['gvar_coordinate_length_mismatches']}"
+            )
         # VariationIndex Device records live below lazily decompiled GPOS
         # subtables; a lazy font makes the recursive integrity scan see zero.
         font = TTFont(path, lazy=False, recalcTimestamp=False)
@@ -11165,8 +13950,19 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
         if not version_name or f"project {VERSION}" not in version_name:
             reasons.append(f"nameID 5 does not identify project {VERSION}")
         copyright_name = font["name"].getDebugName(0) if "name" in font else None
-        if copyright_name != PROJECT_COPYRIGHT:
-            reasons.append("nameID 0 is not the complete four-party copyright")
+        if copyright_name != project_copyright(region):
+            reasons.append("nameID 0 is not the complete regional copyright")
+        license_description = font["name"].getDebugName(13) if "name" in font else None
+        license_url = font["name"].getDebugName(14) if "name" in font else None
+        if license_description != PROJECT_LICENSE_DESCRIPTION or license_url != PROJECT_LICENSE_URL:
+            reasons.append("nameID 13/14 do not identify the project OFL license")
+        unique_ids = {
+            record.toUnicode()
+            for record in font["name"].names
+            if record.nameID == 3
+        } if "name" in font else set()
+        if len(unique_ids) != 1:
+            reasons.append("nameID 3 is not one language-independent unique identifier")
         mac_name_records = sum(
             record.platformID == 1 for record in font["name"].names
         ) if "name" in font else 0
@@ -11181,8 +13977,51 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
             abs_tol=1 / 65536,
         ):
             reasons.append(f"head.fontRevision is not {FONT_REVISION}")
+        if "head" in font:
+            head_flags = int(font["head"].flags)
+            details["head_flags"] = head_flags
+            if not head_flags & 0x0002:
+                reasons.append("head.flags bit 1 is not set for TrueType VF LSB=xMin")
+            if head_flags & 0x0020:
+                reasons.append("head.flags bit 5 must be clear in a variable font")
         if "MVAR" not in font:
             reasons.append("missing MVAR")
+        if "HVAR" not in font:
+            reasons.append("missing HVAR")
+        else:
+            hvar = font["HVAR"].table
+            if hvar.AdvWidthMap is None or hvar.LsbMap is None or hvar.RsbMap is None:
+                reasons.append("HVAR lacks complete advance/LSB/RSB mappings")
+        if "VVAR" not in font:
+            reasons.append("missing VVAR")
+        else:
+            vvar = font["VVAR"].table
+            if (
+                vvar.AdvHeightMap is None
+                or vvar.TsbMap is None
+                or vvar.BsbMap is None
+                or vvar.VOrgMap is None
+            ):
+                reasons.append("VVAR lacks complete advance/TSB/BSB/VOrg mappings")
+        default_lsb_xmin = lsb_xmin_mismatches(font)
+        details["default_lsb_xmin_mismatches"] = len(default_lsb_xmin)
+        if default_lsb_xmin:
+            reasons.append(
+                f"{len(default_lsb_xmin)} default glyphs have hmtx LSB != glyf xMin"
+            )
+        raw_flag_stats = raw_simple_glyph_flag_stats(font)
+        details["raw_simple_glyph_flags"] = raw_flag_stats
+        if not raw_flag_stats["glyphs_checked"]:
+            reasons.append("raw glyf flag audit checked no simple glyphs")
+        if raw_flag_stats["malformed_glyphs"]:
+            reasons.append(
+                f"{raw_flag_stats['malformed_glyphs']} malformed raw simple-glyph flag streams"
+            )
+        if raw_flag_stats["invalid_explicit_overlap_flags"]:
+            reasons.append(
+                f"{raw_flag_stats['invalid_explicit_overlap_flags']} OTS-invalid explicit "
+                "OVERLAP_SIMPLE flags"
+            )
         if not layout_has_feature(font, "GPOS", "chws"):
             reasons.append("missing GPOS chws")
         if not layout_has_feature(font, "GPOS", "vchw"):
@@ -11239,9 +14078,28 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
                     )
         else:
             details["two_em_dash"] = {"ok": False, "skipped": "invalid GDEF VarStore"}
+
+        inter_source = load_inter(italic)
+        inter_controls = inter_outline_control_status(font, inter_source)
+        details["inter_outline_controls"] = inter_controls
+        if not inter_controls["ok"]:
+            reasons.append(
+                "Inter outline controls are not source-aligned: "
+                + repr(inter_controls["mismatches_by_weight"])
+            )
+
+        engine_metrics = harfbuzz_named_metric_status(path, region, italic)
+        details["harfbuzz_named_metrics"] = engine_metrics
+        if not engine_metrics["ok"]:
+            reasons.append(
+                "HarfBuzz named-instance metrics do not match project static fonts: "
+                + repr(engine_metrics["counts_by_weight"])
+            )
     except Exception as error:
         reasons.append(f"font validation failed: {type(error).__name__}: {error}")
     finally:
+        if inter_source is not None:
+            inter_source.close()
         if source is not None:
             source.close()
         if font is not None:
@@ -11301,10 +14159,20 @@ def build_all(
     for path in required_paths:
         if not path.exists():
             raise FileNotFoundError(path)
+    log_step("static: build hinted and unhinted")
+    force_static_weights = set(force_static_weights or ())
+    static_outputs = build_static_fonts(
+        regions,
+        resume=resume_static,
+        force_weights=force_static_weights,
+    )
+    write_static_readme(regions)
     if static_only:
         log_step("variable: skipped by --static-only")
         variable_outputs = existing_variable_outputs()
     else:
+        # Static outputs are built first because all six published static styles
+        # are the final metric authority for the matching VF control points.
         variable_outputs = []
         for region in variable_regions(regions):
             for italic in (False, True):
@@ -11323,14 +14191,6 @@ def build_all(
                 result = build_one_variable(region, italic)
                 result["rebuilt"] = True
                 variable_outputs.append(result)
-    log_step("static: build hinted and unhinted")
-    force_static_weights = set(force_static_weights or ())
-    static_outputs = build_static_fonts(
-        regions,
-        resume=resume_static,
-        force_weights=force_static_weights,
-    )
-    write_static_readme(regions)
     report = {
         "family": "Sarasa Ui PropDigits",
         "version": VERSION,
@@ -11344,6 +14204,9 @@ def build_all(
         "build_script": "tools/build_sarasa_ui_propdigits_sc.py",
         "bootstrap_sources": {
             "sarasa_gothic": SARASA_TAG,
+            "sarasa_commit": SARASA_COMMIT,
+            "sarasa_source_archive_sha256": SARASA_SOURCE_ARCHIVE_SHA256,
+            "sarasa_package_lock_sha256": SARASA_PACKAGE_LOCK_SHA256,
             "sarasa_ui_ttf": f"{SARASA_VERSION} hinted/unhinted",
             "source_han_sans": SOURCE_HAN_TAG,
             "source_han_vf_archive_sha256": SOURCE_HAN_VF_ARCHIVE_SHA256,
@@ -11360,20 +14223,23 @@ def build_all(
             "east_asian_spacing": importlib.metadata.version("east-asian-spacing"),
             "chlorophytum_jobs": SARASA_HINT_JOBS,
             "hint_environment_prep_jobs": SARASA_HINT_PREP_JOBS,
+            "static_hint_recipe_sha256": static_hint_recipe_fingerprint(),
         },
         "source_base_by_region": {
-            region: str(source_han_vf_path(region)) for region in variable_regions(regions)
+            region: portable_report_path(source_han_vf_path(region))
+            for region in variable_regions(regions)
         },
         "classical_vf_override_by_region": {
-            region: str(path)
+            region: portable_report_path(path)
             for region in variable_regions(regions)
             for path in [classical_vf_override_path(region)]
             if path
         },
-        "source_latin_upright": str(INTER_UPRIGHT),
-        "source_latin_italic": str(INTER_ITALIC),
+        "source_latin_upright": portable_report_path(INTER_UPRIGHT),
+        "source_latin_italic": portable_report_path(INTER_ITALIC),
         "reference_unicode_set_by_region": {
-            region: str(reference_font_path(region, "Regular", False)) for region in regions
+            region: portable_report_path(reference_font_path(region, "Regular", False))
+            for region in regions
         },
         "method": (
             "VF 由对应地区的 CJK VF 与 Inter VF 合并而来；SC/TC/HC/J/K 使用对应 "
@@ -11398,6 +14264,9 @@ def build_all(
             "全宽映射。静态轮廓逐字重来自对应 Source Han/Shanggu 静态源；VF 保留同一上游"
             "的 gvar 与 metric 变化。旧 Sarasa calt continuation、pair-start 和破折号 GPOS "
             "PairPos 全部删除。破折号不向 GPOS/GDEF 追加自定义 VariationIndex。合并后会"
+            "保留 U+2026 的非 CJK 下沉比例形式，并以 JAN/KOR/ZHH/ZHS/ZHT locl 恢复"
+            "居中 1em 形式；连续两个字符保持两个 glyph 与严格 2em，vert/vrt2 使用现有"
+            "竖排字形，不新造轮廓或重新 hint。"
             "同步或重映射 Inter layout FeatureParams 引用的界面名称记录；VF nameID 25 使用"
             "只含 ASCII 字母数字的 Variations PostScript Name Prefix。CJK Italic VF 在剪切前"
             "先于正体坐标空间展开全部 gvar IUP 隐含增量，再剪切基础轮廓和真实轮廓 delta，"
@@ -11412,7 +14281,12 @@ def build_all(
             "class/mark 模板时保留 Source Han ItemVariationStore，使 kern/palt/vpal 的 "
             "VariationIndex 继续随轴工作。Source Han 静态与 VF 的 palt/vpal 数值可能不同，"
             "因此五个官方同名字重的静态输出按 Sarasa 静态参考同步，Heavy 按同次 pass2 来源同步，"
-            "VF 输出保留 Source Han VF 可变值。VF 和静态输出都包含 "
+            "VF 输出保留 Source Han VF 可变值。VF 在最终 metric 校准前物化全部继承 gvar，"
+            "随后直接校正默认 400 的 Inter 基础复合组件，并对 200..900 的另外 12 个探测点中"
+            "超出 2 units 的字形追加组件坐标校正；按组件依赖恢复决定运行时 LSB/TSB 的 "
+            "xMin/yMax 后，再以不改变相对轮廓的整字平移校准 HarfBuzz 边距。简单字形、组件"
+            "数量或变换不匹配均硬失败。六个发布字重再由 HarfBuzz 对项目 unhinted 静态成品逐 cmap"
+            "要求 horizontal/vertical advance、LSB、TSB exact。VF 和静态输出都包含 "
             "STAT；静态 STAT 只描述单实例样式，不保留 fvar/gvar 可变表。glyph 总数不强行"
             "补齐到与上游一致：cmap 字形和布局可达的未编码字形会保留，不可达 glyph 数量"
             "差异不视为渲染缺陷。静态 TTF 从对应地区静态 Source Han Sans 和 Inter 源字体出发，"
@@ -11442,9 +14316,11 @@ def build_all(
             "公开字重遵循 Sarasa/CSS 口径：200、300、400、600、700、900；CJK 的 public 200/600 分别来自 Source Han ExtraLight 250/Medium 500。",
             "VF 与静态 TTF 都使用与 Inter 一致的上下文冒号 colon-run 行为。",
             "静态与 VF 都使用 Source Han/Shanggu 的 ccmp、地区 locl、vert/vrt2 破折号结构；非 CJK 比例路径、CJK 1em/2em/3em、KOR 单字特例和 CL 全局全宽映射分别跟随对应上游，轮廓与 metrics 随字重变化。",
+            "U+2026 在非 CJK 语言下保留下沉比例形式，在中日韩 locl 下切换为居中 1em 形式；连续两个字符严格占 2em，竖排复用上游现有字形。",
             "VF 与静态 TTF 都追加来自 Noto CJK 交付流程的 GPOS chws/vchw；Source Han Sans 2.005R 与 Sarasa 1.0.40 参考成品本身不含这两个 FeatureRecord。",
             "静态 CL 使用 Shanggu Sans 官方发布物作为旧字形轮廓来源；公开 cmap 与 GSUB/GPOS 模板按 SarasaUiCL 边界裁剪，五个官方同名字重的非数字 metrics 同步 SarasaUiCL，Heavy 900 保留 Shanggu Heavy 来源数据。",
             "静态 TTF 与上游一样使用 post format 3，不存储 glyph names；PropDigits 关系只由 cmap/GSUB 表达，不改 glyph order。",
+            "拉丁静态 TTF 跟随 Sarasa 静态 Inter 片段路径，拉丁 VF 跟随 Inter VF；不强制两条上游路径的完整 bbox 相同，但 Inter 的 7 个设计控制点、6 个中间探测点和六个发布字重的运行时 metrics 分别严格核验。",
             "Heavy 900 是本项目扩展实例；上游 Sarasa 公开静态系列止于 Bold 700。Bold 只作为 Heavy 的布局、命名和 hint 配置边界，Heavy 的 glyf、hmtx/vmtx、VORG、bbox 与 palt 保留 Source Han/Shanggu Heavy 和 Inter Black 构建结果。",
         ],
         "final_gsub_features": sorted(FINAL_GSUB_FEATURES),
@@ -11459,6 +14335,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--static-only", action="store_true", help="只重建静态 hinted/unhinted TTF，不重建 VF 输出。")
     parser.add_argument(
+        "--refresh-static-finalization-only",
+        action="store_true",
+        help="只刷新现有静态 TTF 的最终 GSUB、命名、法律信息与 unhinted 栅格表；除明确白名单表外逐表保护，不重新 hint。",
+    )
+    parser.add_argument(
         "--regions",
         default=",".join(REGION_ORDER),
         help="逗号分隔的输出地区列表，默认 CL,SC,TC,HC,J,K；hinted 分析环境仍固定包含六地区。",
@@ -11466,12 +14347,12 @@ def main() -> None:
     parser.add_argument(
         "--resume-variable",
         action="store_true",
-        help="校验现有 VF 的轴映射、实例、版本、版权、MVAR 与 chws/vchw；完整时跳过，否则重建。",
+        help="校验现有 VF 的轴映射、实例、版本、版权、gvar、MVAR、chws/vchw、破折号、省略号、Inter 轮廓控制点与 HarfBuzz 命名字重 metrics；完整时跳过，否则重建。",
     )
     parser.add_argument(
         "--resume-static",
         action="store_true",
-        help="逐文件验证静态输出的版本、metadata、hint、layout 与破折号结构；同一地区字重的四个文件全部通过时跳过，否则成组重建。",
+        help="逐文件验证静态输出的版本、metadata、hint、layout、破折号与省略号结构；同一地区字重的四个文件全部通过时跳过，否则成组重建。",
     )
     parser.add_argument(
         "--force-static-weights",
@@ -11482,6 +14363,27 @@ def main() -> None:
     force_static_weights = parse_static_weights(args.force_static_weights)
     if force_static_weights and not args.resume_static:
         parser.error("--force-static-weights requires --resume-static")
+    if args.refresh_static_finalization_only:
+        if args.static_only or args.resume_variable or args.resume_static or force_static_weights:
+            parser.error(
+                "--refresh-static-finalization-only cannot be combined with build/resume options"
+            )
+        regions = parse_regions(args.regions)
+        outputs = refresh_static_finalization_outputs(regions)
+        write_static_readme(regions)
+        print(
+            json.dumps(
+                {
+                    "mode": "static-finalization-only",
+                    "version": VERSION,
+                    "regions": regions,
+                    "outputs": outputs,
+                },
+                ensure_ascii=False,
+                indent=2,
+            )
+        )
+        return
     report = build_all(
         static_only=args.static_only,
         regions=parse_regions(args.regions),

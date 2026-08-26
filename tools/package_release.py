@@ -1,0 +1,254 @@
+from __future__ import annotations
+
+import argparse
+import hashlib
+import sys
+import zipfile
+from dataclasses import dataclass
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+
+import build_sarasa_ui_propdigits_sc as build  # noqa: E402
+
+
+ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
+REQUIRED_DOCUMENTS = ("LICENSE.txt", "NOTICE.md", "README.md")
+EXPECTED_EXTERNAL_ATTR = 0o100644 << 16
+SOURCE_DIGEST_CACHE: dict[tuple[Path, int, int], str] = {}
+
+
+@dataclass(frozen=True)
+class Package:
+    filename: str
+    files: tuple[tuple[Path, str], ...]
+
+
+def documentation_files() -> tuple[tuple[Path, str], ...]:
+    return (
+        (ROOT / "LICENSE", "LICENSE.txt"),
+        (ROOT / "NOTICE.md", "NOTICE.md"),
+        (ROOT / "README.md", "README.md"),
+    )
+
+
+def directory_files(directory: Path, prefix: str = "") -> tuple[tuple[Path, str], ...]:
+    if not directory.is_dir():
+        raise FileNotFoundError(directory)
+    return tuple(
+        (path, f"{prefix}{path.relative_to(directory).as_posix()}")
+        for path in sorted(directory.rglob("*"))
+        if path.is_file()
+    )
+
+
+def variable_files(region: str | None = None) -> tuple[tuple[Path, str], ...]:
+    regions = [region] if region else list(build.REGION_ORDER)
+    files = []
+    for current_region in regions:
+        for italic in (False, True):
+            path = build.VARIABLE_DIR / build.variable_output_name(current_region, italic)
+            files.append((path, path.name))
+    return tuple(files)
+
+
+def release_packages() -> list[Package]:
+    version = build.VERSION
+    docs = documentation_files()
+    packages: list[Package] = []
+    for region in build.REGION_ORDER:
+        packages.append(
+            Package(
+                f"Sarasa-Ui-VF-PropDigits-{region}-TTF-{version}.zip",
+                docs + variable_files(region),
+            )
+        )
+        hinted_dir = build.static_dir(region, True)
+        unhinted_dir = build.static_dir(region, False)
+        packages.append(
+            Package(
+                f"SarasaUiPropDigits{region}-TTF-{version}.zip",
+                docs + directory_files(hinted_dir),
+            )
+        )
+        packages.append(
+            Package(
+                f"SarasaUiPropDigits{region}-TTF-Unhinted-{version}.zip",
+                docs + directory_files(unhinted_dir),
+            )
+        )
+
+    packages.append(
+        Package(
+            f"Sarasa-Ui-VF-PropDigits-TTF-{version}.zip",
+            docs + variable_files(),
+        )
+    )
+    for hinted in (True, False):
+        variant = "TTF" if hinted else "TTF-Unhinted"
+        files = list(docs)
+        for region in build.REGION_ORDER:
+            directory = build.static_dir(region, hinted)
+            files.extend(directory_files(directory, f"{directory.name}/"))
+        packages.append(
+            Package(
+                f"SarasaUiPropDigits-{variant}-{version}.zip",
+                tuple(files),
+            )
+        )
+    if len(packages) != 21:
+        raise AssertionError(f"expected 21 release packages, got {len(packages)}")
+    return packages
+
+
+def zip_info(archive_name: str) -> zipfile.ZipInfo:
+    info = zipfile.ZipInfo(archive_name, ZIP_TIMESTAMP)
+    info.create_system = 3
+    info.external_attr = 0o100644 << 16
+    info.compress_type = zipfile.ZIP_DEFLATED
+    return info
+
+
+def package_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def source_sha256(path: Path) -> str:
+    stat = path.stat()
+    key = (path.resolve(), stat.st_size, stat.st_mtime_ns)
+    if key not in SOURCE_DIGEST_CACHE:
+        SOURCE_DIGEST_CACHE[key] = package_sha256(path)
+    return SOURCE_DIGEST_CACHE[key]
+
+
+def archive_member_sha256(archive: zipfile.ZipFile, name: str) -> str:
+    digest = hashlib.sha256()
+    with archive.open(name) as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def validate_package_sources(package: Package) -> None:
+    names = [archive_name for _path, archive_name in package.files]
+    if len(names) != len(set(names)):
+        duplicates = sorted({name for name in names if names.count(name) > 1})
+        raise ValueError(f"duplicate ZIP members in {package.filename}: {duplicates}")
+    missing_documents = sorted(set(REQUIRED_DOCUMENTS) - set(names))
+    if missing_documents:
+        raise ValueError(
+            f"{package.filename} lacks required documents: {missing_documents}"
+        )
+    for path, archive_name in package.files:
+        if not path.is_file():
+            raise FileNotFoundError(path)
+        build.validate_archive_member_paths([archive_name], ROOT)
+
+
+def write_package(package: Package, output_dir: Path) -> dict[str, object]:
+    validate_package_sources(package)
+    output_dir.mkdir(parents=True, exist_ok=True)
+    output = output_dir / package.filename
+    pending = output.with_suffix(output.suffix + ".tmp")
+    pending.unlink(missing_ok=True)
+    with zipfile.ZipFile(
+        pending,
+        "w",
+        compression=zipfile.ZIP_DEFLATED,
+        compresslevel=9,
+        allowZip64=True,
+    ) as archive:
+        for source, archive_name in sorted(package.files, key=lambda item: item[1]):
+            archive.writestr(
+                zip_info(archive_name),
+                source.read_bytes(),
+                compress_type=zipfile.ZIP_DEFLATED,
+                compresslevel=9,
+            )
+    pending.replace(output)
+    verify_package(output, package)
+    return {
+        "file": output.name,
+        "bytes": output.stat().st_size,
+        "sha256": package_sha256(output),
+        "members": len(package.files),
+    }
+
+
+def verify_package(path: Path, package: Package) -> None:
+    expected = sorted(archive_name for _source, archive_name in package.files)
+    sources = {archive_name: source for source, archive_name in package.files}
+    with zipfile.ZipFile(path) as archive:
+        actual = archive.namelist()
+        if actual != expected:
+            raise ValueError(f"ZIP member order/content mismatch in {path}")
+        if archive.testzip() is not None:
+            raise ValueError(f"ZIP CRC validation failed in {path}")
+        for info in archive.infolist():
+            if info.date_time != ZIP_TIMESTAMP:
+                raise ValueError(f"non-reproducible ZIP timestamp in {path}: {info.filename}")
+            if info.external_attr != EXPECTED_EXTERNAL_ATTR:
+                raise ValueError(f"unexpected ZIP permissions in {path}: {info.filename}")
+            if info.compress_type != zipfile.ZIP_DEFLATED:
+                raise ValueError(f"unexpected ZIP compression in {path}: {info.filename}")
+            source = sources[info.filename]
+            if info.file_size != source.stat().st_size:
+                raise ValueError(f"ZIP member size mismatch in {path}: {info.filename}")
+            if archive_member_sha256(archive, info.filename) != source_sha256(source):
+                raise ValueError(f"ZIP member SHA-256 mismatch in {path}: {info.filename}")
+        missing_documents = sorted(set(REQUIRED_DOCUMENTS) - set(actual))
+        if missing_documents:
+            raise ValueError(f"{path} lacks required documents: {missing_documents}")
+
+
+def write_checksums(output_dir: Path, results: list[dict[str, object]]) -> Path:
+    path = output_dir / "SHA256SUMS.txt"
+    lines = [f"{item['sha256']}  {item['file']}" for item in sorted(results, key=lambda item: str(item["file"]))]
+    path.write_text("\n".join(lines) + "\n", encoding="ascii", newline="\n")
+    return path
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="生成并核验 21 个可复现 Release ZIP。")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=ROOT / "dist" / f"v{build.VERSION}",
+        help="ZIP 输出目录。",
+    )
+    parser.add_argument(
+        "--verify-only",
+        action="store_true",
+        help="只核验输出目录中已有的 21 个 ZIP。",
+    )
+    args = parser.parse_args()
+    packages = release_packages()
+    results: list[dict[str, object]] = []
+    for index, package in enumerate(packages, start=1):
+        output = args.output_dir / package.filename
+        print(f"[package {index:02d}/21] {package.filename}", flush=True)
+        if args.verify_only:
+            validate_package_sources(package)
+            verify_package(output, package)
+            results.append(
+                {
+                    "file": output.name,
+                    "bytes": output.stat().st_size,
+                    "sha256": package_sha256(output),
+                    "members": len(package.files),
+                }
+            )
+        else:
+            results.append(write_package(package, args.output_dir))
+    checksums = write_checksums(args.output_dir, results)
+    print(f"[package] wrote {checksums}", flush=True)
+
+
+if __name__ == "__main__":
+    main()

@@ -1,243 +1,204 @@
 {
   "title": "Sarasa Ui PropDigits FontBakery 审计",
-  "generated_at": "2026-08-23 05:46:17 +0800",
+  "generated_at": "2026-08-26 22:29:54 +0800",
   "toolchain": {
     "fontbakery": "1.1.0",
     "fontbakery_bundled_opentype_sanitizer": "9.2.0",
     "independent_ots": "9.3.0"
   },
   "release_gate": {
-    "font_version": {
-      "fonts": 156,
-      "result_counts": {
+    "fonts": 156,
+    "selected_checks": {
+      "no_mac_entries": {
+        "PASS": 156
+      },
+      "opentype/STAT/ital_axis": {
+        "PASS": 6
+      },
+      "opentype/font_version": {
         "PASS": 156
       }
     },
-    "post_fix_no_mac_and_font_version_representatives": {
-      "checks": 10,
-      "result_counts": {
-        "PASS": 10
+    "per_region_batches": {
+      "CL": {
+        "fonts": 26,
+        "result_counts": {
+          "(not finished)": 0,
+          "PASS": 53
+        }
+      },
+      "SC": {
+        "fonts": 26,
+        "result_counts": {
+          "(not finished)": 0,
+          "PASS": 53
+        }
+      },
+      "TC": {
+        "fonts": 26,
+        "result_counts": {
+          "(not finished)": 0,
+          "PASS": 53
+        }
+      },
+      "HC": {
+        "fonts": 26,
+        "result_counts": {
+          "(not finished)": 0,
+          "PASS": 53
+        }
+      },
+      "J": {
+        "fonts": 26,
+        "result_counts": {
+          "(not finished)": 0,
+          "PASS": 53
+        }
+      },
+      "K": {
+        "fonts": 26,
+        "result_counts": {
+          "(not finished)": 0,
+          "PASS": 53
+        }
       }
     },
-    "upright_italic_stat_pair": {
-      "checks": 1,
-      "result_counts": {
-        "PASS": 1
-      }
+    "total_result_counts": {
+      "PASS": 318
     },
-    "all_font_mac_name_records": {
-      "fonts": 156,
-      "fonts_changed": 156,
-      "records_removed": 732,
-      "remaining": 0,
-      "unexpected_changed_tables": 0
-    },
+    "all_batches_exit_zero": true,
     "independent_ots": {
       "fonts": 156,
       "successful": 156,
-      "failures": 0
+      "unexpected_messages": 0
+    },
+    "main_audit": {
+      "passed": true,
+      "total_failures": 0
     },
     "unexplained_project_specific_failures": []
   },
-  "representative_full_profiles": [
-    {
-      "case": "SC Regular hinted static",
-      "checks": 127,
-      "original_result_counts": {
-        "FAIL": 4,
-        "INFO": 3,
-        "PASS": 73,
-        "SKIP": 39,
-        "WARN": 8
-      },
-      "warnings": [
-        "contour_count",
-        "math_signs_width",
-        "opentype/gdef_mark_chars",
-        "opentype/gdef_spacing_marks",
-        "opentype/post_table_version",
-        "opentype/xavgcharwidth",
-        "overlapping_path_segments",
-        "stylisticset_description"
-      ],
-      "failures_found": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "no_mac_entries"
-      ],
-      "corrected_after_profile": [
-        "no_mac_entries"
-      ],
-      "single-file_invocation_artifacts": [],
-      "expected_upstream_or_profile_limit_failures_remaining": [
-        "base_has_width",
-        "case_mapping",
-        "file_size"
-      ]
+  "representative_full_profile": {
+    "inputs": [
+      "SC Regular hinted static",
+      "SC Regular unhinted static",
+      "SC Heavy hinted static",
+      "SC Heavy Italic hinted static",
+      "SC upright VF",
+      "SC Italic VF"
+    ],
+    "result_counts": {
+      "(not finished)": 0,
+      "FAIL": 29,
+      "INFO": 18,
+      "PASS": 409,
+      "SKIP": 198,
+      "WARN": 48
     },
-    {
-      "case": "SC Regular unhinted static",
-      "checks": 127,
-      "original_result_counts": {
-        "FAIL": 5,
-        "INFO": 3,
-        "PASS": 70,
-        "SKIP": 40,
-        "WARN": 9
+    "checks": 702,
+    "issues_by_filename": {
+      "<family>": {
+        "FAIL": [
+          "family/single_directory",
+          "opentype/family/bold_italic_unique_for_nameid1",
+          "opentype/family/consistent_family_name",
+          "opentype/family/underline_thickness",
+          "opentype/varfont/family_axis_ranges",
+          "typographic_family_name"
+        ]
       },
-      "warnings": [
-        "contour_count",
-        "math_signs_width",
-        "opentype/gdef_mark_chars",
-        "opentype/gdef_spacing_marks",
-        "opentype/post_table_version",
-        "opentype/xavgcharwidth",
-        "ots",
-        "overlapping_path_segments",
-        "stylisticset_description"
-      ],
-      "failures_found": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "no_mac_entries",
-        "smart_dropout"
-      ],
-      "corrected_after_profile": [
-        "no_mac_entries"
-      ],
-      "single-file_invocation_artifacts": [],
-      "expected_upstream_or_profile_limit_failures_remaining": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "smart_dropout"
-      ]
-    },
-    {
-      "case": "SC Heavy Italic hinted static",
-      "checks": 127,
-      "original_result_counts": {
-        "FAIL": 5,
-        "INFO": 3,
-        "PASS": 68,
-        "SKIP": 43,
-        "WARN": 8
+      "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf": {
+        "FAIL": [
+          "base_has_width",
+          "case_mapping",
+          "file_size",
+          "name/family_and_style_max_length",
+          "smart_dropout"
+        ],
+        "WARN": [
+          "math_signs_width",
+          "opentype/gdef_mark_chars",
+          "opentype/gdef_spacing_marks",
+          "opentype/post_table_version",
+          "opentype/xavgcharwidth",
+          "overlapping_path_segments",
+          "stylisticset_description",
+          "unreachable_glyphs"
+        ]
       },
-      "warnings": [
-        "contour_count",
-        "math_signs_width",
-        "opentype/gdef_mark_chars",
-        "opentype/gdef_spacing_marks",
-        "opentype/post_table_version",
-        "opentype/xavgcharwidth",
-        "overlapping_path_segments",
-        "stylisticset_description"
-      ],
-      "failures_found": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "no_mac_entries",
-        "opentype/STAT/ital_axis"
-      ],
-      "corrected_after_profile": [
-        "no_mac_entries"
-      ],
-      "single-file_invocation_artifacts": [
-        "opentype/STAT/ital_axis"
-      ],
-      "expected_upstream_or_profile_limit_failures_remaining": [
-        "base_has_width",
-        "case_mapping",
-        "file_size"
-      ]
-    },
-    {
-      "case": "SC upright VF",
-      "checks": 127,
-      "original_result_counts": {
-        "FAIL": 6,
-        "INFO": 3,
-        "PASS": 88,
-        "SKIP": 22,
-        "WARN": 8
+      "Sarasa-Ui-VF-PropDigits-SC[wght].ttf": {
+        "FAIL": [
+          "base_has_width",
+          "case_mapping",
+          "file_size",
+          "name/family_and_style_max_length",
+          "smart_dropout"
+        ],
+        "WARN": [
+          "math_signs_width",
+          "opentype/gdef_mark_chars",
+          "opentype/gdef_spacing_marks",
+          "opentype/post_table_version",
+          "opentype/xavgcharwidth",
+          "overlapping_path_segments",
+          "stylisticset_description",
+          "unreachable_glyphs"
+        ]
       },
-      "warnings": [
-        "math_signs_width",
-        "opentype/gdef_mark_chars",
-        "opentype/gdef_spacing_marks",
-        "opentype/post_table_version",
-        "opentype/xavgcharwidth",
-        "overlapping_path_segments",
-        "stylisticset_description",
-        "unreachable_glyphs"
-      ],
-      "failures_found": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "name/family_and_style_max_length",
-        "no_mac_entries",
-        "smart_dropout"
-      ],
-      "corrected_after_profile": [
-        "no_mac_entries"
-      ],
-      "single-file_invocation_artifacts": [],
-      "expected_upstream_or_profile_limit_failures_remaining": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "name/family_and_style_max_length",
-        "smart_dropout"
-      ]
-    },
-    {
-      "case": "SC Italic VF",
-      "checks": 127,
-      "original_result_counts": {
-        "FAIL": 7,
-        "INFO": 3,
-        "PASS": 88,
-        "SKIP": 21,
-        "WARN": 8
+      "SarasaUiPropDigitsSC-Heavy.ttf": {
+        "FAIL": [
+          "base_has_width",
+          "case_mapping",
+          "file_size"
+        ],
+        "WARN": [
+          "contour_count",
+          "math_signs_width",
+          "opentype/gdef_mark_chars",
+          "opentype/gdef_spacing_marks",
+          "opentype/post_table_version",
+          "opentype/xavgcharwidth",
+          "overlapping_path_segments",
+          "stylisticset_description"
+        ]
       },
-      "warnings": [
-        "math_signs_width",
-        "opentype/gdef_mark_chars",
-        "opentype/gdef_spacing_marks",
-        "opentype/post_table_version",
-        "opentype/xavgcharwidth",
-        "overlapping_path_segments",
-        "stylisticset_description",
-        "unreachable_glyphs"
-      ],
-      "failures_found": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "name/family_and_style_max_length",
-        "no_mac_entries",
-        "opentype/STAT/ital_axis",
-        "smart_dropout"
-      ],
-      "corrected_after_profile": [
-        "no_mac_entries"
-      ],
-      "single-file_invocation_artifacts": [
-        "opentype/STAT/ital_axis"
-      ],
-      "expected_upstream_or_profile_limit_failures_remaining": [
-        "base_has_width",
-        "case_mapping",
-        "file_size",
-        "name/family_and_style_max_length",
-        "smart_dropout"
-      ]
+      "SarasaUiPropDigitsSC-HeavyItalic.ttf": {
+        "FAIL": [
+          "base_has_width",
+          "case_mapping",
+          "file_size"
+        ],
+        "WARN": [
+          "contour_count",
+          "math_signs_width",
+          "opentype/gdef_mark_chars",
+          "opentype/gdef_spacing_marks",
+          "opentype/post_table_version",
+          "opentype/xavgcharwidth",
+          "overlapping_path_segments",
+          "stylisticset_description"
+        ]
+      },
+      "SarasaUiPropDigitsSC-Regular.ttf": {
+        "FAIL": [
+          "base_has_width",
+          "case_mapping",
+          "file_size",
+          "smart_dropout"
+        ],
+        "WARN": [
+          "contour_count",
+          "math_signs_width",
+          "opentype/gdef_mark_chars",
+          "opentype/gdef_spacing_marks",
+          "opentype/post_table_version",
+          "opentype/xavgcharwidth",
+          "overlapping_path_segments",
+          "stylisticset_description"
+        ]
+      }
     }
-  ],
+  },
   "upstream_selected_check_baselines": {
     "official_sarasa_ui_sc_regular_hinted_and_unhinted": {
       "checks": 28,
@@ -347,11 +308,9 @@
     }
   },
   "classification": {
-    "fixed_project_regression": {
-      "no_mac_entries": "STAT/fvar 新名称曾带入 platform 1 记录；最终 156 个字体共删除 732 条，与官方 Sarasa/Source Han 成品一致。"
-    },
-    "invocation_artifact": {
-      "opentype/STAT/ital_axis": "单独检查 Italic 文件时 FontBakery 无法找到 Roman 配对；将静态 Heavy 正斜体和 VF 正斜体成对传入后为 PASS。"
+    "invocation_artifacts": {
+      "family_level_checks": "一次调用混合 hinted/unhinted、静态/VF 与多个公开家族，因此 family/single_directory、family name、underline、axis-range 等集合级检查不是单一家族发布结果；逐地区三项正式门均为 PASS。",
+      "opentype/STAT/ital_axis": "单独检查 Italic 会缺少 Roman 配对；正式门按地区同时传入正斜体后为 PASS。"
     },
     "expected_failures": {
       "base_has_width": "U+0488/U+0489 的零 advance 继承官方 Sarasa 与 Source Han。",
@@ -360,7 +319,7 @@
       "name/family_and_style_max_length": "Source Han VF 同样触发 31 字符限制；保留公开家族名。",
       "smart_dropout": "正式 unhinted TTF 与未 hint 的 VF 没有 prep smart-dropout 指令。"
     },
-    "expected_warnings": "GDEF mark/spacing、post format 3、xAvgCharWidth、数学符号宽度、空 ss 描述和 VF 不可达保留 glyph 可在官方 Sarasa 或 Source Han 基线复现；contour_count 与 overlapping_path_segments 所指轮廓已由主审计的静态 exact/Heavy 来源/VF 来源配对证明与相应上游来源一致。"
+    "expected_warnings": "GDEF mark/spacing、post format 3、xAvgCharWidth、数学符号宽度、空 ss 描述和 VF 不可达保留 glyph 可在官方 Sarasa 或 Source Han 基线复现；contour_count 与 overlapping_path_segments 已由主审计的静态 exact、Heavy 来源和 VF 13 点来源配对覆盖。"
   },
-  "policy": "不把通用 FontBakery profile 的 FAIL 总数伪装成 0；发布门槛是项目新增回归为 0，并把可复现的上游基线、通用 profile 限制和单文件调用假失败分别列出。"
+  "policy": "不把通用 FontBakery profile 的 FAIL 总数伪装成 0；发布硬门是全部 156 字体的 font_version/no_mac_entries、按地区成对 STAT/ital_axis、独立 OTS 与主审计。上游基线、通用 CJK profile 限制和集合调用假失败分别保留。"
 }
