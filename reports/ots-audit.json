@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-23T05:40:55+08:00",
+  "generated_at": "2026-08-26T09:32:30+08:00",
   "tool": "OpenType Sanitizer",
   "version": "9.3.0",
   "distribution": "khaledhosny/ots v9.3.0 Windows release",
@@ -7,38 +7,1117 @@
   "fonts_checked": 156,
   "successful": 156,
   "failures": [],
+  "unexpected_messages": [],
   "message_profiles": [
     {
-      "count": 84,
+      "count": 156,
       "messages": [
         "File sanitized successfully!"
       ],
       "samples": [
-        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
-        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
-        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
-        "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf"
-      ]
-    },
-    {
-      "count": 72,
-      "messages": [
-        "WARNING: maxp: Bad maxZones: 0",
-        "ERROR: gasp: The last record should be 0xFFFF as a sentinel value for rangeMaxPPEM",
-        "ERROR: Table discarded",
-        "File sanitized successfully!"
-      ],
-      "samples": [
-        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
-        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
         "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
-        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf"
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Light.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-LightItalic.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Regular.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Italic.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBold.ttf",
+        "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBoldItalic.ttf"
       ]
     }
   ],
-  "expected_unhinted_baseline": {
-    "expected": 72,
-    "count": 72
-  },
-  "unexpected_messages": []
+  "results": [
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Light.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-LightItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Regular.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Italic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-SemiBold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Bold.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Heavy.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    },
+    {
+      "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+      "returncode": 0,
+      "messages": [
+        "File sanitized successfully!"
+      ]
+    }
+  ]
 }

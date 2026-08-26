@@ -4,7 +4,7 @@
   "fonts": [
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
-      "size": 35236220,
+      "size": 53922844,
       "names": {
         "family": "Sarasa Ui VF PropDigits CL",
         "subfamily": "Italic",
@@ -15,7 +15,7 @@
         "typographic_subfamily": "Italic"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48471,
+      "glyph_count": 48474,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -293,7 +293,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -340,7 +340,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 110,
+          "lookups": 113,
           "scripts": [
             {
               "tag": "DFLT",
@@ -576,7 +576,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
-      "size": 33518192,
+      "size": 40114436,
       "names": {
         "family": "Sarasa Ui VF PropDigits CL",
         "subfamily": "Regular",
@@ -587,7 +587,7 @@
         "typographic_subfamily": "Regular"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48510,
+      "glyph_count": 48513,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -865,7 +865,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -913,7 +913,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 110,
+          "lookups": 113,
           "scripts": [
             {
               "tag": "DFLT",
@@ -1149,7 +1149,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
-      "size": 36060788,
+      "size": 54689044,
       "names": {
         "family": "Sarasa Ui VF PropDigits HC",
         "subfamily": "Italic",
@@ -1160,7 +1160,7 @@
         "typographic_subfamily": "Italic"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48736,
+      "glyph_count": 48737,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -1485,7 +1485,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 116,
           "scripts": [
             {
               "tag": "DFLT",
@@ -1721,7 +1721,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
-      "size": 34319104,
+      "size": 40024772,
       "names": {
         "family": "Sarasa Ui VF PropDigits HC",
         "subfamily": "Regular",
@@ -1732,7 +1732,7 @@
         "typographic_subfamily": "Regular"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48775,
+      "glyph_count": 48776,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -2058,7 +2058,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 116,
           "scripts": [
             {
               "tag": "DFLT",
@@ -2294,7 +2294,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
-      "size": 35431180,
+      "size": 53546572,
       "names": {
         "family": "Sarasa Ui VF PropDigits J",
         "subfamily": "Italic",
@@ -2305,7 +2305,7 @@
         "typographic_subfamily": "Italic"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48558,
+      "glyph_count": 48559,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -2630,7 +2630,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 112,
+          "lookups": 115,
           "scripts": [
             {
               "tag": "DFLT",
@@ -2866,7 +2866,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
-      "size": 33678236,
+      "size": 39289748,
       "names": {
         "family": "Sarasa Ui VF PropDigits J",
         "subfamily": "Regular",
@@ -2877,7 +2877,7 @@
         "typographic_subfamily": "Regular"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48597,
+      "glyph_count": 48598,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -3203,7 +3203,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 112,
+          "lookups": 115,
           "scripts": [
             {
               "tag": "DFLT",
@@ -3439,7 +3439,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
-      "size": 35391916,
+      "size": 53470204,
       "names": {
         "family": "Sarasa Ui VF PropDigits K",
         "subfamily": "Italic",
@@ -3450,7 +3450,7 @@
         "typographic_subfamily": "Italic"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48474,
+      "glyph_count": 48475,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -3775,7 +3775,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 112,
+          "lookups": 115,
           "scripts": [
             {
               "tag": "DFLT",
@@ -4011,7 +4011,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
-      "size": 33643192,
+      "size": 39255916,
       "names": {
         "family": "Sarasa Ui VF PropDigits K",
         "subfamily": "Regular",
@@ -4022,7 +4022,7 @@
         "typographic_subfamily": "Regular"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48513,
+      "glyph_count": 48514,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -4348,7 +4348,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 112,
+          "lookups": 115,
           "scripts": [
             {
               "tag": "DFLT",
@@ -4584,7 +4584,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "size": 35786460,
+      "size": 54146872,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Italic",
@@ -4595,7 +4595,7 @@
         "typographic_subfamily": "Italic"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48704,
+      "glyph_count": 48705,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -4920,7 +4920,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 116,
           "scripts": [
             {
               "tag": "DFLT",
@@ -5156,7 +5156,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "size": 34050864,
+      "size": 39716704,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Regular",
@@ -5167,7 +5167,7 @@
         "typographic_subfamily": "Regular"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48743,
+      "glyph_count": 48744,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -5493,7 +5493,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 116,
           "scripts": [
             {
               "tag": "DFLT",
@@ -5729,7 +5729,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
-      "size": 36112264,
+      "size": 54778772,
       "names": {
         "family": "Sarasa Ui VF PropDigits TC",
         "subfamily": "Italic",
@@ -5740,7 +5740,7 @@
         "typographic_subfamily": "Italic"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48753,
+      "glyph_count": 48754,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -6065,7 +6065,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 116,
           "scripts": [
             {
               "tag": "DFLT",
@@ -6301,7 +6301,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
-      "size": 34373140,
+      "size": 40096060,
       "names": {
         "family": "Sarasa Ui VF PropDigits TC",
         "subfamily": "Regular",
@@ -6312,7 +6312,7 @@
         "typographic_subfamily": "Regular"
       },
       "head_font_revision": 1.0402984619140625,
-      "glyph_count": 48792,
+      "glyph_count": 48793,
       "post_format": 3.0,
       "underline_thickness": 68,
       "underline_position": -169,
@@ -6638,7 +6638,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 113,
+          "lookups": 116,
           "scripts": [
             {
               "tag": "DFLT",
@@ -6874,12 +6874,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
-      "size": 24173024,
+      "size": 24173664,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits CL Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Bold",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Bold"
@@ -7163,7 +7163,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -7211,7 +7211,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -7397,12 +7397,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "size": 24976744,
+      "size": 24977380,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits CL Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Bold Italic"
@@ -7686,7 +7686,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -7733,7 +7733,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -7919,12 +7919,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "size": 24285424,
+      "size": 24286068,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "ExtraLight"
@@ -8208,7 +8208,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -8256,7 +8256,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -8442,12 +8442,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "size": 25093376,
+      "size": 25094012,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "ExtraLight Italic"
@@ -8731,7 +8731,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -8778,7 +8778,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -8964,12 +8964,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Heavy.ttf",
-      "size": 23875540,
+      "size": 23876180,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Heavy",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Heavy"
@@ -9253,7 +9253,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -9301,7 +9301,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -9487,12 +9487,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "size": 24687520,
+      "size": 24688156,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Heavy Italic"
@@ -9776,7 +9776,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -9823,7 +9823,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -10009,12 +10009,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Italic.ttf",
-      "size": 25119804,
+      "size": 25120440,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Italic"
@@ -10298,7 +10298,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -10345,7 +10345,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -10531,12 +10531,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Light.ttf",
-      "size": 24414708,
+      "size": 24415348,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Light",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Light"
@@ -10820,7 +10820,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -10868,7 +10868,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -11054,12 +11054,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "size": 25220772,
+      "size": 25221408,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Light Italic"
@@ -11343,7 +11343,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -11390,7 +11390,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -11576,12 +11576,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-Regular.ttf",
-      "size": 24316992,
+      "size": 24317636,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Regular",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Regular"
@@ -11865,7 +11865,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -11913,7 +11913,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -12099,12 +12099,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "size": 24261184,
+      "size": 24261828,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "SemiBold"
@@ -12388,7 +12388,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -12436,7 +12436,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -12622,12 +12622,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.3/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "size": 25066012,
+      "size": 25066648,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "SemiBold Italic"
@@ -12911,7 +12911,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -12958,7 +12958,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -13144,12 +13144,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Bold.ttf",
-      "size": 24136744,
+      "size": 24137136,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits HC Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Bold",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Bold"
@@ -13481,7 +13481,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -13667,12 +13667,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "size": 24931936,
+      "size": 24932328,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits HC Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Bold Italic"
@@ -14003,7 +14003,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -14189,12 +14189,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "size": 24306872,
+      "size": 24307264,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "ExtraLight"
@@ -14526,7 +14526,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -14712,12 +14712,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "size": 25106964,
+      "size": 25107356,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "ExtraLight Italic"
@@ -15048,7 +15048,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -15234,12 +15234,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Heavy.ttf",
-      "size": 23854808,
+      "size": 23855200,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Heavy",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Heavy"
@@ -15571,7 +15571,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -15757,12 +15757,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "size": 24655660,
+      "size": 24656052,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Heavy Italic"
@@ -16093,7 +16093,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -16279,12 +16279,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Italic.ttf",
-      "size": 25078360,
+      "size": 25078752,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Italic"
@@ -16615,7 +16615,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -16801,12 +16801,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Light.ttf",
-      "size": 24385908,
+      "size": 24386300,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Light",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Light"
@@ -17138,7 +17138,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -17324,12 +17324,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "size": 25185880,
+      "size": 25186272,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Light Italic"
@@ -17660,7 +17660,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -17846,12 +17846,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-Regular.ttf",
-      "size": 24283480,
+      "size": 24283872,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Regular",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Regular"
@@ -18183,7 +18183,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -18369,12 +18369,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "size": 24221084,
+      "size": 24221476,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "SemiBold"
@@ -18706,7 +18706,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -18892,12 +18892,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.3/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "size": 25017576,
+      "size": 25017968,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "SemiBold Italic"
@@ -19228,7 +19228,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -19414,12 +19414,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Bold.ttf",
-      "size": 23899552,
+      "size": 23899944,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits J Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Bold",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Bold"
@@ -19751,7 +19751,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -19937,12 +19937,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "size": 24697292,
+      "size": 24697684,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits J Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Bold Italic"
@@ -20273,7 +20273,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -20459,12 +20459,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "size": 24097148,
+      "size": 24097540,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "ExtraLight"
@@ -20796,7 +20796,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -20982,12 +20982,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "size": 24903192,
+      "size": 24903584,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "ExtraLight Italic"
@@ -21318,7 +21318,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -21504,12 +21504,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Heavy.ttf",
-      "size": 23615316,
+      "size": 23615708,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Heavy",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Heavy"
@@ -21841,7 +21841,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -22027,12 +22027,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "size": 24419768,
+      "size": 24420160,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Heavy Italic"
@@ -22363,7 +22363,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -22549,12 +22549,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Italic.ttf",
-      "size": 24870880,
+      "size": 24871272,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Italic"
@@ -22885,7 +22885,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -23071,12 +23071,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Light.ttf",
-      "size": 24179636,
+      "size": 24180028,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Light",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Light"
@@ -23408,7 +23408,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -23594,12 +23594,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "size": 24983148,
+      "size": 24983540,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Light Italic"
@@ -23930,7 +23930,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -24116,12 +24116,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-Regular.ttf",
-      "size": 24072048,
+      "size": 24072440,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Regular",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Regular"
@@ -24453,7 +24453,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -24639,12 +24639,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "size": 24002352,
+      "size": 24002744,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "SemiBold"
@@ -24976,7 +24976,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -25162,12 +25162,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.3/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "size": 24802252,
+      "size": 24802644,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-J-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "SemiBold Italic"
@@ -25498,7 +25498,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -25684,12 +25684,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Bold.ttf",
-      "size": 23855536,
+      "size": 23855928,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits K Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Bold",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Bold"
@@ -26021,7 +26021,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -26207,12 +26207,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "size": 24651876,
+      "size": 24652268,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits K Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Bold Italic"
@@ -26543,7 +26543,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -26729,12 +26729,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "size": 24051156,
+      "size": 24051548,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "ExtraLight"
@@ -27066,7 +27066,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -27252,12 +27252,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "size": 24855688,
+      "size": 24856080,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "ExtraLight Italic"
@@ -27588,7 +27588,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -27774,12 +27774,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Heavy.ttf",
-      "size": 23571772,
+      "size": 23572164,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Heavy",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Heavy"
@@ -28111,7 +28111,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -28297,12 +28297,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "size": 24374840,
+      "size": 24375232,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Heavy Italic"
@@ -28633,7 +28633,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -28819,12 +28819,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Italic.ttf",
-      "size": 24824252,
+      "size": 24824644,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Italic"
@@ -29155,7 +29155,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -29341,12 +29341,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Light.ttf",
-      "size": 24133944,
+      "size": 24134336,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Light",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Light"
@@ -29678,7 +29678,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -29864,12 +29864,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-LightItalic.ttf",
-      "size": 24936016,
+      "size": 24936408,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Light Italic"
@@ -30200,7 +30200,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -30386,12 +30386,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-Regular.ttf",
-      "size": 24026844,
+      "size": 24027236,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Regular",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Regular"
@@ -30723,7 +30723,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -30909,12 +30909,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-SemiBold.ttf",
-      "size": 23957376,
+      "size": 23957768,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "SemiBold"
@@ -31246,7 +31246,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -31432,12 +31432,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.3/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "size": 24755812,
+      "size": 24756204,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-K-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "SemiBold Italic"
@@ -31768,7 +31768,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -31954,12 +31954,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Bold.ttf",
-      "size": 23971968,
+      "size": 23972360,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits SC Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Bold",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Bold"
@@ -32291,7 +32291,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -32477,12 +32477,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "size": 24761320,
+      "size": 24761712,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits SC Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Bold Italic"
@@ -32813,7 +32813,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -32999,12 +32999,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "size": 24151412,
+      "size": 24151804,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "ExtraLight"
@@ -33336,7 +33336,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -33522,12 +33522,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "size": 24947292,
+      "size": 24947684,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "ExtraLight Italic"
@@ -33858,7 +33858,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -34044,12 +34044,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Heavy.ttf",
-      "size": 23694252,
+      "size": 23694644,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Heavy",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Heavy"
@@ -34381,7 +34381,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -34567,12 +34567,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "size": 24488640,
+      "size": 24489032,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Heavy Italic"
@@ -34903,7 +34903,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -35089,12 +35089,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Italic.ttf",
-      "size": 24915852,
+      "size": 24916244,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Italic"
@@ -35425,7 +35425,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -35611,12 +35611,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Light.ttf",
-      "size": 24232296,
+      "size": 24232688,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Light",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Light"
@@ -35948,7 +35948,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -36134,12 +36134,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "size": 25027700,
+      "size": 25028092,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Light Italic"
@@ -36470,7 +36470,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -36656,12 +36656,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-Regular.ttf",
-      "size": 24126144,
+      "size": 24126536,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Regular",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Regular"
@@ -36993,7 +36993,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -37179,12 +37179,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "size": 24054452,
+      "size": 24054844,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "SemiBold"
@@ -37516,7 +37516,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -37702,12 +37702,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.3/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "size": 24845828,
+      "size": 24846220,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "SemiBold Italic"
@@ -38038,7 +38038,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -38224,12 +38224,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Bold.ttf",
-      "size": 24174340,
+      "size": 24174732,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits TC Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Bold",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Bold"
@@ -38561,7 +38561,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -38747,12 +38747,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "size": 24969700,
+      "size": 24970092,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits TC Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Bold Italic"
@@ -39083,7 +39083,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -39269,12 +39269,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "size": 24333540,
+      "size": 24333932,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "ExtraLight"
@@ -39606,7 +39606,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -39792,12 +39792,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "size": 25133744,
+      "size": 25134136,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "ExtraLight Italic"
@@ -40128,7 +40128,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -40314,12 +40314,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Heavy.ttf",
-      "size": 23897032,
+      "size": 23897424,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Heavy",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Heavy"
@@ -40651,7 +40651,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -40837,12 +40837,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "size": 24698408,
+      "size": 24698800,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Heavy Italic"
@@ -41173,7 +41173,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -41359,12 +41359,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Italic.ttf",
-      "size": 25108544,
+      "size": 25108936,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Italic"
@@ -41695,7 +41695,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -41881,12 +41881,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Light.ttf",
-      "size": 24414852,
+      "size": 24415244,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Light",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Light"
@@ -42218,7 +42218,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -42404,12 +42404,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "size": 25214848,
+      "size": 25215240,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Light Italic"
@@ -42740,7 +42740,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -42926,12 +42926,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-Regular.ttf",
-      "size": 24313684,
+      "size": 24314076,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Regular",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Regular"
@@ -43263,7 +43263,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -43449,12 +43449,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "size": 24254356,
+      "size": 24254748,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "SemiBold"
@@ -43786,7 +43786,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -43972,12 +43972,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.3/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "size": 25050944,
+      "size": 25051336,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; hinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "SemiBold Italic"
@@ -44308,7 +44308,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -44494,12 +44494,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Bold.ttf",
-      "size": 13024552,
+      "size": 13025200,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits CL Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Bold",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Bold"
@@ -44783,7 +44783,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -44831,7 +44831,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -45017,12 +45017,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "size": 13818964,
+      "size": 13819608,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits CL Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Bold Italic"
@@ -45306,7 +45306,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -45353,7 +45353,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -45539,12 +45539,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "size": 13325944,
+      "size": 13326596,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "ExtraLight"
@@ -45828,7 +45828,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -45876,7 +45876,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -46062,12 +46062,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "size": 14119044,
+      "size": 14119688,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "ExtraLight Italic"
@@ -46351,7 +46351,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -46398,7 +46398,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -46584,12 +46584,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Heavy.ttf",
-      "size": 12911884,
+      "size": 12912532,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Heavy",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Heavy"
@@ -46873,7 +46873,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -46921,7 +46921,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -47107,12 +47107,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "size": 13713608,
+      "size": 13714252,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Heavy Italic"
@@ -47396,7 +47396,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -47443,7 +47443,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -47629,12 +47629,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Italic.ttf",
-      "size": 13984920,
+      "size": 13985564,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Italic"
@@ -47918,7 +47918,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -47965,7 +47965,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -48151,12 +48151,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Light.ttf",
-      "size": 13305984,
+      "size": 13306632,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Light",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Light"
@@ -48440,7 +48440,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -48488,7 +48488,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -48674,12 +48674,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "size": 14097920,
+      "size": 14098564,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Light Italic"
@@ -48963,7 +48963,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -49010,7 +49010,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -49196,12 +49196,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-Regular.ttf",
-      "size": 13192180,
+      "size": 13192832,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-Regular",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "Regular"
@@ -49485,7 +49485,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -49533,7 +49533,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -49719,12 +49719,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "size": 13115132,
+      "size": 13115784,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits CL SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "SemiBold"
@@ -50008,7 +50008,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 62,
+          "feature_records": 63,
           "unique_features": [
             "aalt",
             "calt",
@@ -50056,7 +50056,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -50242,12 +50242,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "size": 13909344,
+      "size": 13909988,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits CL SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-CL-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits CL",
         "typographic_subfamily": "SemiBold Italic"
@@ -50531,7 +50531,7 @@
       "layout": {
         "GSUB": {
           "present": true,
-          "feature_records": 61,
+          "feature_records": 62,
           "unique_features": [
             "aalt",
             "calt",
@@ -50578,7 +50578,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -50764,12 +50764,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Bold.ttf",
-      "size": 13068328,
+      "size": 13068728,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits HC Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Bold",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Bold"
@@ -51101,7 +51101,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -51287,12 +51287,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "size": 13854264,
+      "size": 13854664,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits HC Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Bold Italic"
@@ -51623,7 +51623,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -51809,12 +51809,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "size": 13458304,
+      "size": 13458704,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "ExtraLight"
@@ -52146,7 +52146,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -52332,12 +52332,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "size": 14244140,
+      "size": 14244540,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "ExtraLight Italic"
@@ -52668,7 +52668,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -52854,12 +52854,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Heavy.ttf",
-      "size": 12965740,
+      "size": 12966140,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Heavy",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Heavy"
@@ -53191,7 +53191,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -53377,12 +53377,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "size": 13756380,
+      "size": 13756780,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Heavy Italic"
@@ -53713,7 +53713,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -53899,12 +53899,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Italic.ttf",
-      "size": 14055796,
+      "size": 14056196,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Italic"
@@ -54235,7 +54235,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -54421,12 +54421,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Light.ttf",
-      "size": 13396524,
+      "size": 13396924,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Light",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Light"
@@ -54758,7 +54758,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -54944,12 +54944,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "size": 14181512,
+      "size": 14181912,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Light Italic"
@@ -55280,7 +55280,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -55466,12 +55466,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-Regular.ttf",
-      "size": 13271204,
+      "size": 13271604,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-Regular",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "Regular"
@@ -55803,7 +55803,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -55989,12 +55989,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "size": 13177728,
+      "size": 13178128,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits HC SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "SemiBold"
@@ -56326,7 +56326,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -56512,12 +56512,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "size": 13963576,
+      "size": 13963976,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits HC SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansHC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-HC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits HC",
         "typographic_subfamily": "SemiBold Italic"
@@ -56848,7 +56848,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -57034,12 +57034,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Bold.ttf",
-      "size": 12880744,
+      "size": 12881144,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits J Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Bold",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Bold"
@@ -57371,7 +57371,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -57557,12 +57557,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "size": 13669176,
+      "size": 13669576,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits J Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Bold Italic"
@@ -57893,7 +57893,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -58079,12 +58079,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "size": 13270292,
+      "size": 13270692,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "ExtraLight"
@@ -58416,7 +58416,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -58602,12 +58602,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "size": 14061484,
+      "size": 14061884,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "ExtraLight Italic"
@@ -58938,7 +58938,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -59124,12 +59124,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Heavy.ttf",
-      "size": 12778108,
+      "size": 12778508,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Heavy",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Heavy"
@@ -59461,7 +59461,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -59647,12 +59647,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "size": 13572316,
+      "size": 13572716,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Heavy Italic"
@@ -59983,7 +59983,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -60169,12 +60169,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Italic.ttf",
-      "size": 13873864,
+      "size": 13874264,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Italic"
@@ -60505,7 +60505,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -60691,12 +60691,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Light.ttf",
-      "size": 13207808,
+      "size": 13208208,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Light",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Light"
@@ -61028,7 +61028,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -61214,12 +61214,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "size": 13997192,
+      "size": 13997592,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Light Italic"
@@ -61550,7 +61550,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -61736,12 +61736,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-Regular.ttf",
-      "size": 13085104,
+      "size": 13085504,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-Regular",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "Regular"
@@ -62073,7 +62073,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -62259,12 +62259,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "size": 12993852,
+      "size": 12994252,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits J SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "SemiBold"
@@ -62596,7 +62596,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -62782,12 +62782,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "size": 13783140,
+      "size": 13783540,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits J SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSans + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-J-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits J",
         "typographic_subfamily": "SemiBold Italic"
@@ -63118,7 +63118,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -63304,12 +63304,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Bold.ttf",
-      "size": 12857372,
+      "size": 12857772,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits K Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Bold",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Bold"
@@ -63641,7 +63641,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -63827,12 +63827,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "size": 13644404,
+      "size": 13644804,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits K Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Bold Italic"
@@ -64163,7 +64163,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -64349,12 +64349,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "size": 13245924,
+      "size": 13246324,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "ExtraLight"
@@ -64686,7 +64686,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -64872,12 +64872,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "size": 14035608,
+      "size": 14036008,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "ExtraLight Italic"
@@ -65208,7 +65208,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -65394,12 +65394,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Heavy.ttf",
-      "size": 12755284,
+      "size": 12755684,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Heavy",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Heavy"
@@ -65731,7 +65731,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -65917,12 +65917,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "size": 13548108,
+      "size": 13548508,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Heavy Italic"
@@ -66253,7 +66253,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 105,
+          "lookups": 108,
           "scripts": [
             {
               "tag": "DFLT",
@@ -66439,12 +66439,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Italic.ttf",
-      "size": 13848544,
+      "size": 13848944,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Italic"
@@ -66775,7 +66775,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -66961,12 +66961,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Light.ttf",
-      "size": 13183596,
+      "size": 13183996,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Light",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Light"
@@ -67298,7 +67298,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -67484,12 +67484,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-LightItalic.ttf",
-      "size": 13971540,
+      "size": 13971940,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Light Italic"
@@ -67820,7 +67820,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -68006,12 +68006,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-Regular.ttf",
-      "size": 13061212,
+      "size": 13061612,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-Regular",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "Regular"
@@ -68343,7 +68343,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -68529,12 +68529,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-SemiBold.ttf",
-      "size": 12970236,
+      "size": 12970636,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits K SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "SemiBold"
@@ -68866,7 +68866,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -69052,12 +69052,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "size": 13758064,
+      "size": 13758464,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits K SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansK + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-K-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits K",
         "typographic_subfamily": "SemiBold Italic"
@@ -69388,7 +69388,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 103,
+          "lookups": 106,
           "scripts": [
             {
               "tag": "DFLT",
@@ -69574,12 +69574,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Bold.ttf",
-      "size": 12980944,
+      "size": 12981344,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits SC Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Bold",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Bold"
@@ -69911,7 +69911,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -70097,12 +70097,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "size": 13761124,
+      "size": 13761524,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits SC Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Bold Italic"
@@ -70433,7 +70433,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -70619,12 +70619,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "size": 13367340,
+      "size": 13367740,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "ExtraLight"
@@ -70956,7 +70956,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -71142,12 +71142,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "size": 14149116,
+      "size": 14149516,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "ExtraLight Italic"
@@ -71478,7 +71478,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -71664,12 +71664,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Heavy.ttf",
-      "size": 12885560,
+      "size": 12885960,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Heavy",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Heavy"
@@ -72001,7 +72001,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -72187,12 +72187,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "size": 13670660,
+      "size": 13671060,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Heavy Italic"
@@ -72523,7 +72523,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -72709,12 +72709,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Italic.ttf",
-      "size": 13962384,
+      "size": 13962784,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Italic"
@@ -73045,7 +73045,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -73231,12 +73231,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Light.ttf",
-      "size": 13305832,
+      "size": 13306232,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Light",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Light"
@@ -73568,7 +73568,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -73754,12 +73754,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "size": 14086356,
+      "size": 14086756,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Light Italic"
@@ -74090,7 +74090,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -74276,12 +74276,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-Regular.ttf",
-      "size": 13182856,
+      "size": 13183256,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-Regular",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "Regular"
@@ -74613,7 +74613,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -74799,12 +74799,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "size": 13088984,
+      "size": 13089384,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits SC SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "SemiBold"
@@ -75136,7 +75136,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -75322,12 +75322,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "size": 13869520,
+      "size": 13869920,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits SC SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansSC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-SC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits SC",
         "typographic_subfamily": "SemiBold Italic"
@@ -75658,7 +75658,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -75844,12 +75844,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Bold.ttf",
-      "size": 13095532,
+      "size": 13095932,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PropDigits TC Bold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Bold",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Bold"
@@ -76181,7 +76181,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -76367,12 +76367,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "size": 13881632,
+      "size": 13882032,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PropDigits TC Bold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Bold-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Bold Italic"
@@ -76703,7 +76703,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -76889,12 +76889,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "size": 13481724,
+      "size": 13482124,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC ExtraLight",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-ExtraLight",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "ExtraLight"
@@ -77226,7 +77226,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -77412,12 +77412,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "size": 14267756,
+      "size": 14268156,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC ExtraLight Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "ExtraLight Italic"
@@ -77748,7 +77748,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -77934,12 +77934,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Heavy.ttf",
-      "size": 12993668,
+      "size": 12994068,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC Heavy",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Heavy",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Heavy"
@@ -78271,7 +78271,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -78457,12 +78457,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "size": 13784716,
+      "size": 13785116,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC Heavy Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Heavy Italic"
@@ -78793,7 +78793,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -78979,12 +78979,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Italic.ttf",
-      "size": 14081936,
+      "size": 14082336,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Italic"
@@ -79315,7 +79315,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -79501,12 +79501,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Light.ttf",
-      "size": 13420476,
+      "size": 13420876,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC Light",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Light",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Light"
@@ -79838,7 +79838,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -80024,12 +80024,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "size": 14205572,
+      "size": 14205972,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC Light Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Light-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Light Italic"
@@ -80360,7 +80360,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -80546,12 +80546,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-Regular.ttf",
-      "size": 13297420,
+      "size": 13297820,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-Regular",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "Regular"
@@ -80883,7 +80883,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -81069,12 +81069,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "size": 13204508,
+      "size": 13204908,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PropDigits TC SemiBold",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-SemiBold",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "SemiBold"
@@ -81406,7 +81406,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
@@ -81592,12 +81592,12 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.3/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "size": 13990448,
+      "size": 13990848,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PropDigits TC SemiBold Italic",
-        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits",
+        "version": "Version 1.0403; project 1.0.40.3; static SourceHanSansTC + static Inter; PropDigits; unhinted",
         "postscript": "Sarasa-Ui-PropDigits-TC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PropDigits TC",
         "typographic_subfamily": "SemiBold Italic"
@@ -81928,7 +81928,7 @@
             "vrt2",
             "zero"
           ],
-          "lookups": 104,
+          "lookups": 107,
           "scripts": [
             {
               "tag": "DFLT",
