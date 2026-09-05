@@ -5,6 +5,7 @@
 *.tmp
 build-*.ps1
 .build-cache/
+reports/visual-candidates.json
 artifacts/
 dist/
 __pycache__/

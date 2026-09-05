@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import json
 import sys
 import zipfile
 from dataclasses import dataclass
@@ -54,6 +55,27 @@ def variable_files(region: str | None = None) -> tuple[tuple[Path, str], ...]:
     return tuple(files)
 
 
+def static_files(region: str, hinted: bool, prefix: str = "") -> tuple[tuple[Path, str], ...]:
+    directory = build.static_dir(region, hinted)
+    files = directory_files(directory, prefix)
+    expected = {
+        build.static_output_name(region, str(stop["name"]), italic)
+        for stop in build.SOURCE_HAN_WEIGHT_STOPS
+        for italic in (False, True)
+    }
+    actual = {
+        path.relative_to(directory).as_posix()
+        for path, _name in files
+        if path.suffix.lower() == ".ttf"
+    }
+    if actual != expected:
+        raise ValueError(
+            f"静态字体清单不完整：{directory.name}；"
+            f"缺少 {sorted(expected - actual)}，多出 {sorted(actual - expected)}"
+        )
+    return files
+
+
 def release_packages() -> list[Package]:
     version = build.VERSION
     docs = documentation_files()
@@ -70,13 +92,13 @@ def release_packages() -> list[Package]:
         packages.append(
             Package(
                 f"SarasaUiPropDigits{region}-TTF-{version}.zip",
-                docs + directory_files(hinted_dir),
+                docs + static_files(region, True),
             )
         )
         packages.append(
             Package(
                 f"SarasaUiPropDigits{region}-TTF-Unhinted-{version}.zip",
-                docs + directory_files(unhinted_dir),
+                docs + static_files(region, False),
             )
         )
 
@@ -91,7 +113,7 @@ def release_packages() -> list[Package]:
         files = list(docs)
         for region in build.REGION_ORDER:
             directory = build.static_dir(region, hinted)
-            files.extend(directory_files(directory, f"{directory.name}/"))
+            files.extend(static_files(region, hinted, f"{directory.name}/"))
         packages.append(
             Package(
                 f"SarasaUiPropDigits-{variant}-{version}.zip",
@@ -145,10 +167,57 @@ def validate_package_sources(package: Package) -> None:
         raise ValueError(
             f"{package.filename} lacks required documents: {missing_documents}"
         )
+    if not any(path.suffix.lower() == ".ttf" for path, _name in package.files):
+        raise ValueError(f"{package.filename} 不包含字体")
     for path, archive_name in package.files:
         if not path.is_file():
             raise FileNotFoundError(path)
         build.validate_archive_member_paths([archive_name], ROOT)
+
+
+def validate_release_audits(packages: list[Package]) -> None:
+    import audit_sarasa_ui_propdigits as audit
+
+    paths = {path for package in packages for path, _name in package.files if path.suffix.lower() == ".ttf"}
+    if paths != set(audit.release_font_paths()) or len(paths) != 156:
+        raise ValueError("发布字体清单必须完整包含 12 个 VF 和 144 个静态 TTF")
+    manifest = audit.audit_input_manifest()
+    reports = {}
+    for name in ("release-audit", "ots-audit", "fontbakery-audit", "visual-audit"):
+        report_path = ROOT / "reports" / f"{name}.json"
+        report = json.loads(report_path.read_text(encoding="utf-8"))
+        if report.get("input_manifest") != manifest:
+            raise ValueError(f"{name} 未覆盖当前全部字体，或字体 SHA-256 已改变")
+        build.assert_portable_report_text(json.dumps(report, ensure_ascii=False))
+        reports[name] = report
+    main_report = reports["release-audit"]
+    gate = main_report.get("gate", {})
+    expected_sections = set(audit.AUDIT_GATE_SECTIONS)
+    if (
+        gate.get("complete") is not True
+        or gate.get("passed") is not True
+        or gate.get("total_failures") != 0
+        or gate.get("skipped_sections") != 0
+        or gate.get("executed_sections") != len(expected_sections)
+        or set(gate.get("sections", {})) != expected_sections
+        or any(item != {"status": "passed", "failure_count": 0} for item in gate["sections"].values())
+        or main_report.get("audit_contract") != audit.audit_contract_manifest()
+    ):
+        raise ValueError("当前构建与审计代码没有完整通过主审计")
+    ots = reports["ots-audit"]
+    if ots.get("fonts_checked") != 156 or ots.get("successful") != 156 or ots.get("failures") or ots.get("unexpected_messages"):
+        raise ValueError("OTS 尚未完整通过 156 个字体")
+    fb = reports["fontbakery-audit"].get("release_gate", {})
+    if fb.get("total_result_counts") != {"PASS": 318} or fb.get("all_batches_exit_zero") is not True:
+        raise ValueError("FontBakery 发布门尚未取得 318 PASS")
+    if fb.get("selected_checks") != {"opentype/font_version": {"PASS": 156}, "no_mac_entries": {"PASS": 156}, "opentype/STAT/ital_axis": {"PASS": 6}}:
+        raise ValueError("FontBakery 的逐字体及正斜体配对检查覆盖不完整")
+    batches = fb.get("per_region_batches", {})
+    if set(batches) != set(build.REGION_ORDER) or any(batch.get("fonts") != 26 or batch.get("jobs") != 4 for batch in batches.values()):
+        raise ValueError("FontBakery 必须按六地区、每批 26 字体、-J 4 运行")
+    visual = reports["visual-audit"]
+    if visual.get("complete") is not True or visual.get("passed") is not True:
+        raise ValueError("视觉检查尚未完整通过")
 
 
 def write_package(package: Package, output_dir: Path) -> dict[str, object]:
@@ -229,6 +298,9 @@ def main() -> None:
     )
     args = parser.parse_args()
     packages = release_packages()
+    for package in packages:
+        validate_package_sources(package)
+    validate_release_audits(packages)
     results: list[dict[str, object]] = []
     for index, package in enumerate(packages, start=1):
         output = args.output_dir / package.filename
@@ -246,6 +318,13 @@ def main() -> None:
             )
         else:
             results.append(write_package(package, args.output_dir))
+    expected_archives = {package.filename for package in packages}
+    actual_archives = {path.name for path in args.output_dir.glob("*.zip")}
+    if actual_archives != expected_archives:
+        raise ValueError("输出目录中的 ZIP 清单必须恰好等于本版 21 个发布包")
+    # Bind the completed archives to the same audited fonts even if a source
+    # file changed while the packages were being compressed.
+    validate_release_audits(packages)
     checksums = write_checksums(args.output_dir, results)
     print(f"[package] wrote {checksums}", flush=True)
 
