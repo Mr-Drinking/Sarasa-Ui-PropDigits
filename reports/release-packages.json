@@ -1,13 +1,13 @@
 {
   "title": "发布包完整性检查",
   "version": "1.0.40.4",
-  "generated_at": "2026-09-05T18:38:00.904413+00:00",
+  "generated_at": "2026-09-05T19:00:26.057217+00:00",
   "complete": true,
   "passed": true,
   "package_count": 21,
   "unique_fonts": 156,
   "font_member_occurrences": 312,
-  "total_bytes": 3460536185,
+  "total_bytes": 3460558214,
   "verification_runs": 2,
   "checks": [
     "当前 156 个字体的完整发布门与 SHA-256",
@@ -24,7 +24,7 @@
   "documentation_sha256": {
     "LICENSE": "b024393386349421117772d89e50ebbc875e58e0cc615f0954eebd44756755a7",
     "NOTICE.md": "6ffe7e40780813299d730cc809f40ca58678b43f4c9c1d4449e49483ffa2e18d",
-    "README.md": "c45dfe5b9882ad99083277c3cfeb2b9c585df19158cd2a7105b568029945c32e"
+    "README.md": "7c4ace95d92b574a8b9288fc02f83534b5214251837325145038964d07824bee"
   },
   "input_manifest": {
     "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-ExtraLight.ttf": {
@@ -655,150 +655,151 @@
   "packages": [
     {
       "file": "Sarasa-Ui-VF-PropDigits-CL-TTF-1.0.40.4.zip",
-      "bytes": 43789073,
-      "sha256": "21e189d5777267e0b7b67dfae4bad9f6c7d544023620ca4274f5057ef96ab1a3",
+      "bytes": 43790122,
+      "sha256": "d4567e3df57ba2f63e631404deb2b2b58cd1673057be4003a5df3f71c90e14cd",
       "members": 5,
       "font_members": 2
     },
     {
       "file": "SarasaUiPropDigitsCL-TTF-1.0.40.4.zip",
-      "bytes": 151528459,
-      "sha256": "5030fe91c068f7f49b8dd61d7117c9166b645ba630bf659ba5cf8acef96598e6",
+      "bytes": 151529508,
+      "sha256": "936ebad68a64b50343cc64b1d3ba720623708324fb06af4da3f367a4f133905b",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4.zip",
-      "bytes": 93408584,
-      "sha256": "71b85123394880a0289ca99254855233ca6a85d1c8684096a72faf7466e20e5e",
+      "bytes": 93409633,
+      "sha256": "d208c6c12807d5a45f2bd9c6190dd16cca169d51b0eae65086170ac4858036a7",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "Sarasa-Ui-VF-PropDigits-SC-TTF-1.0.40.4.zip",
-      "bytes": 44538877,
-      "sha256": "caffccaba2e0320d8a2774bda6ce42018a312dabcd9258eb742d0b42c2e0f4d5",
+      "bytes": 44539926,
+      "sha256": "93fa84815b799435379551d3d354bcab802367238313d57d4a1d041c3a9fce90",
       "members": 5,
       "font_members": 2
     },
     {
       "file": "SarasaUiPropDigitsSC-TTF-1.0.40.4.zip",
-      "bytes": 150573344,
-      "sha256": "812ba5a00c204d0f6a7457bb545a198d1bfe6643769d4ec450eb73c7cf293da2",
+      "bytes": 150574393,
+      "sha256": "8e7bc405712bc8f2da16cea58fb5673d0da229ac365e53bdf299a318d99c02bf",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4.zip",
-      "bytes": 93331808,
-      "sha256": "29a58772ae84a41308f70e23375f39b86e179e090a59b39670a9ab3f58c7c3d5",
+      "bytes": 93332857,
+      "sha256": "7d7561bb9c3bc9b64f4c21127ec406646366e311c9ed723ba664838f402b3828",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "Sarasa-Ui-VF-PropDigits-TC-TTF-1.0.40.4.zip",
-      "bytes": 45066360,
-      "sha256": "db79d45f67a5de91b2bf72bca43c96f56d23d2ccd5d0593f4ca5b91ebc14d81a",
+      "bytes": 45067409,
+      "sha256": "126174b892e9a80f16a42e6c47febe4357c118fd178aa80c178be05a6aa9ee46",
       "members": 5,
       "font_members": 2
     },
     {
       "file": "SarasaUiPropDigitsTC-TTF-1.0.40.4.zip",
-      "bytes": 152497606,
-      "sha256": "749658ce1a50312a54db385301cb64088372fde30ef6fb6f9e60fdf5beba8d25",
+      "bytes": 152498655,
+      "sha256": "8bda361a0c5a3120a71e8dccdc289823d63c817a6d841acd07a431d44a03870d",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4.zip",
-      "bytes": 94567585,
-      "sha256": "a2a69da7e38417b2853b84e1dfdb2d1e41c5eb0d716dad8736cf6d238fe339cd",
+      "bytes": 94568634,
+      "sha256": "84e6eefb28ca83d6da9754d4cbe71d3496fd6f810d73a6e5822ce411c93f380e",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "Sarasa-Ui-VF-PropDigits-HC-TTF-1.0.40.4.zip",
-      "bytes": 45026199,
-      "sha256": "69129bf57d8db83defcf7bb5db4d23e41e345705b59ef46521154357abd05c5c",
+      "bytes": 45027248,
+      "sha256": "11e76da34ca32b1fff992c343d0472a2458cfa55e1b99f52cd354e1ff470e980",
       "members": 5,
       "font_members": 2
     },
     {
       "file": "SarasaUiPropDigitsHC-TTF-1.0.40.4.zip",
-      "bytes": 152242015,
-      "sha256": "0eb0ca8c521431c9a5abd52a8c8342cd5b8e8554b4e0a7aa98b7b615c54117dc",
+      "bytes": 152243064,
+      "sha256": "be07ad3c92e12722907442e848711a49e2850a3bc2aad2af515e862b43d6ccf6",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4.zip",
-      "bytes": 94402210,
-      "sha256": "d0fc5621f0ca9c7d0c0b76e27a783f7406110d57a87beb269457a835c1f9411a",
+      "bytes": 94403259,
+      "sha256": "3bf8648a087aa3d5c9a47fa5a50a0715e40cd4d87d0cb9c705ae9b4ff797591d",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "Sarasa-Ui-VF-PropDigits-J-TTF-1.0.40.4.zip",
-      "bytes": 43651857,
-      "sha256": "9a063b0e6002082b4820b09474f82949dac164340525256ffa27f7cbbc8760e3",
+      "bytes": 43652906,
+      "sha256": "7796a5705a0bcfd0626f79afa366fa8e0849c9a7bbca24a1ebf644e46591e845",
       "members": 5,
       "font_members": 2
     },
     {
       "file": "SarasaUiPropDigitsJ-TTF-1.0.40.4.zip",
-      "bytes": 149299804,
-      "sha256": "ae1ceade95487fe83fba8daa4dadce1e3c4e8879729866203e5fdbd80c438190",
+      "bytes": 149300853,
+      "sha256": "e00f9841527cf49ed6a4cd37c7f45c45ca9dd6fcd1c2b37c1951b39f0f3ee333",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4.zip",
-      "bytes": 91904684,
-      "sha256": "54de19c6361b37d7918c75833c25499c93a5b0491a7780bd32a310de4daf1222",
+      "bytes": 91905733,
+      "sha256": "1cf0c1c40883e22e2d3172631746543f22c896924a4b9cc812a78b69b3184012",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "Sarasa-Ui-VF-PropDigits-K-TTF-1.0.40.4.zip",
-      "bytes": 43639561,
-      "sha256": "af440734f3cda66fdc1bbabbd33097edc8fe6eef22b0c81995b2d963bbd9bea4",
+      "bytes": 43640610,
+      "sha256": "4588eb0340d4d4f63d9fe311a6d43597c00318706b944c638041a30794942538",
       "members": 5,
       "font_members": 2
     },
     {
       "file": "SarasaUiPropDigitsK-TTF-1.0.40.4.zip",
-      "bytes": 149086287,
-      "sha256": "45273448a4f14ed95a53b645079cf3b81dc3c5fa650393473a2047d8e4b0a4ec",
+      "bytes": 149087336,
+      "sha256": "bb9e751b847eb81baa649a78bb58f68d79cb4720c3cb4417a5bc1b5e628c0ef8",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4.zip",
-      "bytes": 91782720,
-      "sha256": "3a466a702d64c6771f7fb2dc12ff8b8a4b31dbd03414530184c54c39cee1b33a",
+      "bytes": 91783769,
+      "sha256": "02ac31dc8bd5332b1f33b4422c96991f1b10d4b9768131593058044c30c98609",
       "members": 17,
       "font_members": 12
     },
     {
       "file": "Sarasa-Ui-VF-PropDigits-TTF-1.0.40.4.zip",
-      "bytes": 265661692,
-      "sha256": "99065ad97720e226ba16ba02b0f702c8e5494dde6bb7e880eb58f8640ba37344",
+      "bytes": 265662741,
+      "sha256": "75fbfeaaf0a3ee5f79d2a870450b786aea88d268656b63e7e97e1da8e2772194",
       "members": 15,
       "font_members": 12
     },
     {
       "file": "SarasaUiPropDigits-TTF-1.0.40.4.zip",
-      "bytes": 905182936,
-      "sha256": "a7177d6d8d26e6778707fd55e988fe7448c663fdacd8c76d69aeea37b677fe5d",
+      "bytes": 905183985,
+      "sha256": "2b67198716bde422e2e7bac8d3981ca6a7a4c9c07ff92dd0f36df76612cd1343",
       "members": 87,
       "font_members": 72
     },
     {
       "file": "SarasaUiPropDigits-TTF-Unhinted-1.0.40.4.zip",
-      "bytes": 559354524,
-      "sha256": "8eeedd78baa869f7d44ab6f9acedd2724412ce81728d79073388c971a96303c1",
+      "bytes": 559355573,
+      "sha256": "c8b41c56512d82b604936a5b07caec23f4e949593511ee6a339c4a6f11aed00b",
       "members": 87,
       "font_members": 72
     }
-  ]
+  ],
+  "documentation_note": "全部 21 包均包含补充后的中文 README，统一使用 GPT-6 Astra 表述。"
 }

@@ -31,6 +31,20 @@ Sarasa Ui PropDigits 是面向中西文混排的更纱 Ui 衍生字体。默认 
 
 CL 的静态与可变字体采用同一 Shanggu 发布版本，公开 cmap 和 layout 按 Sarasa Ui CL 边界裁剪。五个官方同名字重的非数字度量沿用 Sarasa Ui CL，Heavy 使用对应 Heavy 来源。TrueType 成品均移除仅适用于 CFF/CFF2 的 VORG。静态竖排原点由最终 `glyf/vmtx` 决定；VF 通过 `gvar` metric phantom points 保持原点和 advance，复合字形使用独立度量，13 个轴点逐 glyph 核对横向边距与竖排原点。真实轮廓和静态 hint 均保持不变。
 
+## 下载与使用
+
+从对应版本的 Release 下载所需地区和格式。以 SC 为例：
+
+| 包名 | 内容 |
+| --- | --- |
+| `Sarasa-Ui-VF-PropDigits-SC-TTF-1.0.40.4.zip` | 正体、斜体两个可变 TTF，每个文件含完整公开字重轴 |
+| `SarasaUiPropDigitsSC-TTF-1.0.40.4.zip` | 六字重正斜体，共 12 个 hinted 静态 TTF |
+| `SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4.zip` | 同样 12 个静态样式，不含 hint 指令 |
+
+文件名不含地区的三个包分别汇总全部地区的 VF、hinted 静态或 unhinted 静态字体。只需要一个地区时下载对应地区包即可。只接受单个字体文件且支持可变 TTF 的工具，可使用对应地区的正体 VF；斜体另有独立文件，字重由应用选择。
+
+字体文件提供字形、度量和 OpenType 特性，实际效果还取决于应用是否使用该字体、传入的语言与脚本、选择的字重，以及是否启用相应特性。本项目没有提供 Android 或 Windows 的系统字体替换工具；应用验收范围见下文。
+
 ## 字重
 
 | 公开坐标 | 样式 | Source Han 内部坐标 | Inter 坐标 |
@@ -122,8 +136,7 @@ $env:HTTPS_PROXY = 'http://127.0.0.1:7897'
 python -m unittest discover -s tools/tests
 python tools\audit_sarasa_ui_propdigits.py --raster-jobs 8
 python tools\check_external_release.py
-python tools\package_release.py
-python tools\package_release.py --verify-only
+python tools\render_visual_checks.py
 ```
 
 主审计保留显式 23 节注册表。未注册、跳过或覆盖不足都不能得到 PASSED；完整发布要求 `total_failures=0`。检查包括全码位轮廓与度量、FreeType 栅格、GSUB/GPOS、地区边界、数字与标点、CJK 剪切、Inter 13 点轮廓及定位、两端 HarfBuzz 运行时、轴与法律元数据。
@@ -134,9 +147,30 @@ OTS 9.3.0 必须对 156 个字体全部成功，没有意外输出或丢表。Fo
 
 视觉检查单独记录实际字体、轴点、截图和运行环境。主审计、OTS、FontBakery 与视觉报告均绑定同一组 156 个成品的哈希；报告使用可移植路径。
 
+`render_visual_checks.py` 为六地区各生成静态、可变和放大细节样张，共 18 张，保存到 `assets/checks/`；同时生成 `reports/visual-candidates.json`。候选报告始终标记为尚未通过，生成图片本身不等于完成视觉验收。
+
+发布前必须实际查看全部样张，检查字重递进、正斜体、数字与冒号、替代 G 字偶距、堆叠附加符号、横竖标点，以及有无裁切或错位。审阅记录以候选报告的字体和图片哈希为基础，逐图填写 `reviewed`、`passed` 和具体观察，保存为 `reports/visual-audit.json`。只有六地区、全部 156 个字体均已查看且没有未解决问题时，才能将总记录标记为 `complete=true`、`passed=true`。应用实测另记环境、字体哈希、轴点、实际结果和截图；没有实测的平台明确列为未验证。
+
+完成这些检查后再打包：
+
+```powershell
+python tools\package_release.py
+python tools\package_release.py --verify-only
+```
+
 打包器固定生成六地区各三包和三个全地区包，共 21 个 ZIP。每包包含 LICENSE、中文 README/NOTICE，静态包必须恰好有对应 12 个 TTF，地区 VF 包必须有正斜体两个 VF。校验成员顺序、CRC、SHA-256、时间戳、权限和压缩方式，再输出 `SHA256SUMS.txt`。
 
-报告位于 [reports](reports)：`release-audit.json`、`ots-audit.json`、`fontbakery-audit.json`、`visual-audit.json`、`font-inspection.json` 与构建报告。最终发布结果以对应版本的完整报告为准。
+v1.0.40.4 的已完成结果如下：
+
+| 检查 | 结果与记录 |
+| --- | --- |
+| 完整主审计 | 23 节全部通过，`total_failures=0`；16,659,660 次 FreeType 栅格渲染，[主审计报告](reports/release-audit.json) |
+| OTS | 156/156 通过，无意外输出或丢表，[OTS 报告](reports/ots-audit.json) |
+| FontBakery 发布门 | 六地区各 26 字体、`-J 4`，共 318 PASS，[FontBakery 报告](reports/fontbakery-audit.json) |
+| 视觉 | 156 字体的 18 张样张及 Windows Chromium 实测截图已查看，[视觉记录](reports/visual-audit.json) |
+| 发布包 | 21 个 ZIP 通过生成时校验和独立复验，[包清单与 SHA-256](reports/release-packages.json) |
+
+字体表检查和构建来源另见 [reports](reports) 中的 `font-inspection.json` 与 `Sarasa-Ui-PropDigits-report.json`。上述结果针对本版实际成品；Android 实机与 Unigram 尚未实测，字体审计通过不能替代这些应用的验收。
 
 ## 许可证
 
