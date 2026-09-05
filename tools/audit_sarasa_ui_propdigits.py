@@ -3,6 +3,9 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import hashlib
+import functools
+import string
+import unicodedata
 import io
 import importlib.metadata
 import importlib.util
@@ -21,6 +24,8 @@ from python_env_bootstrap import ensure_project_python
 
 
 AUDIT_DEPS = {
+    "fontTools": ("fonttools", "fonttools[woff]==4.63.0", "4.63.0"),
+    "uharfbuzz": ("uharfbuzz", "uharfbuzz==0.56.0", "0.56.0"),
     "freetype": ("freetype-py", "freetype-py==2.5.1", "2.5.1"),
     "numpy": ("numpy", "numpy==2.4.2", "2.4.2"),
 }
@@ -165,6 +170,9 @@ def audit_contract_manifest() -> dict[str, str]:
     paths = [
         Path(__file__).resolve(),
         Path(b.__file__).resolve(),
+        ROOT / "tools" / "python_env_bootstrap.py",
+        ROOT / "tools" / "check_external_release.py",
+        ROOT / "tools" / "package_release.py",
         ROOT / "requirements-build.txt",
         ROOT / "requirements-audit.txt",
     ]
@@ -3893,6 +3901,29 @@ def vf_ellipsis_axis_status(path: Path) -> dict[str, Any]:
     }
 
 
+def default_punctuation_status(path: Path, region: str, weights: tuple[int, ...] = ()) -> dict[str, Any]:
+    if region not in set(b.REGION_ORDER):
+        return {"applicable": False, "failures": [], "cases": 0}
+    font = hb.Font(hb.Face(path.read_bytes()))
+    failures = []; cases = 0
+    for weight in weights or (None,):
+        if weight is not None:
+            font.set_variations({"wght": weight})
+        for script in (None, "Latn", "Hani"):
+            for direction in ("ltr", "ttb"):
+                for text, advance, horizontal_glyphs in (("……", 2000, 2), ("——", 2000, 1), ("———", 3000, 1)):
+                    buf = hb.Buffer(); buf.add_str(text); buf.direction = direction
+                    if script is not None:
+                        buf.script = script
+                    buf.guess_segment_properties()
+                    hb.shape(font, buf)
+                    actual = sum(p.x_advance if direction == "ltr" else -p.y_advance for p in buf.glyph_positions)
+                    cases += 1
+                    if actual != advance or (direction == "ltr" and len(buf.glyph_infos) != horizontal_glyphs):
+                        failures.append({"weight": weight, "script": script, "direction": direction, "text": text, "advance": actual, "glyphs": len(buf.glyph_infos)})
+    return {"applicable": True, "failures": failures, "cases": cases}
+
+
 def audit_static_ellipsis_shaping() -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     weights = [str(stop["name"]) for stop in b.SOURCE_HAN_WEIGHT_STOPS]
@@ -3925,6 +3956,9 @@ def audit_static_ellipsis_shaping() -> list[dict[str, Any]]:
                     status = ellipsis_shaping_status(path)
                     item["counts"]["ellipsis_structure"] = status["failure_counts"]["structure"]
                     item["counts"]["ellipsis_shaping"] = status["failure_counts"]["shaping"]
+                    default_status = default_punctuation_status(path, region)
+                    item["counts"]["default_punctuation"] = len(default_status["failures"])
+                    item["default_punctuation"] = default_status
                     if not status["ok"]:
                         item["samples"] = {
                             "structure": status["structure"],
@@ -3969,6 +4003,9 @@ def audit_vf_ellipsis_shaping() -> list[dict[str, Any]]:
                 axis_status["failure_counts"].values()
             )
             item["control_status"] = control_status
+            default_status = default_punctuation_status(path, region, INTER_POSITION_WEIGHTS)
+            item["counts"]["default_punctuation"] = len(default_status["failures"])
+            item["default_punctuation"] = default_status
             item["axis_sweep"] = axis_status
             if control_failures:
                 item["samples"]["controls"] = control_failures
@@ -4551,7 +4588,7 @@ def langsys_signatures(font: TTFont, table_tag: str, by_tag: bool) -> list[list[
     return signatures
 
 
-def expected_upstream_dash_gsub_template(
+def expected_source_punctuation_gsub_template(
     reference: TTFont,
     region: str,
 ) -> tuple[list[str], list[list[Any]], list[list[Any]]]:
@@ -4683,6 +4720,28 @@ def expected_upstream_dash_gsub_template(
                 )
             )
     return expected_tags, index_signatures, tag_signatures
+
+
+def expected_upstream_dash_gsub_template(reference: TTFont, region: str) -> tuple[list[str], list[list[Any]], list[list[Any]]]:
+    tags, indices, _tag_signatures = expected_source_punctuation_gsub_template(reference, region)
+    if region not in set(b.REGION_ORDER):
+        return tags, indices, _tag_signatures
+    insertion = max(index + 1 for index, tag in enumerate(tags) if tag == "locl")
+    tags.insert(insertion, "locl")
+    result = []
+    existing = {(row[0], row[1]) for row in indices}
+    for script, language, required, features in indices:
+        shifted = [index + (index >= insertion) for index in features]
+        required = required + (required >= insertion) if required is not None else None
+        if language == "dflt":
+            if script in {"DFLT", "latn"} and (script, "ENG ") not in existing:
+                result.append([script, "ENG ", required, list(shifted)])
+            shifted.append(insertion)
+        result.append([script, language, required, shifted])
+    script_order = {record.ScriptTag: index for index, record in enumerate(reference["GSUB"].table.ScriptList.ScriptRecord)}
+    result.sort(key=lambda row: (script_order[row[0]], "" if row[1] == "dflt" else row[1]))
+    tagged = [[script, language, None if required is None else tags[required], [tags[index] for index in features]] for script, language, required, features in result]
+    return tags, result, tagged
 
 
 def langsys_feature_tags(font: TTFont, table_tag: str, script_tag: str, lang_tag: str) -> list[str]:
@@ -5127,6 +5186,11 @@ def audit_metadata() -> dict[str, Any]:
     static_count = 0
     variable_count = 0
     samples = {"static": [], "variable": []}
+    for path in release_font_paths():
+        if path.exists():
+            with TTFont(path, lazy=True) as font:
+                if "glyf" in font and "VORG" in font:
+                    failures.append({"kind": "truetype_vorg", "file": display_path(path)})
     for region in b.REGION_ORDER:
         for hinted in [True, False]:
             directory = b.static_dir(region, hinted)
@@ -6337,8 +6401,18 @@ def compare_harfbuzz_vf_metrics(
     hb_font: hb.Font,
     expected: TTFont,
     weight: int,
+    expected_hb: hb.Font | None = None,
 ) -> dict[str, Any]:
     hb_font.set_variations({"wght": weight})
+    if expected_hb is None:
+        stream = io.BytesIO()
+        old_recalc = expected.recalcBBoxes
+        expected.recalcBBoxes = False
+        try:
+            expected.save(stream)
+        finally:
+            expected.recalcBBoxes = old_recalc
+        expected_hb = hb.Font(hb.Face(stream.getvalue()))
     expected_cmap = expected.getBestCmap() or {}
     counts = {
         "missing_glyph": 0,
@@ -6360,7 +6434,10 @@ def compare_harfbuzz_vf_metrics(
                 samples["missing_glyph"].append(f"U+{codepoint:04X}")
             continue
         compared += 1
-        expected_h_advance, expected_lsb = expected["hmtx"].metrics[expected_glyph]
+        expected_gid = expected_hb.get_nominal_glyph(codepoint)
+        expected_extents = expected_hb.get_glyph_extents(expected_gid)
+        expected_h_advance = expected_hb.get_glyph_h_advance(expected_gid)
+        expected_lsb = expected_extents.x_bearing if expected_extents is not None else 0
         actual_h_advance = hb_font.get_glyph_h_advance(glyph_id)
         if actual_h_advance != expected_h_advance:
             counts["horizontal_advance"] += 1
@@ -6369,7 +6446,7 @@ def compare_harfbuzz_vf_metrics(
                     [f"U+{codepoint:04X}", actual_h_advance, expected_h_advance]
                 )
         if "vmtx" in expected and expected_glyph in expected["vmtx"].metrics:
-            expected_v_advance, _expected_tsb = expected["vmtx"].metrics[expected_glyph]
+            expected_v_advance = -expected_hb.get_glyph_v_advance(expected_gid)
             actual_v_advance = hb_font.get_glyph_v_advance(glyph_id)
             if actual_v_advance != -expected_v_advance:
                 counts["vertical_advance"] += 1
@@ -6396,7 +6473,10 @@ def compare_harfbuzz_vf_metrics(
                     [f"U+{codepoint:04X}", extents.x_bearing, expected_lsb]
                 )
         if "vmtx" in expected and expected_glyph in expected["vmtx"].metrics:
-            _expected_v_advance, expected_tsb = expected["vmtx"].metrics[expected_glyph]
+            expected_tsb = (
+                expected_hb.get_glyph_v_origin(expected_gid)[1] - expected_extents.y_bearing
+                if expected_extents is not None else 0
+            )
             _origin_x, origin_y = hb_font.get_glyph_v_origin(glyph_id)
             actual_tsb = origin_y - extents.y_bearing
             if actual_tsb != expected_tsb:
@@ -6415,6 +6495,7 @@ def compare_harfbuzz_vf_metrics(
                     )
     return {
         "counts": counts,
+        "reference_engine": "HarfBuzz",
         "coverage": {
             "codepoints_compared": compared,
             "glyph_extents_compared": extent_compared,
@@ -6500,6 +6581,7 @@ def audit_vf_engine_metrics() -> list[dict[str, Any]]:
                                 hb_font,
                                 expected,
                                 weight_value,
+                                hb.Font(hb.Face(expected_path.read_bytes())),
                             )
                         )
                     finally:
@@ -7775,7 +7857,7 @@ def positioning_delta(
     ]
 
 
-def audit_vf_source_gpos_variations() -> list[dict[str, Any]]:
+def audit_source_han_gpos_variations() -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     weights = [
         (str(stop["name"]), int(stop["value"]))
@@ -7938,6 +8020,134 @@ def audit_vf_source_gpos_variations() -> list[dict[str, Any]]:
         finally:
             source_font.close()
     return out
+
+
+INTER_POSITION_WEIGHTS = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
+
+
+def inter_positioning_signature(font: hb.Font, text: str, kind: str, *, source: bool) -> tuple[tuple[int, ...], ...]:
+    if kind == "mark":
+        # Disabling mark invokes HarfBuzz fallback positioning, which depends on
+        # each font's outlines/metrics. Compare actual attached ink relative to
+        # the base instead of subtracting that unrelated fallback algorithm.
+        buf = hb.Buffer(); buf.add_str(text); buf.script = "Latn"; buf.language = "en"; buf.direction = "ltr"
+        hb.shape(font, buf, {"kern": False, "mark": True, "mkmk": True, "ss03": source, "cv10": source})
+        pen_x = pen_y = 0
+        ink = []; origins = []
+        for info, position in zip(buf.glyph_infos, buf.glyph_positions):
+            extent = font.get_glyph_extents(info.codepoint)
+            origins.append((pen_x + position.x_offset, pen_y + position.y_offset))
+            ink.append((pen_x + position.x_offset + (extent.x_bearing if extent else 0), pen_y + position.y_offset + (extent.y_bearing if extent else 0)))
+            pen_x += position.x_advance; pen_y += position.y_advance
+        origin_x, origin_y = ink[0]
+        base_x, base_y = origins[0]
+        return tuple((x - base_x, y - base_y, ix - origin_x, iy - origin_y) for (x, y), (ix, iy) in zip(origins, ink))
+    signatures = []
+    for enabled in (False, True):
+        features = {"kern": False, "mark": False, "mkmk": False, "ss03": source, "cv10": source}
+        if kind == "kern":
+            features["kern"] = enabled
+        else:
+            features["mark"] = features["mkmk"] = enabled
+        buf = hb.Buffer(); buf.add_str(text); buf.script = "Latn"; buf.language = "en"; buf.direction = "ltr"
+        hb.shape(font, buf, features)
+        signatures.append([(p.x_advance, p.y_advance, p.x_offset, p.y_offset) for p in buf.glyph_positions])
+    if len(signatures[0]) != len(signatures[1]):
+        raise ValueError("定位开关改变了 glyph 数量")
+    return tuple(tuple(a - b for a, b in zip(on, off)) for on, off in zip(signatures[1], signatures[0]))
+
+
+def positioning_signature_comparison(actual: tuple, expected: tuple, kind: str, text: str, weight: int) -> tuple[bool, int]:
+    if kind == "mark":
+        # Two rounded attachment anchors can accumulate 2 units. The rendered
+        # comparison additionally contains two independently quantized glyph
+        # bearings; inspect both components instead of attributing all 3-unit
+        # ink differences to incorrect positioning.
+        tolerances = (2, 2, 4, 4)
+    else:
+        limit = 0 if text in {"LY", "GT", "Go"} and weight in (400, 900) else 1
+        tolerances = (limit,) * 4
+    deltas = [tuple(abs(a - e) for a, e in zip(row_a, row_e)) for row_a, row_e in zip(actual, expected)]
+    if kind == "mark":
+        # A stack has multiple attachment links. Check each link's two anchors
+        # independently; summing their rounding over the whole stack would
+        # incorrectly apply a single-link tolerance to multiple operations.
+        deltas = [
+            ((0, 0) if index == 0 else tuple(abs((actual[index][axis] - actual[index - 1][axis]) - (expected[index][axis] - expected[index - 1][axis])) for axis in (0, 1))) + row[2:]
+            for index, row in enumerate(deltas)
+        ]
+    failed = len(actual) != len(expected) or any(delta > limit for row in deltas for delta, limit in zip(row, tolerances))
+    return failed, max((delta for row in deltas for delta in row), default=0)
+
+
+@functools.lru_cache(maxsize=26)
+def inter_positioning_reference(italic: bool, weight: int) -> tuple[tuple[str, str, tuple[tuple[int, ...], ...]], ...]:
+    # Independent source: keep original cmap/GPOS and enable the original GSUB
+    # variants in HarfBuzz. Never call the product's baking/import helpers.
+    source = TTFont(b.INTER_ITALIC if italic else b.INTER_UPRIGHT)
+    source = instantiateVariableFont(source, {"opsz": 14, "wght": (200, 400, 900)}, inplace=True)
+    b.scale_upem(source, 1000)
+    cmap = source.getBestCmap()
+    alternatives = b.get_single_substitution_mapping(source, "cv10")
+    alternate_chars = [chr(cp) for cp, glyph in cmap.items() if glyph in alternatives]
+    pairs = {a + z for a in string.ascii_letters for z in string.ascii_letters}
+    for a in alternate_chars:
+        for z in string.ascii_letters:
+            pairs.update((a + z, z + a))
+    stackable = set()
+    for lookup_index in b.feature_lookup_indices(source, "GPOS", {"mkmk"}):
+        for subtable in source["GPOS"].table.LookupList.Lookup[lookup_index].SubTable:
+            if hasattr(subtable, "ExtSubTable"):
+                subtable = subtable.ExtSubTable
+            stackable.update(subtable.Mark2Coverage.glyphs)
+    # Arbitrary combining characters may have no attachment in Inter itself;
+    # their unpositioned advance differences are not a GPOS regression.
+    marks = [chr(cp) for cp in range(0x300, 0x370) if cp in cmap and cmap[cp] in stackable and unicodedata.combining(chr(cp))]
+    cases = [("kern", text) for text in sorted(pairs)]
+    cases.extend(("mark", base + mark + "\u0301") for base in "GHTYfxy" for mark in marks)
+    stream = io.BytesIO(); source.flavor = None; source.save(stream); source.close()
+    font = hb.Font(hb.Face(stream.getvalue())); font.set_variations({"wght": weight})
+    return tuple((kind, text, inter_positioning_signature(font, text, kind, source=True)) for kind, text in cases)
+
+
+def audit_inter_positioning() -> list[dict[str, Any]]:
+    results = []
+    for region in b.variable_regions(b.REGION_ORDER):
+        for italic in (False, True):
+            path = vf_path(region, italic)
+            font = hb.Font(hb.Face(path.read_bytes())) if path.exists() else None
+            for weight in INTER_POSITION_WEIGHTS:
+                item = {"kind": "inter-positioning", "region": region, "italic": italic, "wght": weight, "target": display_path(path), "counts": {"kern": 0, "mark": 0}, "coverage": {"kern": 0, "mark": 0}, "observations": {"kern_quantization": 0, "mark_quantization": 0}, "maximum_deltas": {"kern": 0, "mark": 0}, "samples": []}
+                if font is None:
+                    item["missing"] = True; results.append(item); continue
+                font.set_variations({"wght": weight})
+                for kind, text, expected in inter_positioning_reference(italic, weight):
+                    actual = inter_positioning_signature(font, text, kind, source=False)
+                    item["coverage"][kind] += 1
+                    failed, maximum = positioning_signature_comparison(actual, expected, kind, text, weight)
+                    item["maximum_deltas"][kind] = max(item["maximum_deltas"][kind], maximum)
+                    if maximum and not failed:
+                        item["observations"][f"{kind}_quantization"] += 1
+                    if failed:
+                        item["counts"][kind] += 1
+                        if len(item["samples"]) < 12:
+                            item["samples"].append({"text": text, "feature": kind, "actual": actual, "expected": expected, "maximum_delta": maximum})
+                log(f"Inter 定位：{region} {'Italic' if italic else '正体'} {weight}，失败 {sum(item['counts'].values())}")
+                results.append(item)
+    return results
+
+
+def audit_vf_source_gpos_variations() -> list[dict[str, Any]]:
+    return audit_source_han_gpos_variations() + audit_inter_positioning()
+
+
+def inter_positioning_coverage_failures(results: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    cases = [item for item in results if item.get("kind") == "inter-positioning"]
+    expected = {(region, italic, weight) for region in b.variable_regions(b.REGION_ORDER) for italic in (False, True) for weight in INTER_POSITION_WEIGHTS}
+    actual = {(item.get("region"), item.get("italic"), item.get("wght")) for item in cases}
+    if len(cases) != len(expected) or actual != expected or any(item.get("missing") or item["coverage"]["kern"] < 2704 or item["coverage"]["mark"] == 0 for item in cases):
+        return [{"kind": "inter-positioning-incomplete", "expected_cases": len(expected), "actual_cases": len(cases)}]
+    return []
 
 
 def nonzero(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -8388,6 +8598,7 @@ def main() -> None:
         cl_source_outlines,
     )
     if not args.raster_only:
+        coverage_failures.extend(inter_positioning_coverage_failures(vf_source_gpos_variations))
         coverage_failures.extend(
             vf_source_metric_coverage_failures(
                 vf_source_pairing,

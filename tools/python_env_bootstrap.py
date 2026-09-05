@@ -41,7 +41,8 @@ def ensure_project_python(
     if os.environ.get("SARASA_SKIP_PYTHON_DEPS") == "1":
         return
     needed = missing_dependencies(dependencies)
-    if not needed:
+    requested_venv = os.environ.get("SARASA_PYTHON_VENV")
+    if not needed and not requested_venv:
         return
 
     venv_dir = Path(
@@ -51,10 +52,9 @@ def ensure_project_python(
         )
     ).resolve()
     python = venv_python(venv_dir)
-    active = (
-        os.environ.get("SARASA_PYTHON_ENV_ACTIVE") == "1"
-        or (python.exists() and Path(sys.executable).resolve() == python.resolve())
-    )
+    # Symlinked venv executables can resolve to the same base Python. The
+    # environment prefix, not the executable or an inherited marker, owns pip.
+    active = Path(sys.prefix).resolve() == venv_dir
     if not active:
         if not python.exists():
             print(f"[{label}] create project Python environment: {venv_dir}", flush=True)
@@ -62,7 +62,15 @@ def ensure_project_python(
         env = dict(os.environ)
         env["SARASA_PYTHON_ENV_ACTIVE"] = "1"
         original_args = list(getattr(sys, "orig_argv", [sys.executable, *sys.argv]))
-        os.execve(str(python), [str(python), *original_args[1:]], env)
+        argv = [str(python), *original_args[1:]]
+        if os.name == "nt":
+            # Windows has no POSIX exec; preserve redirected handles and quote
+            # the argument vector through subprocess instead of the CRT overlay.
+            raise SystemExit(subprocess.call(argv, env=env))
+        os.execve(str(python), argv, env)
+
+    if not needed:
+        return
 
     print(
         f"[{label}] install pinned dependencies in project environment: {' '.join(needed)}",

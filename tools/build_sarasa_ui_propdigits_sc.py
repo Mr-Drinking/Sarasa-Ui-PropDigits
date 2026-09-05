@@ -167,9 +167,9 @@ def log_step(message: str) -> None:
 
 
 SARASA_VERSION = "1.0.40"
-VERSION = "1.0.40.3"
-FONT_REVISION = 1.0403
-OPENTYPE_VERSION = "1.0403"
+VERSION = "1.0.40.4"
+FONT_REVISION = 1.0404
+OPENTYPE_VERSION = "1.0404"
 SARASA_TAG = f"v{SARASA_VERSION}"
 SARASA_COMMIT = "4b908c71116a3192f7a9889bd67b1939a891e527"
 SARASA_SOURCE_ARCHIVE_SHA256 = "4ef493207030d9bd811695a71b9edeabff498f27b03d515f8f393445afc14ea9"
@@ -425,7 +425,7 @@ SARASA_HINT_CONFIGS = {
 }
 CHLOROPHYTUM_HINT_STORE_ORDER = "numeric-gid-hcfg-shared-v3"
 STATIC_HINT_WORK_VERSION = 5
-STATIC_POSTPROCESS_VERSION = 6
+STATIC_POSTPROCESS_VERSION = 7
 STATIC_HINT_RECIPE = {
     "version": STATIC_HINT_WORK_VERSION,
     "fragments": "sarasa-pass1-kanji-hangul",
@@ -1726,7 +1726,14 @@ def rebuild_gdef_from_reference(font: TTFont, reference: TTFont) -> dict[str, in
             class_defs[glyph_name] = reference_classes[glyph_name]
     class_defs = {glyph_name: value for glyph_name, value in class_defs.items() if glyph_name in glyph_set}
 
-    gdef = copy.deepcopy(reference_gdef)
+    # Variable lookup flags and filtering-set indices belong to the merged
+    # source GDEF. Replacing its sets with auto-named static sets makes them
+    # empty; the subsetter then rewrites UseMarkFilteringSet to IgnoreMarks.
+    gdef = copy.deepcopy(font["GDEF"] if "fvar" in font and "GDEF" in font else reference_gdef)
+    if "fvar" in font and getattr(gdef.table, "GlyphClassDef", None):
+        inherited = {name: value for name, value in gdef.table.GlyphClassDef.classDefs.items() if name in glyph_set}
+        inherited.update(class_defs)
+        class_defs = inherited
     gdef.table.GlyphClassDef.classDefs = class_defs
     mark_sets = getattr(gdef.table, "MarkGlyphSetsDef", None)
     if mark_sets and getattr(mark_sets, "Coverage", None):
@@ -3961,6 +3968,8 @@ def harfbuzz_named_metric_status(
         }
         compared = 0
         hb_font.set_variations({"wght": weight_value})
+        expected_path = static_dir(region, False) / static_output_name(region, weight_name, italic)
+        expected_hb = hb.Font(hb.Face(expected_path.read_bytes()))
         try:
             for codepoint, expected_glyph in (expected.getBestCmap() or {}).items():
                 glyph_id = hb_font.get_nominal_glyph(codepoint)
@@ -3976,9 +3985,10 @@ def harfbuzz_named_metric_status(
                         )
                     continue
                 compared += 1
-                expected_h_advance, expected_lsb = expected["hmtx"].metrics[
-                    expected_glyph
-                ]
+                expected_gid = expected_hb.get_nominal_glyph(codepoint)
+                expected_extents = expected_hb.get_glyph_extents(expected_gid)
+                expected_h_advance = expected_hb.get_glyph_h_advance(expected_gid)
+                expected_lsb = expected_extents.x_bearing if expected_extents is not None else 0
                 actual_h_advance = hb_font.get_glyph_h_advance(glyph_id)
                 if actual_h_advance != expected_h_advance:
                     counts["horizontal_advance"] += 1
@@ -4007,9 +4017,11 @@ def harfbuzz_named_metric_status(
                         )
                 if "vmtx" not in expected or expected_glyph not in expected["vmtx"].metrics:
                     continue
-                expected_v_advance, expected_tsb = expected["vmtx"].metrics[
-                    expected_glyph
-                ]
+                expected_v_advance = -expected_hb.get_glyph_v_advance(expected_gid)
+                expected_tsb = (
+                    expected_hb.get_glyph_v_origin(expected_gid)[1] - expected_extents.y_bearing
+                    if expected_extents is not None else 0
+                )
                 actual_v_advance = hb_font.get_glyph_v_advance(glyph_id)
                 if actual_v_advance != -expected_v_advance:
                     counts["vertical_advance"] += 1
@@ -4047,7 +4059,7 @@ def harfbuzz_named_metric_status(
             not any(counts.values())
             for counts in counts_by_weight.values()
         ),
-        "reference_mode": "project-static-unhinted",
+        "reference_mode": "harfbuzz-both-project-static-unhinted-and-vf",
         "counts_by_weight": counts_by_weight,
         "codepoints_compared_by_weight": compared_by_weight,
         "failure_samples": samples,
@@ -4574,6 +4586,8 @@ def bake_single_substitution_feature(
     return count
 
 
+
+
 def shift_glyph_x(font: TTFont, glyph_name: str, dx: float) -> None:
     dx = otRound(dx)
     if not dx or glyph_name not in font["glyf"].glyphs:
@@ -4944,10 +4958,23 @@ def load_inter(italic: bool) -> TTFont:
     inter = TTFont(INTER_ITALIC if italic else INTER_UPRIGHT)
     inter = instantiateVariableFont(inter, INTER_AXIS_LIMIT, inplace=False, optimize=True)
     scale_upem(inter, 1000)
-    bake_single_substitution_feature(inter, "ss03")
-    bake_single_substitution_feature(inter, "cv10")
+    bake_inter_feature_defaults(inter)
     bake_inter_ui_tnum_defaults(inter)
     return inter
+
+
+def bake_inter_feature_defaults(font: TTFont) -> dict[str, str]:
+    # Sarasa bakes these presets by changing cmap identities. This preserves
+    # each alternate's kerning/anchors and leaves component glyphs intact.
+    effective = {name: name for name in font.getBestCmap().values()}
+    for tag in ("ss03", "cv10"):
+        substitutions = get_single_substitution_mapping(font, tag)
+        effective = {original: substitutions.get(current, current) for original, current in effective.items()}
+    effective = {original: target for original, target in effective.items() if original != target}
+    for table in font["cmap"].tables:
+        if table.isUnicode():
+            table.cmap = {codepoint: effective.get(name, name) for codepoint, name in table.cmap.items()}
+    return effective
 
 
 def bake_inter_ui_tnum_defaults(font: TTFont) -> int:
@@ -5202,39 +5229,6 @@ def remove_glyphs(font: TTFont, glyph_names: set[str]) -> int:
     return len(removable)
 
 
-def strip_ot_variation_devices(obj: Any, seen: set[int] | None = None) -> None:
-    if seen is None:
-        seen = set()
-    if obj is None or isinstance(obj, (str, int, float, bool, bytes)):
-        return
-    obj_id = id(obj)
-    if obj_id in seen:
-        return
-    seen.add(obj_id)
-    if isinstance(obj, dict):
-        for key, value in list(obj.items()):
-            if isinstance(value, ot.Device) and getattr(value, "DeltaFormat", None) == 0x8000:
-                obj[key] = None
-            else:
-                strip_ot_variation_devices(value, seen)
-        return
-    if isinstance(obj, list):
-        for index, value in enumerate(obj):
-            if isinstance(value, ot.Device) and getattr(value, "DeltaFormat", None) == 0x8000:
-                obj[index] = None
-            else:
-                strip_ot_variation_devices(value, seen)
-        return
-    if isinstance(obj, tuple):
-        for value in obj:
-            strip_ot_variation_devices(value, seen)
-        return
-    if hasattr(obj, "__dict__"):
-        for key, value in vars(obj).items():
-            if isinstance(value, ot.Device) and getattr(value, "DeltaFormat", None) == 0x8000:
-                setattr(obj, key, None)
-            else:
-                strip_ot_variation_devices(value, seen)
 
 
 def import_name_id(
@@ -5302,6 +5296,98 @@ def import_layout_feature_names(
     return imported
 
 
+def import_inter_gpos_variations(base: TTFont, inter: TTFont) -> dict[int, int]:
+    """Re-express Inter's positioning in the public axis and merge its store."""
+    assert_public_axis_ready_for_inter_remap(base)
+    inter["GPOS"].ensureDecompiled()
+    devices = collect_ot_variation_devices(inter["GPOS"].table)
+    indices = sorted({(device.StartSize << 16) | device.EndSize for device in devices} - {0xFFFFFFFF})
+    if not indices:
+        return {0xFFFFFFFF: 0xFFFFFFFF}
+    store = getattr(inter["GDEF"].table, "VarStore", None) if "GDEF" in inter else None
+    if store is None:
+        raise ValueError("Inter GPOS 变化引用缺少 GDEF VarStore")
+    if [axis.axisTag for axis in inter["fvar"].axes] != ["wght"]:
+        raise ValueError("导入 Inter GPOS 前必须固定 opsz，仅保留 wght")
+    axis = weight_axis(inter)
+    inter_segment = inter["avar"].segments["wght"] if "avar" in inter else {-1.0: -1.0, 0.0: 0.0, 1.0: 1.0}
+    base_axis = weight_axis(base)
+    base_segment = base["avar"].segments["wght"]
+    weights = set(SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT)
+    # Include every breakpoint of both coordinate mappings and every source
+    # region. Merely moving a tent's three endpoints loses its linear pieces.
+    weights.update(denormalize_axis_value(value, axis.minValue, axis.defaultValue, axis.maxValue) for value in inter_segment)
+    weights.update(denormalize_axis_value(value, base_axis.minValue, base_axis.defaultValue, base_axis.maxValue) for value in base_segment)
+    for region in store.VarRegionList.Region:
+        support = region.VarRegionAxis[0]
+        for value in (support.StartCoord, support.PeakCoord, support.EndCoord):
+            weights.add(denormalize_axis_value(inverse_piecewise_map(value, inter_segment), axis.minValue, axis.defaultValue, axis.maxValue))
+    weights = sorted(weight for weight in weights if base_axis.minValue <= weight <= base_axis.maxValue)
+    by_location = {
+        floatToFixedToFloat(vf_mapped_normalized_weight(base, weight), 14): weight
+        for weight in weights
+    }
+    for weight in SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT:
+        by_location[floatToFixedToFloat(vf_mapped_normalized_weight(base, weight), 14)] = weight
+    locations = sorted(by_location)
+    weights = [by_location[value] for value in locations]
+    model = VariationModel([{"wght": value} if value else {} for value in locations], axisOrder=["wght"])
+    instancers = [VarStoreInstancer(store, inter["fvar"].axes, {"wght": vf_mapped_normalized_weight(inter, weight)}) for weight in weights]
+    builder = OnlineVarStoreBuilder(["wght"])
+    builder.setModel(model)
+    remap = {}
+    for index in indices:
+        default, new_index = builder.storeMasters([instancer[index] for instancer in instancers], round=otRound)
+        if default:
+            raise ValueError("Inter GPOS 变化数据在默认坐标不为零")
+        remap[index] = new_index
+    additional = builder.finish()
+    if "GDEF" not in base:
+        base["GDEF"] = newTable("GDEF")
+        base["GDEF"].table = ot.GDEF()
+    gdef = base["GDEF"].table
+    existing = getattr(gdef, "VarStore", None)
+    if existing is not None:
+        merged, merged_indices = append_item_variation_store(existing, additional, [remap[index] for index in indices])
+        remap = dict(zip(indices, merged_indices))
+    else:
+        merged = additional
+    gdef.Version = 0x00010003
+    gdef.VarStore = merged
+    remap[0xFFFFFFFF] = 0xFFFFFFFF
+    return remap
+
+
+def remap_layout_variation_devices(table: Any, mapping: dict[int, int]) -> None:
+    transformed = {}
+    def visit(value: Any) -> Any:
+        if value is None or isinstance(value, (str, int, float, bool, bytes)):
+            return value
+        if id(value) in transformed:
+            return transformed[id(value)]
+        if isinstance(value, ot.Device) and getattr(value, "DeltaFormat", None) == 0x8000:
+            index = mapping[(value.StartSize << 16) | value.EndSize]
+            # The store builder uses NO_VARIATION_INDEX for a constant zero
+            # delta. A null Device offset expresses that without a reference.
+            if index == 0xFFFFFFFF:
+                transformed[id(value)] = None
+                return None
+            value.StartSize, value.EndSize = index >> 16, index & 0xFFFF
+            transformed[id(value)] = value
+            return value
+        transformed[id(value)] = value
+        if isinstance(value, list):
+            value[:] = [visit(item) for item in value]
+        elif isinstance(value, dict):
+            for key, item in list(value.items()):
+                value[key] = visit(item)
+        elif hasattr(value, "__dict__"):
+            for key, item in list(vars(value).items()):
+                setattr(value, key, visit(item))
+        return value
+    visit(table)
+
+
 def append_layout_features(
     base: TTFont,
     inter: TTFont,
@@ -5314,10 +5400,16 @@ def append_layout_features(
             f"inter_{table_tag.lower()}_lookups_imported": 0,
             f"inter_{table_tag.lower()}_feature_names_imported": 0,
         }
+    variation_map = import_inter_gpos_variations(base, inter) if table_tag == "GPOS" else {}
     if table_tag not in base:
         base[table_tag] = copy.deepcopy(inter[table_tag])
         rename = {name: prefixed(name) for name in inter.getGlyphOrder() if name != ".notdef"}
         rename_ot_glyph_references(base[table_tag].table, rename)
+        for lookup in base[table_tag].table.LookupList.Lookup:
+            if lookup.LookupFlag & 0x0010:
+                lookup.MarkFilteringSet = base._sarasa_inter_mark_filter_map[lookup.MarkFilteringSet]
+        if table_tag == "GPOS":
+            remap_layout_variation_devices(base[table_tag].table, variation_map)
         name_id_remap: dict[int, int] = {}
         names_imported = 0
         if base[table_tag].table.FeatureList:
@@ -5333,6 +5425,7 @@ def append_layout_features(
             f"inter_{table_tag.lower()}_feature_names_imported": names_imported,
         }
 
+    inter[table_tag].ensureDecompiled()
     source = inter[table_tag].table
     target = base[table_tag].table
     if not source.FeatureList or not source.LookupList:
@@ -5352,13 +5445,24 @@ def append_layout_features(
 
     rename = {name: prefixed(name) for name in inter.getGlyphOrder() if name != ".notdef"}
     feature_records = [record for record in source.FeatureList.FeatureRecord if record.FeatureTag in feature_tags]
-    lookup_indices = sorted({index for record in feature_records for index in record.Feature.LookupListIndex})
-    lookup_index_map: dict[int, int] = {}
+    lookup_indices_set = {index for record in feature_records for index in record.Feature.LookupListIndex}
+    pending = list(lookup_indices_set)
+    while pending:
+        for record in layout_lookup_records(source.LookupList.Lookup[pending.pop()]):
+            if record.LookupListIndex not in lookup_indices_set:
+                lookup_indices_set.add(record.LookupListIndex)
+                pending.append(record.LookupListIndex)
+    lookup_indices = sorted(lookup_indices_set)
+    lookup_index_map = {index: len(target.LookupList.Lookup) + offset for offset, index in enumerate(lookup_indices)}
     for old_index in lookup_indices:
         lookup = copy.deepcopy(source.LookupList.Lookup[old_index])
         rename_ot_glyph_references(lookup, rename)
+        if lookup.LookupFlag & 0x0010:
+            lookup.MarkFilteringSet = base._sarasa_inter_mark_filter_map[lookup.MarkFilteringSet]
+        for record in layout_lookup_records(lookup):
+            record.LookupListIndex = lookup_index_map[record.LookupListIndex]
         if table_tag == "GPOS":
-            strip_ot_variation_devices(lookup)
+            remap_layout_variation_devices(lookup, variation_map)
         new_index = len(target.LookupList.Lookup)
         target.LookupList.Lookup.append(lookup)
         lookup_index_map[old_index] = new_index
@@ -5385,11 +5489,64 @@ def append_layout_features(
     }
 
 
+def layout_lookup_records(value: Any, seen: set[int] | None = None) -> list[Any]:
+    if isinstance(value, (ot.SubstLookupRecord, ot.PosLookupRecord)):
+        return [value]
+    if value is None or isinstance(value, (str, int, float, bool, bytes)):
+        return []
+    seen = set() if seen is None else seen
+    if id(value) in seen:
+        return []
+    seen.add(id(value))
+    if isinstance(value, dict):
+        children = value.values()
+    elif isinstance(value, (list, tuple)):
+        children = value
+    elif hasattr(value, "__dict__"):
+        children = vars(value).values()
+    else:
+        return []
+    return [record for child in children for record in layout_lookup_records(child, seen)]
+
+
 def import_inter_layout_features(base: TTFont, inter: TTFont) -> dict[str, int]:
     report: dict[str, int] = {}
+    report.update(import_inter_gdef_classes(base, inter))
     report.update(append_layout_features(base, inter, "GSUB", INTER_GSUB_FEATURES))
     report.update(append_layout_features(base, inter, "GPOS", INTER_GPOS_FEATURES))
     return report
+
+
+def import_inter_gdef_classes(base: TTFont, inter: TTFont) -> dict[str, int]:
+    if "GDEF" not in inter:
+        return {"inter_gdef_mark_sets_imported": 0}
+    if "GDEF" not in base:
+        base["GDEF"] = newTable("GDEF")
+        base["GDEF"].table = ot.GDEF()
+        base["GDEF"].table.Version = 0x00010000
+    target = base["GDEF"].table
+    source = inter["GDEF"].table
+    rename = {name: prefixed(name) for name in inter.getGlyphOrder() if name != ".notdef"}
+    if getattr(source, "GlyphClassDef", None):
+        if not getattr(target, "GlyphClassDef", None):
+            target.GlyphClassDef = ot.ClassDef(); target.GlyphClassDef.classDefs = {}
+        target.GlyphClassDef.classDefs.update({rename[name]: value for name, value in source.GlyphClassDef.classDefs.items() if name in rename})
+    source_sets = getattr(source, "MarkGlyphSetsDef", None)
+    mapping = {}
+    if source_sets:
+        if not getattr(target, "MarkGlyphSetsDef", None):
+            target.MarkGlyphSetsDef = ot.MarkGlyphSetsDef()
+            target.MarkGlyphSetsDef.MarkSetTableFormat = 1
+            target.MarkGlyphSetsDef.Coverage = []
+        for index, coverage in enumerate(source_sets.Coverage):
+            mapping[index] = len(target.MarkGlyphSetsDef.Coverage)
+            cloned = copy.deepcopy(coverage)
+            cloned.glyphs = [rename[name] for name in cloned.glyphs if name in rename]
+            target.MarkGlyphSetsDef.Coverage.append(cloned)
+        target.MarkGlyphSetsDef.MarkSetCount = len(target.MarkGlyphSetsDef.Coverage)
+        target.Version = max(target.Version, 0x00010002)
+    base._sarasa_inter_mark_filter_map = mapping
+    return {"inter_gdef_mark_sets_imported": len(mapping)}
 
 
 def remove_metric_variation_maps(font: TTFont) -> None:
@@ -8647,6 +8804,71 @@ def apply_cjk_ellipsis_behavior(font: TTFont) -> dict[str, Any]:
     return report
 
 
+def apply_default_regional_punctuation(font: TTFont, region: str) -> dict[str, Any]:
+    language = {"CL": "ZHT ", "SC": "ZHS ", "TC": "ZHT ", "HC": "ZHH ", "J": "JAN ", "K": "KOR "}.get(region)
+    if language is None:
+        return {"default_regional_punctuation": False}
+    roles = cjk_ellipsis_roles(font)
+    mapping = dict(dash_locl_mappings_by_language(font).get(language, {}))
+    mapping[roles["proportional"]] = roles["fullwidth"]
+    gsub = font["GSUB"].table
+    source_indices = {
+        lookup
+        for langsys in langsys_records_for_language(font, language)
+        for index in langsys.FeatureIndex
+        if gsub.FeatureList.FeatureRecord[index].FeatureTag == "locl"
+        for lookup in gsub.FeatureList.FeatureRecord[index].Feature.LookupListIndex
+    }
+    lookup_indices = sorted(index for index in source_indices if (
+        lookup_single_substitution_mapping(gsub, index)
+        and set(lookup_single_substitution_mapping(gsub, index).items()) <= set(mapping.items())
+    ))
+    covered = {}
+    for index in lookup_indices:
+        covered.update(lookup_single_substitution_mapping(gsub, index))
+    if covered != mapping:
+        raise ValueError("缺少可复用的地区标点 locl lookup")
+    default_langs = [record.Script.DefaultLangSys for record in gsub.ScriptList.ScriptRecord if record.Script.DefaultLangSys]
+    # Repeated finalization must not add duplicate lookups or features.
+    matches = []
+    for langsys in default_langs:
+        for index in langsys.FeatureIndex:
+            record = gsub.FeatureList.FeatureRecord[index]
+            if record.FeatureTag != "locl":
+                continue
+            combined = {}
+            for lookup in record.Feature.LookupListIndex:
+                combined.update(lookup_single_substitution_mapping(gsub, lookup))
+            if combined == mapping:
+                matches.append(index)
+                break
+    if len(matches) == len(default_langs):
+        for index in set(matches):
+            feature = gsub.FeatureList.FeatureRecord[index].Feature
+            feature.LookupListIndex = list(lookup_indices)
+            feature.LookupCount = len(lookup_indices)
+        return {"default_regional_punctuation": True, "default_punctuation_already_valid": True}
+    # Reuse the original locl lookups in their ccmp -> locl -> vert order.
+    # Appending a new substitution after vert would collapse a vertical 2em
+    # dash to the source's 1em default before localization can run.
+    feature_index = insert_gsub_feature_record(font, "locl", lookup_indices)
+    for record in gsub.ScriptList.ScriptRecord:
+        script = record.Script
+        if not script.DefaultLangSys:
+            continue
+        if record.ScriptTag in {"DFLT", "latn"} and not any(lang.LangSysTag == "ENG " for lang in script.LangSysRecord):
+            english = ot.LangSysRecord()
+            english.LangSysTag = "ENG "
+            english.LangSys = copy.deepcopy(script.DefaultLangSys)
+            script.LangSysRecord.append(english)
+            script.LangSysRecord.sort(key=lambda lang: lang.LangSysTag)
+            script.LangSysCount = len(script.LangSysRecord)
+        script.DefaultLangSys = copy.deepcopy(script.DefaultLangSys)
+        script.DefaultLangSys.FeatureIndex.append(feature_index)
+        script.DefaultLangSys.FeatureCount = len(script.DefaultLangSys.FeatureIndex)
+    return {"default_regional_punctuation": True, "default_punctuation_language": language.strip()}
+
+
 def cjk_ellipsis_structure_status(font: TTFont) -> dict[str, Any]:
     reasons: list[str] = []
     try:
@@ -8795,6 +9017,7 @@ def apply_upstream_dash_behavior(
             link_lookup_to_all_gsub_features(font, tag, vertical_lookup)
         )
     report.update(apply_cjk_ellipsis_behavior(font))
+    report.update(apply_default_regional_punctuation(font, region))
 
     gdef = font["GDEF"].table if "GDEF" in font else None
     class_defs = getattr(getattr(gdef, "GlyphClassDef", None), "classDefs", None)
@@ -10538,6 +10761,8 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         region,
         italic,
     )
+    log_step(f"variable {style_label}: normalize TrueType vertical origins")
+    vorgless_report = normalize_variable_vertical_origin(base)
     log_step(f"variable {style_label}: materialize and validate final gvar")
     gvar_finalization_report = materialize_gvar_variations(base)
     if gvar_finalization_report["gvar_coordinate_length_mismatches"]:
@@ -10637,6 +10862,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         **post_metric_gvar_report,
         **final_inter_bound_report,
         **final_inter_engine_metric_report,
+        **vorgless_report,
         **gvar_finalization_report,
     }
 
@@ -10791,8 +11017,6 @@ def safe_extract_tar_all(tf: tarfile.TarFile, destination: Path) -> None:
 
 
 def extract_zip_basename(archive: Path, basename: str, out_path: Path) -> Path:
-    if out_path.exists():
-        return out_path
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with zipfile.ZipFile(archive) as zf:
         validate_zip_archive(zf, out_path.parent)
@@ -10801,8 +11025,8 @@ def extract_zip_basename(archive: Path, basename: str, out_path: Path) -> Path:
             raise FileNotFoundError(f"{basename} not found in {archive}")
         member = sorted(members, key=len)[0]
         log_step(f"extract {basename}")
-        with zf.open(member) as src, out_path.open("wb") as dst:
-            shutil.copyfileobj(src, dst, 1024 * 1024)
+        payload = zf.read(member)
+        verify_or_write_source(out_path, payload)
     return out_path
 
 
@@ -10815,19 +11039,14 @@ def extract_zip_first_basename(archive: Path, basenames: list[str], out_dir: Pat
             if not members:
                 continue
             out_path = out_dir / basename
-            if not out_path.exists():
-                out_path.parent.mkdir(parents=True, exist_ok=True)
-                member = sorted(members, key=len)[0]
-                log_step(f"extract {basename}")
-                with zf.open(member) as src, out_path.open("wb") as dst:
-                    shutil.copyfileobj(src, dst, 1024 * 1024)
+            out_path.parent.mkdir(parents=True, exist_ok=True)
+            member = sorted(members, key=len)[0]
+            verify_or_write_source(out_path, zf.read(member))
             return out_path
     raise FileNotFoundError(f"None of {basenames} found in {archive}")
 
 
 def extract_7z_ttf_prefix(archive: Path, out_dir: Path, prefix: str) -> None:
-    if any(out_dir.glob(f"{prefix}*.ttf")):
-        return
     import py7zr
 
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -10838,12 +11057,10 @@ def extract_7z_ttf_prefix(archive: Path, out_dir: Path, prefix: str) -> None:
             validate_archive_member_paths(zf.getnames(), tmp_dir)
             zf.extractall(tmp_dir)
         for path in tmp_dir.rglob(f"{prefix}*.ttf"):
-            shutil.copy2(path, out_dir / path.name)
+            verify_or_write_source(out_dir / path.name, path.read_bytes())
 
 
 def extract_7z_basename(archive: Path, basename: str, out_path: Path) -> Path:
-    if out_path.exists():
-        return out_path
     import py7zr
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -10859,8 +11076,21 @@ def extract_7z_basename(archive: Path, basename: str, out_path: Path) -> Path:
         matches = list(tmp_dir.rglob(basename))
         if not matches:
             raise FileNotFoundError(f"{basename} not extracted from {archive}")
-        shutil.copy2(matches[0], out_path)
+        verify_or_write_source(out_path, matches[0].read_bytes())
     return out_path
+
+
+def verify_or_write_source(path: Path, payload: bytes) -> None:
+    """Compare cached bytes with a member of a freshly verified archive."""
+    expected = hashlib.sha256(payload).hexdigest()
+    if path.exists():
+        if file_sha256(path) != expected:
+            raise RuntimeError(f"缓存源 SHA-256 校验失败：{path.name}")
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    pending = path.with_name(path.name + ".extract.tmp")
+    pending.write_bytes(payload)
+    pending.replace(path)
 
 
 def node_platform_archive() -> tuple[str, str, str]:
@@ -10899,8 +11129,12 @@ def bundled_npm_executable() -> Path:
     return bin_dir / ("npm.cmd" if platform.system().lower() == "windows" else "npm")
 
 
+_NODE_RUNTIME_VERIFIED = False
+
+
 def ensure_node_runtime() -> None:
-    if bundled_node_executable().exists() and bundled_npm_executable().exists():
+    global _NODE_RUNTIME_VERIFIED
+    if _NODE_RUNTIME_VERIFIED:
         return
     system, arch, ext = node_platform_archive()
     archive_name = f"node-{NODE_VERSION}-{system}-{arch}.{ext}"
@@ -10913,10 +11147,31 @@ def ensure_node_runtime() -> None:
     log_step(f"extract {archive_name}")
     if ext == "zip":
         with zipfile.ZipFile(archive) as zf:
-            safe_extract_zip_all(zf, NODE_DIR)
+            validate_zip_archive(zf, NODE_DIR)
+            for member in zf.infolist():
+                if not member.is_dir():
+                    verify_or_write_source(NODE_DIR / member.filename, zf.read(member))
     else:
-        with tarfile.open(archive, "r:xz") as tf:
-            safe_extract_tar_all(tf, NODE_DIR)
+        with tempfile.TemporaryDirectory(prefix="sarasa-node-") as tmp_name:
+            staging = Path(tmp_name)
+            with tarfile.open(archive, "r:xz") as tf:
+                safe_extract_tar_all(tf, staging)
+            for member in staging.rglob("*"):
+                destination = NODE_DIR / member.relative_to(staging)
+                if member.is_symlink():
+                    target = os.readlink(member)
+                    if destination.is_symlink():
+                        if os.readlink(destination) != target:
+                            raise RuntimeError(f"Node 缓存链接校验失败：{member.name}")
+                    elif destination.exists():
+                        raise RuntimeError(f"Node 缓存链接类型错误：{member.name}")
+                    else:
+                        destination.parent.mkdir(parents=True, exist_ok=True)
+                        destination.symlink_to(target)
+                elif member.is_file():
+                    verify_or_write_source(destination, member.read_bytes())
+                    destination.chmod(member.stat().st_mode)
+    _NODE_RUNTIME_VERIFIED = True
 
 
 def local_runtime_env() -> dict[str, str]:
@@ -10972,17 +11227,9 @@ def bootstrap_sarasa_source_tree() -> None:
 
 def ensure_vf_sources(regions: list[str]) -> None:
     global INTER_ITALIC
-    needed_vfs = [source_han_vf_path(region) for region in variable_regions(regions)]
     needed_classical_vfs = [
         path for path in (classical_vf_override_path(region) for region in variable_regions(regions)) if path
     ]
-    if (
-        all(path.exists() for path in needed_vfs)
-        and all(path.exists() for path in needed_classical_vfs)
-        and INTER_UPRIGHT.exists()
-        and INTER_ITALIC.exists()
-    ):
-        return
     SRC_DIR.mkdir(parents=True, exist_ok=True)
     source_han_zip = download_file_checked(
         f"https://github.com/adobe-fonts/source-han-sans/releases/download/{SOURCE_HAN_TAG}/02_SourceHanSans-VF.zip",
@@ -10996,25 +11243,18 @@ def ensure_vf_sources(regions: list[str]) -> None:
     )
     for region in variable_regions(regions):
         target = source_han_vf_path(region)
-        if not target.exists():
-            extract_zip_basename(source_han_zip, source_han_vf_basename(region) or "", target)
-    if any(not path.exists() for path in needed_classical_vfs):
+        extract_zip_basename(source_han_zip, source_han_vf_basename(region) or "", target)
+    if needed_classical_vfs:
         shanggu_archive = download_file_checked(
             f"https://github.com/GuiWonder/Shanggu/releases/download/{SHANGGU_TAG}/{SHANGGU_SANS_VF_ARCHIVE_NAME}",
             SOURCE_ARCHIVE_DIR / f"ShangguSansVF_TTFs-{SHANGGU_TAG}.7z",
             SHANGGU_SANS_VF_SHA256,
         )
         for target in needed_classical_vfs:
-            if not target.exists():
-                extract_7z_basename(shanggu_archive, target.name, target)
+            extract_7z_basename(shanggu_archive, target.name, target)
     extract_zip_basename(inter_zip, "InterVariable.ttf", INTER_UPRIGHT)
-    if not INTER_ITALIC.exists():
-        italic = extract_zip_first_basename(
-            inter_zip,
-            ["InterVariable-Italic.woff2", "InterVariable-Italic.ttf"],
-            SRC_DIR,
-        )
-        INTER_ITALIC = italic
+    italic_basename = "InterVariable-Italic.ttf" if INTER_ITALIC.suffix.lower() == ".ttf" else "InterVariable-Italic.woff2"
+    extract_zip_basename(inter_zip, italic_basename, INTER_ITALIC)
 
 
 def ensure_classical_static_sources(regions: list[str]) -> None:
@@ -11026,16 +11266,23 @@ def ensure_classical_static_sources(regions: list[str]) -> None:
         for path in [classical_static_override_path(region, weight_name)]
         if path
     ]
-    if not needed or all(path.exists() for path in needed):
+    if not needed:
         return
     shanggu_archive = download_file_checked(
         f"https://github.com/GuiWonder/Shanggu/releases/download/{SHANGGU_TAG}/{SHANGGU_SANS_TTF_ARCHIVE_NAME}",
         SOURCE_ARCHIVE_DIR / f"ShangguSansTTFs-{SHANGGU_TAG}.7z",
         SHANGGU_SANS_TTF_SHA256,
     )
-    for target in needed:
-        if not target.exists():
-            extract_7z_basename(shanggu_archive, target.name, target)
+    for directory in dict.fromkeys(target.parent for target in needed):
+        extract_7z_ttf_prefix(shanggu_archive, directory, "ShangguSansTC-")
+    for region in regions:
+        if not region_config(region)["classical"]:
+            continue
+        for weight_name, source in STATIC_STYLE_SOURCES.items():
+            target = classical_static_override_path(region, weight_name)
+            canonical = target.parent / f"ShangguSansTC-{source['shs']}.ttf"
+            if target != canonical:
+                verify_or_write_source(target, canonical.read_bytes())
 
 
 def ensure_reference_sarasa(regions: list[str]) -> None:
@@ -11046,19 +11293,18 @@ def ensure_reference_sarasa(regions: list[str]) -> None:
         unhinted_dir = region_reference_dir(region, False)
         hinted_regular = hinted_dir / f"{prefix}-Regular.ttf"
         unhinted_regular = unhinted_dir / f"{prefix}-Regular.ttf"
-        if not (hinted_regular.exists() and unhinted_regular.exists()):
-            hinted_archive = download_file_checked(
-                f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-{SARASA_VERSION}.7z",
-                SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-{SARASA_VERSION}.7z",
-                SARASA_UI_ARCHIVE_SHA256[region]["hinted"],
-            )
-            unhinted_archive = download_file_checked(
-                f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
-                SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
-                SARASA_UI_ARCHIVE_SHA256[region]["unhinted"],
-            )
-            extract_7z_ttf_prefix(hinted_archive, hinted_dir, f"{prefix}-")
-            extract_7z_ttf_prefix(unhinted_archive, unhinted_dir, f"{prefix}-")
+        hinted_archive = download_file_checked(
+            f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-{SARASA_VERSION}.7z",
+            SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-{SARASA_VERSION}.7z",
+            SARASA_UI_ARCHIVE_SHA256[region]["hinted"],
+        )
+        unhinted_archive = download_file_checked(
+            f"https://github.com/be5invis/Sarasa-Gothic/releases/download/{SARASA_TAG}/{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
+            SOURCE_ARCHIVE_DIR / f"{prefix}-TTF-Unhinted-{SARASA_VERSION}.7z",
+            SARASA_UI_ARCHIVE_SHA256[region]["unhinted"],
+        )
+        extract_7z_ttf_prefix(hinted_archive, hinted_dir, f"{prefix}-")
+        extract_7z_ttf_prefix(unhinted_archive, unhinted_dir, f"{prefix}-")
         for path in [hinted_regular, unhinted_regular]:
             font = TTFont(path, lazy=True)
             try:
@@ -11121,6 +11367,24 @@ def ensure_sarasa_source_tree() -> None:
                 f"Sarasa Gothic source commit mismatch at {SARASA_SOURCE_DIR}: "
                 f"expected {SARASA_COMMIT}, got {actual_commit}"
             )
+        result = subprocess.run(
+            ["git", "diff", "--exit-code", "HEAD", "--", "."],
+            cwd=SARASA_SOURCE_DIR, capture_output=True, text=True,
+        )
+        if result.returncode:
+            raise RuntimeError("Sarasa 固定提交的源码或字体缓存已被修改")
+    else:
+        source_zip = download_file_checked(
+            f"https://github.com/be5invis/Sarasa-Gothic/archive/{SARASA_COMMIT}.zip",
+            SOURCE_ARCHIVE_DIR / f"Sarasa-Gothic-{SARASA_COMMIT}.zip",
+            SARASA_SOURCE_ARCHIVE_SHA256,
+        )
+        with zipfile.ZipFile(source_zip) as archive:
+            validate_zip_archive(archive, SARASA_SOURCE_DIR)
+            for member in archive.infolist():
+                if not member.is_dir():
+                    relative = Path(*PurePosixPath(member.filename).parts[1:])
+                    verify_or_write_source(SARASA_SOURCE_DIR / relative, archive.read(member))
 
     npm_marker = SARASA_SOURCE_DIR / "node_modules" / ".sarasa-ui-propdigits-package-lock.sha256"
     marker_value = npm_marker.read_text(encoding="ascii").strip() if npm_marker.exists() else ""
@@ -11130,12 +11394,13 @@ def ensure_sarasa_source_tree() -> None:
         run_checked([npm_executable(), "ci"], cwd=SARASA_SOURCE_DIR, capture_output=False, env=local_runtime_env())
         npm_marker.parent.mkdir(parents=True, exist_ok=True)
         npm_marker.write_text(lock_sha256 + "\n", encoding="ascii")
-def ensure_build_sources(static_only: bool, regions: list[str]) -> None:
+def ensure_build_sources(static_only: bool, regions: list[str], *, full_hint_group: bool = True) -> None:
     if os.environ.get("SARASA_SKIP_SOURCE_BOOTSTRAP") == "1":
         return
     ensure_reference_sarasa(regions)
     ensure_sarasa_source_tree()
-    ensure_classical_static_sources(regions)
+    # Even a single-region hinted build analyzes the same full hint group.
+    ensure_classical_static_sources(REGION_ORDER if full_hint_group else regions)
     if not static_only:
         ensure_vf_sources(regions)
 
@@ -12421,7 +12686,7 @@ def refresh_static_finalization_font(
 ) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(path)
-    intentionally_changed = {"head", "maxp", "OS/2", "name", "gasp", "GSUB"}
+    intentionally_changed = {"head", "maxp", "OS/2", "name", "gasp", "GSUB", "VORG"}
     before = sfnt_table_hashes(path, intentionally_changed)
     tmp_path = path.with_name(path.name + ".finalization.tmp")
     tmp_path.unlink(missing_ok=True)
@@ -12442,6 +12707,8 @@ def refresh_static_finalization_font(
         mac_report = remove_mac_name_records(font)
         ellipsis_before = cjk_ellipsis_structure_status(font)
         ellipsis_report = apply_cjk_ellipsis_behavior(font)
+        ellipsis_report.update(apply_default_regional_punctuation(font, region))
+        vertical_report = normalize_static_vertical_origin(font)
         font.save(tmp_path, reorderTables=True)
     finally:
         font.close()
@@ -12493,7 +12760,102 @@ def refresh_static_finalization_font(
         **raster_report,
         **revision_report,
         **mac_report,
+        **vertical_report,
     }
+
+
+def normalize_static_vertical_origin(font: TTFont) -> dict[str, Any]:
+    # VORG is defined for CFF/CFF2 only. Some shapers still read a VORG in a
+    # TrueType font, overriding the origin derived from its final glyf/vmtx.
+    removed = "glyf" in font and "fvar" not in font and "VORG" in font
+    if removed:
+        del font["VORG"]
+    return {"static_vorg_removed": removed, "static_vertical_origin_source": "glyf/vmtx"}
+
+
+def normalize_variable_vertical_origin(font: TTFont) -> dict[str, Any]:
+    if "VORG" not in font:
+        return {"variable_vorg_removed": False}
+    weights = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
+    source_hb = hb.Font(hb.Face(serialized_font_bytes(font)))
+    order = font.getGlyphOrder()
+    expected = {}
+    expected_x = {}
+    for weight in weights:
+        source_hb.set_variations({"wght": weight})
+        expected[weight] = [source_hb.get_glyph_v_origin(gid)[1] for gid in range(len(order))]
+        expected_x[weight] = [ext.x_bearing if (ext := source_hb.get_glyph_extents(gid)) is not None else None for gid in range(len(order))]
+    cleared = 0
+    for glyph in font["glyf"].glyphs.values():
+        glyph.expand(font["glyf"])
+        for component in getattr(glyph, "components", []):
+            if component.flags & glyf_table.USE_MY_METRICS:
+                component.flags &= ~glyf_table.USE_MY_METRICS
+                cleared += 1
+    del font["VORG"]
+    supports = advance_supports(font, [weight for weight in weights if weight != 400])
+    added = 0
+    for iteration in range(5):
+        current_hb = hb.Font(hb.Face(serialized_font_bytes(font)))
+        errors = {}
+        for weight in weights:
+            current_hb.set_variations({"wght": weight})
+            for gid, target in enumerate(expected[weight]):
+                difference = target - current_hb.get_glyph_v_origin(gid)[1]
+                ext = current_hb.get_glyph_extents(gid)
+                dx = ext.x_bearing - expected_x[weight][gid] if ext is not None and expected_x[weight][gid] is not None else 0
+                if difference or dx:
+                    errors.setdefault(gid, {})[weight] = (dx, difference)
+        if not errors:
+            return {"variable_vorg_removed": True, "vorgless_metric_rounds": iteration, "vorgless_phantom_corrections": added, "vorgless_use_my_metrics_removed": cleared, "vorgless_control_weights": list(weights), "vorgless_origin_mismatches": 0}
+        if any(400 in changes for changes in errors.values()):
+            raise RuntimeError("VORG 与默认 glyf/vmtx 原点冲突，不能只修改变化数据")
+        if iteration == 4:
+            raise RuntimeError(f"无 VORG 的竖排度量校准未收敛：{len(errors)} glyph；" + repr([(order[gid], changes, [component.flags for component in getattr(font['glyf'][order[gid]], 'components', [])]) for gid, changes in list(errors.items())[:8]]))
+        # HarfBuzz's TrueType path uses gvar phantom points, not optional VVAR
+        # TSB/origin maps. Give composites independent metrics and compensate
+        # both phantom pairs equally; real outlines and advances stay intact.
+        for gid, changes in errors.items():
+            glyph = order[gid]
+            for weight, (dx, correction) in changes.items():
+                coordinates = [(0, 0)] * gvar_coordinate_count(font, glyph)
+                coordinates[-4:] = [(dx, 0), (dx, 0), (0, correction), (0, correction)]
+                font["gvar"].variations.setdefault(glyph, []).append(TupleVariation({"wght": supports[weight]}, coordinates))
+        added += sum(len(changes) for changes in errors.values())
+        log_step(f"VF 无 VORG 竖排校准 {iteration + 1}：{len(errors)} glyph")
+    raise AssertionError("unreachable")
+
+
+
+def refresh_variable_finalization_outputs(regions: list[str]) -> list[dict[str, Any]]:
+    outputs = []
+    for region in regions:
+        for italic in (False, True):
+            path = VARIABLE_DIR / variable_output_name(region, italic)
+            allowed = {"GSUB", "name", "head", "VORG", "glyf", "loca", "gvar"}
+            before = sfnt_table_hashes(path, allowed)
+            pending = path.with_name(path.name + ".finalization.tmp")
+            font = TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False)
+            try:
+                geometry_before = {name: glyph_point_structure(font, name) for name in font.getGlyphOrder()}
+                report = apply_default_regional_punctuation(font, region)
+                report.update(normalize_variable_vertical_origin(font))
+                if geometry_before != {name: glyph_point_structure(font, name) for name in font.getGlyphOrder()}:
+                    raise RuntimeError("VF 最终化改变了真实轮廓坐标")
+                update_vf_names(font, region, italic)
+                remove_mac_name_records(font)
+                update_head_project_revision(font)
+                font.save(pending)
+            finally:
+                font.close()
+            try:
+                if sfnt_table_hashes(pending, allowed) != before:
+                    raise RuntimeError("VF 最终化改变了受保护的轮廓、定位或度量表")
+                pending.replace(path)
+            finally:
+                pending.unlink(missing_ok=True)
+            outputs.append({"file": portable_report_path(path), "region": region, "italic": italic, "protected_tables": sorted(before), **report})
+    return outputs
 
 
 def refresh_static_finalization_outputs(regions: list[str]) -> list[dict[str, Any]]:
@@ -12692,6 +13054,8 @@ def postprocess_static_font(
         finally:
             dash_source.close()
         report.update(remove_mac_name_records(font))
+        report.update(normalize_static_vertical_origin(font))
+        report.update(apply_default_regional_punctuation(font, region))
         font.save(path, reorderTables=True)
     finally:
         if post_layout_reference is not None:
@@ -12713,6 +13077,7 @@ def prepare_static_style(
     tmp_dir: Path,
     italic: bool,
     emit_output: bool = True,
+    prepare_hints: bool = True,
 ) -> tuple[dict[str, Any], dict[str, Any] | None]:
     weight_name = str(stop["name"])
     weight_value = int(stop["value"])
@@ -12786,6 +13151,9 @@ def prepare_static_style(
             **pass1_derivative_report,
             **unhinted_report,
         }
+
+    if not prepare_hints:
+        return {}, unhinted_output
 
     hinted_work = tmp_dir / "hinted" / region / f"{weight_name}{'Italic' if italic else ''}"
     hinted_work.mkdir(parents=True, exist_ok=True)
@@ -13047,6 +13415,25 @@ def build_static_weight_group(
                 **hinted_postprocess,
             }
         )
+    return outputs
+
+
+def build_unhinted_fonts(regions: list[str], *, only_missing: bool = False) -> list[dict[str, Any]]:
+    outputs = []
+    for region in regions:
+        static_dir(region, False).mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="sarasa-unhinted-") as tmp_name:
+        for stop in SOURCE_HAN_WEIGHT_STOPS:
+            for region in regions:
+                for italic in (False, True):
+                    path = static_dir(region, False) / static_output_name(region, str(stop["name"]), italic)
+                    if only_missing and path.exists():
+                        continue
+                    _context, output = prepare_static_style(
+                        region, stop, Path(tmp_name) / str(stop["name"]), italic,
+                        prepare_hints=False,
+                    )
+                    outputs.append(output)
     return outputs
 
 
@@ -13359,150 +13746,41 @@ def inspect_font(path: Path) -> dict[str, Any]:
 
 
 def static_readme_text(region: str, hinted: bool) -> str:
-    family = static_family(region)
-    family_local = static_family_local(region)
-    shs_prefix = source_han_static_prefix(region)
-    title = f"{family} TTF {VERSION}" if hinted else f"{family} TTF Unhinted {VERSION}"
-    cl_note = (
-        f"CL 地区的传统旧字形覆盖跟随 Shanggu Sans {SHANGGU_TAG} 官方 TTF：\n"
-        "汉字底稿先取 SourceHanSansK，再用 ShangguSansTC 静态 TTF 覆盖。\n"
-        "最终公开 cmap 和 GSUB/GPOS 模板按 SarasaUiCL 参考字体裁剪；五个\n"
-        "官方同名字重同步非数字 metrics，Heavy 保留 Shanggu Heavy 来源数据。"
-        if region == "CL"
-        else f"{region} 地区沿用 Sarasa 上游路径：CJK 底稿来自 {shs_prefix}。"
-    )
-    hint_note = (
-        "hinted 套件会对本项目实际生成的静态片段重新 hint。每个字重都固定\n"
-        "建立 Sarasa 上游顺序的完整环境：96 个 pass1 加 6 个 kanji 和 6 个\n"
-        "hangul，最后把全部 108 个输入交给一次统一 instruct。SemiBold 直接采用\n"
-        "上游同名环境；Heavy 的 Ui 与 FE 使用实际 900 轮廓，辅助拉丁环境和 hcfg\n"
-        "采用 Bold 边界，不复制相邻成品的 glyph instructions。\n"
-        "静态 PropDigits 会把 ':' remap\n"
-        "到已有的 pnum glyph，移除旧的冒号上下文替换，再追加与 Inter 一致的\n"
-        "colon-run calt 规则。"
-        if hinted
-        else "unhinted 套件同样沿用上游 Sarasa 的静态片段构建路径，但直接用\n"
-        "未 hint 的 pass1/kanji/hangul 片段进入 pass2。它会跳过\n"
-        "ttfautohint 和 Chlorophytum，提供正式的无 TrueType instructions\n"
-        "静态输出。"
-    )
-    return f"""{title}
+    variant = "hinted" if hinted else "unhinted"
+    source = "Source Han K 与 Shanggu Sans TC 1.028" if region == "CL" else f"Source Han Sans {region}"
+    default = "未提供语言标记时使用对应地区的全宽标点；明确的 Latn/en 保留英文省略号路径。KOR 单破折号保留地区特例。"
+    return f"""Sarasa Ui PropDigits {region} {VERSION}（{variant}）
 
-本目录包含静态 TrueType 字体。这些字体从静态 {shs_prefix} 和
-Inter 源字体出发，经 Sarasa 的 pass1/kanji/hangul/pass2 构建路径生成，
-然后补上 PropDigits 派生行为。
+本包包含 200 ExtraLight、300 Light、400 Regular、600 SemiBold、700 Bold、900 Heavy
+及对应 Italic，共 12 个静态 TTF。350 仅是 VF 隐藏锚点，不提供静态样式。
 
-{cl_note}
+来源为 {source} 与 Inter 4.1，按 Sarasa 1.0.40 的 pass1/kanji/hangul/pass2
+静态流程构建，不从 VF 实例化。600 配对 Source Han 500 和 Inter 600。
+CL 的公开 cmap/layout 限于 Sarasa Ui CL 边界。
 
-字重：
+默认 ASCII 数字为比例宽；tnum 切换等宽，pnum 恢复比例宽。
+冒号使用 Inter colon-run calt。{default}
+破折号、省略号和竖排沿用对应 Source Han/Shanggu 字形，保持
+ccmp → locl → vert/vrt2 顺序。中文双省略号为两个居中 glyph，共 2em；
+中文双连、三连破折号分别为 2em、3em。CL 破折号全局保留 Shanggu 全宽形式。
 
-- ExtraLight 200
-- Light 300
-- Regular 400
-- SemiBold 600
-- Bold 700
-- Heavy 900
+chws/vchw 来自 Noto CJK 交付后处理；是否自动启用取决于实际应用。
+静态竖排原点由最终 glyf/vmtx 决定，移除不适用于 TrueType 的 VORG。
+post 使用 format 3，不保存虚构 glyph 名称。命名和布局修订不会重新 hint。
 
-ExtraLight、Light、Regular、SemiBold、Bold 与上游 Sarasa 的公开静态样式
-一致；Heavy 900 是本项目保留的扩展实例。SemiBold 600 沿用 Sarasa 的静态
-配对：CJK 使用 Source Han Sans Medium 500，Latin 使用 Inter SemiBold 600。
-Heavy 使用 Source Han/Shanggu Heavy 900 与 Inter Black 900；Bold 只提供
-布局、命名和 hint 配置边界，不覆盖 Heavy 的 glyph 数据。
-
-公开字重采用 Sarasa/CSS 口径：ExtraLight 是 200。CJK 轮廓来源仍是
-Source Han Sans 的 ExtraLight 口径 250；VF 通过轴映射让 public
-wght=200 对应 Source Han 内部 wght=250，并让 public wght=600 对应
-Source Han 内部 wght=500；Inter 在两个位置分别对应 200 和 600。
-
-每个字重都包含正体和 Italic 文件。ASCII 数字默认使用比例宽度；
-OpenType tnum 会恢复等宽数字，pnum 会把等宽数字切回比例数字。
-静态 TTF 与 VF 使用一致的、与 Inter 兼容的 calt 冒号行为：
-1:2 会上浮 ':'，1:a 和 a:2 不会上浮，1::2 等连续冒号上下文遵循
-Inter 的 colon-run 规则。
-
-破折号跟随 Source Han/Shanggu 的 ccmp、locl、vert/vrt2 结构。{region}
-在非 CJK 语言下保留比例 U+2014 和比例 U+2E3A/U+2E3B；CJK 地区标签
-把它们切到严格 1em/2em/3em 的横竖字形。KOR 单字保留 Source Han
-较窄且位置较高的地区字形；CL 则跟随 Shanggu，把 U+2014/U+2015
-全局映射到同一全宽字形，不另造地区 locl。正常双连、三连路径各使用一个
-长 glyph；仅显式启用 vrt2 的上游边界可能保留多个相同竖排单字形。
-破折号笔画厚度、少量 side bearing 和比例 advance 会随字重变化，固定的是
-CJK 的 1em/2em/3em 语义与中宫基线。Italic 使用对应正体轮廓的 9.4 度剪切。
-
-省略号保留 Source Han/Shanggu 的语言语义：拉丁文字上下文（Latn/en）下，
-U+2026 是下沉的比例字形；CJK 文字上下文中的 JAN/KOR/ZHH/ZHS/ZHT
-locl 把它切换为居中的 1em 全宽字形，因此连续两个 U+2026 保持两个 glyph
-并严格占 2em；vert/vrt2 再切换到现成的竖排字形。中文应传入 Hani/zh-Hans、
-Hani/zh-Hant 或 Hani/zh-HK，日文与韩文分别使用 Hani/ja、Hani/ko；缺少
-对应 CJK script/language 上下文时使用非 CJK 默认路径。该路由不新造轮廓、
-不合成连字，也不重新 hint。
-
-最终成品还会按 Noto CJK 的官方交付流程加入 GPOS chws/vchw：chws
-用于横排连续全角标点的上下文压缩，vchw 用于对应的竖排压缩。实现固定使用
-chws_tool 1.4.5 与 east-asian-spacing 1.4.5；Source Han Sans 2.005R
-底稿本身不含这两个 FeatureRecord，因此它们在所有轮廓、hint、metrics 和
-Sarasa layout 模板处理完成后统一追加。
-
-name 表包含地区本地化显示名，例如：
-{family_local} ExtraLight.
-OS/2.achVendID 使用本派生项目的 MRDK，不继承上游 Sarasa Ui 的
-???? 占位值。head.fontRevision 使用 OpenType fixed 数值 {OPENTYPE_VERSION}，
-对应本仓库版本 {VERSION}；nameID 5 以 OpenType 数值 Version {OPENTYPE_VERSION}
-开头，并在后续 project 字段保留完整版本 {VERSION}。最终 name 表与官方
-Sarasa/Source Han 成品一样不保留 platform 1（Macintosh）记录；Windows/Unicode
-本地化名称以及 Sarasa、Inter、Adobe、Google 的版权保持完整，CL 另保留
-Shanggu Fonts 的原版权声明。nameID 3/5 还会明确区分 hinted 与 unhinted，
-避免系统把两套文件视为重复字体。
-{hint_note}
-静态 TTF 保留静态 STAT 表，供现代应用识别 weight/italic 样式；这不会让
-静态 TTF 变成可变字体。GSUB/GPOS 的 FeatureRecord 顺序、Script/LangSys
-覆盖和基础 lookup 结构按对应样式的上游 Sarasa Ui {region} 静态字体套模板；
-随后追加 Noto CJK chws/vchw 的 FeatureRecord 和 contextual positioning lookup。
-静态 TTF 最终会按对应 Sarasa Ui 参考字体裁剪 cmap；五个官方同名字重同步
-非数字 metrics，Heavy 则保留同次 Sarasa pass2 Heavy/Black 的 hmtx/vmtx、
-VORG、glyf 与 bbox。`palt` 下假名等已有 glyph 的定位值按展开轮廓结构与
-横竖 metrics 建立语义映射：官方同名字重从 Sarasa 参考同步，Heavy 从同次
-pass2 来源同步，不依赖 post format 3 产生的跨字体不稳定自动名。
-破折号从对应字重的 Source Han/Shanggu 静态源复制 9 个核心语义字形，
-SC/TC/HC/J/K 另复制 KOR 单字特例；各 CJK 地区标签优先在已有 locl
-FeatureRecord 中原位扩展，模板没有对应 locl 时才补充一条，CAT 空 locl
-继续保持为空。旧 calt continuation、pair-start 与竖排 PairPos 不会保留。
-hinted 成品在相同四点矩形拓扑间替换坐标并保留已生成的 glyph program，
-无需重新运行整组高层 hint 分析；审计逐角色核对 instructions、上游轮廓、
-hmtx/vmtx、字重单调性和 FreeType 多 ppem 位图。
-对于 exact 静态样式，非数字/非冒号码位会保留上游 simple glyph flags、
-glyf bbox 和组合字形结构；Noto chws/vchw 后处理结束后还会再次恢复可直接
-对齐字形的参考 bbox，避免 1 unit 重算通过 phantom points 改变 hinted 位图。
-静态 TTF 与上游一样使用 post format 3，不在
-字体中存储 glyph names；数字的默认比例宽/tnum 等宽关系由 cmap 与 GSUB
-表达，不再为显示名称改变 glyph order 或制造与 GID 不一致的自动名。最终写出 glyf
-时保留首点 OVERLAP_SIMPLE 语义，并优先用 OTS 可接受的首 flag repeat run
-保存重复 overlap flag；坐标替换使 x/y 压缩位不同、无法共用 repeat 时，只清除
-后续点上无语义且被 OTS 禁止的显式重复 bit 6。resume 与发布审计会解析原始
-flag stream。unhinted 套件将 maxp.maxZones 规范为 1，并把 gasp 的最后范围
-规范为 0xFFFF sentinel；这不会加入 TrueType instructions，也不会改变 glyf。
-glyph 总数不强行补齐到与上游一致；cmap 字形和布局可达的未编码字形会保留，
-不可达 glyph 数量差异视为构建产物。
-这些字体是修改派生版，不是 Sarasa Gothic、Source Han Sans 或 Inter 的官方发布。
+请阅读包根目录的中文 README.md、NOTICE.md 和 LICENSE.txt。
+完整版本的主审计、OTS、分地区 FontBakery、视觉检查与 21 包校验报告见仓库 reports。
+这些字体按 SIL Open Font License 1.1 分发，是修改版字体，不是任何上游的官方发布。
 """
 
 
-def write_static_readme(regions: list[str]) -> None:
+
+def write_static_readme(regions: list[str], variants: tuple[bool, ...] = (True, False)) -> None:
     for region in regions:
-        hinted_dir = static_dir(region, True)
-        unhinted_dir = static_dir(region, False)
-        hinted_dir.mkdir(parents=True, exist_ok=True)
-        unhinted_dir.mkdir(parents=True, exist_ok=True)
-        (hinted_dir / "README.txt").write_text(
-            static_readme_text(region, True),
-            encoding="utf-8",
-            newline="\n",
-        )
-        (unhinted_dir / "README.txt").write_text(
-            static_readme_text(region, False),
-            encoding="utf-8",
-            newline="\n",
-        )
+        for hinted in variants:
+            directory = static_dir(region, hinted)
+            directory.mkdir(parents=True, exist_ok=True)
+            (directory / "README.txt").write_text(static_readme_text(region, hinted), encoding="utf-8", newline="\n")
 
 
 def portable_report_path(path: Path) -> str:
@@ -13878,6 +14156,8 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
         # VariationIndex Device records live below lazily decompiled GPOS
         # subtables; a lazy font makes the recursive integrity scan see zero.
         font = TTFont(path, lazy=False, recalcTimestamp=False)
+        if "VORG" in font:
+            reasons.append("TrueType VF still contains CFF-only VORG")
         if "fvar" not in font:
             reasons.append("missing fvar")
         else:
@@ -14146,11 +14426,13 @@ def build_all(
     resume_variable: bool = False,
     resume_static: bool = False,
     force_static_weights: set[str] | None = None,
+    variable_only: bool = False,
+    unhinted_only: bool = False,
 ) -> dict[str, Any]:
     regions = list(REGION_ORDER if regions is None else dict.fromkeys(check_region(region) for region in regions))
-    ensure_build_sources(static_only, regions)
+    ensure_build_sources(static_only or unhinted_only, regions, full_hint_group=not (variable_only or unhinted_only))
     required_paths = [reference_font_path(region, "Regular", False) for region in regions]
-    if not static_only:
+    if not (static_only or unhinted_only):
         required_paths.extend([source_han_vf_path(region) for region in variable_regions(regions)])
         required_paths.extend(
             path for path in (classical_vf_override_path(region) for region in variable_regions(regions)) if path
@@ -14159,15 +14441,16 @@ def build_all(
     for path in required_paths:
         if not path.exists():
             raise FileNotFoundError(path)
-    log_step("static: build hinted and unhinted")
     force_static_weights = set(force_static_weights or ())
-    static_outputs = build_static_fonts(
-        regions,
-        resume=resume_static,
-        force_weights=force_static_weights,
-    )
-    write_static_readme(regions)
-    if static_only:
+    if variable_only or unhinted_only:
+        log_step("static: prepare selected unhinted references without hint analysis")
+        static_outputs = build_unhinted_fonts(regions, only_missing=variable_only)
+    else:
+        log_step("static: build hinted and unhinted")
+        static_outputs = build_static_fonts(regions, resume=resume_static, force_weights=force_static_weights)
+    if not variable_only:
+        write_static_readme(regions, (False,) if unhinted_only else (True, False))
+    if static_only or unhinted_only:
         log_step("variable: skipped by --static-only")
         variable_outputs = existing_variable_outputs()
     else:
@@ -14198,6 +14481,8 @@ def build_all(
         "variable_regions": variable_regions(regions),
         "static_regions": regions,
         "static_only": static_only,
+        "variable_only": variable_only,
+        "unhinted_only": unhinted_only,
         "resume_variable": resume_variable,
         "resume_static": resume_static,
         "force_static_weights": sorted(force_static_weights),
@@ -14333,12 +14618,16 @@ def build_all(
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--static-only", action="store_true", help="只重建静态 hinted/unhinted TTF，不重建 VF 输出。")
+    modes = parser.add_mutually_exclusive_group()
+    modes.add_argument("--static-only", action="store_true", help="只重建静态 hinted/unhinted TTF，不重建 VF 输出。")
+    modes.add_argument("--variable-only", action="store_true", help="只重建所选地区 VF；缺少静态度量参考时自动准备 unhinted，完全跳过 hint 流程。")
+    modes.add_argument("--unhinted-only", action="store_true", help="只按 Sarasa 静态片段路径重建所选地区 unhinted TTF，完全跳过 hint 流程。")
     parser.add_argument(
         "--refresh-static-finalization-only",
         action="store_true",
         help="只刷新现有静态 TTF 的最终 GSUB、命名、法律信息与 unhinted 栅格表；除明确白名单表外逐表保护，不重新 hint。",
     )
+    parser.add_argument("--refresh-variable-finalization-only", action="store_true", help="只刷新现有 VF 的 GSUB 默认语言路由、命名与版本，逐表保护轮廓、定位和度量。")
     parser.add_argument(
         "--regions",
         default=",".join(REGION_ORDER),
@@ -14363,8 +14652,14 @@ def main() -> None:
     force_static_weights = parse_static_weights(args.force_static_weights)
     if force_static_weights and not args.resume_static:
         parser.error("--force-static-weights requires --resume-static")
+    if args.refresh_variable_finalization_only:
+        if args.refresh_static_finalization_only or args.static_only or args.variable_only or args.unhinted_only or args.resume_variable or args.resume_static or force_static_weights:
+            parser.error("VF 最终化不能与其他构建模式组合")
+        outputs = refresh_variable_finalization_outputs(parse_regions(args.regions))
+        print(json.dumps({"mode": "variable-finalization-only", "version": VERSION, "outputs": outputs}, ensure_ascii=False, indent=2))
+        return
     if args.refresh_static_finalization_only:
-        if args.static_only or args.resume_variable or args.resume_static or force_static_weights:
+        if args.static_only or args.variable_only or args.unhinted_only or args.resume_variable or args.resume_static or force_static_weights:
             parser.error(
                 "--refresh-static-finalization-only cannot be combined with build/resume options"
             )
@@ -14390,6 +14685,8 @@ def main() -> None:
         resume_variable=args.resume_variable,
         resume_static=args.resume_static,
         force_static_weights=force_static_weights,
+        variable_only=args.variable_only,
+        unhinted_only=args.unhinted_only,
     )
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

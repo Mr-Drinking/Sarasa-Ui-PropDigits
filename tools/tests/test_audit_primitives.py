@@ -566,6 +566,9 @@ class ReleasePackageTests(unittest.TestCase):
                 source.write_text("alpha", encoding="ascii")
                 files.append((source, name))
             package = package_release.Package("probe.zip", tuple(files))
+            font = root / "probe.ttf"
+            font.write_bytes(b"font-fixture")
+            package = package_release.Package("probe.zip", tuple(files) + ((font, font.name),))
             package_release.write_package(package, root)
             files[0][0].write_text("omega", encoding="ascii")
             package_release.SOURCE_DIGEST_CACHE.clear()

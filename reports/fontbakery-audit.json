@@ -1,64 +1,695 @@
 {
-  "title": "Sarasa Ui PropDigits FontBakery 审计",
-  "generated_at": "2026-08-26 22:29:54 +0800",
+  "title": "FontBakery 分地区发布检查",
+  "generated_at": "2026-09-05T14:33:22.484465+00:00",
   "toolchain": {
-    "fontbakery": "1.1.0",
-    "fontbakery_bundled_opentype_sanitizer": "9.2.0",
-    "independent_ots": "9.3.0"
+    "fontbakery": "1.1.0"
   },
+  "input_manifest": {
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-ExtraLight.ttf": {
+      "size": 13325804,
+      "sha256": "d9a1460786658672a7ba1eb31e0a3e14d52572e234dfd80edbf036dfc7b5245d"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
+      "size": 14118892,
+      "sha256": "b307d8f7e2dd6ee4b57905046e17e9c90374f08fb70836d798f88a5502bb4997"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Light.ttf": {
+      "size": 13305916,
+      "sha256": "0f07f0921008d5dda1370053b13f9e65a12ad7f56b5998bf65910eadb90fd75f"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-LightItalic.ttf": {
+      "size": 14097844,
+      "sha256": "3b9ad36fed1afb9f9b83b9ae1e4bf366e40857d60aa39895b38d4e5cb34a191f"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Regular.ttf": {
+      "size": 13192112,
+      "sha256": "16d3a39d87a9470562b7fe0049e2ad97ecb154afd91f00cbe4c7c31c295c6dea"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Italic.ttf": {
+      "size": 13984840,
+      "sha256": "ebe0fad11322d334ac05de79935414d19cbc9ab9b783c30902aacd4fe505d711"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-SemiBold.ttf": {
+      "size": 13115032,
+      "sha256": "be367c7b657d69a7c39da85b367dc65f7e82b8ab4b740158d9ce849576a3df54"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
+      "size": 13909232,
+      "sha256": "8b5cae5b1dfcdba083403d321fbe9df593630c9c5a4483729c643867d1dd6b9f"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Bold.ttf": {
+      "size": 13024452,
+      "sha256": "b38a5c255f47650bf6e97cad0caf44abb82b817c092fd79f1695ccfe4dd83752"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-BoldItalic.ttf": {
+      "size": 13818856,
+      "sha256": "7a88c45144178e1db6aef7be36c5c759d97e98ab6c5eab7d743aee9c43464abc"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Heavy.ttf": {
+      "size": 12911788,
+      "sha256": "65f6deb422f6851d5bc9645791586eb3ea73eef6a82448387fec254e6b7aefa4"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
+      "size": 13713504,
+      "sha256": "9ce87dee5b1d4e27950167814c0f705e937069b3403e14ea39d8a435d4705746"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-ExtraLight.ttf": {
+      "size": 24285276,
+      "sha256": "a8b7f8489edfcf4f04374e1cfa6caa3c893b86b36c6314445d7013270cd6ec36"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
+      "size": 25093216,
+      "sha256": "234742197f84d9bd675d045bd8a1f4ddecbeaeab577733ca94a8247f3da5705e"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Light.ttf": {
+      "size": 24414632,
+      "sha256": "d2b2b936f4197b20e1d411da6a68d46348f7d9549f0a143070e3707ccf84b957"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-LightItalic.ttf": {
+      "size": 25220688,
+      "sha256": "dcdaf88889732d83d88c1420c88e018a74f486f67d590292e976698ff7af34aa"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Regular.ttf": {
+      "size": 24316916,
+      "sha256": "3e4c5fa6021db9611054dfb612d75b2b7061141f0dae123bb32b2c329afbaa0b"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Italic.ttf": {
+      "size": 25119716,
+      "sha256": "e336b382f67462eb5290a0fdae37fcccfac32ce4b898a93b15c8878df927890d"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-SemiBold.ttf": {
+      "size": 24261076,
+      "sha256": "33e8cf165e97d36aab5930ea1b5ab602b3ee481719e8976121804e9db11ef117"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
+      "size": 25065892,
+      "sha256": "660d4fca38788719f6d2ac9f93b08294a883d7bfdbf85b726ff75e9334718fef"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Bold.ttf": {
+      "size": 24172916,
+      "sha256": "ee121d064cc9eaee6553299fc986aac555967cb1734bd19030e1ecedfa4ac20e"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-BoldItalic.ttf": {
+      "size": 24976628,
+      "sha256": "70f30f933c6ca2f7e86f69dac694cdc14f1509c8cab6cd99cddd96cad6779e5e"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Heavy.ttf": {
+      "size": 23875436,
+      "sha256": "2d18976edfddbe48e15bd3f689be0664fb30c8df453b8754d4d6a9cddbe9e40f"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
+      "size": 24687408,
+      "sha256": "809b2c23a65ef58514316410fe33ff6a02dedb35073796f583ca15a3fdb72201"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf": {
+      "size": 40388948,
+      "sha256": "bd579dc43a0f3beb2ba3780bfdd2f0507632be52ad1b3bd59375006aeddb77fb"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf": {
+      "size": 54203040,
+      "sha256": "9f11d9f237601b8ae1715c375b809941a24b38adb7e81c5386e18d5104ee2f1f"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-ExtraLight.ttf": {
+      "size": 13366988,
+      "sha256": "2ec71dfc8113aac87f38ec00cfc3a01c4734b0a8cbece1334c3df9db2aad3b52"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
+      "size": 14148764,
+      "sha256": "abd0b970e945c7b39a4d896d3243f81c695c1c27cc9fd179f1752af278e25771"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Light.ttf": {
+      "size": 13305556,
+      "sha256": "f393dfe130c8abbd0abd4ee177264295ba4fc79ea8f88cc0c61947f4a9961007"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-LightItalic.ttf": {
+      "size": 14086080,
+      "sha256": "495d31b946ab203dc709f8fb1333e08623b437e121745da57d55b72a983078d9"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Regular.ttf": {
+      "size": 13182576,
+      "sha256": "530973b89acc5c10df56f6a0967aced89881cc513e14b6afff5b64ca6af30698"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Italic.ttf": {
+      "size": 13962104,
+      "sha256": "5c083db502a52e47f8e53cc506d1ba40ae115466a17e5b2259c74f600c4e0ccb"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-SemiBold.ttf": {
+      "size": 13088672,
+      "sha256": "3f6ae4b5127f23b447510bd48f438b55aad33da823699cf1da36ae22b7f0aaa2"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
+      "size": 13869208,
+      "sha256": "8c1c85c155044d48595fcb06bbaf5028064b23c0f01a540cb681f35b34508b37"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Bold.ttf": {
+      "size": 12980636,
+      "sha256": "9360b7b1eb3d7ba7df2eb5737ca8ab728e9b9ea879b17ad48550fba0a960498f"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-BoldItalic.ttf": {
+      "size": 13760816,
+      "sha256": "2a46f20359e072441dfebf8e035eb2d88bd5e35f4ce2fb3743c1de324fca63ff"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Heavy.ttf": {
+      "size": 12885256,
+      "sha256": "0c5038f8de5d8f8d6c57b7fe12c8d436c19fc299f780ab65822e9307df379a0c"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
+      "size": 13670356,
+      "sha256": "a732b55a9eabd8672a339fa9e07a917cc19ac145f5034a09848425d749629742"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-ExtraLight.ttf": {
+      "size": 24151052,
+      "sha256": "51efa8e246f2e080c3b8a55253886fa001b5e761cee92c5daf8024d47a5a1d4e"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
+      "size": 24946932,
+      "sha256": "aa15ea6c4c5dd041dd67d9dc212b19e951e921fadfb43bce0e4a3ce7b563eec6"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Light.ttf": {
+      "size": 24232012,
+      "sha256": "8f95be36a499a390c7a0779852b181ba2b2d255e87a57fc0c35066738ffae139"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-LightItalic.ttf": {
+      "size": 25027416,
+      "sha256": "4d7eb01b7785de4e98704b0c39dad0f7b3b914e92a300f350e2f9c36675abc23"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Regular.ttf": {
+      "size": 24125856,
+      "sha256": "95d65be10cd4d20f0a78b71883d42eacbd03c1f5b1e8b610f017f2de7d348efe"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Italic.ttf": {
+      "size": 24915564,
+      "sha256": "a0c20dcc3bb8ed1903fcee00542081eab5cc2edb3a32a95cc53de1d4cae9f77c"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-SemiBold.ttf": {
+      "size": 24054132,
+      "sha256": "77682ab806809ec76def1de0880ff54488c7cfe88000d15b7742bb3fff7781a6"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
+      "size": 24845508,
+      "sha256": "4b9bbc6ca6273f1f2cddcc6db90dfacf508282f991507c6e2a9969903c9a03db"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Bold.ttf": {
+      "size": 23971652,
+      "sha256": "4820ef50f6444d74013cc2da5f5ddc4ff00be1c77f759cc510a493986d004034"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-BoldItalic.ttf": {
+      "size": 24761004,
+      "sha256": "ac9f68284f3330daf352d4817afda6ece883035ee374f33de8de0429d498ae00"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Heavy.ttf": {
+      "size": 23693940,
+      "sha256": "352e0e88e4b4afde6b2f276749959f7ac2f66cf9369fd27d160b8c514480feec"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
+      "size": 24488328,
+      "sha256": "490623aa350a39207c8c2b8a77c411f657d09e69e5a1b24abf4c52dff4cede00"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf": {
+      "size": 39997612,
+      "sha256": "2467429c95431dd1027f6454ce4d90c3c6012329166c25f103fa31e3e5fe8ace"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf": {
+      "size": 54432308,
+      "sha256": "d5980c15a768d131cab4e8499ca2fcbfa5f9ebc4f03687d39670e057700cd470"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-ExtraLight.ttf": {
+      "size": 13481376,
+      "sha256": "0a4e52db3bbf63d52a30fcd9dc33c1366c38e83fd632a6d99fcd7c9c88ed29cc"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
+      "size": 14267404,
+      "sha256": "4f46d1a32553af673e4950bd1988d98b6e9c1d8a246c372f44c9ef0f3ac1ff7c"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Light.ttf": {
+      "size": 13420204,
+      "sha256": "d12b02f6db8d4c9d713b501eaa1b6d8b28cd0759839f91eb4d606e921d21967a"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-LightItalic.ttf": {
+      "size": 14205296,
+      "sha256": "748ceed316d94c3a1404e2edc7295078fd99cba0b33f45317b918188e9fa97c2"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Regular.ttf": {
+      "size": 13297144,
+      "sha256": "2c30d8779f3be7e24c8ae9cc93bd65268dc1fea54b7dea750d89c491ddd7f2ad"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Italic.ttf": {
+      "size": 14081656,
+      "sha256": "88a6a21d266f54da370d5d5b9ce8bc18ede72fcc294a1b88146aa5a12e9baea7"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-SemiBold.ttf": {
+      "size": 13204200,
+      "sha256": "f06c708e9d081e2b432e7bd760f7b9b18ad5e927ee8b7d4bb16b08ec42ea9bde"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
+      "size": 13990136,
+      "sha256": "2240271244714256899dc305736e34968202e612d69d9fcff2a12c5c0471e299"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Bold.ttf": {
+      "size": 13095228,
+      "sha256": "88b2127734d110b753cb52c7898bea1f218de558d49a8c834a4907834789f1a3"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-BoldItalic.ttf": {
+      "size": 13881324,
+      "sha256": "ca2910b4ef83393363ce7e56c89083efae8a6aaa5b799dfb48d3b183d70ead6f"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Heavy.ttf": {
+      "size": 12993368,
+      "sha256": "5d77086159731e0e0c60c8e95ba5ed1ccf3266463503553424e986ead4a67c28"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
+      "size": 13784412,
+      "sha256": "47e5c603d77ba7eea5a9876933a0e2162fc2f4794bd8cac12dd1c704a9c8f37d"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-ExtraLight.ttf": {
+      "size": 24333184,
+      "sha256": "11d23aaeb8a1447f3da8b5795fd43893871dfd26ec00a4856adf09ba173078de"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
+      "size": 25133384,
+      "sha256": "ff91212210fe2fd536caa361520ec1481499659495af4ec3454ba68265c816d2"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Light.ttf": {
+      "size": 24414572,
+      "sha256": "7abb78492b0c2b03f3e5e1112e4ea6ab431e89e4841f7298a6202a5e54c993b8"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-LightItalic.ttf": {
+      "size": 25214564,
+      "sha256": "462e687f624a87e55186314ff176251dc8c676a6e58978b4817e79ed257790e4"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Regular.ttf": {
+      "size": 24313400,
+      "sha256": "ce9e2e15e259573bf3e329d37c50f81d0d5a2766f54b942fa2e50441796a7381"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Italic.ttf": {
+      "size": 25108256,
+      "sha256": "7fa5ba4b113a7dc594f778ecd9228de4d2fa78d91cdb7039fbd66e3ca08fbe97"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-SemiBold.ttf": {
+      "size": 24254040,
+      "sha256": "64e8b2063601398eff19cf107397aa9125eec4ddaebb2a463b723765f8a4b1c8"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
+      "size": 25050624,
+      "sha256": "5e2aba18b6277a3aa5099854c1a8f4282882b194cd8a07fa3c8d9d19c7a190c7"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Bold.ttf": {
+      "size": 24174028,
+      "sha256": "a93bd8bd77caa956278cf8321d521939e5737f26c28130123137d10a8c4a2d50"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-BoldItalic.ttf": {
+      "size": 24969384,
+      "sha256": "43c32470e7843359d668a234e80b0575cf40be16545c6e416eddb15febed1b0b"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Heavy.ttf": {
+      "size": 23896724,
+      "sha256": "a3f42b0c050bbcdeae29d8f8cdbaad530a3bee04bfdf9e69e212d85a31dc9c04"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
+      "size": 24698096,
+      "sha256": "c454bef965f8a64a9f9c6fe331a16834e7cb5ea70940a2fec49e3ddb11d40fc3"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf": {
+      "size": 40380416,
+      "sha256": "7dad60e2fcac087a8fce7739cb9ac29a2219ea3639109bde703aa4794cc0d979"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf": {
+      "size": 55067660,
+      "sha256": "2f13ef4d32014d3a30dfe5c3c845e7322eb2f424e98875c0c44ed43102fc9b55"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-ExtraLight.ttf": {
+      "size": 13457956,
+      "sha256": "35613801c29f7e6739f8416d7dd1c91875598aa68c64de9c09dcb75b3b4c3b34"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
+      "size": 14243788,
+      "sha256": "e1e7e9b53c8e8fea17514e65cb5bf97871584ef2bf67e754e8f48960b32ddcf7"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Light.ttf": {
+      "size": 13396252,
+      "sha256": "401c472d6d4f27d6cd2acb249ff9e6eb1c3aca7ea5cbd60e68436c415d7ed613"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-LightItalic.ttf": {
+      "size": 14181236,
+      "sha256": "155a9e4c4900d457ae51e1d5e2b56aeede786c1d7b9e8d04a0517207d37a810a"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Regular.ttf": {
+      "size": 13270928,
+      "sha256": "d25a6ab77aa7d1619d37f41651d47be3bafb85168df44dc570255ef39ef15bc6"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Italic.ttf": {
+      "size": 14055516,
+      "sha256": "531e1f3e667f9fb09b9cd57ffdab7fcbb8c4642544caf96029ff3d28ea7d13f0"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-SemiBold.ttf": {
+      "size": 13177420,
+      "sha256": "75c6f698ddd2fb9e93b7cca6141fa7ca850b41d5e790eccf4664c84bf3b2d0d7"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
+      "size": 13963264,
+      "sha256": "c974926ef7826a7293c44a0dae659181733f1114570930dfec1d0ae3755cbd2f"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Bold.ttf": {
+      "size": 13068024,
+      "sha256": "a0d27c82e63fd385cf1b6eabfdcc24dfc89385920d1326215244b8ddad2dc6bf"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-BoldItalic.ttf": {
+      "size": 13853956,
+      "sha256": "69bc63f38c254c8015571f48ab0365ccf3b6d09c0215dff873a4caf4a2ca15f1"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Heavy.ttf": {
+      "size": 12965440,
+      "sha256": "d4f837db19da8bfecf9cce74ee6a0b4be7c698e30b06b3a2d582b8db642b3727"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
+      "size": 13756076,
+      "sha256": "43d9501c0606bcce69a18382f21d857d88d77c1054f392c2bcb8e214cafdb747"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-ExtraLight.ttf": {
+      "size": 24306516,
+      "sha256": "100bb25dd5d298b2f1a89dc57a2fe60e112e2f80cfead09f219697368a195a4c"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
+      "size": 25106604,
+      "sha256": "ad495e38c8f757884931e9de6662c86688a336cae1a17ddbef1fe15ee8bb112c"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Light.ttf": {
+      "size": 24385628,
+      "sha256": "420d0b82dfbd824788ba9c156d9cb76476331877ee1fd2e780e542e55093e74c"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-LightItalic.ttf": {
+      "size": 25185596,
+      "sha256": "8e5fb3e61ca9bd91ca6477e53a2ec0134422ea15374b9a81bd2a26ad32981bd2"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Regular.ttf": {
+      "size": 24283196,
+      "sha256": "0a43ccb0b12974dcf126dd988b5403267d602cdd208d3590cda32eb191d573d3"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Italic.ttf": {
+      "size": 25078072,
+      "sha256": "b3ae011584e7dbd42ce6f5303c2edb5c62d9667fe3f46241b7bd579f550dda4e"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-SemiBold.ttf": {
+      "size": 24220768,
+      "sha256": "4a02c28b9b1d2ee6bc9e3e3d0b8db91565553e75d377382ba8b54fe78cd911b2"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
+      "size": 25017256,
+      "sha256": "892b2ff7257fb1813b849dca8a59c21e5ab18ccd2a144ccb7e0a1d27bd562c83"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Bold.ttf": {
+      "size": 24136432,
+      "sha256": "091b65732f54bfea161d93bd725d0345ce55024db40bb3f692fc87fe429e05ce"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-BoldItalic.ttf": {
+      "size": 24931620,
+      "sha256": "52c3e37c514ce3af48810c0d336785731796b9a6a42fe3b2ca7b013f873eacc2"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Heavy.ttf": {
+      "size": 23854500,
+      "sha256": "f0cfb008322845b082214c53eb773cdc63662bacc1ee351d0f5e31598ae8b18b"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
+      "size": 24655348,
+      "sha256": "a6975a0e6bc4f3758e7ae49a6dc402111b68e81a7cb5e0645a02af6a552af90f"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf": {
+      "size": 40309032,
+      "sha256": "a7ae7d8a98adf2de416f3a9516bd18f44ba6ede81a9480fbbb7954e4472e4c2c"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf": {
+      "size": 54977832,
+      "sha256": "e7c51c8010d12c8ffc2ecfaff8b2d53de4ad8e72ee9e02d4f4838655c926adb0"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-ExtraLight.ttf": {
+      "size": 13269908,
+      "sha256": "ea81dda109d9f72327d9352fce9f58c780263240a7430b0e887c87312a392eac"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
+      "size": 14061096,
+      "sha256": "90b44be64564d4fa53d5d421a6b5df2f1e1be8600cb587af02fa423e11512197"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Light.ttf": {
+      "size": 13207500,
+      "sha256": "cd6765ac4a1c2f6f6f5840a03896c9fe1fea0146555a95d8739c84c3a6b8884e"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-LightItalic.ttf": {
+      "size": 13996880,
+      "sha256": "9a7ce2b3636798fb40f0588c4c710f804af6c2411b863143202c8ecd0c602614"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Regular.ttf": {
+      "size": 13084792,
+      "sha256": "3e1ea8a2221a4e247bd6aa6b174af0caacf8546328d98d9a874a4457690f4f79"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Italic.ttf": {
+      "size": 13873548,
+      "sha256": "019a84b75dca59cd3b96f653a49462d5a7873a82bbeb2a84d1bb47b41fbe32f2"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-SemiBold.ttf": {
+      "size": 12993508,
+      "sha256": "159f4dc37cfa59a636bf5580df3694ff8095d590ebea3d2b81a833db0bcb4c56"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
+      "size": 13782792,
+      "sha256": "88563be65ec07bc8989cea5eb886d6164572f84179b31763c5d9b8eecb29e088"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Bold.ttf": {
+      "size": 12880404,
+      "sha256": "617e0b85f3ce6fbf4278fff2458a7882a26756096ff7d176c267ea50b68de1ea"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-BoldItalic.ttf": {
+      "size": 13668832,
+      "sha256": "f0ec2e37fb1a796719cc3a29469dd8e4eaa75b55f666e24d28192f83482be145"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Heavy.ttf": {
+      "size": 12777768,
+      "sha256": "24735a6cd17496c26493194d8c964a85fb087be70015c45cbc6890b8f2e19bb5"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
+      "size": 13571976,
+      "sha256": "836de181b38caff917d62b4b642ff26a8a8048640217375ace37c82d375ada69"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-ExtraLight.ttf": {
+      "size": 24096756,
+      "sha256": "8dde8ac7084b1db9e871d5a2cab2a19cead59b98479cb63ebebe11286c84e0f7"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
+      "size": 24902796,
+      "sha256": "d8c9f1b5d06348a585cd3904f76730f709da7a29eb2991e3e6fa97a47b3e0733"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Light.ttf": {
+      "size": 24179320,
+      "sha256": "4b05f8e23b70684313a7b826c4fcdb89b2c91442390f80347110186eb715103b"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-LightItalic.ttf": {
+      "size": 24982828,
+      "sha256": "405b23f290ebaf17a161a9ddf04be03e29144d168f2a55bf24bf9698777707ac"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Regular.ttf": {
+      "size": 24071728,
+      "sha256": "9b66e1fb4fc647f95096a52c8c3a2b8f3223b5cb65da05ca1fd5c44c48b8c7b1"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Italic.ttf": {
+      "size": 24870556,
+      "sha256": "21827af12f9f0c4794e4ca441f7146b896b9a964eb8472ce1ce1d3043141d458"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-SemiBold.ttf": {
+      "size": 24002000,
+      "sha256": "2385dc19a3112c2f9171887c00b67f21aa9d5e6930eefd53541882a6773a26c7"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
+      "size": 24801896,
+      "sha256": "3aa0b2f037949fffe15e6f5c92b61348d830e6b69e483d20f489242a6837233c"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Bold.ttf": {
+      "size": 23899204,
+      "sha256": "5ae26dcf917017dbaa3f9594b354faba9f79d5053624a1e35242a3eeb836423a"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-BoldItalic.ttf": {
+      "size": 24696940,
+      "sha256": "9a4e8cd6cc7e3f560790cb1c198804af97e7ee687da94e487be3570571e5dbee"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Heavy.ttf": {
+      "size": 23614968,
+      "sha256": "ca0dd85ee7d1c3056444497a4c4c093979d38b3705ef060762ca23c109a31c15"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
+      "size": 24419420,
+      "sha256": "6fa287f4849c582f15ce645857de52a4c77760b5e611c8e89542e1857f5d0a44"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf": {
+      "size": 39554888,
+      "sha256": "3e766c02c35c4ab44224db27a3701421b63e9e75c110f1e99f535e93a87abb69"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf": {
+      "size": 53817492,
+      "sha256": "257178b5175d96323009738a40a7536b28d8c63e06a99d737bdda770176a500e"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-ExtraLight.ttf": {
+      "size": 13245540,
+      "sha256": "290dac1335d0a16e3e36b7a68e6e4a757521a02281218ceb1f9c7fe824a17d06"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
+      "size": 14035220,
+      "sha256": "bb4fb63894740b127135409e7b33eabb996b3cb333afa7a2fc3cd474d2be7330"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Light.ttf": {
+      "size": 13183288,
+      "sha256": "0fd06ca4be5769e89128e41fbde4379a2fe29daf1cc99ba97a4a87e925899df8"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-LightItalic.ttf": {
+      "size": 13971228,
+      "sha256": "6080264cd1967e4c53efb1eca2a65c68edefed24d5014be15d3e0c3a4f84b0ab"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Regular.ttf": {
+      "size": 13060900,
+      "sha256": "f6d7afb8e83f1ccf2e24eb8511fccee6dbed1892e7f10b79c40077eb2f127a46"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Italic.ttf": {
+      "size": 13848228,
+      "sha256": "99f371fdee1804b135d4d69f8419b57211c1647c0343c679918dd248ab1526ce"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-SemiBold.ttf": {
+      "size": 12969892,
+      "sha256": "4a0acc66052cf507af7d3596147a3d3267ca53688031740eff843483d23e4553"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
+      "size": 13757716,
+      "sha256": "2d1a34e23df147e40f0b4c4aa3c20552f71cc1b500b43f4b75b019af72066a3f"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Bold.ttf": {
+      "size": 12857032,
+      "sha256": "25dcef49040aa7ec46c2fbd27d09bbfa6412584dd126b6c70112813dbcef012d"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-BoldItalic.ttf": {
+      "size": 13644060,
+      "sha256": "1c6eea2c4f05b1b63dd9dc93552dc62385ae8b8a0ee4b67259bd4c1e221fd7c9"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Heavy.ttf": {
+      "size": 12754944,
+      "sha256": "df36e6e2c9874fb2795a2dfaef5a0b033d1f79a5536e6752fa990c51de89e97b"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-HeavyItalic.ttf": {
+      "size": 13547768,
+      "sha256": "c987df7d559744ec6e985ffab4dc097ebd10c152a58f6d097a3c0340016e9659"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-ExtraLight.ttf": {
+      "size": 24050764,
+      "sha256": "e377e352f7e3b084b9f992bf48bc39d43778118b389917b2dc2447ded04e450b"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
+      "size": 24855292,
+      "sha256": "d6f3a59dd20b33da3b56373e51c677d72a423d6ad5271929b7295278bde485f3"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Light.ttf": {
+      "size": 24133628,
+      "sha256": "3fd61d32219c1939d1bc9c618f7c727e28ad5ce04ad7a3f6ffa91182251d6099"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-LightItalic.ttf": {
+      "size": 24935696,
+      "sha256": "678e35d75b0929c993e551156eff976633a91bb67ee03382bee5f2a868f5b7bb"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Regular.ttf": {
+      "size": 24026524,
+      "sha256": "cc2ad650235df25648cfbb1299161350b2b2d75eae7b883c181bad7aa813aa5b"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Italic.ttf": {
+      "size": 24823928,
+      "sha256": "42a9e726e0c2ccdefbd775e3c9d9f4bc6c09c3b322cf0a866345f84148dbf6e4"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-SemiBold.ttf": {
+      "size": 23957024,
+      "sha256": "ec95cb40a3f23fe87568f4688d2cc80e5344b1351b2cfb2a4e27610b4e6646e8"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
+      "size": 24755456,
+      "sha256": "79dd0d5cb8f1e52a00caf88f6d02d4f9effb98062e4f186bd90509f9b781ccdc"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Bold.ttf": {
+      "size": 23855188,
+      "sha256": "1ed6a0ffb929a6889e16ad730984e55d6142424187599d15844e973fa2fb5c35"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-BoldItalic.ttf": {
+      "size": 24651524,
+      "sha256": "db646d3793c237e3c0e19890454ab19afb769ac64305ce34a520713c2733b5ef"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Heavy.ttf": {
+      "size": 23571424,
+      "sha256": "a6180112346764d88f723d79bc1540fd740b57cb1d9be7647ff06bd768ce3a24"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-HeavyItalic.ttf": {
+      "size": 24374492,
+      "sha256": "b607056842cde83477201b6e688654d102d579443b2d46e339c28716618524bd"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf": {
+      "size": 39520756,
+      "sha256": "11438e0a4a6db5ad49efd740ec6b874e0ff3b217eb4fa66ce3fb9788796d3d41"
+    },
+    "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf": {
+      "size": 53740816,
+      "sha256": "ae9f60c11082af2cda08310efb82e6b17f761e4a34a45e0df4dea6ffd7a78494"
+    }
+  },
+  "inputs_unchanged": true,
   "release_gate": {
     "fonts": 156,
     "selected_checks": {
+      "opentype/font_version": {
+        "PASS": 156
+      },
       "no_mac_entries": {
         "PASS": 156
       },
       "opentype/STAT/ital_axis": {
         "PASS": 6
-      },
-      "opentype/font_version": {
-        "PASS": 156
       }
     },
     "per_region_batches": {
       "CL": {
         "fonts": 26,
+        "jobs": 4,
+        "exit_code": 0,
         "result_counts": {
-          "(not finished)": 0,
           "PASS": 53
         }
       },
       "SC": {
         "fonts": 26,
+        "jobs": 4,
+        "exit_code": 0,
         "result_counts": {
-          "(not finished)": 0,
           "PASS": 53
         }
       },
       "TC": {
         "fonts": 26,
+        "jobs": 4,
+        "exit_code": 0,
         "result_counts": {
-          "(not finished)": 0,
           "PASS": 53
         }
       },
       "HC": {
         "fonts": 26,
+        "jobs": 4,
+        "exit_code": 0,
         "result_counts": {
-          "(not finished)": 0,
           "PASS": 53
         }
       },
       "J": {
         "fonts": 26,
+        "jobs": 4,
+        "exit_code": 0,
         "result_counts": {
-          "(not finished)": 0,
           "PASS": 53
         }
       },
       "K": {
         "fonts": 26,
+        "jobs": 4,
+        "exit_code": 0,
         "result_counts": {
-          "(not finished)": 0,
           "PASS": 53
         }
       }
@@ -67,259 +698,4472 @@
       "PASS": 318
     },
     "all_batches_exit_zero": true,
-    "independent_ots": {
-      "fonts": 156,
-      "successful": 156,
-      "unexpected_messages": 0
-    },
-    "main_audit": {
-      "passed": true,
-      "total_failures": 0
-    },
-    "unexplained_project_specific_failures": []
+    "passed": true
   },
-  "representative_full_profile": {
-    "inputs": [
-      "SC Regular hinted static",
-      "SC Regular unhinted static",
-      "SC Heavy hinted static",
-      "SC Heavy Italic hinted static",
-      "SC upright VF",
-      "SC Italic VF"
+  "results": {
+    "CL": [
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/STAT/ital_axis",
+        "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      }
     ],
-    "result_counts": {
-      "(not finished)": 0,
-      "FAIL": 29,
-      "INFO": 18,
-      "PASS": 409,
-      "SKIP": 198,
-      "WARN": 48
-    },
-    "checks": 702,
-    "issues_by_filename": {
-      "<family>": {
-        "FAIL": [
-          "family/single_directory",
-          "opentype/family/bold_italic_unique_for_nameid1",
-          "opentype/family/consistent_family_name",
-          "opentype/family/underline_thickness",
-          "opentype/varfont/family_axis_ranges",
-          "typographic_family_name"
+    "SC": [
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       },
-      "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf": {
-        "FAIL": [
-          "base_has_width",
-          "case_mapping",
-          "file_size",
-          "name/family_and_style_max_length",
-          "smart_dropout"
-        ],
-        "WARN": [
-          "math_signs_width",
-          "opentype/gdef_mark_chars",
-          "opentype/gdef_spacing_marks",
-          "opentype/post_table_version",
-          "opentype/xavgcharwidth",
-          "overlapping_path_segments",
-          "stylisticset_description",
-          "unreachable_glyphs"
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       },
-      "Sarasa-Ui-VF-PropDigits-SC[wght].ttf": {
-        "FAIL": [
-          "base_has_width",
-          "case_mapping",
-          "file_size",
-          "name/family_and_style_max_length",
-          "smart_dropout"
-        ],
-        "WARN": [
-          "math_signs_width",
-          "opentype/gdef_mark_chars",
-          "opentype/gdef_spacing_marks",
-          "opentype/post_table_version",
-          "opentype/xavgcharwidth",
-          "overlapping_path_segments",
-          "stylisticset_description",
-          "unreachable_glyphs"
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       },
-      "SarasaUiPropDigitsSC-Heavy.ttf": {
-        "FAIL": [
-          "base_has_width",
-          "case_mapping",
-          "file_size"
-        ],
-        "WARN": [
-          "contour_count",
-          "math_signs_width",
-          "opentype/gdef_mark_chars",
-          "opentype/gdef_spacing_marks",
-          "opentype/post_table_version",
-          "opentype/xavgcharwidth",
-          "overlapping_path_segments",
-          "stylisticset_description"
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       },
-      "SarasaUiPropDigitsSC-HeavyItalic.ttf": {
-        "FAIL": [
-          "base_has_width",
-          "case_mapping",
-          "file_size"
-        ],
-        "WARN": [
-          "contour_count",
-          "math_signs_width",
-          "opentype/gdef_mark_chars",
-          "opentype/gdef_spacing_marks",
-          "opentype/post_table_version",
-          "opentype/xavgcharwidth",
-          "overlapping_path_segments",
-          "stylisticset_description"
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       },
-      "SarasaUiPropDigitsSC-Regular.ttf": {
-        "FAIL": [
-          "base_has_width",
-          "case_mapping",
-          "file_size",
-          "smart_dropout"
-        ],
-        "WARN": [
-          "contour_count",
-          "math_signs_width",
-          "opentype/gdef_mark_chars",
-          "opentype/gdef_spacing_marks",
-          "opentype/post_table_version",
-          "opentype/xavgcharwidth",
-          "overlapping_path_segments",
-          "stylisticset_description"
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/STAT/ital_axis",
+        "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       }
-    }
-  },
-  "upstream_selected_check_baselines": {
-    "official_sarasa_ui_sc_regular_hinted_and_unhinted": {
-      "checks": 28,
-      "result_counts": {
-        "FAIL": 7,
-        "PASS": 6,
-        "WARN": 15
+    ],
+    "TC": [
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
       },
-      "results_by_check": {
-        "base_has_width": [
-          "FAIL"
-        ],
-        "case_mapping": [
-          "FAIL"
-        ],
-        "file_size": [
-          "FAIL"
-        ],
-        "math_signs_width": [
-          "WARN"
-        ],
-        "name/family_and_style_max_length": [
-          "PASS"
-        ],
-        "no_mac_entries": [
-          "PASS"
-        ],
-        "opentype/gdef_mark_chars": [
-          "WARN"
-        ],
-        "opentype/gdef_spacing_marks": [
-          "WARN"
-        ],
-        "opentype/post_table_version": [
-          "WARN"
-        ],
-        "opentype/xavgcharwidth": [
-          "WARN"
-        ],
-        "ots": [
-          "PASS",
-          "WARN"
-        ],
-        "smart_dropout": [
-          "FAIL",
-          "PASS"
-        ],
-        "stylisticset_description": [
-          "WARN"
-        ],
-        "unreachable_glyphs": [
-          "WARN"
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/STAT/ital_axis",
+        "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       }
-    },
-    "source_han_sans_sc_vf": {
-      "checks": 14,
-      "result_counts": {
-        "FAIL": 4,
-        "PASS": 6,
-        "WARN": 4
+    ],
+    "HC": [
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
       },
-      "results_by_check": {
-        "base_has_width": [
-          "FAIL"
-        ],
-        "case_mapping": [
-          "PASS"
-        ],
-        "file_size": [
-          "FAIL"
-        ],
-        "math_signs_width": [
-          "WARN"
-        ],
-        "name/family_and_style_max_length": [
-          "FAIL"
-        ],
-        "no_mac_entries": [
-          "PASS"
-        ],
-        "opentype/gdef_mark_chars": [
-          "WARN"
-        ],
-        "opentype/gdef_spacing_marks": [
-          "PASS"
-        ],
-        "opentype/post_table_version": [
-          "WARN"
-        ],
-        "opentype/xavgcharwidth": [
-          "PASS"
-        ],
-        "ots": [
-          "PASS"
-        ],
-        "smart_dropout": [
-          "FAIL"
-        ],
-        "stylisticset_description": [
-          "PASS"
-        ],
-        "unreachable_glyphs": [
-          "WARN"
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/STAT/ital_axis",
+        "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
         ]
       }
-    }
-  },
-  "classification": {
-    "invocation_artifacts": {
-      "family_level_checks": "一次调用混合 hinted/unhinted、静态/VF 与多个公开家族，因此 family/single_directory、family name、underline、axis-range 等集合级检查不是单一家族发布结果；逐地区三项正式门均为 PASS。",
-      "opentype/STAT/ital_axis": "单独检查 Italic 会缺少 Roman 配对；正式门按地区同时传入正斜体后为 PASS。"
-    },
-    "expected_failures": {
-      "base_has_width": "U+0488/U+0489 的零 advance 继承官方 Sarasa 与 Source Han。",
-      "case_mapping": "Sarasa 公开 cmap 没有补齐 FontBakery 所列 Unicode 大小写配对。",
-      "file_size": "通用 profile 的 9 MiB 上限不适用于完整 CJK 字体。",
-      "name/family_and_style_max_length": "Source Han VF 同样触发 31 字符限制；保留公开家族名。",
-      "smart_dropout": "正式 unhinted TTF 与未 hint 的 VF 没有 prep smart-dropout 指令。"
-    },
-    "expected_warnings": "GDEF mark/spacing、post format 3、xAvgCharWidth、数学符号宽度、空 ss 描述和 VF 不可达保留 glyph 可在官方 Sarasa 或 Source Han 基线复现；contour_count 与 overlapping_path_segments 已由主审计的静态 exact、Heavy 来源和 VF 13 点来源配对覆盖。"
-  },
-  "policy": "不把通用 FontBakery profile 的 FAIL 总数伪装成 0；发布硬门是全部 156 字体的 font_version/no_mac_entries、按地区成对 STAT/ital_axis、独立 OTS 与主审计。上游基线、通用 CJK profile 限制和集合调用假失败分别保留。"
+    ],
+    "J": [
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/STAT/ital_axis",
+        "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      }
+    ],
+    "K": [
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/STAT/ital_axis",
+        "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      }
+    ]
+  }
 }
