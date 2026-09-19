@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import importlib.metadata
 import json
+import os
 import platform
 import re
 import subprocess
@@ -15,7 +16,7 @@ from pathlib import Path
 
 import audit_sarasa_ui_propdigits as audit
 import build_sarasa_ui_propdigits_sc as build
-from python_env_bootstrap import ensure_project_python
+from python_env_bootstrap import isolated_tool_python
 from fontTools.ttLib import TTFont
 
 
@@ -90,7 +91,11 @@ def run_ots(manifest: dict) -> bool:
 
 
 def run_fontbakery(manifest: dict) -> bool:
-    ensure_project_python({"fontbakery": ("fontbakery", "fontbakery==1.1.0", "1.1.0")}, project_root=build.ROOT, label="FontBakery")
+    python, environment = isolated_tool_python(
+        Path(os.environ.get("SARASA_FONTBAKERY_VENV", build.ROOT / ".build-cache" / "fontbakery-venv")),
+        build.ROOT / "requirements-fontbakery.txt",
+        {"fontbakery": "1.1.0", "freetype-py": "2.3.0", "fonttools": "4.63.0"},
+    )
     directory = build.ROOT / ".build-cache" / "fontbakery"
     directory.mkdir(parents=True, exist_ok=True)
     batches = {}; records = {}; totals = Counter(); selected = {check: Counter() for check in CHECKS}
@@ -100,7 +105,7 @@ def run_fontbakery(manifest: dict) -> bool:
         if len(fonts) != 26:
             raise RuntimeError(f"{region} FontBakery 批次必须恰好包含 26 个字体，实际 {len(fonts)}")
         native = directory / f"{region}.json"
-        arguments = [sys.executable, "-m", "fontbakery", "check-universal", "-J", "4", "--json", str(native)]
+        arguments = [str(python), "-m", "fontbakery", "check-universal", "-J", "4", "--json", str(native)]
         for check in CHECKS:
             arguments.extend(["-c", check])
         arguments.extend(audit.display_path(font) for font in fonts)
@@ -121,7 +126,7 @@ def run_fontbakery(manifest: dict) -> bool:
                 records[region].append({"check": identifier, "font": check.get("filename"), "result": check["result"], "logs": check["logs"]})
     unchanged = audit.audit_input_manifest() == manifest
     success = unchanged and dict(totals) == {"PASS": 318} and all(batch["exit_code"] == 0 for batch in batches.values())
-    report = {"title": "FontBakery 分地区发布检查", "generated_at": datetime.now(timezone.utc).isoformat(), "toolchain": {"fontbakery": importlib.metadata.version("fontbakery")}, "input_manifest": manifest, "inputs_unchanged": unchanged, "release_gate": {"fonts": 156, "selected_checks": {name: dict(value) for name, value in selected.items()}, "per_region_batches": batches, "total_result_counts": dict(totals), "all_batches_exit_zero": all(batch["exit_code"] == 0 for batch in batches.values()), "passed": success}, "results": records}
+    report = {"title": "FontBakery 分地区发布检查", "generated_at": datetime.now(timezone.utc).isoformat(), "toolchain": environment["versions"], "environment": environment, "input_manifest": manifest, "inputs_unchanged": unchanged, "release_gate": {"fonts": 156, "selected_checks": {name: dict(value) for name, value in selected.items()}, "per_region_batches": batches, "total_result_counts": dict(totals), "all_batches_exit_zero": all(batch["exit_code"] == 0 for batch in batches.values()), "passed": success}, "results": records}
     save_report("fontbakery-audit.json", report)
     return success
 

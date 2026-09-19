@@ -6,7 +6,7 @@ import json
 import sys
 import zipfile
 from dataclasses import dataclass
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -175,6 +175,69 @@ def validate_package_sources(package: Package) -> None:
         build.validate_archive_member_paths([archive_name], ROOT)
 
 
+def validate_visual_report(visual: dict, manifest: dict) -> None:
+    import audit_sarasa_ui_propdigits as audit
+
+    if visual.get("complete") is not True or visual.get("passed") is not True or visual.get("review_required") is not False:
+        raise ValueError("视觉检查尚未完整通过")
+    if visual.get("input_manifest") != manifest:
+        raise ValueError("视觉报告的字体 SHA-256 不匹配")
+    if visual.get("fonts_reviewed") != 156 or sorted(visual.get("reviewed_fonts", [])) != sorted(manifest):
+        raise ValueError("视觉报告缺少准确的 156 个已审阅字体清单")
+    if sorted(visual.get("regions", [])) != sorted(build.REGION_ORDER):
+        raise ValueError("视觉报告没有覆盖全部六地区")
+    generator = "tools/render_visual_checks.py"
+    if visual.get("generator") != generator or visual.get("generator_sha256") != package_sha256(ROOT / generator):
+        raise ValueError("视觉生成器 SHA-256 不匹配")
+
+    def verify_image(item: dict, *, expected_png: bool = False) -> None:
+        name = item.get("file", "")
+        relative = PurePosixPath(name)
+        if relative.is_absolute() or ".." in relative.parts or "\\" in name or not name.startswith("assets/checks/"):
+            raise ValueError("视觉图片路径无效")
+        path = ROOT / relative
+        if not path.resolve().is_relative_to((ROOT / "assets" / "checks").resolve()) or not path.is_file():
+            raise ValueError("视觉图片不存在或位于检查目录之外")
+        if item.get("reviewed") is not True or item.get("passed") is not True:
+            raise ValueError("视觉图片尚未审阅通过")
+        if item.get("sha256") != package_sha256(path):
+            raise ValueError("视觉图片 SHA-256 不匹配")
+        with path.open("rb") as stream:
+            header = stream.read(8)
+            if header != b"\x89PNG\r\n\x1a\n" and (expected_png or not header.startswith(b"\xff\xd8\xff")):
+                raise ValueError("视觉图片格式无效")
+
+    images = visual.get("images", [])
+    expected_names = {f"assets/checks/{region}-{kind}.png" for region in build.REGION_ORDER for kind in ("static", "variable", "detail")}
+    if len(images) != 18 or {item.get("file") for item in images} != expected_names:
+        raise ValueError("视觉报告必须准确包含六地区的 18 张样张")
+    reviewed = set()
+    for item in images:
+        verify_image(item, expected_png=True)
+        if not item.get("observations") or not all(isinstance(value, str) and value.strip() for value in item["observations"]):
+            raise ValueError("视觉图片缺少具体审阅记录")
+        region = item.get("region")
+        if region not in build.REGION_ORDER or not item["file"].startswith(f"assets/checks/{region}-"):
+            raise ValueError("视觉图片地区不匹配")
+        cases = item.get("cases", [])
+        if item["file"].endswith("-static.png"):
+            expected = {(audit.display_path(audit.static_path(region, str(stop["name"]), italic, hinted)), int(stop["value"]), italic, hinted) for stop in build.SOURCE_HAN_WEIGHT_STOPS for italic in (False, True) for hinted in (False, True)}
+            actual = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("hinted")) for case in cases]
+        elif item["file"].endswith("-variable.png"):
+            expected = {(audit.display_path(audit.vf_path(region, italic)), weight, italic, None) for weight in audit.INTER_POSITION_WEIGHTS for italic in (False, True)}
+            actual = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("hinted")) for case in cases]
+        else:
+            expected = {(audit.display_path(audit.vf_path(region, False)), weight) for weight in (200, 400, 600, 900)}
+            actual = [(case.get("font"), case.get("weight")) for case in cases]
+        if len(actual) != len(expected) or set(actual) != expected or any(not isinstance(case.get("pixels"), int) or case["pixels"] <= 0 for case in cases):
+            raise ValueError("视觉图片的字体、字重或样式覆盖不完整")
+        reviewed.update(case[0] for case in actual)
+    if reviewed != set(manifest):
+        raise ValueError("视觉图片没有覆盖全部成品")
+    for screenshot in visual.get("runtime_screenshots", []):
+        verify_image(screenshot)
+
+
 def validate_release_audits(packages: list[Package]) -> None:
     import audit_sarasa_ui_propdigits as audit
 
@@ -215,9 +278,10 @@ def validate_release_audits(packages: list[Package]) -> None:
     batches = fb.get("per_region_batches", {})
     if set(batches) != set(build.REGION_ORDER) or any(batch.get("fonts") != 26 or batch.get("jobs") != 4 for batch in batches.values()):
         raise ValueError("FontBakery 必须按六地区、每批 26 字体、-J 4 运行")
-    visual = reports["visual-audit"]
-    if visual.get("complete") is not True or visual.get("passed") is not True:
-        raise ValueError("视觉检查尚未完整通过")
+    environment = reports["fontbakery-audit"].get("environment", {})
+    if environment.get("versions", {}).get("freetype-py") != "2.3.0" or environment.get("pip_check") != {"returncode": 0, "passed": True}:
+        raise ValueError("FontBakery 独立环境尚未通过固定依赖与 pip check 检查")
+    validate_visual_report(reports["visual-audit"], manifest)
 
 
 def write_package(package: Package, output_dir: Path) -> dict[str, object]:

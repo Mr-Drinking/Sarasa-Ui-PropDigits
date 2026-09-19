@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -15,8 +16,9 @@ import uharfbuzz as hb
 from PIL import Image, ImageDraw, ImageFont
 
 
-SAMPLE = "LY GT Go ĢT 0123456789 1:2 G\u0300\u0301 中文……——（「更纱」）"
+SAMPLE = "LY GT Go ,; 0123456789 1:2 1: :2 G\u0300\u0301 中文……——（「更纱」）"
 OUT = build.ROOT / "assets" / "checks"
+LABEL_FONT: Path | None = None
 
 
 class FontRenderer:
@@ -52,10 +54,18 @@ class FontRenderer:
 
 
 def labels(size: int):
-    for name in ("C:/Windows/Fonts/msyh.ttc", "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf"):
-        if Path(name).exists():
-            return ImageFont.truetype(name, size)
-    raise RuntimeError("缺少样张标签字体")
+    path = label_font_path()
+    return ImageFont.truetype(str(path), size)
+
+
+def label_font_path() -> Path:
+    # The release's SC font includes the Chinese labels on every platform.
+    # A user override also supports a local TTF/OTF/TTC without OS path guesses.
+    configured = LABEL_FONT or os.environ.get("SARASA_VISUAL_LABEL_FONT")
+    path = Path(configured) if configured else audit.static_path("SC", "Regular", False, False)
+    if not path.is_file():
+        raise RuntimeError("样张标签字体不存在；请用 --label-font 或 SARASA_VISUAL_LABEL_FONT 指定字体")
+    return path
 
 
 def sheet(region: str, variable: bool) -> dict:
@@ -103,19 +113,26 @@ def sheet(region: str, variable: bool) -> dict:
 
 
 def detail_sheet(region: str) -> dict:
-    image = Image.new("RGB", (1850, 1180), "white")
+    image = Image.new("RGB", (1850, 1450), "white")
     draw = ImageDraw.Draw(image); title_font = labels(30); label_font = labels(20)
     draw.text((32, 22), f"{region} · 定位与默认竖排放大检查", font=title_font, fill=(15, 40, 75))
     regular = FontRenderer(audit.vf_path(region, False), 104)
+    italic = FontRenderer(audit.vf_path(region, True), 104)
+    tabular = FontRenderer(audit.vf_path(region, False), 44)
     cases = []
     for index, weight in enumerate((200, 400, 600, 900)):
         regular.weight(weight)
-        baseline = 208 + 224 * index
+        italic.weight(weight); tabular.weight(weight)
+        baseline = 208 + 300 * index
         draw.text((34, baseline - 112), f"wght {weight}", font=label_font, fill=(65, 80, 100))
-        regular.draw(image, "LY GT Go ĢT G\u0300\u0301", (175, baseline), language="en")
+        regular.draw(image, "LY GT Go ,; G\u0300\u0301", (175, baseline), language="en")
+        draw.text((1190, baseline - 126), "斜体标点", font=label_font, fill=(65, 80, 100))
+        italic.draw(image, ",; ,;", (1190, baseline), language="en")
         delta = audit.inter_positioning_signature(regular.font, "LY", "kern", source=False)[0][0]
         draw.text((175, baseline + 25), f"LY 实际字偶距调整：{delta} units", font=label_font, fill=(65, 80, 100))
-        cases.append({"font": audit.display_path(audit.vf_path(region, False)), "weight": weight, "pixels": 104, "LY_adjustment": delta})
+        tabular.draw(image, "0123456789 1:2 1: :2", (175, baseline + 109), features={"tnum": True, "zero": True})
+        draw.text((175, baseline + 134), "tnum + zero：斜线零与其余数字严格等宽；边界冒号上浮", font=label_font, fill=(65, 80, 100))
+        cases.append({"font": audit.display_path(audit.vf_path(region, False)), "weight": weight, "pixels": 104, "LY_adjustment": delta, "italic_font": audit.display_path(audit.vf_path(region, True)), "combination_features": {"tnum": True, "zero": True}})
     vertical = FontRenderer(audit.vf_path(region, False), 45); vertical.weight(400)
     draw.text((1570, 85), "默认竖排", font=label_font, fill=(65, 80, 100))
     vertical.draw(image, "中文……——排版", (1670, 145), direction="ttb")
@@ -124,9 +141,12 @@ def detail_sheet(region: str) -> dict:
 
 
 def main() -> None:
+    global LABEL_FONT
     parser = argparse.ArgumentParser(description="用实际成品生成字体视觉样张；生成结果须人工查看，不自动声明通过。")
     parser.add_argument("--regions", default=",".join(build.REGION_ORDER))
+    parser.add_argument("--label-font", type=Path, help="样张标签使用的 TTF/OTF/TTC；默认使用本项目 SC Regular unhinted 字体。")
     args = parser.parse_args()
+    LABEL_FONT = args.label_font
     regions = build.parse_regions(args.regions)
     OUT.mkdir(parents=True, exist_ok=True)
     manifest = audit.audit_input_manifest()
@@ -139,6 +159,8 @@ def main() -> None:
     if manifest != audit.audit_input_manifest():
         raise RuntimeError("生成样张期间成品发生变化")
     candidate = {"title": "字体视觉检查候选样张", "generated_at": datetime.now(timezone.utc).isoformat(), "complete": False, "passed": False, "review_required": True, "input_manifest": manifest, "generator": "tools/render_visual_checks.py", "generator_sha256": build.file_sha256(Path(__file__)), "engines": {"HarfBuzz": hb.version_string(), "FreeType": list(freetype.version())}, "regions": regions, "images": images}
+    candidate["reviewed_fonts"] = []
+    candidate["label_font"] = {"file": build.portable_report_path(label_font_path()), "sha256": build.file_sha256(label_font_path())}
     path = build.ROOT / "reports" / "visual-candidates.json"
     build.write_json_atomic(path, candidate)
     print(f"[visual] {audit.display_path(path)}，等待实际查看。", flush=True)

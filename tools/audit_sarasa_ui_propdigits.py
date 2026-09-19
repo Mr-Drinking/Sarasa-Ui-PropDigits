@@ -173,8 +173,11 @@ def audit_contract_manifest() -> dict[str, str]:
         ROOT / "tools" / "python_env_bootstrap.py",
         ROOT / "tools" / "check_external_release.py",
         ROOT / "tools" / "package_release.py",
+        ROOT / "tools" / "render_visual_checks.py",
         ROOT / "requirements-build.txt",
         ROOT / "requirements-audit.txt",
+        ROOT / "requirements-visual.txt",
+        ROOT / "requirements-fontbakery.txt",
     ]
     return {
         display_path(path): b.file_sha256(path)
@@ -951,25 +954,50 @@ def audit_static_raster(
     )
 
 
+COLON_FEATURE_COMBINATIONS = ({}, {"tnum": True}, {"pnum": True}, {"zero": True}, {"tnum": True, "zero": True})
+COLON_TEXTS = tuple(dict.fromkeys(["09:41", "1:2", "1:", ":2", "1:a", "a:2", "a:b", "a::::::::::2", "a::b::::::2", "1::2::::::a", *[left + ":" * count + right for left in ("", "0", "1", "a", "A", " ") for right in ("", "2", "a", "A", " ") for count in range(1, 17)]]))
+
+
+def colon_runtime_signature(runtime: hb.Font, text: str, features: dict, raised: int) -> tuple[bool, ...]:
+    buffer = hb.Buffer(); buffer.add_codepoints([ord(char) for char in text])
+    buffer.script = "Latn"; buffer.language = "en"; buffer.direction = "ltr"
+    hb.shape(runtime, buffer, features)
+    return tuple(info.codepoint == raised for info in buffer.glyph_infos if text[info.cluster] == ":")
+
+
+@functools.lru_cache(maxsize=26)
+def source_colon_signatures(italic: bool, weight: int) -> tuple:
+    # Read the original Inter file independently: no product baking or rule
+    # reconstruction helper is used as the expected result.
+    path = b.INTER_ITALIC if italic else b.INTER_UPRIGHT
+    with TTFont(path) as source:
+        raised = source.getGlyphID(b.get_single_substitution_mapping(source, "case")[source.getBestCmap()[0x3A]])
+        source.flavor = None
+        stream = io.BytesIO(); source.save(stream)
+    runtime = hb.Font(hb.Face(stream.getvalue()))
+    runtime.set_variations({"wght": weight, "opsz": 14})
+    return tuple(tuple(colon_runtime_signature(runtime, text, features, raised) for text in COLON_TEXTS) for features in COLON_FEATURE_COMBINATIONS)
+
+
 def colon_status(path: Path) -> dict[str, Any]:
-    strings = ["09:41", "1:2", "1:a", "a:2", "a:b"]
-    shaped = {text: b.shape_glyph_names(path, text, "Latn") for text in strings}
-    raw_colon = shaped["a:b"][1] if shaped.get("a:b") and len(shaped["a:b"]) == 3 else None
-    raised_0941 = shaped["09:41"][2] if shaped.get("09:41") and len(shaped["09:41"]) == 5 else None
-    raised_12 = shaped["1:2"][1] if shaped.get("1:2") and len(shaped["1:2"]) == 3 else None
-    non_digit_ok = all(shaped.get(text) and len(shaped[text]) == 3 and shaped[text][1] == raw_colon for text in ["1:a", "a:2", "a:b"])
-    return {
-        "ok": raw_colon is not None
-        and raised_0941 is not None
-        and raised_12 is not None
-        and raised_0941 != raw_colon
-        and raised_12 != raw_colon
-        and non_digit_ok,
-        "raw_colon": raw_colon,
-        "raised_0941": raised_0941,
-        "raised_1_2": raised_12,
-        "shapes": shaped,
-    }
+    with TTFont(path) as font:
+        italic = bool(font["post"].italicAngle)
+        weights = INTER_POSITION_WEIGHTS if "fvar" in font else (font["OS/2"].usWeightClass,)
+        raised = font.getGlyphID(b.get_single_substitution_mapping(font, "case")[font.getBestCmap()[0x3A]])
+    runtime = hb.Font(hb.Face(path.read_bytes()))
+    failures = 0; samples = []; cases = 0
+    for weight in weights:
+        runtime.set_variations({"wght": weight})
+        expected = source_colon_signatures(italic, weight)
+        for index, features in enumerate(COLON_FEATURE_COMBINATIONS):
+            for text, reference in zip(COLON_TEXTS, expected[index]):
+                actual = colon_runtime_signature(runtime, text, features, raised)
+                cases += 1
+                if actual != reference or len(actual) != text.count(":"):
+                    failures += 1
+                    if len(samples) < 12:
+                        samples.append({"wght": weight, "text": text, "features": features, "actual": actual, "source": reference})
+    return {"ok": failures == 0, "source": "Inter 4.1 原始 calt", "weights": list(weights), "feature_combinations": list(COLON_FEATURE_COMBINATIONS), "cases": cases, "failures": failures, "samples": samples}
 
 
 def digit_width_status(
@@ -997,11 +1025,28 @@ def digit_width_status(
     default = shape({"kern": False, "pnum": False, "tnum": False})
     proportional = shape({"kern": False, "pnum": True, "tnum": False})
     tabular = shape({"kern": False, "pnum": False, "tnum": True})
+    combinations = {"tnum+zero": shape({"kern": False, "tnum": True, "pnum": False, "zero": True})}
+    if "ss01" in feature_tags:
+        combinations["tnum+ss01+zero"] = shape({"kern": False, "tnum": True, "pnum": False, "zero": True, "ss01": True})
     default_advances = [item[1] for item in default]
     proportional_advances = [item[1] for item in proportional]
     tabular_advances = [item[1] for item in tabular]
     default_is_proportional = len(set(default_advances)) > 1
     tabular_is_uniform = len(tabular_advances) == 10 and len(set(tabular_advances)) == 1
+    combination_advances = {label: [item[1] for item in values] for label, values in combinations.items()}
+    combinations_uniform = all(len(values) == 10 and values == tabular_advances for values in combination_advances.values())
+    ft = freetype.Face(io.BytesIO(data))
+    if variations:
+        ft.set_var_design_coords([variations["wght"]])
+    reverse = {name: gid for gid, name in enumerate(glyph_order)}
+    freetype_advances = {}
+    for label, signature in {"tnum": tabular, **combinations}.items():
+        widths = []
+        for item in signature:
+            ft.load_glyph(reverse[item[0]], freetype.FT_LOAD_NO_SCALE | freetype.FT_LOAD_NO_HINTING | freetype.FT_LOAD_NO_BITMAP)
+            widths.append(ft.glyph.metrics.horiAdvance)
+        freetype_advances[label] = widths
+    freetype_uniform = all(len(widths) == 10 and len(set(widths)) == 1 and widths == freetype_advances["tnum"] for widths in freetype_advances.values())
     default_equals_pnum = default == proportional
     tnum_changes_glyphs = [item[0] for item in tabular] != [item[0] for item in proportional]
     ok = (
@@ -1009,6 +1054,8 @@ def digit_width_status(
         and len(default) == len(proportional) == len(tabular) == 10
         and default_is_proportional
         and tabular_is_uniform
+        and combinations_uniform
+        and freetype_uniform
         and default_equals_pnum
         and tnum_changes_glyphs
     )
@@ -1023,6 +1070,10 @@ def digit_width_status(
         "default_advances": default_advances,
         "pnum_advances": proportional_advances,
         "tnum_advances": tabular_advances,
+        "combination_advances": combination_advances,
+        "combinations_uniform": combinations_uniform,
+        "freetype_advances": freetype_advances,
+        "freetype_uniform": freetype_uniform,
     }
 
 
@@ -5451,6 +5502,9 @@ def audit_metadata() -> dict[str, Any]:
                         variable_digits,
                         digit_width_status(static_digit_path),
                     )
+                for weight_value in INTER_POSITION_WEIGHTS:
+                    if str(weight_value) not in digit_width_instances:
+                        digit_width_instances[str(weight_value)] = digit_width_status(path, {"wght": weight_value})
                 item = {
                     "file": display_path(path),
                     "vendor": font["OS/2"].achVendID,
@@ -5610,7 +5664,7 @@ def audit_metadata() -> dict[str, Any]:
                     not item["has_fvar"]
                     or not item["has_gvar"]
                     or not item["has_hvar"]
-                    or not item["has_vvar"]
+                    or item["has_vvar"]
                     or not item["has_mvar"]
                     or not item["has_stat"]
                 ):
@@ -5623,14 +5677,12 @@ def audit_metadata() -> dict[str, Any]:
                             "status": item["hvar_side_bearing_maps"],
                         }
                     )
-                if not all(item["vvar_metric_maps"].values()):
-                    failures.append(
-                        {
-                            "kind": "vf_vvar_metric_maps",
-                            "file": item["file"],
-                            "status": item["vvar_metric_maps"],
-                        }
-                    )
+                moving_origins = sum(bool(item.coordinates[-4] and item.coordinates[-4][0]) for items in font["gvar"].variations.values() for item in items)
+                if moving_origins:
+                    failures.append({"kind": "vf_noncanonical_horizontal_origin", "file": item["file"], "tuples": moving_origins})
+                tabular_structure = b.tabular_advance_structure_status(font)
+                if not tabular_structure["ok"]:
+                    failures.append({"kind": "vf_tabular_advance_curves", "file": item["file"], "status": tabular_structure})
                 if item["default_lsb_xmin_mismatches"]:
                     failures.append(
                         {
@@ -6521,6 +6573,92 @@ def is_anchor350_side_bearing_quantization_only(
     )
 
 
+def normalization_rounding_pair(actual: int, expected: int, low: float, high: float) -> bool:
+    if abs(actual - expected) != 1:
+        return False
+    lower, upper = sorted((actual, expected))
+    return low <= lower + 0.5 <= high and low >= lower - 0.5 and high <= upper + 0.5
+
+
+def cross_engine_coverage_failures(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    sweeps = [item for item in items if "cross_engine_axis_sweep" in item]
+    expected = {(region, italic) for region in b.REGION_ORDER for italic in (False, True)}
+    actual = {(item.get("region"), item.get("italic")) for item in sweeps}
+    if len(sweeps) != 12 or actual != expected:
+        return [{"kind": "cross-engine-font-coverage", "expected": 12, "actual": len(sweeps)}]
+    failures = []
+    metrics = {"x_min", "x_max", "y_min", "y_max", "vertical_origin", "horizontal_advance", "vertical_advance"}
+    for item in sweeps:
+        sweep = item["cross_engine_axis_sweep"]
+        points = sweep.get("axis_points", [])
+        if (
+            len(points) != 13
+            or {case.get("wght") for case in points} != set(INTER_POSITION_WEIGHTS)
+            or not sweep.get("glyphs")
+            or set(sweep.get("engines", {})) != {"FreeType", "HarfBuzz"}
+            or any(case.get("glyphs_compared") != sweep["glyphs"] or set(case.get("counts", {})) != metrics for case in points)
+        ):
+            failures.append({"kind": "cross-engine-axis-coverage", "region": item["region"], "italic": item["italic"]})
+    return failures
+
+
+def cross_engine_metric_status(path: Path) -> dict[str, Any]:
+    data = path.read_bytes()
+    runtime = hb.Font(hb.Face(data))
+    rasterizer = freetype.Face(io.BytesIO(data))
+    glyphs = runtime.face.glyph_count
+    metrics_font = TTFont(path, lazy=True)
+    hvar = metrics_font["HVAR"].table
+    order = metrics_font.getGlyphOrder()
+    flags = freetype.FT_LOAD_NO_SCALE | freetype.FT_LOAD_NO_HINTING | freetype.FT_LOAD_NO_BITMAP
+    cases = []
+    for weight in INTER_POSITION_WEIGHTS:
+        runtime.set_variations({"wght": weight})
+        rasterizer.set_var_design_coords([weight])
+        normalized = b.vf_mapped_normalized_weight(metrics_font, weight)
+        # The two engines quantize normalized coordinates at different stages.
+        # Bound that difference by one F2Dot14 unit and evaluate the font's own
+        # HVAR independently. Only adjacent rounding around a proven half-unit
+        # boundary is an observation; an arbitrary one-unit advance error fails.
+        interpolators = [b.VarStoreInstancer(hvar.VarStore, metrics_font["fvar"].axes, {"wght": max(-1.0, min(1.0, normalized + delta))}) for delta in (-1 / 16384, 0, 1 / 16384)]
+        names = ("x_min", "x_max", "y_min", "y_max", "vertical_origin", "horizontal_advance", "vertical_advance")
+        counts = dict.fromkeys(names, 0); observations = dict.fromkeys(names, 0); maximum = dict.fromkeys(names, 0)
+        samples = []; advance_rounding = []
+        for gid in range(glyphs):
+            rasterizer.load_glyph(gid, flags)
+            metrics = rasterizer.glyph.metrics
+            deltas = {"horizontal_advance": metrics.horiAdvance - runtime.get_glyph_h_advance(gid), "vertical_advance": metrics.vertAdvance + runtime.get_glyph_v_advance(gid)}
+            extent = runtime.get_glyph_extents(gid)
+            if extent is not None:
+                deltas.update(x_min=metrics.horiBearingX - extent.x_bearing, x_max=metrics.horiBearingX + metrics.width - extent.x_bearing - extent.width, y_min=metrics.horiBearingY - metrics.height - extent.y_bearing - extent.height, y_max=metrics.horiBearingY - extent.y_bearing, vertical_origin=metrics.horiBearingY + metrics.vertBearingY - runtime.get_glyph_v_origin(gid)[1])
+            for name, delta in deltas.items():
+                maximum[name] = max(maximum[name], abs(delta))
+                # Each unscaled outline boundary/origin can independently round
+                # by one design unit. Check them separately, not a permissive
+                # aggregate TSB tolerance. Advance exceptions require the
+                # independent HVAR normalization bound below.
+                limit = 0 if name.endswith("advance") else 1
+                explained = False
+                if name == "horizontal_advance" and abs(delta) == 1:
+                    glyph_name = order[gid]
+                    index = hvar.AdvWidthMap.mapping[glyph_name] if hvar.AdvWidthMap is not None else gid
+                    base = metrics_font["hmtx"].metrics[glyph_name][0]
+                    values = [base + interpolator[index] for interpolator in interpolators]
+                    low, high = min(values), max(values)
+                    explained = normalization_rounding_pair(metrics.horiAdvance, runtime.get_glyph_h_advance(gid), low, high)
+                    if explained and len(advance_rounding) < 12:
+                        advance_rounding.append({"gid": gid, "FreeType": metrics.horiAdvance, "HarfBuzz": runtime.get_glyph_h_advance(gid), "unrounded_HVAR_interval": [low, high]})
+                if abs(delta) > limit and not explained:
+                    counts[name] += 1
+                    if len(samples) < 12:
+                        samples.append({"gid": gid, "metric": name, "difference": delta})
+                elif delta:
+                    observations[name] += 1
+        cases.append({"wght": weight, "glyphs_compared": glyphs, "counts": counts, "maximum_deltas": maximum, "rounding_observations": observations, "advance_rounding_examples": advance_rounding, "samples": samples})
+    metrics_font.close()
+    return {"engines": {"HarfBuzz": hb.version_string(), "FreeType": list(freetype.version())}, "glyphs": glyphs, "axis_points": cases, "failures": sum(sum(case["counts"].values()) for case in cases)}
+
+
 def audit_vf_engine_metrics() -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     regions = b.variable_regions(b.REGION_ORDER)
@@ -6549,6 +6687,7 @@ def audit_vf_engine_metrics() -> list[dict[str, Any]]:
             hb_font.scale = (face.upem, face.upem)
             variable = TTFont(path)
             try:
+                cross_engine = cross_engine_metric_status(path)
                 for weight_name, weight_value in named_weights:
                     done += 1
                     expected_path = static_path(
@@ -6586,6 +6725,9 @@ def audit_vf_engine_metrics() -> list[dict[str, Any]]:
                         )
                     finally:
                         expected.close()
+                    if weight_value == named_weights[0][1]:
+                        item["cross_engine_axis_sweep"] = cross_engine
+                        item["counts"]["cross_engine_metrics"] = cross_engine["failures"]
                     out.append(item)
 
                 done += 1
@@ -8599,6 +8741,7 @@ def main() -> None:
     )
     if not args.raster_only:
         coverage_failures.extend(inter_positioning_coverage_failures(vf_source_gpos_variations))
+        coverage_failures.extend(cross_engine_coverage_failures(vf_engine_metrics))
         coverage_failures.extend(
             vf_source_metric_coverage_failures(
                 vf_source_pairing,
@@ -8774,6 +8917,7 @@ def main() -> None:
         "metadata_failures": metadata["failures"],
         "audit_coverage_failures": coverage_failures,
         "non_failing_observation_policy": {
+            "cross_engine_rounding": "FreeType 未缩放轮廓边界和竖排原点逐项与 HarfBuzz 比较，各项仅允许 1 unit 的独立坐标取整。横向 advance 的 1 unit 差异必须由独立 HVAR 插值、正负一个 F2Dot14 坐标量化范围内的半整数边界解释；其他 advance 差异失败。原始计数、最大值和插值区间保留。tnum 与 zero 组合在每个引擎内仍要求严格等宽。",
             "glyph_id_differences": "post format 3 不存储 glyph name；只要 cmap、轮廓、metrics 与 layout 审计通过，GID 不要求等同。",
             "instruction_bytecode_differences": (
                 "hinted 字体由本项目在修改后的完整字形环境中重新 hint，不复制上游 glyph program；"
@@ -8819,7 +8963,7 @@ def main() -> None:
             ),
             "vf_punctuation_source_quantization": (
                 "VF 破折号与省略号的源轮廓必须先写入并重新读取 SFNT，再与成品比较，避免拿未量化浮点源数据制造假差异；"
-                "横竖 advance 另由 HarfBuzz 直接读取成品与真实上游 VF 的 HVAR/VVAR 并要求整数 exact。Italic 为匹配"
+                "横竖 advance 另由 HarfBuzz 直接读取成品的 HVAR/gvar 与真实上游 VF 的度量并要求整数 exact。Italic 为匹配"
                 "官方 Sarasa 静态度量产生的整字 LSB 平移单独记为观察项，平移后的轮廓形状及六个发布字重对项目静态"
                 "字体的逐码位 side bearing 仍为硬失败门槛。"
             ),
