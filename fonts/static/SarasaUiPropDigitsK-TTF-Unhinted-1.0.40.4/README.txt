@@ -8,7 +8,8 @@ Sarasa Ui PropDigits K 1.0.40.4（unhinted）
 CL 的公开 cmap/layout 限于 Sarasa Ui CL 边界。
 
 默认 ASCII 数字为比例宽；tnum 切换等宽，pnum 恢复比例宽。
-冒号使用 Inter colon-run calt。未提供语言标记时使用对应地区的全宽标点；明确的 Latn/en 保留英文省略号路径。KOR 单破折号保留地区特例。
+冒号复用 Inter 的上下文规则，在 tnum 之前执行；1:2、1:、:2 上浮，
+1:a、a:2、a:b 保持原位。tnum 与 zero 可同时启用。未提供语言标记时使用对应地区的全宽标点；明确的 Latn/en 保留英文省略号路径。KOR 单破折号保留地区特例。
 破折号、省略号和竖排沿用对应 Source Han/Shanggu 字形，保持
 ccmp → locl → vert/vrt2 顺序。中文双省略号为两个居中 glyph，共 2em；
 中文双连、三连破折号分别为 2em、3em。CL 破折号全局保留 Shanggu 全宽形式。

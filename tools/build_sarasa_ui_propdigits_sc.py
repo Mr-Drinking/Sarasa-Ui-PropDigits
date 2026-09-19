@@ -425,7 +425,7 @@ SARASA_HINT_CONFIGS = {
 }
 CHLOROPHYTUM_HINT_STORE_ORDER = "numeric-gid-hcfg-shared-v3"
 STATIC_HINT_WORK_VERSION = 5
-STATIC_POSTPROCESS_VERSION = 7
+STATIC_POSTPROCESS_VERSION = 8
 STATIC_HINT_RECIPE = {
     "version": STATIC_HINT_WORK_VERSION,
     "fragments": "sarasa-pass1-kanji-hangul",
@@ -4364,6 +4364,65 @@ def tnum_digit_targets(font: TTFont) -> dict[int, str]:
     return targets
 
 
+def tabular_digit_alternates(font: TTFont) -> set[str]:
+    tnum = get_single_substitution_mapping(font, "tnum")
+    tags = {record.FeatureTag for record in font["GSUB"].table.FeatureList.FeatureRecord if record.FeatureTag == "zero" or record.FeatureTag.startswith(("ss", "cv"))}
+    mappings = [get_single_substitution_mapping(font, tag) for tag in sorted(tags)]
+    def closure(seeds: set[str]) -> set[str]:
+        result = set(seeds)
+        while True:
+            additions = {mapping[name] for mapping in mappings for name in result if name in mapping} - result
+            if not additions:
+                return result
+            result.update(additions)
+    cmap = font.getBestCmap()
+    digits = closure({cmap[cp] for cp in range(0x30, 0x3A)})
+    return closure({tnum[name] for name in digits if name in tnum})
+
+
+def align_tabular_alternate_advances(font: TTFont) -> dict[str, Any]:
+    if "gvar" not in font or "HVAR" not in font:
+        return {"tabular_alternate_advances_aligned": 0}
+    names = tabular_digit_alternates(font)
+    reference = tnum_digit_targets(font)[0x31]
+    if reference not in names:
+        raise RuntimeError("等宽数字参考字形不在替代字形闭包中")
+    curves = []
+    for item in font["gvar"].variations.get(reference, []):
+        left = item.coordinates[-4] or (0, 0)
+        right = item.coordinates[-3] or (0, 0)
+        if right[0] != left[0]:
+            curves.append((copy.deepcopy(item.axes), right[0] - left[0]))
+    hvar = font["HVAR"].table
+    order = font.getGlyphOrder()
+    indices = dict(hvar.AdvWidthMap.mapping) if hvar.AdvWidthMap is not None else {name: index for index, name in enumerate(order)}
+    reference_index = indices[reference]
+    advance = font["hmtx"].metrics[reference][0]
+    for name in names:
+        indices[name] = reference_index
+        font["hmtx"].metrics[name] = (advance, font["hmtx"].metrics[name][1])
+        if name == reference:
+            continue
+        items = font["gvar"].variations.setdefault(name, [])
+        for item in items:
+            item.coordinates[-3] = item.coordinates[-4] or (0, 0)
+        items[:] = [item for item in items if any(point not in (None, (0, 0)) for point in item.coordinates)]
+        for axes, delta in curves:
+            coordinates = [(0, 0)] * gvar_coordinate_count(font, name)
+            coordinates[-3] = (delta, 0)
+            items.append(TupleVariation(axes, coordinates))
+    hvar.AdvWidthMap = var_builder.buildVarIdxMap([indices[name] for name in order], order)
+    return {"tabular_alternate_advances_aligned": len(names), "tabular_alternates_share_hvar_advance": True}
+
+
+def tabular_advance_structure_status(font: TTFont) -> dict[str, Any]:
+    names = tabular_digit_alternates(font)
+    table = font["HVAR"].table
+    indices = {table.AdvWidthMap.mapping[name] if table.AdvWidthMap is not None else font.getGlyphID(name) for name in names}
+    advances = {font["hmtx"].metrics[name][0] for name in names}
+    return {"ok": len(names) >= 11 and len(indices) == len(advances) == 1, "glyphs": len(names), "advance_curves": len(indices), "default_advances": sorted(advances)}
+
+
 def reference_digit_hmtx(reference: TTFont) -> dict[int, tuple[int, int]]:
     cmap = reference.getBestCmap()
     metrics: dict[int, tuple[int, int]] = {}
@@ -5490,20 +5549,20 @@ def append_layout_features(
 
 
 def layout_lookup_records(value: Any, seen: set[int] | None = None) -> list[Any]:
-    if isinstance(value, (ot.SubstLookupRecord, ot.PosLookupRecord)):
-        return [value]
     if value is None or isinstance(value, (str, int, float, bool, bytes)):
         return []
     seen = set() if seen is None else seen
     if id(value) in seen:
         return []
     seen.add(id(value))
+    if isinstance(value, (ot.SubstLookupRecord, ot.PosLookupRecord)):
+        return [value]
     if isinstance(value, dict):
         children = value.values()
     elif isinstance(value, (list, tuple)):
         children = value
     elif hasattr(value, "__dict__"):
-        children = vars(value).values()
+        children = [child for key, child in vars(value).items() if key not in {"reader", "font"}]
     else:
         return []
     return [record for child in children for record in layout_lookup_records(child, seen)]
@@ -10307,6 +10366,7 @@ def digit_colon_calt_lookup_indices(font: TTFont, colon: str) -> set[int]:
 def remove_gsub_lookups(font: TTFont, remove_indices: set[int]) -> dict[str, int]:
     if "GSUB" not in font or not font["GSUB"].table.LookupList or not remove_indices:
         return {"gsub_lookups_removed": 0}
+    font["GSUB"].ensureDecompiled()
     gsub = font["GSUB"].table
     old_lookups = gsub.LookupList.Lookup
     remove_indices = {index for index in remove_indices if 0 <= index < len(old_lookups)}
@@ -10322,7 +10382,11 @@ def remove_gsub_lookups(font: TTFont, remove_indices: set[int]) -> dict[str, int
         new_lookups.append(lookup)
 
     if gsub.FeatureList:
+        seen_features = set()
         for feature_record in gsub.FeatureList.FeatureRecord:
+            if id(feature_record.Feature) in seen_features:
+                continue
+            seen_features.add(id(feature_record.Feature))
             indices = [
                 index_map[index]
                 for index in list(feature_record.Feature.LookupListIndex or [])
@@ -10331,14 +10395,18 @@ def remove_gsub_lookups(font: TTFont, remove_indices: set[int]) -> dict[str, int
             feature_record.Feature.LookupListIndex = indices
             feature_record.Feature.LookupCount = len(indices)
 
+    mapped_records = {}
     def remap_records(container: Any) -> None:
         records = list(getattr(container, "SubstLookupRecord", []) or [])
         if records:
             kept_records = []
             for record in records:
-                if record.LookupListIndex not in index_map:
+                if id(record) not in mapped_records:
+                    mapped_records[id(record)] = index_map.get(record.LookupListIndex)
+                mapped = mapped_records[id(record)]
+                if mapped is None:
                     continue
-                record.LookupListIndex = index_map[record.LookupListIndex]
+                record.LookupListIndex = mapped
                 kept_records.append(record)
             container.SubstLookupRecord = kept_records
             if hasattr(container, "SubstCount"):
@@ -10427,85 +10495,112 @@ def ensure_raised_colon_glyph(font: TTFont, colon: str, raised: str | None) -> t
     return raised, 1
 
 
-def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
-    glyphs = font.getGlyphSet()
+@functools.lru_cache(maxsize=2)
+def inter_context_reference(italic: bool) -> TTFont:
+    ensure_inter_sources()
+    return load_inter(italic)
+
+
+def inter_layout_glyph_map(font: TTFont, source: TTFont) -> dict[str, str]:
+    """Match layout identities through cmap and feature edges, including post 3."""
+    names = set(font.getGlyphOrder())
+    result = {name: prefixed(name) for name in source.getGlyphOrder() if prefixed(name) in names}
     cmap = font.getBestCmap()
-    if 0x3A not in cmap or not all(cp in cmap for cp in range(0x30, 0x3A)):
-        return {"digit_colon_feature_added": False, "digit_colon_raise": 0}
+    for cp, name in source.getBestCmap().items():
+        if cp in cmap:
+            result[name] = cmap[cp]
+    tags = {record.FeatureTag for record in source["GSUB"].table.FeatureList.FeatureRecord}
+    edges = [(get_single_substitution_mapping(source, tag), get_single_substitution_mapping(font, tag)) for tag in sorted(tags)]
+    for _iteration in range(16):
+        before = len(result)
+        for source_mapping, target_mapping in edges:
+            reverse = {target: original for original, target in target_mapping.items()}
+            for original, target in source_mapping.items():
+                if original in result and result[original] in target_mapping:
+                    result.setdefault(target, target_mapping[result[original]])
+                if target in result and result[target] in reverse:
+                    result.setdefault(original, reverse[result[target]])
+        if len(result) == before:
+            return result
+    raise RuntimeError("Inter 布局身份映射未收敛")
+
+
+def move_gsub_lookups_before(font: TTFont, moved: list[int], before: int) -> dict[int, int]:
+    font["GSUB"].ensureDecompiled()
+    gsub = font["GSUB"].table
+    order = [index for index in range(len(gsub.LookupList.Lookup)) if index not in moved]
+    insertion = order.index(before)
+    order[insertion:insertion] = moved
+    mapping = {old: new for new, old in enumerate(order)}
+    seen_features = set()
+    for record in gsub.FeatureList.FeatureRecord:
+        if id(record.Feature) in seen_features:
+            continue
+        seen_features.add(id(record.Feature))
+        record.Feature.LookupListIndex = [mapping[index] for index in record.Feature.LookupListIndex]
+    for record in layout_lookup_records(gsub.LookupList):
+        record.LookupListIndex = mapping[record.LookupListIndex]
+    gsub.LookupList.Lookup = [gsub.LookupList.Lookup[index] for index in order]
+    return mapping
+
+
+def add_digit_colon_feature(font: TTFont) -> dict[str, Any]:
+    font["GSUB"].ensureDecompiled()
+    cmap = font.getBestCmap()
+    if 0x3A not in cmap:
+        return {"digit_colon_feature_added": False}
     colon = cmap[0x3A]
-    digit_names = [cmap[cp] for cp in range(0x30, 0x3A)]
-    tabular_names = tnum_digit_glyphs(font, digit_names)
-    digit_names = [name for name in dict.fromkeys([*digit_names, *tabular_names]) if name in glyphs]
-    if colon not in glyphs or not digit_names:
-        return {"digit_colon_feature_added": False, "digit_colon_raise": 0}
-
+    italic = bool(font["post"].italicAngle)
+    source = inter_context_reference(italic)
+    source_colon = source.getBestCmap()[0x3A]
+    glyph_map = inter_layout_glyph_map(font, source)
+    raised = get_single_substitution_mapping(font, "case").get(colon)
     existing_raised, removed = remove_existing_calt_colon_substitutions(font, colon)
-    old_colon_lookup_indices = digit_colon_calt_lookup_indices(font, colon)
-    lookup_cleanup_report = remove_gsub_lookups(font, old_colon_lookup_indices)
-    empty_feature_report = drop_empty_feature_records(font, "GSUB", "calt")
-    raised, raised_created = ensure_raised_colon_glyph(font, colon, existing_raised)
-    glyphs = font.getGlyphSet()
-    colonish = [name for name in dict.fromkeys([colon, raised]) if name in glyphs]
-    single_sub = ot.SingleSubst()
-    single_sub.mapping = {colon: raised}
-    single_lookup = ot.Lookup()
-    single_lookup.LookupType = 1
-    single_lookup.LookupFlag = 0
-    single_lookup.SubTable = [single_sub]
-    single_lookup.SubTableCount = 1
-    single_index = append_gsub_lookup(font, single_lookup)
-
-    chain_subtables = []
-
-    def add_chain_rule(backtrack: list[list[str]], lookahead: list[list[str]]) -> None:
-        subst_record = ot.SubstLookupRecord()
-        subst_record.SequenceIndex = 0
-        subst_record.LookupListIndex = single_index
-        chain = ot.ChainContextSubst()
-        chain.Format = 3
-        chain.BacktrackGlyphCount = len(backtrack)
-        chain.BacktrackCoverage = [coverage(font, names) for names in backtrack]
-        chain.InputGlyphCount = 1
-        chain.InputCoverage = [coverage(font, [colon])]
-        chain.LookAheadGlyphCount = len(lookahead)
-        chain.LookAheadCoverage = [coverage(font, names) for names in lookahead]
-        chain.SubstCount = 1
-        chain.SubstLookupRecord = [subst_record]
-        chain_subtables.append(chain)
-
-    # Inter's calt raises a single colon only between digits. Colon runs are
-    # then propagated to the right once the first colon has been raised.
-    add_chain_rule([digit_names], [digit_names + colonish])
-    add_chain_rule([[raised]], [])
-    # Inter also raises colon runs of length three or more before a digit.
-    for run_tail_len in range(2, 9):
-        add_chain_rule([], [colonish] * run_tail_len + [digit_names])
-
-    chain_lookup = ot.Lookup()
-    chain_lookup.LookupType = 6
-    chain_lookup.LookupFlag = 0
-    chain_lookup.SubTable = chain_subtables
-    chain_lookup.SubTableCount = len(chain_subtables)
-    chain_index = append_gsub_lookup(font, chain_lookup)
-    merge_report = merge_gsub_lookup_indices_into_features(font, "calt", [chain_index])
-    feature_added = False
-    if merge_report["calt_features_merged"] == 0:
+    raised = raised or existing_raised
+    if not raised:
+        raise RuntimeError("缺少 Inter 原有的上浮冒号字形")
+    glyph_map[get_single_substitution_mapping(source, "case")[source_colon]] = raised
+    old_indices = digit_colon_calt_lookup_indices(font, colon)
+    cleanup = remove_gsub_lookups(font, old_indices)
+    # Keep the native feature records and language-system ordering. The new
+    # colon lookup below also fills a record whose old lookup was removed.
+    single = ot.Lookup(); single.LookupType = 1; single.LookupFlag = 0
+    subst = ot.SingleSubst(); subst.mapping = {colon: raised}
+    single.SubTable = [subst]; single.SubTableCount = 1
+    single_index = append_gsub_lookup(font, single)
+    rules = []
+    for index in feature_lookup_indices(source, "GSUB", {"calt"}):
+        lookup = source["GSUB"].table.LookupList.Lookup[index]
+        if lookup.LookupType != 6:
+            continue
+        for subtable in lookup.SubTable:
+            if getattr(subtable, "Format", None) != 3 or subtable.InputGlyphCount != 1 or source_colon not in subtable.InputCoverage[0].glyphs:
+                continue
+            rule = copy.deepcopy(subtable)
+            rule.InputCoverage = [coverage(font, [colon])]
+            for attribute in ("BacktrackCoverage", "LookAheadCoverage"):
+                setattr(rule, attribute, [coverage(font, sorted({glyph_map[name] for name in cov.glyphs if name in glyph_map})) for cov in getattr(rule, attribute)])
+            if any(not cov.glyphs for cov in [*rule.BacktrackCoverage, *rule.LookAheadCoverage]):
+                continue
+            for record in rule.SubstLookupRecord:
+                record.LookupListIndex = single_index
+            rules.append(rule)
+    if not rules:
+        raise RuntimeError("固定 Inter 来源中未找到冒号上下文规则")
+    chain = ot.Lookup(); chain.LookupType = 6; chain.LookupFlag = 0
+    chain.SubTable = rules; chain.SubTableCount = len(rules)
+    chain_index = append_gsub_lookup(font, chain)
+    merged = merge_gsub_lookup_indices_into_features(font, "calt", [chain_index])
+    if not merged["calt_features_merged"]:
         append_gsub_feature(font, "calt", [chain_index])
-        feature_added = True
-    enable_features_for_all_scripts(font, {"calt"})
-    return {
-        "digit_colon_feature_added": True,
-        "digit_colon_calt_feature_added": feature_added,
-        **merge_report,
-        "digit_colon_existing_calt_lookups_removed": len(old_colon_lookup_indices),
-        **lookup_cleanup_report,
-        **empty_feature_report,
-        "digit_colon_existing_calt_mappings_removed": removed,
-        "digit_colon_raised_glyph_created": raised_created,
-        "digit_colon_context": "inter-compatible-colon-runs",
-        "digit_colon_single_lookup_index": single_index,
-        "digit_colon_chain_lookup_index": chain_index,
-    }
+        enable_features_for_all_scripts(font, {"calt"})
+    # Inter runs calt before width and zero substitutions. Preserve that order
+    # so tnum cannot replace colon with colon.tf before its context is matched.
+    width_indices = feature_lookup_indices(font, "GSUB", {"tnum", "pnum", "zero"})
+    if width_indices:
+        indices = move_gsub_lookups_before(font, [single_index, chain_index], min(width_indices))
+        single_index, chain_index = indices[single_index], indices[chain_index]
+    return {"digit_colon_feature_added": True, "digit_colon_context": "fixed-inter-source-rules", "digit_colon_rules": len(rules), "digit_colon_existing_calt_mappings_removed": removed, "digit_colon_single_lookup_index": single_index, "digit_colon_chain_lookup_index": chain_index, **cleanup}
 
 
 def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
@@ -10763,6 +10858,9 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     )
     log_step(f"variable {style_label}: normalize TrueType vertical origins")
     vorgless_report = normalize_variable_vertical_origin(base)
+    vorgless_report.update(add_digit_colon_feature(base))
+    vorgless_report.update(align_tabular_alternate_advances(base))
+    vorgless_report.update(normalize_cross_engine_metrics(base))
     log_step(f"variable {style_label}: materialize and validate final gvar")
     gvar_finalization_report = materialize_gvar_variations(base)
     if gvar_finalization_report["gvar_coordinate_length_mismatches"]:
@@ -11225,8 +11323,18 @@ def bootstrap_sarasa_source_tree() -> None:
     extract_zip_tree(source_zip, SARASA_SOURCE_DIR)
 
 
+def ensure_inter_sources() -> None:
+    archive = download_file_checked(
+        f"https://github.com/rsms/inter/releases/download/{INTER_TAG}/Inter-4.1.zip",
+        SOURCE_ARCHIVE_DIR / "Inter-4.1.zip",
+        INTER_ARCHIVE_SHA256,
+    )
+    extract_zip_basename(archive, "InterVariable.ttf", INTER_UPRIGHT)
+    italic_basename = "InterVariable-Italic.ttf" if INTER_ITALIC.suffix.lower() == ".ttf" else "InterVariable-Italic.woff2"
+    extract_zip_basename(archive, italic_basename, INTER_ITALIC)
+
+
 def ensure_vf_sources(regions: list[str]) -> None:
-    global INTER_ITALIC
     needed_classical_vfs = [
         path for path in (classical_vf_override_path(region) for region in variable_regions(regions)) if path
     ]
@@ -11235,11 +11343,6 @@ def ensure_vf_sources(regions: list[str]) -> None:
         f"https://github.com/adobe-fonts/source-han-sans/releases/download/{SOURCE_HAN_TAG}/02_SourceHanSans-VF.zip",
         SOURCE_ARCHIVE_DIR / f"SourceHanSans-VF-{SOURCE_HAN_TAG}.zip",
         SOURCE_HAN_VF_ARCHIVE_SHA256,
-    )
-    inter_zip = download_file_checked(
-        f"https://github.com/rsms/inter/releases/download/{INTER_TAG}/Inter-4.1.zip",
-        SOURCE_ARCHIVE_DIR / "Inter-4.1.zip",
-        INTER_ARCHIVE_SHA256,
     )
     for region in variable_regions(regions):
         target = source_han_vf_path(region)
@@ -11252,9 +11355,7 @@ def ensure_vf_sources(regions: list[str]) -> None:
         )
         for target in needed_classical_vfs:
             extract_7z_basename(shanggu_archive, target.name, target)
-    extract_zip_basename(inter_zip, "InterVariable.ttf", INTER_UPRIGHT)
-    italic_basename = "InterVariable-Italic.ttf" if INTER_ITALIC.suffix.lower() == ".ttf" else "InterVariable-Italic.woff2"
-    extract_zip_basename(inter_zip, italic_basename, INTER_ITALIC)
+    ensure_inter_sources()
 
 
 def ensure_classical_static_sources(regions: list[str]) -> None:
@@ -12709,6 +12810,7 @@ def refresh_static_finalization_font(
         ellipsis_report = apply_cjk_ellipsis_behavior(font)
         ellipsis_report.update(apply_default_regional_punctuation(font, region))
         vertical_report = normalize_static_vertical_origin(font)
+        colon_report = add_digit_colon_feature(font)
         font.save(tmp_path, reorderTables=True)
     finally:
         font.close()
@@ -12761,6 +12863,7 @@ def refresh_static_finalization_font(
         **revision_report,
         **mac_report,
         **vertical_report,
+        **colon_report,
     }
 
 
@@ -12826,13 +12929,98 @@ def normalize_variable_vertical_origin(font: TTFont) -> dict[str, Any]:
     raise AssertionError("unreachable")
 
 
+def normalize_cross_engine_metrics(font: TTFont) -> dict[str, Any]:
+    """Use xMin == LSB with a stationary left phantom, and gvar vertical metrics.
+
+    FreeType ignores horizontal/vertical phantom deltas when HVAR/VVAR exists.
+    Translate the horizontal coordinate frame, including component offsets,
+    rather than compensating only one engine's phantom-point interpretation.
+    VVAR cannot describe varying TrueType origins to FreeType, so vertical
+    metrics have one authoritative representation in gvar in the final font.
+    """
+    if "gvar" not in font:
+        return {"cross_engine_metric_normalization": False}
+    if "VVAR" not in font and "VORG" not in font and not any(item.coordinates[-4] and item.coordinates[-4][0] for items in font["gvar"].variations.values() for item in items):
+        return {"cross_engine_metric_normalization": True, "cross_engine_metrics_already_canonical": True, "vertical_metrics_source": "gvar"}
+    weights = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
+    def snapshot() -> dict[int, list[tuple]]:
+        runtime = hb.Font(hb.Face(serialized_font_bytes(font)))
+        result = {}
+        for weight in weights:
+            runtime.set_variations({"wght": weight})
+            result[weight] = [
+                (runtime.get_glyph_extents(gid), runtime.get_glyph_h_advance(gid), runtime.get_glyph_v_advance(gid), runtime.get_glyph_v_origin(gid))
+                for gid in range(len(font.getGlyphOrder()))
+            ]
+        return result
+    expected = snapshot()
+    materialized = materialize_gvar_variations(font)
+    if materialized["gvar_coordinate_length_mismatches"]:
+        raise RuntimeError("跨引擎度量规范化前的 gvar 坐标数量不匹配")
+    mismatches = lsb_xmin_mismatches(font)
+    if mismatches:
+        raise RuntimeError("跨引擎度量规范化要求默认 xMin 与 LSB 一致")
+    variations = font["gvar"].variations
+    origins = {
+        name: [(copy.deepcopy(item.axes), item.coordinates[-4][0]) for item in items if item.coordinates[-4] and item.coordinates[-4][0]]
+        for name, items in variations.items()
+    }
+    translated = compensated = 0
+    for name in font.getGlyphOrder():
+        glyph = font["glyf"][name]
+        items = variations.setdefault(name, [])
+        for item in items:
+            dx = (item.coordinates[-4] or (0, 0))[0]
+            if not dx:
+                continue
+            if glyph.isComposite():
+                item.coordinates[:-4] = [((point or (0, 0))[0] - dx, (point or (0, 0))[1]) for point in item.coordinates[:-4]]
+            else:
+                # Adding a constant to every explicit delta commutes with IUP.
+                # Preserve inferred fractional deltas; materializing them as
+                # integer gvar coordinates subtly changes curves (e.g. dots).
+                item.coordinates[:-4] = [None if point is None else (point[0] - dx, point[1]) for point in item.coordinates[:-4]]
+                start = 0
+                for end in getattr(glyph, "endPtsOfContours", []):
+                    if all(point is None for point in item.coordinates[start:end + 1]):
+                        item.coordinates[start] = (-dx, 0)
+                    start = end + 1
+            item.coordinates[-4] = (0, 0)
+            item.coordinates[-3] = ((item.coordinates[-3] or (0, 0))[0] - dx, 0)
+            translated += 1
+        if not glyph.isComposite():
+            continue
+        by_support = {tuple(sorted(item.axes.items())): item for item in items}
+        for index, component in enumerate(glyph.components):
+            _child, transform = component.getComponentInfo()
+            for axes, dx in origins.get(component.glyphName, []):
+                key = tuple(sorted(axes.items()))
+                if key not in by_support:
+                    item = TupleVariation(axes, [(0, 0)] * gvar_coordinate_count(font, name))
+                    items.append(item)
+                    by_support[key] = item
+                item = by_support[key]
+                x, y = item.coordinates[index] or (0, 0)
+                item.coordinates[index] = (x + otRound(dx * transform[0]), y + otRound(dx * transform[1]))
+                compensated += 1
+    removed = "VVAR" in font
+    if removed:
+        del font["VVAR"]
+    font["head"].flags |= 2
+    actual = snapshot()
+    changes = [(weight, font.getGlyphName(gid), before, after) for weight in weights for gid, (before, after) in enumerate(zip(expected[weight], actual[weight])) if before != after]
+    if changes:
+        raise RuntimeError(f"横向原点规范化改变了已有运行时轮廓边界或度量：{len(changes)}，{changes[:4]!r}")
+    return {"cross_engine_metric_normalization": True, "horizontal_origin_tuples_translated": translated, "component_origin_tuples_compensated": compensated, "vertical_metrics_source": "gvar", "vvar_removed_for_shared_vertical_origin": removed, "runtime_metric_preservation_weights": list(weights), "runtime_metric_preservation_glyphs": len(font.getGlyphOrder()), "runtime_metric_preservation_mismatches": 0}
+
+
 
 def refresh_variable_finalization_outputs(regions: list[str]) -> list[dict[str, Any]]:
     outputs = []
     for region in regions:
         for italic in (False, True):
             path = VARIABLE_DIR / variable_output_name(region, italic)
-            allowed = {"GSUB", "name", "head", "VORG", "glyf", "loca", "gvar"}
+            allowed = {"GSUB", "name", "head", "VORG", "VVAR", "HVAR", "hmtx", "glyf", "loca", "gvar"}
             before = sfnt_table_hashes(path, allowed)
             pending = path.with_name(path.name + ".finalization.tmp")
             font = TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False)
@@ -12842,6 +13030,9 @@ def refresh_variable_finalization_outputs(regions: list[str]) -> list[dict[str, 
                 report.update(normalize_variable_vertical_origin(font))
                 if geometry_before != {name: glyph_point_structure(font, name) for name in font.getGlyphOrder()}:
                     raise RuntimeError("VF 最终化改变了真实轮廓坐标")
+                report.update(add_digit_colon_feature(font))
+                report.update(align_tabular_alternate_advances(font))
+                report.update(normalize_cross_engine_metrics(font))
                 update_vf_names(font, region, italic)
                 remove_mac_name_records(font)
                 update_head_project_revision(font)
@@ -13759,7 +13950,8 @@ def static_readme_text(region: str, hinted: bool) -> str:
 CL 的公开 cmap/layout 限于 Sarasa Ui CL 边界。
 
 默认 ASCII 数字为比例宽；tnum 切换等宽，pnum 恢复比例宽。
-冒号使用 Inter colon-run calt。{default}
+冒号复用 Inter 的上下文规则，在 tnum 之前执行；1:2、1:、:2 上浮，
+1:a、a:2、a:b 保持原位。tnum 与 zero 可同时启用。{default}
 破折号、省略号和竖排沿用对应 Source Han/Shanggu 字形，保持
 ccmp → locl → vert/vrt2 顺序。中文双省略号为两个居中 glyph，共 2em；
 中文双连、三连破折号分别为 2em、3em。CL 破折号全局保留 Shanggu 全宽形式。
@@ -14158,6 +14350,8 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
         font = TTFont(path, lazy=False, recalcTimestamp=False)
         if "VORG" in font:
             reasons.append("TrueType VF still contains CFF-only VORG")
+        if "VVAR" in font:
+            reasons.append("TrueType VF vertical origins still depend on conflicting VVAR/phantom paths")
         if "fvar" not in font:
             reasons.append("missing fvar")
         else:
@@ -14272,17 +14466,10 @@ def variable_output_resume_status(region: str, italic: bool) -> tuple[bool, dict
             hvar = font["HVAR"].table
             if hvar.AdvWidthMap is None or hvar.LsbMap is None or hvar.RsbMap is None:
                 reasons.append("HVAR lacks complete advance/LSB/RSB mappings")
-        if "VVAR" not in font:
-            reasons.append("missing VVAR")
-        else:
-            vvar = font["VVAR"].table
-            if (
-                vvar.AdvHeightMap is None
-                or vvar.TsbMap is None
-                or vvar.BsbMap is None
-                or vvar.VOrgMap is None
-            ):
-                reasons.append("VVAR lacks complete advance/TSB/BSB/VOrg mappings")
+        if "gvar" in font and any(item.coordinates[-4] and item.coordinates[-4][0] for items in font["gvar"].variations.values() for item in items):
+            reasons.append("horizontal phantom origin still varies")
+        if "HVAR" in font and not tabular_advance_structure_status(font)["ok"]:
+            reasons.append("tabular digit alternatives do not share a single advance curve")
         default_lsb_xmin = lsb_xmin_mismatches(font)
         details["default_lsb_xmin_mismatches"] = len(default_lsb_xmin)
         if default_lsb_xmin:
@@ -14627,7 +14814,7 @@ def main() -> None:
         action="store_true",
         help="只刷新现有静态 TTF 的最终 GSUB、命名、法律信息与 unhinted 栅格表；除明确白名单表外逐表保护，不重新 hint。",
     )
-    parser.add_argument("--refresh-variable-finalization-only", action="store_true", help="只刷新现有 VF 的 GSUB 默认语言路由、命名与版本，逐表保护轮廓、定位和度量。")
+    parser.add_argument("--refresh-variable-finalization-only", action="store_true", help="刷新现有 VF 的 GSUB、数字替代字形等宽及跨引擎度量表示；逐表保护 GPOS 等数据，并核对 13 点运行时边界与度量。")
     parser.add_argument(
         "--regions",
         default=",".join(REGION_ORDER),

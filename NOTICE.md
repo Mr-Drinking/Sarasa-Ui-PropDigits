@@ -37,6 +37,8 @@
 - 默认比例数字，tnum/pnum 负责宽度切换，冒号遵循 Inter colon-run calt。六地区无语言标记时采用各自地区的标点语义；显式英文和各地区本地化行为见 README。
 - chws/vchw 源于 Noto CJK 交付后处理，具体应用是否自动启用需要实测。
 - Italic VF 先物化 IUP 再剪切，metric phantom points 不剪切；TrueType VORG 被移除，静态竖排原点由最终 glyf/vmtx 决定，VF 使用明确的 metric phantom 变化数据。元数据与布局修订不重新 hint。
+- 本次同 tag 修订将 VF 横向原点补偿转入轮廓及组件坐标，保留 HVAR，竖向度量统一由 gvar 提供并移除 VVAR，避免 FreeType 与 HarfBuzz 采用冲突的原点路径。tnum 与 zero 组合共享等宽变化曲线。
+- 构建、主审计环境与 FontBakery 环境分开准备并分别运行 pip check。视觉发布门同时校验逐图审阅状态、图片与生成器哈希、地区及字体覆盖。
 - 固定版本、归档 SHA-256、解包缓存、Python 私有环境及 Node 运行时均由正式构建入口准备和核验。
 - 发布前必须完成完整主审计、156 个字体的 OTS、按地区运行的 FontBakery 318 PASS、视觉检查与 21 个 ZIP 校验。报告绑定当前字体哈希，使用可移植路径。
 

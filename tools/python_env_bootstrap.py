@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib
 import importlib.metadata
 import importlib.util
+import json
 import os
 import subprocess
 import sys
@@ -41,14 +42,10 @@ def ensure_project_python(
     if os.environ.get("SARASA_SKIP_PYTHON_DEPS") == "1":
         return
     needed = missing_dependencies(dependencies)
-    requested_venv = os.environ.get("SARASA_PYTHON_VENV")
-    if not needed and not requested_venv:
-        return
-
     venv_dir = Path(
         os.environ.get(
             "SARASA_PYTHON_VENV",
-            project_root / ".build-cache" / "python-venv",
+            project_root / ".build-cache" / "build-audit-venv",
         )
     ).resolve()
     python = venv_python(venv_dir)
@@ -70,6 +67,7 @@ def ensure_project_python(
         os.execve(str(python), argv, env)
 
     if not needed:
+        subprocess.check_call([sys.executable, "-m", "pip", "check"])
         return
 
     print(
@@ -94,3 +92,35 @@ def ensure_project_python(
             "Python dependencies remain unsatisfied after project-environment install: "
             + " ".join(remaining)
         )
+    subprocess.check_call([sys.executable, "-m", "pip", "check"])
+
+
+def isolated_tool_python(
+    directory: Path,
+    requirements: Path,
+    versions: Mapping[str, str],
+) -> tuple[Path, dict[str, object]]:
+    """Prepare a separate tool environment without restarting the caller."""
+    directory = directory.resolve()
+    if directory == Path(sys.prefix).resolve():
+        raise RuntimeError("FontBakery 必须使用独立于构建和主审计的 Python 环境")
+    python = venv_python(directory)
+    if not python.exists():
+        venv.EnvBuilder(with_pip=True, clear=False).create(directory)
+    probe = (
+        "import importlib.metadata as m,json,sys; "
+        "print(json.dumps({n:m.version(n) for n in sys.argv[1:]}))"
+    )
+    def installed() -> dict[str, str] | None:
+        result = subprocess.run([str(python), "-c", probe, *versions], capture_output=True, text=True)
+        return json.loads(result.stdout) if result.returncode == 0 else None
+    actual = installed()
+    if actual != dict(versions):
+        subprocess.check_call([str(python), "-m", "pip", "install", "--disable-pip-version-check", "--no-input", "-r", str(requirements)])
+        actual = installed()
+    if actual != dict(versions):
+        raise RuntimeError("独立发布工具环境未满足固定版本")
+    checked = subprocess.run([str(python), "-m", "pip", "check"], capture_output=True, text=True)
+    if checked.returncode:
+        raise RuntimeError("独立发布工具环境存在依赖冲突：" + checked.stdout + checked.stderr)
+    return python, {"versions": actual, "pip_check": {"returncode": 0, "passed": True}}

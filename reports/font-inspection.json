@@ -4,7 +4,7 @@
   "fonts": [
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
-      "size": 54203040,
+      "size": 54968876,
       "names": {
         "family": "Sarasa Ui VF PropDigits CL",
         "subfamily": "Italic",
@@ -579,7 +579,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
-      "size": 40388948,
+      "size": 40409492,
       "names": {
         "family": "Sarasa Ui VF PropDigits CL",
         "subfamily": "Regular",
@@ -1155,7 +1155,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
-      "size": 54977832,
+      "size": 55731580,
       "names": {
         "family": "Sarasa Ui VF PropDigits HC",
         "subfamily": "Italic",
@@ -1730,7 +1730,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
-      "size": 40309032,
+      "size": 40425756,
       "names": {
         "family": "Sarasa Ui VF PropDigits HC",
         "subfamily": "Regular",
@@ -2306,7 +2306,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
-      "size": 53817492,
+      "size": 54551824,
       "names": {
         "family": "Sarasa Ui VF PropDigits J",
         "subfamily": "Italic",
@@ -2881,7 +2881,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
-      "size": 39554888,
+      "size": 39670360,
       "names": {
         "family": "Sarasa Ui VF PropDigits J",
         "subfamily": "Regular",
@@ -3457,7 +3457,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
-      "size": 53740816,
+      "size": 54473360,
       "names": {
         "family": "Sarasa Ui VF PropDigits K",
         "subfamily": "Italic",
@@ -4032,7 +4032,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
-      "size": 39520756,
+      "size": 39636728,
       "names": {
         "family": "Sarasa Ui VF PropDigits K",
         "subfamily": "Regular",
@@ -4608,7 +4608,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "size": 54432308,
+      "size": 55171932,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Italic",
@@ -5183,7 +5183,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "size": 39997612,
+      "size": 40111092,
       "names": {
         "family": "Sarasa Ui VF PropDigits SC",
         "subfamily": "Regular",
@@ -5759,7 +5759,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
-      "size": 55067660,
+      "size": 55822968,
       "names": {
         "family": "Sarasa Ui VF PropDigits TC",
         "subfamily": "Italic",
@@ -6334,7 +6334,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
-      "size": 40380416,
+      "size": 40497984,
       "names": {
         "family": "Sarasa Ui VF PropDigits TC",
         "subfamily": "Regular",
@@ -6910,7 +6910,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Bold.ttf",
-      "size": 24172916,
+      "size": 24173684,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold",
@@ -7436,7 +7436,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "size": 24976628,
+      "size": 24977420,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold Italic",
@@ -7961,7 +7961,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "size": 24285276,
+      "size": 24286044,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Regular",
@@ -8487,7 +8487,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "size": 25093216,
+      "size": 25094008,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Italic",
@@ -9012,7 +9012,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Heavy.ttf",
-      "size": 23875436,
+      "size": 23876204,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Regular",
@@ -9538,7 +9538,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "size": 24687408,
+      "size": 24688200,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Italic",
@@ -10063,7 +10063,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Italic.ttf",
-      "size": 25119716,
+      "size": 25120508,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Italic",
@@ -10588,7 +10588,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Light.ttf",
-      "size": 24414632,
+      "size": 24415400,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Regular",
@@ -11114,7 +11114,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "size": 25220688,
+      "size": 25221480,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Italic",
@@ -11639,7 +11639,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Regular.ttf",
-      "size": 24316916,
+      "size": 24317684,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Regular",
@@ -12165,7 +12165,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "size": 24261076,
+      "size": 24261844,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Regular",
@@ -12691,7 +12691,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "size": 25065892,
+      "size": 25066684,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Italic",
@@ -13216,7 +13216,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Bold.ttf",
-      "size": 24136432,
+      "size": 24137192,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold",
@@ -13742,7 +13742,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "size": 24931620,
+      "size": 24932408,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold Italic",
@@ -14267,7 +14267,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "size": 24306516,
+      "size": 24307276,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Regular",
@@ -14793,7 +14793,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "size": 25106604,
+      "size": 25107392,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Italic",
@@ -15318,7 +15318,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Heavy.ttf",
-      "size": 23854500,
+      "size": 23855260,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Regular",
@@ -15844,7 +15844,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "size": 24655348,
+      "size": 24656136,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Italic",
@@ -16369,7 +16369,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Italic.ttf",
-      "size": 25078072,
+      "size": 25078860,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Italic",
@@ -16894,7 +16894,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Light.ttf",
-      "size": 24385628,
+      "size": 24386388,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Regular",
@@ -17420,7 +17420,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "size": 25185596,
+      "size": 25186384,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Italic",
@@ -17945,7 +17945,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Regular.ttf",
-      "size": 24283196,
+      "size": 24283956,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Regular",
@@ -18471,7 +18471,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "size": 24220768,
+      "size": 24221528,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Regular",
@@ -18997,7 +18997,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "size": 25017256,
+      "size": 25018044,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Italic",
@@ -19522,7 +19522,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Bold.ttf",
-      "size": 23899204,
+      "size": 23899964,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold",
@@ -20048,7 +20048,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "size": 24696940,
+      "size": 24697728,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold Italic",
@@ -20573,7 +20573,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "size": 24096756,
+      "size": 24097516,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Regular",
@@ -21099,7 +21099,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "size": 24902796,
+      "size": 24903584,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Italic",
@@ -21624,7 +21624,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Heavy.ttf",
-      "size": 23614968,
+      "size": 23615732,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Regular",
@@ -22150,7 +22150,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "size": 24419420,
+      "size": 24420204,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Italic",
@@ -22675,7 +22675,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Italic.ttf",
-      "size": 24870556,
+      "size": 24871344,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Italic",
@@ -23200,7 +23200,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Light.ttf",
-      "size": 24179320,
+      "size": 24180080,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Regular",
@@ -23726,7 +23726,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "size": 24982828,
+      "size": 24983616,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Italic",
@@ -24251,7 +24251,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Regular.ttf",
-      "size": 24071728,
+      "size": 24072488,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Regular",
@@ -24777,7 +24777,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "size": 24002000,
+      "size": 24002760,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Regular",
@@ -25303,7 +25303,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "size": 24801896,
+      "size": 24802684,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Italic",
@@ -25828,7 +25828,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Bold.ttf",
-      "size": 23855188,
+      "size": 23855948,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold",
@@ -26354,7 +26354,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "size": 24651524,
+      "size": 24652312,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold Italic",
@@ -26879,7 +26879,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "size": 24050764,
+      "size": 24051524,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Regular",
@@ -27405,7 +27405,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "size": 24855292,
+      "size": 24856080,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Italic",
@@ -27930,7 +27930,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Heavy.ttf",
-      "size": 23571424,
+      "size": 23572188,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Regular",
@@ -28456,7 +28456,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "size": 24374492,
+      "size": 24375276,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Italic",
@@ -28981,7 +28981,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Italic.ttf",
-      "size": 24823928,
+      "size": 24824716,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Italic",
@@ -29506,7 +29506,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Light.ttf",
-      "size": 24133628,
+      "size": 24134388,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Regular",
@@ -30032,7 +30032,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-LightItalic.ttf",
-      "size": 24935696,
+      "size": 24936484,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Italic",
@@ -30557,7 +30557,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Regular.ttf",
-      "size": 24026524,
+      "size": 24027284,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Regular",
@@ -31083,7 +31083,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-SemiBold.ttf",
-      "size": 23957024,
+      "size": 23957784,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Regular",
@@ -31609,7 +31609,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "size": 24755456,
+      "size": 24756244,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Italic",
@@ -32134,7 +32134,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Bold.ttf",
-      "size": 23971652,
+      "size": 23972416,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold",
@@ -32660,7 +32660,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "size": 24761004,
+      "size": 24761788,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold Italic",
@@ -33185,7 +33185,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "size": 24151052,
+      "size": 24151816,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Regular",
@@ -33711,7 +33711,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "size": 24946932,
+      "size": 24947716,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Italic",
@@ -34236,7 +34236,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Heavy.ttf",
-      "size": 23693940,
+      "size": 23694704,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Regular",
@@ -34762,7 +34762,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "size": 24488328,
+      "size": 24489112,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Italic",
@@ -35287,7 +35287,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Italic.ttf",
-      "size": 24915564,
+      "size": 24916348,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Italic",
@@ -35812,7 +35812,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Light.ttf",
-      "size": 24232012,
+      "size": 24232776,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Regular",
@@ -36338,7 +36338,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "size": 25027416,
+      "size": 25028200,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Italic",
@@ -36863,7 +36863,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Regular.ttf",
-      "size": 24125856,
+      "size": 24126620,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Regular",
@@ -37389,7 +37389,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "size": 24054132,
+      "size": 24054896,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Regular",
@@ -37915,7 +37915,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "size": 24845508,
+      "size": 24846292,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Italic",
@@ -38440,7 +38440,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Bold.ttf",
-      "size": 24174028,
+      "size": 24174788,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold",
@@ -38966,7 +38966,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "size": 24969384,
+      "size": 24970172,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold Italic",
@@ -39491,7 +39491,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "size": 24333184,
+      "size": 24333944,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Regular",
@@ -40017,7 +40017,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "size": 25133384,
+      "size": 25134172,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Italic",
@@ -40542,7 +40542,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Heavy.ttf",
-      "size": 23896724,
+      "size": 23897484,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Regular",
@@ -41068,7 +41068,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "size": 24698096,
+      "size": 24698884,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Italic",
@@ -41593,7 +41593,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Italic.ttf",
-      "size": 25108256,
+      "size": 25109044,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Italic",
@@ -42118,7 +42118,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Light.ttf",
-      "size": 24414572,
+      "size": 24415332,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Regular",
@@ -42644,7 +42644,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "size": 25214564,
+      "size": 25215352,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Italic",
@@ -43169,7 +43169,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Regular.ttf",
-      "size": 24313400,
+      "size": 24314160,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Regular",
@@ -43695,7 +43695,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "size": 24254040,
+      "size": 24254800,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Regular",
@@ -44221,7 +44221,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "size": 25050624,
+      "size": 25051412,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Italic",
@@ -44746,7 +44746,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Bold.ttf",
-      "size": 13024452,
+      "size": 13025220,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold",
@@ -45272,7 +45272,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "size": 13818856,
+      "size": 13819648,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Bold Italic",
@@ -45797,7 +45797,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "size": 13325804,
+      "size": 13326572,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Regular",
@@ -46323,7 +46323,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "size": 14118892,
+      "size": 14119684,
       "names": {
         "family": "Sarasa Ui PropDigits CL ExtraLight",
         "subfamily": "Italic",
@@ -46848,7 +46848,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Heavy.ttf",
-      "size": 12911788,
+      "size": 12912556,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Regular",
@@ -47374,7 +47374,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "size": 13713504,
+      "size": 13714296,
       "names": {
         "family": "Sarasa Ui PropDigits CL Heavy",
         "subfamily": "Italic",
@@ -47899,7 +47899,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Italic.ttf",
-      "size": 13984840,
+      "size": 13985632,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Italic",
@@ -48424,7 +48424,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Light.ttf",
-      "size": 13305916,
+      "size": 13306684,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Regular",
@@ -48950,7 +48950,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "size": 14097844,
+      "size": 14098636,
       "names": {
         "family": "Sarasa Ui PropDigits CL Light",
         "subfamily": "Italic",
@@ -49475,7 +49475,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Regular.ttf",
-      "size": 13192112,
+      "size": 13192880,
       "names": {
         "family": "Sarasa Ui PropDigits CL",
         "subfamily": "Regular",
@@ -50001,7 +50001,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "size": 13115032,
+      "size": 13115800,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Regular",
@@ -50527,7 +50527,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "size": 13909232,
+      "size": 13910024,
       "names": {
         "family": "Sarasa Ui PropDigits CL SemiBold",
         "subfamily": "Italic",
@@ -51052,7 +51052,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Bold.ttf",
-      "size": 13068024,
+      "size": 13068784,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold",
@@ -51578,7 +51578,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "size": 13853956,
+      "size": 13854744,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Bold Italic",
@@ -52103,7 +52103,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "size": 13457956,
+      "size": 13458716,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Regular",
@@ -52629,7 +52629,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "size": 14243788,
+      "size": 14244576,
       "names": {
         "family": "Sarasa Ui PropDigits HC ExtraLight",
         "subfamily": "Italic",
@@ -53154,7 +53154,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Heavy.ttf",
-      "size": 12965440,
+      "size": 12966200,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Regular",
@@ -53680,7 +53680,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "size": 13756076,
+      "size": 13756864,
       "names": {
         "family": "Sarasa Ui PropDigits HC Heavy",
         "subfamily": "Italic",
@@ -54205,7 +54205,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Italic.ttf",
-      "size": 14055516,
+      "size": 14056304,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Italic",
@@ -54730,7 +54730,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Light.ttf",
-      "size": 13396252,
+      "size": 13397012,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Regular",
@@ -55256,7 +55256,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "size": 14181236,
+      "size": 14182024,
       "names": {
         "family": "Sarasa Ui PropDigits HC Light",
         "subfamily": "Italic",
@@ -55781,7 +55781,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Regular.ttf",
-      "size": 13270928,
+      "size": 13271688,
       "names": {
         "family": "Sarasa Ui PropDigits HC",
         "subfamily": "Regular",
@@ -56307,7 +56307,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "size": 13177420,
+      "size": 13178180,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Regular",
@@ -56833,7 +56833,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "size": 13963264,
+      "size": 13964052,
       "names": {
         "family": "Sarasa Ui PropDigits HC SemiBold",
         "subfamily": "Italic",
@@ -57358,7 +57358,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Bold.ttf",
-      "size": 12880404,
+      "size": 12881164,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold",
@@ -57884,7 +57884,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "size": 13668832,
+      "size": 13669620,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Bold Italic",
@@ -58409,7 +58409,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "size": 13269908,
+      "size": 13270668,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Regular",
@@ -58935,7 +58935,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "size": 14061096,
+      "size": 14061884,
       "names": {
         "family": "Sarasa Ui PropDigits J ExtraLight",
         "subfamily": "Italic",
@@ -59460,7 +59460,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Heavy.ttf",
-      "size": 12777768,
+      "size": 12778532,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Regular",
@@ -59986,7 +59986,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "size": 13571976,
+      "size": 13572760,
       "names": {
         "family": "Sarasa Ui PropDigits J Heavy",
         "subfamily": "Italic",
@@ -60511,7 +60511,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Italic.ttf",
-      "size": 13873548,
+      "size": 13874336,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Italic",
@@ -61036,7 +61036,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Light.ttf",
-      "size": 13207500,
+      "size": 13208260,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Regular",
@@ -61562,7 +61562,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "size": 13996880,
+      "size": 13997668,
       "names": {
         "family": "Sarasa Ui PropDigits J Light",
         "subfamily": "Italic",
@@ -62087,7 +62087,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Regular.ttf",
-      "size": 13084792,
+      "size": 13085552,
       "names": {
         "family": "Sarasa Ui PropDigits J",
         "subfamily": "Regular",
@@ -62613,7 +62613,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "size": 12993508,
+      "size": 12994268,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Regular",
@@ -63139,7 +63139,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "size": 13782792,
+      "size": 13783580,
       "names": {
         "family": "Sarasa Ui PropDigits J SemiBold",
         "subfamily": "Italic",
@@ -63664,7 +63664,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Bold.ttf",
-      "size": 12857032,
+      "size": 12857792,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold",
@@ -64190,7 +64190,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "size": 13644060,
+      "size": 13644848,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Bold Italic",
@@ -64715,7 +64715,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "size": 13245540,
+      "size": 13246300,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Regular",
@@ -65241,7 +65241,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "size": 14035220,
+      "size": 14036008,
       "names": {
         "family": "Sarasa Ui PropDigits K ExtraLight",
         "subfamily": "Italic",
@@ -65766,7 +65766,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Heavy.ttf",
-      "size": 12754944,
+      "size": 12755708,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Regular",
@@ -66292,7 +66292,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "size": 13547768,
+      "size": 13548552,
       "names": {
         "family": "Sarasa Ui PropDigits K Heavy",
         "subfamily": "Italic",
@@ -66817,7 +66817,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Italic.ttf",
-      "size": 13848228,
+      "size": 13849016,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Italic",
@@ -67342,7 +67342,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Light.ttf",
-      "size": 13183288,
+      "size": 13184048,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Regular",
@@ -67868,7 +67868,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-LightItalic.ttf",
-      "size": 13971228,
+      "size": 13972016,
       "names": {
         "family": "Sarasa Ui PropDigits K Light",
         "subfamily": "Italic",
@@ -68393,7 +68393,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Regular.ttf",
-      "size": 13060900,
+      "size": 13061660,
       "names": {
         "family": "Sarasa Ui PropDigits K",
         "subfamily": "Regular",
@@ -68919,7 +68919,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-SemiBold.ttf",
-      "size": 12969892,
+      "size": 12970652,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Regular",
@@ -69445,7 +69445,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "size": 13757716,
+      "size": 13758504,
       "names": {
         "family": "Sarasa Ui PropDigits K SemiBold",
         "subfamily": "Italic",
@@ -69970,7 +69970,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Bold.ttf",
-      "size": 12980636,
+      "size": 12981400,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold",
@@ -70496,7 +70496,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "size": 13760816,
+      "size": 13761600,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Bold Italic",
@@ -71021,7 +71021,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "size": 13366988,
+      "size": 13367752,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Regular",
@@ -71547,7 +71547,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "size": 14148764,
+      "size": 14149548,
       "names": {
         "family": "Sarasa Ui PropDigits SC ExtraLight",
         "subfamily": "Italic",
@@ -72072,7 +72072,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Heavy.ttf",
-      "size": 12885256,
+      "size": 12886020,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Regular",
@@ -72598,7 +72598,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "size": 13670356,
+      "size": 13671140,
       "names": {
         "family": "Sarasa Ui PropDigits SC Heavy",
         "subfamily": "Italic",
@@ -73123,7 +73123,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Italic.ttf",
-      "size": 13962104,
+      "size": 13962888,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Italic",
@@ -73648,7 +73648,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Light.ttf",
-      "size": 13305556,
+      "size": 13306320,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Regular",
@@ -74174,7 +74174,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "size": 14086080,
+      "size": 14086864,
       "names": {
         "family": "Sarasa Ui PropDigits SC Light",
         "subfamily": "Italic",
@@ -74699,7 +74699,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Regular.ttf",
-      "size": 13182576,
+      "size": 13183340,
       "names": {
         "family": "Sarasa Ui PropDigits SC",
         "subfamily": "Regular",
@@ -75225,7 +75225,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "size": 13088672,
+      "size": 13089436,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Regular",
@@ -75751,7 +75751,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "size": 13869208,
+      "size": 13869992,
       "names": {
         "family": "Sarasa Ui PropDigits SC SemiBold",
         "subfamily": "Italic",
@@ -76276,7 +76276,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Bold.ttf",
-      "size": 13095228,
+      "size": 13095988,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold",
@@ -76802,7 +76802,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "size": 13881324,
+      "size": 13882112,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Bold Italic",
@@ -77327,7 +77327,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "size": 13481376,
+      "size": 13482136,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Regular",
@@ -77853,7 +77853,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "size": 14267404,
+      "size": 14268192,
       "names": {
         "family": "Sarasa Ui PropDigits TC ExtraLight",
         "subfamily": "Italic",
@@ -78378,7 +78378,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Heavy.ttf",
-      "size": 12993368,
+      "size": 12994128,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Regular",
@@ -78904,7 +78904,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "size": 13784412,
+      "size": 13785200,
       "names": {
         "family": "Sarasa Ui PropDigits TC Heavy",
         "subfamily": "Italic",
@@ -79429,7 +79429,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Italic.ttf",
-      "size": 14081656,
+      "size": 14082444,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Italic",
@@ -79954,7 +79954,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Light.ttf",
-      "size": 13420204,
+      "size": 13420964,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Regular",
@@ -80480,7 +80480,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "size": 14205296,
+      "size": 14206084,
       "names": {
         "family": "Sarasa Ui PropDigits TC Light",
         "subfamily": "Italic",
@@ -81005,7 +81005,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Regular.ttf",
-      "size": 13297144,
+      "size": 13297904,
       "names": {
         "family": "Sarasa Ui PropDigits TC",
         "subfamily": "Regular",
@@ -81531,7 +81531,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "size": 13204200,
+      "size": 13204960,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Regular",
@@ -82057,7 +82057,7 @@
     },
     {
       "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "size": 13990136,
+      "size": 13990924,
       "names": {
         "family": "Sarasa Ui PropDigits TC SemiBold",
         "subfamily": "Italic",
