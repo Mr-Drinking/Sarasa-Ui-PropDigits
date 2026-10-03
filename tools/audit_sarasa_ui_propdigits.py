@@ -12,23 +12,20 @@ import importlib.util
 import json
 import math
 import os
+import re
 import subprocess
 import sys
+import tempfile
 import time
 from collections import Counter
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Any
 
-from python_env_bootstrap import ensure_project_python
+from python_env_bootstrap import AUDIT_DEPENDENCIES, ensure_project_python
 
 
-AUDIT_DEPS = {
-    "fontTools": ("fonttools", "fonttools[woff]==4.63.0", "4.63.0"),
-    "uharfbuzz": ("uharfbuzz", "uharfbuzz==0.56.0", "0.56.0"),
-    "freetype": ("freetype-py", "freetype-py==2.5.1", "2.5.1"),
-    "numpy": ("numpy", "numpy==2.4.2", "2.4.2"),
-}
+AUDIT_DEPS = AUDIT_DEPENDENCIES
 
 
 def ensure_audit_deps() -> None:
@@ -39,7 +36,8 @@ def ensure_audit_deps() -> None:
     )
 
 
-ensure_audit_deps()
+if __name__ == "__main__":
+    ensure_audit_deps()
 
 import freetype
 import numpy as np
@@ -51,15 +49,22 @@ from fontTools.pens.perimeterPen import PerimeterPen
 from fontTools.pens.recordingPen import DecomposingRecordingPen
 from fontTools.pens.teePen import TeePen
 from fontTools.ttLib import TTFont
+from fontTools.ttLib.tables.ttProgram import Program
 from fontTools.varLib.instancer import instantiateVariableFont
 from fontTools.varLib.varStore import VarStoreInstancer
+from fontTools.varLib.models import normalizeValue, piecewiseLinearMap
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 import build_sarasa_ui_propdigits_sc as b  # noqa: E402
 
 START = time.time()
-INTENTIONAL_CPS = set(range(0x30, 0x3A)) | {0x3A}
+INTENTIONAL_CPS = set(range(0x30, 0x3A)) | {
+    0x20, 0xA0, 0x2008, 0x2C, 0x2E, 0x3A, 0x3B,
+    0x28, 0x29, 0x5B, 0x5D, 0x7B, 0x7D,
+    0x2A, 0x2B, 0x3C, 0x3D, 0x3E, 0x7E,
+    0xB1, 0xD7, 0xF7, 0x2212, 0x2248, 0x2260, 0x2264, 0x2265,
+}
 STATIC_REFERENCE_DASH_EXCEPTIONS = set(b.DASH_CMAP_CODEPOINTS)
 EXACT_WEIGHTS = [str(stop["name"]) for stop in b.SOURCE_HAN_WEIGHT_STOPS]
 UPSTREAM_EXACT_WEIGHTS = [
@@ -178,11 +183,124 @@ def audit_contract_manifest() -> dict[str, str]:
         ROOT / "requirements-audit.txt",
         ROOT / "requirements-visual.txt",
         ROOT / "requirements-fontbakery.txt",
+        ROOT / "requirements-build.lock",
+        ROOT / "requirements-audit.lock",
+        ROOT / "requirements-visual.lock",
+        ROOT / "requirements-fontbakery.lock",
     ]
     return {
         display_path(path): b.file_sha256(path)
         for path in paths
     }
+
+
+def checkpoint_digest(value: Any) -> str:
+    payload = json.dumps(value, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+class AuditCheckpoints:
+    """Persist completed computations; the normal coverage and failure gates still run."""
+
+    def __init__(self, directory: Path | None, provenance: dict[str, Any]) -> None:
+        self.provenance_sha256 = checkpoint_digest(provenance)
+        # Full identities stay in records; short directory/file components keep
+        # Windows paths below legacy limits, including atomic-write suffixes.
+        self.directory = directory / self.provenance_sha256[:20] if directory is not None else None
+        self.reused: list[str] = []
+        self.computed: list[str] = []
+        if self.directory is not None:
+            self.directory.mkdir(parents=True, exist_ok=True)
+            b.write_json_atomic(self.directory / "provenance.json", provenance)
+
+    def run(self, section: str, operation: Any, *args: Any, **kwargs: Any) -> Any:
+        if section not in AUDIT_GATE_SECTIONS or section == "audit_coverage":
+            raise ValueError(f"unregistered audit checkpoint section: {section}")
+        if self.directory is None:
+            return operation(*args, **kwargs)
+        arguments = b.sanitize_report_data({"args": args, "kwargs": kwargs})
+        call_sha256 = checkpoint_digest(arguments)
+        path = self.directory / f"{section}-{call_sha256[:20]}.json"
+        if path.is_file():
+            try:
+                entry = json.loads(path.read_text(encoding="utf-8"))
+                valid = (
+                    entry.get("schema") == 1 and entry.get("complete") is True
+                    and entry.get("section") == section
+                    and entry.get("provenance_sha256") == self.provenance_sha256
+                    and entry.get("arguments") == arguments
+                    and "result" in entry
+                    and entry.get("result_sha256") == checkpoint_digest(entry["result"])
+                )
+            except (OSError, ValueError, TypeError, AttributeError):
+                valid = False
+            if valid:
+                self.reused.append(section)
+                log(f"checkpoint reused: {section}")
+                return entry["result"]
+            log(f"checkpoint invalid; recomputing: {section}")
+        result = operation(*args, **kwargs)
+        portable = b.sanitize_report_data(result)
+        # Only a returned, fully serialized section is committed. An exception
+        # or interrupted write never becomes a complete checkpoint.
+        entry = {"schema": 1, "complete": True, "section": section,
+                 "provenance_sha256": self.provenance_sha256, "arguments": arguments,
+                 "result": portable, "result_sha256": checkpoint_digest(portable)}
+        b.write_json_atomic(path, entry)
+        self.computed.append(section)
+        log(f"checkpoint saved: {section}")
+        return result
+
+
+def audit_checkpoint_sources() -> tuple[list[Path], dict[str, Any]]:
+    """Bind resume data to actual upstream, native reference and tool inputs."""
+    paths: set[Path] = {b.INTER_UPRIGHT, b.INTER_ITALIC, *release_license_document_paths()}
+    work_directories = {weight: b.static_hint_work_dir(weight) for weight in EXACT_WEIGHTS}
+    for region in b.REGION_ORDER:
+        paths.add(b.source_han_vf_path(region))
+        classical = b.classical_vf_override_path(region)
+        if classical is not None:
+            paths.add(classical)
+        for weight in EXACT_WEIGHTS:
+            work = work_directories[weight][1]
+            classical_static = b.classical_static_override_path(region, weight)
+            paths.add(classical_static if classical_static is not None else b.build_shs_ttf(region, weight, work))
+            for italic in (False, True):
+                for hinted in (False, True):
+                    paths.add(static_reference_path(region, weight, italic, hinted))
+                if weight not in UPSTREAM_EXACT_WEIGHTS:
+                    # Materialize this derived reference before freezing inputs.
+                    native = work / "audit-raw-pass2-v1" / region / b.static_output_name(region, weight, italic)
+                    paths.add(native if native.is_file() else static_extension_raw_reference_path(region, weight, italic))
+    work_keys = {weight: key for weight, (key, _work) in work_directories.items()}
+    for weight in EXACT_WEIGHTS:
+        work = work_directories[weight][1]
+        for region in b.REGION_ORDER:
+            for italic in (False, True):
+                fragment = work / "fragments" / f"{region}-{weight}{'Italic' if italic else ''}"
+                paths.update(path for path in fragment.rglob("*.ttf") if path.name != "pass1.project.ttf")
+    tracked = subprocess.check_output(["git", "-C", str(b.SARASA_SOURCE_DIR), "ls-files", "-z"])
+    paths.update(b.SARASA_SOURCE_DIR / name.decode("utf-8") for name in tracked.split(b"\0") if name)
+    identity = {
+        "python": sys.version, "platform": sys.platform,
+        "versions": {name: importlib.metadata.version(name) for name in
+                     ("fonttools", "freetype-py", "uharfbuzz", "numpy", "afdko")},
+        "freetype": list(freetype.version()), "harfbuzz": hb.version_string(),
+        "ttfautohint": b.ttfautohint_identity(),
+        "chlorophytum": b.chlorophytum_package_id(), "native_work_keys": work_keys,
+    }
+    return sorted({path.resolve() for path in paths}), b.sanitize_report_data(identity)
+
+
+def checkpoint_file_manifest(paths: list[Path]) -> list[dict[str, Any]]:
+    return [{"file": display_path(path), "sha256": b.file_sha256(path)} for path in paths]
+
+
+@functools.lru_cache(maxsize=6)
+def expected_codepage_range_1(region: str) -> int:
+    # This oracle comes from the pinned regional upstream, not build constants.
+    with TTFont(b.reference_font_path(region, "Regular", False), lazy=True) as source:
+        return int(source["OS/2"].ulCodePageRange1)
 
 
 def validate_reused_audit_provenance(
@@ -688,6 +806,122 @@ def pixel_component_count(
     return count
 
 
+def hint_reference_geometry(font: TTFont, gid: int) -> tuple:
+    glyph = font["glyf"][font.getGlyphName(gid)]
+    if glyph.isComposite():
+        return (-1, tuple((font.getGlyphID(component.glyphName), tuple(component.getComponentInfo()[1]))
+                          for component in glyph.components))
+    if not glyph.numberOfContours:
+        return (0,)
+    return (glyph.numberOfContours, tuple(glyph.endPtsOfContours), tuple(glyph.coordinates),
+            tuple(int(flag) & 1 for flag in glyph.flags))
+
+
+def apply_native_hint_reference_policy(source: TTFont, reference: TTFont, default_hinted: TTFont,
+                                       unassigned: set[int]) -> tuple[set[int], dict[str, Any]]:
+    """Change only the independently identified fallback instructions upstream.
+
+    Sarasa pass2 retains the pass1 GID prefix. Prove that prefix from complete
+    point/component geometry before using IDs; equal outlines alone are not
+    identities (U+2035 has an identical shape with a different hint style).
+    """
+    size = len(source.getGlyphOrder())
+    if len(reference.getGlyphOrder()) < size or len(default_hinted.getGlyphOrder()) != size:
+        raise ValueError("hint 参照的 pass1 字形清单不一致")
+    for gid in range(size):
+        geometry = hint_reference_geometry(source, gid)
+        if geometry != hint_reference_geometry(reference, gid) or geometry != hint_reference_geometry(default_hinted, gid):
+            raise ValueError(f"hint 参照的 pass1 字形顺序或轮廓不一致：GID {gid}")
+    if not unassigned or not unassigned <= set(range(size)):
+        raise ValueError("ttfautohint 未提供完整有效的 fallback 分类")
+    source_cmap = source.getBestCmap()
+    controlled_cps = [cp for cp in b.UI_AUTOHINT_UNSCALED_CODEPOINTS if cp in source_cmap]
+    controlled = {source.getGlyphID(source_cmap[cp]) for cp in controlled_cps}
+    candidates = set(unassigned) | controlled
+    core = {source.getGlyphID(source.getBestCmap()[ord(char)]) for char in string.ascii_letters + string.digits}
+    if candidates & core:
+        raise ValueError("fallback 分类覆盖了正常拉丁字母或数字")
+    def bytecode(font: TTFont, gid: int) -> bytes:
+        glyph = font["glyf"][font.getGlyphName(gid)]
+        return bytes(glyph.program.getBytecode()) if hasattr(glyph, "program") else b""
+    cleared = set()
+    overridden = set()
+    for gid in sorted(candidates):
+        # Preserve upstream Chlorophytum replacements. This decision uses the
+        # original released font and a fresh default ttfautohint invocation,
+        # never a product font or its generated hint stores.
+        original = bytecode(reference, gid)
+        if original != bytecode(default_hinted, gid):
+            overridden.add(gid)
+            continue
+        if original:
+            glyph = reference["glyf"][reference.getGlyphName(gid)]
+            glyph.program = Program()
+            glyph.program.fromBytecode([])
+            cleared.add(gid)
+    parents: dict[int, set[int]] = {}
+    for gid, name in enumerate(reference.getGlyphOrder()):
+        for component in getattr(reference["glyf"][name], "components", ()):
+            parents.setdefault(reference.getGlyphID(component.glyphName), set()).add(gid)
+    affected = set(cleared)
+    pending = list(cleared)
+    while pending:
+        for parent in parents.get(pending.pop(), set()) - affected:
+            affected.add(parent)
+            pending.append(parent)
+    codepoints = {cp for cp, name in reference.getBestCmap().items() if reference.getGlyphID(name) in affected}
+    return codepoints, {"complete": True, "reference_construction": "fixed-upstream-instructions-with-native-none-fallback",
+                        "prefix_glyphs_checked": size, "source_fallback_glyphs": len(unassigned),
+                        "control_codepoints": [f"U+{cp:04X}" for cp in controlled_cps], "instructions_cleared_gids": sorted(cleared),
+                        "upstream_replaced_instructions_preserved": len(overridden),
+                        "affected_codepoints": [f"U+{cp:04X}" for cp in sorted(codepoints)]}
+
+
+def native_hint_raster_reference(region: str, weight: str, italic: bool, reference: TTFont) -> tuple[bytes, set[int], dict[str, Any]]:
+    if b.UI_AUTOHINT_OPTIONS != ("--fallback-script=none", "--fallback-scaling") or b.UI_AUTOHINT_UNSCALED_CODEPOINTS != (0x0360, 0x22EF) or not b.UI_AUTOHINT_UNSCALED_VERTICAL_SEGMENTS:
+        raise ValueError("hint 配置变更后需要重新定义独立栅格参照")
+    _key, work = b.static_hint_work_dir(weight)
+    source_path = work / "fragments" / f"{region}-{weight}{'Italic' if italic else ''}" / "pass1.ttf"
+    if not source_path.is_file():
+        raise FileNotFoundError(f"缺少 {region} {weight} 的原生 pass1 片段；请先完成静态构建并保留构建缓存")
+    executable, _provider = b.selected_ttfautohint()
+    identity = b.ttfautohint_identity()
+    with tempfile.TemporaryDirectory(prefix="raster-reference-", dir=b.BUILD_CACHE_DIR) as directory:
+        stage = Path(directory)
+        default_path = stage / "default.ttf"
+        native_path = stage / "native-policy.ttf"
+        control_path = stage / "native-policy.control.txt"
+        control_path.write_text(b.ui_hint_control(source_path), encoding="ascii", newline="\n")
+        subprocess.run([str(executable), str(source_path), str(default_path)], capture_output=True, check=True)
+        subprocess.run([str(executable), *b.UI_AUTOHINT_OPTIONS, "--control-file", str(control_path),
+                        str(source_path), str(native_path)], capture_output=True, check=True)
+        with TTFont(source_path, recalcBBoxes=False) as source, TTFont(default_path, recalcBBoxes=False) as default_hinted, TTFont(native_path, recalcBBoxes=False) as native_hinted:
+            if len(native_hinted.getGlyphOrder()) != len(source.getGlyphOrder()):
+                raise ValueError("原生 hint 策略改变了参照字形清单")
+            unassigned = set()
+            for gid in range(len(source.getGlyphOrder())):
+                if hint_reference_geometry(source, gid) != hint_reference_geometry(native_hinted, gid):
+                    raise ValueError("原生 hint 策略改变了参照轮廓")
+                glyph = native_hinted["glyf"][native_hinted.getGlyphName(gid)]
+                original_glyph = default_hinted["glyf"][default_hinted.getGlyphName(gid)]
+                original_program = bytes(original_glyph.program.getBytecode()) if hasattr(original_glyph, "program") else b""
+                if original_program and not (bytes(glyph.program.getBytecode()) if hasattr(glyph, "program") else b""):
+                    unassigned.add(gid)
+            affected, report = apply_native_hint_reference_policy(source, reference, default_hinted, unassigned)
+            report["fallback_classification"] = "independent-native-policy-instructions"
+            report["native_policy_source_sha256"] = b.file_sha256(native_path)
+    if b.ttfautohint_identity() != identity:
+        raise RuntimeError("构造栅格参照期间 ttfautohint 发生变化")
+    reference.recalcBBoxes = False
+    reference.recalcTimestamp = False
+    stream = io.BytesIO()
+    reference.save(stream)
+    data = stream.getvalue()
+    report.update({"source_pass1_sha256": b.file_sha256(source_path), "tool": identity,
+                   "reference_sha256": hashlib.sha256(data).hexdigest(), "original_raster_differences": 0})
+    return data, affected, report
+
+
 def raster_compare_worker(task: dict[str, Any]) -> dict[str, Any]:
     target_path = Path(task["target_path"])
     reference_path = Path(task["reference_path"])
@@ -708,6 +942,7 @@ def raster_compare_worker(task: dict[str, Any]) -> dict[str, Any]:
             "propdigits_render_error": 0,
             "classical_render_error": 0,
             "classical_blank_bitmap": 0,
+            "hint_execution_error": 0,
         },
         "mismatches_by_ppem": {},
         "samples": {},
@@ -716,11 +951,27 @@ def raster_compare_worker(task: dict[str, Any]) -> dict[str, Any]:
         item["missing"] = True
         return item
 
+    # Always execute the actual hinted font, including Heavy whose outline
+    # comparison below deliberately uses FT_LOAD_NO_HINTING.
+    execution = b.native_hint_execution_status(target_path)
+    item["native_hint_execution"] = execution
+    item["counts"]["hint_execution_error"] = execution["failures"] + int(not execution["complete"])
+    if not execution["ok"] or not execution["complete"]:
+        item["raster_aborted"] = "native-hint-execution-failed"
+        item["renders_checked"] = 0
+        return item
+
     target_font = TTFont(target_path, lazy=True)
-    reference_font = TTFont(reference_path, lazy=True)
+    reference_font = TTFont(reference_path, lazy=True, recalcBBoxes=False, recalcTimestamp=False)
+    reference_data = None
+    policy_codepoints: set[int] = set()
     propdigits_pairs: list[tuple[int, str, int, int]] = []
     propdigits_mapping_errors: list[list[str]] = []
     try:
+        if task["comparison_mode"] == "official-hinted-native-fallback":
+            reference_data, policy_codepoints, policy_report = native_hint_raster_reference(task["region"], task["weight"], task["italic"], reference_font)
+            policy_report["original_reference_sha256"] = b.file_sha256(reference_path)
+            item["hint_policy_reference"] = policy_report
         target_cmap = target_font.getBestCmap() or {}
         reference_cmap = reference_font.getBestCmap() or {}
         target_tnum = b.get_single_substitution_mapping(target_font, "tnum")
@@ -729,7 +980,7 @@ def raster_compare_worker(task: dict[str, Any]) -> dict[str, Any]:
         project_reference = (
             task["comparison_mode"] == "project-hinted-vs-unhinted-no-hinting"
         )
-        for codepoint in range(0x30, 0x3A):
+        for codepoint in sorted(INTENTIONAL_CPS):
             target_default = target_cmap.get(codepoint)
             target_tabular = target_tnum.get(target_default) if target_default else None
             reference_default = reference_cmap.get(codepoint)
@@ -782,7 +1033,8 @@ def raster_compare_worker(task: dict[str, Any]) -> dict[str, Any]:
         "propdigits_raster_pairs": len(propdigits_pairs),
     }
     target_face = freetype.Face(str(target_path))
-    reference_face = freetype.Face(str(reference_path))
+    reference_face = freetype.Face(io.BytesIO(reference_data)) if reference_data else freetype.Face(str(reference_path))
+    original_face = freetype.Face(str(reference_path)) if reference_data else None
     load_flags = int(task.get("load_flags", freetype.FT_LOAD_DEFAULT))
     mismatch_samples: list[Any] = []
     error_samples: list[Any] = []
@@ -793,11 +1045,16 @@ def raster_compare_worker(task: dict[str, Any]) -> dict[str, Any]:
     for ppem in task["ppems"]:
         target_face.set_pixel_sizes(0, ppem)
         reference_face.set_pixel_sizes(0, ppem)
+        if original_face is not None:
+            original_face.set_pixel_sizes(0, ppem)
         ppem_mismatches = 0
         for codepoint in codepoints:
             try:
                 target_signature = freetype_render_signature(target_face, codepoint, load_flags)
                 reference_signature = freetype_render_signature(reference_face, codepoint, load_flags)
+                if original_face is not None and codepoint in policy_codepoints:
+                    original_signature = freetype_render_signature(original_face, codepoint, load_flags)
+                    item["hint_policy_reference"]["original_raster_differences"] += int(target_signature != original_signature)
             except Exception as exc:
                 item["counts"]["render_error"] += 1
                 if len(error_samples) < 8:
@@ -911,7 +1168,7 @@ def audit_static_raster(
                         "comparison_mode": (
                             "project-hinted-vs-unhinted-no-hinting"
                             if extension_weight
-                            else "official-hinted-exact"
+                            else "official-hinted-native-fallback"
                         ),
                         "load_flags": (
                             freetype.FT_LOAD_NO_HINTING
@@ -956,13 +1213,29 @@ def audit_static_raster(
 
 COLON_FEATURE_COMBINATIONS = ({}, {"tnum": True}, {"pnum": True}, {"zero": True}, {"tnum": True, "zero": True})
 COLON_TEXTS = tuple(dict.fromkeys(["09:41", "1:2", "1:", ":2", "1:a", "a:2", "a:b", "a::::::::::2", "a::b::::::2", "1::2::::::a", *[left + ":" * count + right for left in ("", "0", "1", "a", "A", " ") for right in ("", "2", "a", "A", " ") for count in range(1, 17)]]))
+COLON_LETTER_CONTROLS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZķļņŗșțĶĻŅŖȘȚäöüáéğåœæßĢ"
+COLON_TEXTS = tuple(dict.fromkeys([*COLON_TEXTS, *[text for letter in COLON_LETTER_CONTROLS for text in (letter + ":2", "1:" + letter, letter + ":", ":" + letter, letter + "::::::2")]]))
 
 
-def colon_runtime_signature(runtime: hb.Font, text: str, features: dict, raised: int) -> tuple[bool, ...]:
+def raised_colon_glyph_ids(font: TTFont) -> set[int]:
+    ordinary = {font.getBestCmap()[0x3A]}
+    widths = [b.get_single_substitution_mapping(font, tag) for tag in ("tnum", "pnum")]
+    for _iteration in range(4):
+        ordinary.update(mapping[name] for mapping in widths for name in tuple(ordinary) if name in mapping)
+    case = b.get_single_substitution_mapping(font, "case")
+    raised = {case[name] for name in ordinary if name in case}
+    for _iteration in range(4):
+        raised.update(mapping[name] for mapping in widths for name in tuple(raised) if name in mapping)
+    if not raised:
+        raise ValueError("字体缺少上浮冒号及其宽度替代字形")
+    return {font.getGlyphID(name) for name in raised}
+
+
+def colon_runtime_signature(runtime: hb.Font, text: str, features: dict, raised: set[int]) -> tuple[bool, ...]:
     buffer = hb.Buffer(); buffer.add_codepoints([ord(char) for char in text])
     buffer.script = "Latn"; buffer.language = "en"; buffer.direction = "ltr"
     hb.shape(runtime, buffer, features)
-    return tuple(info.codepoint == raised for info in buffer.glyph_infos if text[info.cluster] == ":")
+    return tuple(info.codepoint in raised for info in buffer.glyph_infos if text[info.cluster] == ":")
 
 
 @functools.lru_cache(maxsize=26)
@@ -971,7 +1244,7 @@ def source_colon_signatures(italic: bool, weight: int) -> tuple:
     # reconstruction helper is used as the expected result.
     path = b.INTER_ITALIC if italic else b.INTER_UPRIGHT
     with TTFont(path) as source:
-        raised = source.getGlyphID(b.get_single_substitution_mapping(source, "case")[source.getBestCmap()[0x3A]])
+        raised = raised_colon_glyph_ids(source)
         source.flavor = None
         stream = io.BytesIO(); source.save(stream)
     runtime = hb.Font(hb.Face(stream.getvalue()))
@@ -983,7 +1256,7 @@ def colon_status(path: Path) -> dict[str, Any]:
     with TTFont(path) as font:
         italic = bool(font["post"].italicAngle)
         weights = INTER_POSITION_WEIGHTS if "fvar" in font else (font["OS/2"].usWeightClass,)
-        raised = font.getGlyphID(b.get_single_substitution_mapping(font, "case")[font.getBestCmap()[0x3A]])
+        raised = raised_colon_glyph_ids(font)
     runtime = hb.Font(hb.Face(path.read_bytes()))
     failures = 0; samples = []; cases = 0
     for weight in weights:
@@ -998,6 +1271,83 @@ def colon_status(path: Path) -> dict[str, Any]:
                     if len(samples) < 12:
                         samples.append({"wght": weight, "text": text, "features": features, "actual": actual, "source": reference})
     return {"ok": failures == 0, "source": "Inter 4.1 原始 calt", "weights": list(weights), "feature_combinations": list(COLON_FEATURE_COMBINATIONS), "cases": cases, "failures": failures, "samples": samples}
+
+
+CALT_PRESERVATION_TEXTS = tuple(dict.fromkeys([
+    "A@B", "AA@BB", "aa@bb", "A-B", "ABC-DEF", "abc-def", "A+B", "a+b",
+    "(ABC)", "[ABC]", "{ABC}", "1x2", "1*2", "<--", "->", "<->", "<==>",
+    *[left + middle + right for left in ("A", "AB", "a") for middle in ("@", "-", " @ ", " - ") for right in ("B", "BC", "b")],
+]))
+CALT_PRESERVATION_FEATURES = ({}, {"tnum": True, "zero": True}, {"pnum": True})
+
+
+def calt_effect_signature(runtime: hb.Font, text: str, features: dict) -> tuple:
+    results = []
+    for active in (False, True):
+        buffer = hb.Buffer(); buffer.add_str(text)
+        buffer.script = "Latn"; buffer.language = "en"; buffer.direction = "ltr"
+        hb.shape(runtime, buffer, {**features, "calt": active})
+        results.append(tuple((item.cluster, item.codepoint) for item in buffer.glyph_infos))
+    before, after = results
+    return (tuple(item[0] for item in before), tuple(item[0] for item in after),
+            tuple(index for index, pair in enumerate(zip(before, after)) if pair[0] != pair[1]))
+
+
+@functools.lru_cache(maxsize=26)
+def reference_calt_effects(italic: bool, coordinate: int) -> tuple:
+    # All public proportional defaults keep the original Inter cmap identities.
+    # The source GSUB and cmap are independent of the product reconstruction.
+    with TTFont(b.INTER_ITALIC if italic else b.INTER_UPRIGHT) as source:
+        source.flavor = None
+        stream = io.BytesIO(); source.save(stream)
+    runtime = hb.Font(hb.Face(stream.getvalue()))
+    runtime.set_variations({"opsz": 14, "wght": coordinate})
+    return tuple(tuple(calt_effect_signature(runtime, text, features) for text in CALT_PRESERVATION_TEXTS)
+                 for features in CALT_PRESERVATION_FEATURES)
+
+
+def contextual_calt_status(path: Path, region: str, weight: str, italic: bool) -> dict[str, Any]:
+    with TTFont(path, recalcTimestamp=False) as font:
+        structure = b.contextual_case_structure_status(font)
+        weights = INTER_POSITION_WEIGHTS if "fvar" in font else (font["OS/2"].usWeightClass,)
+    runtime = hb.Font(hb.Face(path.read_bytes()))
+    cases = failures = 0; samples = []
+    for coordinate in weights:
+        runtime.set_variations({"wght": coordinate})
+        expected = reference_calt_effects(italic, coordinate)
+        for feature_index, features in enumerate(CALT_PRESERVATION_FEATURES):
+            for text, reference in zip(CALT_PRESERVATION_TEXTS, expected[feature_index]):
+                actual = calt_effect_signature(runtime, text, features)
+                cases += 1
+                if actual != reference:
+                    failures += 1
+                    if len(samples) < 10:
+                        samples.append({"text": text, "features": features, "wght": coordinate, "actual": actual, "source": reference})
+    return {"ok": structure["ok"] and failures == 0, "source": "Inter 4.1 原始 GSUB 与默认比例 cmap",
+            "structure": structure, "weights": list(weights), "cases": cases,
+            "failures": failures + int(not structure["ok"]), "samples": samples}
+
+
+def proportional_defaults_status(data: bytes, weights: tuple[int | None, ...] = (None,)) -> dict[str, Any]:
+    runtime = hb.Font(hb.Face(data))
+    cases = 0; failures = []
+    for weight in weights:
+        if weight is not None:
+            runtime.set_variations({"wght": weight})
+        for codepoint in sorted(INTENTIONAL_CPS):
+            signatures = []
+            for features in ({"pnum": False, "tnum": False}, {"pnum": True, "tnum": False}, {"pnum": False, "tnum": True}):
+                buffer = hb.Buffer(); buffer.add_str(chr(codepoint)); buffer.script = "Latn"; buffer.direction = "ltr"
+                hb.shape(runtime, buffer, {"kern": False, "calt": False, **features})
+                signatures.append([(info.codepoint, pos.x_advance, pos.y_advance, pos.x_offset, pos.y_offset)
+                                   for info, pos in zip(buffer.glyph_infos, buffer.glyph_positions)])
+            plain, proportional, tabular = signatures
+            cases += 1
+            if (len(plain) != 1 or plain[0][0] == 0 or plain != proportional
+                    or len(tabular) != 1 or tabular[0][0] == plain[0][0]):
+                failures.append({"weight": weight, "codepoint": f"U+{codepoint:04X}", "signatures": signatures})
+    return {"ok": cases == 37 * len(weights) and not failures, "codepoints": sorted(INTENTIONAL_CPS),
+            "weights": list(weights), "cases": cases, "failures": failures}
 
 
 def digit_width_status(
@@ -1612,7 +1962,7 @@ def upstream_dash_shaping_status(
                 data,
                 glyph_order,
                 text,
-                "Hani",
+                "Latn" if language == "en" else "Hani",
                 features or {},
                 direction=direction,
                 variations=variations,
@@ -1630,6 +1980,7 @@ def upstream_dash_shaping_status(
             }
 
         cases: dict[str, Any] = {}
+        cases["vertical-segment-cells-and-joins"] = vertical_segment_runtime_status(path, variations)
         single_plain = shaped(
             "—",
             "en",
@@ -1666,10 +2017,10 @@ def upstream_dash_shaping_status(
             encoded_vertical_triple = shaped("⸻", language, "ttb")
             pair_summary = signature_summary(pair)
             triple_summary = signature_summary(triple)
-            expected_localized = label != "default" or region == "CL"
+            expected_localized = label != "default"
             expected_single_advance = (
                 None
-                if label in {"default", "ko"} and region != "CL"
+                if label in {"default", "ko"}
                 else upem
             )
             single_advance = sum(int(row[1]) for row in single)
@@ -1687,8 +2038,8 @@ def upstream_dash_shaping_status(
                 and 0 < single_advance < pair_summary["advance"][0] < triple_summary["advance"][0]
             )
             vertical_ok = (
-                len(vertical_pair) == 1
-                and len(vertical_triple) == 1
+                len(vertical_pair) == 2
+                and len(vertical_triple) == 3
                 and signature_summary(vertical_pair)["advance"] == [0, -2 * upem]
                 and signature_summary(vertical_triple)["advance"] == [0, -3 * upem]
             ) if expected_localized else True
@@ -1698,8 +2049,8 @@ def upstream_dash_shaping_status(
                 and (
                     not expected_localized
                     or (
-                        vertical_pair[0][0] == encoded_vertical_pair[0][0]
-                        and vertical_triple[0][0] == encoded_vertical_triple[0][0]
+                        vertical_pair == encoded_vertical_pair
+                        and vertical_triple == encoded_vertical_triple
                     )
                 )
             )
@@ -1732,7 +2083,7 @@ def upstream_dash_shaping_status(
 
 def dash_semantic_roles(font: TTFont, region: str) -> dict[str, str]:
     roles = b.upstream_dash_roles(font)
-    if region != "CL":
+    if roles["proportional"] != roles["fullwidth"]:
         korean_mapping = b.dash_locl_mappings_by_language(font, roles).get(
             "KOR ",
             {},
@@ -1741,7 +2092,28 @@ def dash_semantic_roles(font: TTFont, region: str) -> dict[str, str]:
         if not korean_single:
             raise ValueError("KOR locl does not expose its single-dash alternate")
         roles["korean_single"] = korean_single
+    if b.vertical_dash_segments(font, roles) is None:
+        # The product's two old long vertical identities are now 1em
+        # intermediates. Their independent source is the single vertical form.
+        roles["vertical_two"] = roles["vertical_single"]
+        roles["vertical_three"] = roles["vertical_single"]
     return roles
+
+
+def copy_classical_cjk_dash_reference(target: TTFont, source: TTFont) -> None:
+    target_roles = b.upstream_dash_roles(target)
+    source_roles = b.upstream_dash_roles(source)
+    for role in ("fullwidth", "fullwidth_two", "fullwidth_three", "vertical_single", "vertical_two", "vertical_three"):
+        b.copy_external_glyph_data(target, target_roles[role], source, source_roles[role])
+
+
+def static_dash_reference_font(region: str, weight_name: str) -> TTFont:
+    work = b.BUILD_CACHE_DIR / "audit-native-dash-sources"
+    source = TTFont(b.build_shs_ttf(region, weight_name, work), recalcBBoxes=False, recalcTimestamp=False)
+    if region == "CL":
+        with TTFont(b.classical_static_override_path(region, weight_name)) as classical:
+            copy_classical_cjk_dash_reference(source, classical)
+    return source
 
 
 def dash_glyph_measurement(
@@ -1928,6 +2300,42 @@ def add_observation_sample(
         samples.append(sample)
 
 
+@functools.lru_cache(maxsize=72)
+def native_ellipsis_instruction_expectation(region: str, weight: str, italic: bool) -> dict[str, Any]:
+    # Build the expectation from the original pass1 and the declared native
+    # hint policy. Never infer an exception from the released target font.
+    _key, work = b.static_hint_work_dir(weight)
+    source = work / "fragments" / f"{region}-{weight}{'Italic' if italic else ''}" / "pass1.ttf"
+    source_sha256 = b.file_sha256(source)
+    control = b.ui_hint_control(source)
+    with tempfile.TemporaryDirectory(prefix="audit-ellipsis-policy-", dir=b.BUILD_CACHE_DIR) as temporary:
+        stage = Path(temporary)
+        control_path = stage / "policy.txt"
+        control_path.write_text(control, encoding="ascii", newline="\n")
+        output = stage / "native-policy.ttf"
+        b.run_ttfautohint([*b.UI_AUTOHINT_OPTIONS, "--control-file", str(control_path), str(source), str(output)])
+        with TTFont(output, recalcTimestamp=False) as reference:
+            name = reference.getBestCmap().get(0x22EF)
+            if name is None:
+                raise ValueError("独立原生 hint 参照缺少 U+22EF")
+            count = dash_instruction_length(reference, name)
+        return {"source": display_path(source), "source_sha256": source_sha256,
+                "native_policy_sha256": b.file_sha256(output), "instruction_bytes": count,
+                "control_sha256": hashlib.sha256(control.encode("ascii")).hexdigest(),
+                "options": list(b.UI_AUTOHINT_OPTIONS), "tool": b.ttfautohint_identity()}
+
+
+def ellipsis_instruction_presence_matches(hinted: bool, role: str, actual_bytes: int,
+                                         native_fullwidth_bytes: int | None = None) -> bool:
+    if hinted and role == "fullwidth":
+        if native_fullwidth_bytes is None or native_fullwidth_bytes < 0:
+            raise ValueError("全宽省略号缺少独立原生 hint 参照")
+        expected = bool(native_fullwidth_bytes)
+    else:
+        expected = hinted
+    return bool(actual_bytes) == expected
+
+
 def audit_static_upstream_dash_sources() -> list[dict[str, Any]]:
     out: list[dict[str, Any]] = []
     area_curves: dict[tuple[str, bool, bool, str], dict[int, float]] = {}
@@ -1945,7 +2353,7 @@ def audit_static_upstream_dash_sources() -> list[dict[str, Any]]:
                 f"static upstream dash source {done}/{total}: "
                 f"{region} {weight_name}"
             )
-            source = TTFont(source_path, recalcBBoxes=False, recalcTimestamp=False)
+            source = static_dash_reference_font(region, weight_name)
             try:
                 source_roles = dash_semantic_roles(source, region)
                 source_glyph_set = source.getGlyphSet()
@@ -2232,16 +2640,24 @@ def audit_static_upstream_dash_sources() -> list[dict[str, Any]]:
                                     target,
                                     target_name,
                                 )
-                                if hinted != bool(instruction_length):
+                                native_policy = (
+                                    native_ellipsis_instruction_expectation(region, weight_name, italic)
+                                    if hinted and role == "fullwidth" else None
+                                )
+                                native_bytes = native_policy["instruction_bytes"] if native_policy else None
+                                if not ellipsis_instruction_presence_matches(hinted, role, instruction_length, native_bytes):
                                     add_counted_sample(
                                         item,
                                         "ellipsis_instructions",
                                         {
                                             "role": role,
                                             "bytes": instruction_length,
-                                            "expected_hinted": hinted,
+                                            "expected_hinted": bool(native_bytes) if native_policy else hinted,
+                                            "native_policy_reference": native_policy,
                                         },
                                     )
+                                if native_policy is not None:
+                                    item["fullwidth_ellipsis_hint_reference"] = native_policy
                                 ellipsis_role_details[role] = {
                                     "source_glyph": source_name,
                                     "target_glyph": target_name,
@@ -2330,13 +2746,13 @@ def vf_dash_reference_font(region: str, italic: bool) -> TTFont:
                 optimize=True,
             )
             override_source.close()
-            b.apply_classical_vf_override(limited, override, region)
+            copy_classical_cjk_dash_reference(limited, override)
         b.apply_public_weight_axis(limited)
-        metric_source = limited
+        b.preserve_upstream_dash_metric_variations(limited, limited)
         if override is not None:
             b.apply_public_weight_axis(override)
-            metric_source = override
-        b.preserve_upstream_dash_metric_variations(limited, metric_source)
+            b.preserve_upstream_dash_metric_variations(limited, override,
+                {"fullwidth", "fullwidth_two", "fullwidth_three", "vertical_single", "vertical_two", "vertical_three"})
         b.remove_metric_variation_maps(limited)
     finally:
         if override is not None:
@@ -2406,9 +2822,7 @@ def audit_vf_upstream_dash_sources() -> list[dict[str, Any]]:
                 continue
             target = TTFont(target_path)
             source = vf_dash_reference_font(region, italic)
-            dash_metric_source_path = (
-                b.classical_vf_override_path(region) or b.source_han_vf_path(region)
-            )
+            dash_metric_source_path = b.source_han_vf_path(region)
             ellipsis_metric_source_path = b.source_han_vf_path(region)
             dash_metric_source = TTFont(dash_metric_source_path)
             ellipsis_metric_source = TTFont(ellipsis_metric_source_path)
@@ -2987,13 +3401,13 @@ def em_dash_raster_status(
                     (1,),
                     2,
                 ),
-                ("vertical-default", "——", "ttb", {}, (1,), 2),
+                ("vertical-default", "——", "ttb", {}, (2,), 2),
                 (
                     "vert",
                     "——",
                     "ttb",
                     {"ccmp": True, "calt": False, "vert": True, "vrt2": False},
-                    (1,),
+                    (2,),
                     2,
                 ),
                 (
@@ -3001,7 +3415,7 @@ def em_dash_raster_status(
                     "——",
                     "ttb",
                     {"ccmp": True, "calt": False, "vert": False, "vrt2": True},
-                    (1, 2),
+                    (2,),
                     2,
                 ),
                 (
@@ -3009,23 +3423,23 @@ def em_dash_raster_status(
                     "——",
                     "ttb",
                     {"ccmp": True, "calt": False, "vert": True, "vrt2": True},
-                    (1,),
+                    (2,),
                     2,
                 ),
                 ("triple-default", "———", "ltr", {}, (1,), 3),
-                ("triple-vertical-default", "———", "ttb", {}, (1,), 3),
+                ("triple-vertical-default", "———", "ttb", {}, (3,), 3),
                 (
                     "triple-vrt2-only",
                     "———",
                     "ttb",
                     {"ccmp": True, "calt": False, "vert": False, "vrt2": True},
-                    (1, 3),
+                    (3,),
                     3,
                 ),
                 ("encoded-two-em-default", "⸺", "ltr", {}, (1,), 2),
-                ("encoded-two-em-vertical-default", "⸺", "ttb", {}, (1,), 2),
+                ("encoded-two-em-vertical-default", "⸺", "ttb", {}, (2,), 2),
                 ("encoded-three-em-default", "⸻", "ltr", {}, (1,), 3),
-                ("encoded-three-em-vertical-default", "⸻", "ttb", {}, (1,), 3),
+                ("encoded-three-em-vertical-default", "⸻", "ttb", {}, (3,), 3),
             ]
         for ppem in ppems:
             face.set_pixel_sizes(0, ppem)
@@ -3106,25 +3520,9 @@ def em_dash_raster_status(
                     and len(glyph_pixels) == len(signature)
                     and all(glyph_pixels)
                     and total_advance == expected_advance
-                    and (
-                        (
-                            not gaps
-                            and component_count == 1
-                        )
-                        if len(signature) == 1
-                        else (
-                            glyph_identity_pattern(signature)
-                            == [0] * len(signature)
-                            and all(count == 1 for count in individual_component_counts)
-                            and len(
-                                {
-                                    tuple(sorted(metrics.items()))
-                                    for metrics in bitmap_metrics
-                                }
-                            )
-                            == 1
-                        )
-                    )
+                    and not gaps
+                    and component_count == 1
+                    and all(count == 1 for count in individual_component_counts)
                 )
                 all_ok = all_ok and case_ok
                 results[f"{ppem}:{name}"] = {
@@ -3952,27 +4350,120 @@ def vf_ellipsis_axis_status(path: Path) -> dict[str, Any]:
     }
 
 
+def public_weight_to_source_han_weight(weight: float, source: TTFont) -> float:
+    anchors = {200: 250, 300: 300, 350: 350, 400: 400, 600: 500, 700: 700, 900: 900}
+    if weight in anchors:
+        return anchors[weight]
+    axis = next(axis for axis in source["fvar"].axes if axis.axisTag == "wght")
+    triple = (axis.minValue, axis.defaultValue, axis.maxValue)
+    avar = source["avar"].segments["wght"]
+    mapped = {public: piecewiseLinearMap(normalizeValue(internal, triple), avar) for public, internal in anchors.items()}
+    normalized = piecewiseLinearMap(piecewiseLinearMap(weight, mapped), {value: key for key, value in avar.items()})
+    return axis.defaultValue + normalized * ((axis.defaultValue - axis.minValue) if normalized < 0 else (axis.maxValue - axis.defaultValue))
+
+
+def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | None = None) -> dict[str, Any]:
+    data = path.read_bytes()
+    runtime = hb.Font(hb.Face(data))
+    if variations: runtime.set_variations(variations)
+    em = runtime.face.upem
+    failures = []; cases = 0
+    with TTFont(io.BytesIO(data)) as font:
+        point_cache = {}
+        for script in ("Latn", "Cyrl", "Grek", "Hani", "Kana", "Hang", "Bopo"):
+            for language in (None, "en", "de", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"):
+                for features in ({}, {"vert": True, "vrt2": False}, {"vert": False, "vrt2": True}):
+                    for text, count in (("——", 2), ("———", 3), ("⸺", 2), ("⸻", 3)):
+                        buf = hb.Buffer(); buf.add_str(text); buf.script = script; buf.direction = "ttb"
+                        if language: buf.language = language
+                        hb.shape(runtime, buf, features)
+                        reasons = []
+                        if len(buf.glyph_infos) != count:
+                            reasons.append("wrong segment count")
+                        previous_bottom = None
+                        for index, (info, pos) in enumerate(zip(buf.glyph_infos, buf.glyph_positions)):
+                            if (pos.x_advance, pos.y_advance) != (0, -em):
+                                reasons.append("segment advance is not 1em")
+                            extent = runtime.get_glyph_extents(info.codepoint)
+                            if not extent or extent.y_bearing + pos.y_offset > 0 or extent.y_bearing + extent.height + pos.y_offset < -em:
+                                reasons.append("ink exceeds its own vertical cell")
+                            name = font.getGlyphName(info.codepoint)
+                            if name not in point_cache:
+                                pen = b.RecordingPen(); runtime.draw_glyph_with_pen(info.codepoint, pen)
+                                points = [point for command, args in pen.value if command in {"moveTo", "lineTo"} for point in args]
+                                if len(points) > 1 and points[0] == points[-1]:
+                                    points.pop()
+                                point_cache[name] = points
+                            points = [(x + pos.x_offset, y + pos.y_offset - index * em) for x, y in point_cache[name]]
+                            if len(points) != 4:
+                                reasons.append("segment is not the required quadrilateral")
+                                continue
+                            high = max(y for x, y in points); low = min(y for x, y in points)
+                            top = sorted((x, y) for x, y in points if abs(y - high) < 1e-6)
+                            bottom = sorted((x, y) for x, y in points if abs(y - low) < 1e-6)
+                            if previous_bottom is not None and top != previous_bottom:
+                                reasons.append("adjacent ink edges do not meet exactly")
+                            previous_bottom = bottom
+                        cases += 1
+                        if reasons:
+                            failures.append({"script": script, "language": language, "features": features,
+                                             "text": text, "reasons": reasons})
+    return {"ok": not failures, "cases": cases, "failures": len(failures), "samples": failures[:24]}
+
+
 def default_punctuation_status(path: Path, region: str, weights: tuple[int, ...] = ()) -> dict[str, Any]:
     if region not in set(b.REGION_ORDER):
         return {"applicable": False, "failures": [], "cases": 0}
-    font = hb.Font(hb.Face(path.read_bytes()))
+    data = path.read_bytes()
+    font = hb.Font(hb.Face(data))
+    with TTFont(io.BytesIO(data), lazy=True) as metadata:
+        variable = "fvar" in metadata
+        static_weight = int(metadata["OS/2"].usWeightClass)
+    if variable:
+        source_path = b.source_han_vf_path(region)
+    else:
+        weight_name = next(name for name, value in EXPECTED_WEIGHTS.items() if value == static_weight)
+        source_path = b.build_shs_ttf(region, weight_name, b.BUILD_CACHE_DIR / "audit-native-dash-sources")
+    source = hb.Font(hb.Face(source_path.read_bytes()))
+    source_metadata = TTFont(source_path, lazy=True) if variable else None
+    regional_language = {"CL": "zh-Hant", "SC": "zh-Hans", "TC": "zh-Hant", "HC": "zh-HK", "J": "ja", "K": "ko"}[region]
+    cjk_languages = ("zh-Hans", "zh-Hant", "zh-HK", "ja", "ko")
+    languages = (None, "en", "de", "fr", "ru", "el", "ca", "ro", *cjk_languages)
+    texts = ("…", "……", "—", "——", "———", "⸺", "⸻")
+    def shape(runtime, text, script, language, direction):
+        buf = hb.Buffer(); buf.add_str(text); buf.direction = direction
+        if script: buf.script = script
+        if language: buf.language = language
+        buf.guess_segment_properties(); hb.shape(runtime, buf)
+        return [len(buf.glyph_infos), sum(p.x_advance for p in buf.glyph_positions), sum(p.y_advance for p in buf.glyph_positions)]
     failures = []; cases = 0
-    for weight in weights or (None,):
-        if weight is not None:
+    for weight in weights or (static_weight,):
+        if variable:
             font.set_variations({"wght": weight})
-        for script in (None, "Latn", "Hani"):
-            for direction in ("ltr", "ttb"):
-                for text, advance, horizontal_glyphs in (("……", 2000, 2), ("——", 2000, 1), ("———", 3000, 1)):
-                    buf = hb.Buffer(); buf.add_str(text); buf.direction = direction
-                    if script is not None:
-                        buf.script = script
-                    buf.guess_segment_properties()
-                    hb.shape(font, buf)
-                    actual = sum(p.x_advance if direction == "ltr" else -p.y_advance for p in buf.glyph_positions)
-                    cases += 1
-                    if actual != advance or (direction == "ltr" and len(buf.glyph_infos) != horizontal_glyphs):
-                        failures.append({"weight": weight, "script": script, "direction": direction, "text": text, "advance": actual, "glyphs": len(buf.glyph_infos)})
-    return {"applicable": True, "failures": failures, "cases": cases}
+            source.set_variations({"wght": public_weight_to_source_han_weight(weight, source_metadata)})
+        for script in (None, "Latn", "Cyrl", "Grek", "Hani", "Kana", "Hang", "Bopo"):
+            for language in languages:
+                effective_language = regional_language if script in {"Hani", "Kana", "Hang", "Bopo"} and language not in cjk_languages else language
+                for direction in ("ltr", "ttb"):
+                    for text in texts:
+                        actual = shape(font, text, script, language, direction)
+                        # Bare punctuation resolves to DFLT in the product,
+                        # which has Western defaults. For CJK scripts absent
+                        # from Source Han (notably Bopo), query the equivalent
+                        # explicit CJK LangSys on its Latin script.
+                        source_script = script if script in {"Latn", "Cyrl", "Grek"} else "Latn"
+                        source_language = effective_language if script is not None else "en"
+                        expected = shape(source, text, source_script, source_language, direction)
+                        if direction == "ttb" and text in {"——", "———", "⸺", "⸻"}:
+                            count = 2 if text in {"——", "⸺"} else 3
+                            expected = [count, 0, -count * font.face.upem]
+                        cases += 1
+                        if actual != expected:
+                            failures.append({"weight": weight, "script": script, "language": language,
+                                             "direction": direction, "text": text, "actual": actual, "expected": expected})
+    if source_metadata is not None: source_metadata.close()
+    return {"applicable": True, "failures": failures, "cases": cases, "source": display_path(source_path),
+            "scripts": [None, "Latn", "Cyrl", "Grek", "Hani", "Kana", "Hang", "Bopo"], "languages": list(languages)}
 
 
 def audit_static_ellipsis_shaping() -> list[dict[str, Any]]:
@@ -4081,27 +4572,27 @@ def vf_em_dash_axis_advance_status(path: Path) -> dict[str, Any]:
             (expected, 0),
             [0],
         ),
-        ("vertical-default", "ttb", {}, (0, -expected), [0]),
+        ("vertical-default", "ttb", {}, (0, -expected), [0, 1]),
         (
             "vert",
             "ttb",
             {"ccmp": True, "calt": False, "vert": True, "vrt2": False},
             (0, -expected),
-            [0],
+            [0, 1],
         ),
         (
             "vrt2-only",
             "ttb",
             {"ccmp": True, "calt": False, "vert": False, "vrt2": True},
             (0, -expected),
-            [0, 0],
+            [0, 1],
         ),
         (
             "vert-plus-vrt2",
             "ttb",
             {"ccmp": True, "calt": False, "vert": True, "vrt2": True},
             (0, -expected),
-            [0],
+            [0, 1],
         ),
     ]
     failure_counts = {name: 0 for name, *_rest in cases}
@@ -4166,8 +4657,19 @@ def vf_static_em_dash_visual_parity_status(
     try:
         vf_order = vf_font.getGlyphOrder()
         static_order = static_font.getGlyphOrder()
-        vf_glyph_set = vf_font.getGlyphSet(location={"wght": weight})
-        static_glyph_set = static_font.getGlyphSet()
+        vf_runtime = hb.Font(hb.Face(vf_data)); vf_runtime.set_variations({"wght": weight})
+        static_runtime = hb.Font(hb.Face(static_data))
+        def runtime_bounds(runtime, order, signature):
+            reverse = {name: gid for gid, name in enumerate(order)}
+            boxes = []; cursor_x = cursor_y = 0
+            for name, x_advance, y_advance, x_offset, y_offset in signature:
+                extent = runtime.get_glyph_extents(reverse[name])
+                if extent is not None:
+                    left = cursor_x + x_offset + extent.x_bearing
+                    top = cursor_y + y_offset + extent.y_bearing
+                    boxes.append((left, top + extent.height, left + extent.width, top))
+                cursor_x += x_advance; cursor_y += y_advance
+            return combined_visual_bounds(boxes)
         vf_face = freetype.Face(str(vf_path))
         vf_face.set_var_design_coords(
             [
@@ -4196,12 +4698,8 @@ def vf_static_em_dash_visual_parity_status(
                 {},
                 direction=direction,
             )
-            vf_bounds = combined_visual_bounds(
-                shaped_visual_bounds(vf_signature, vf_glyph_set)
-            )
-            static_bounds = combined_visual_bounds(
-                shaped_visual_bounds(static_signature, static_glyph_set)
-            )
+            vf_bounds = runtime_bounds(vf_runtime, vf_order, vf_signature)
+            static_bounds = runtime_bounds(static_runtime, static_order, static_signature)
             vf_advance = (
                 sum(row[1] for row in vf_signature),
                 sum(row[2] for row in vf_signature),
@@ -4285,27 +4783,24 @@ def vf_static_em_dash_visual_parity_status(
                     "symmetric_difference_pixels": len(difference),
                     "difference_samples": sorted(difference)[:16],
                 }
+            expected_glyph_count = 1 if direction == "ltr" else 2
             exact_visual_ok = (
-                len(vf_signature) == 1
-                and len(static_signature) == 1
+                len(vf_signature) == expected_glyph_count
+                and len(static_signature) == expected_glyph_count
                 and vf_bounds == static_bounds
                 and vf_advance == static_advance
             )
             exact_raster_ok = all(sample["ok"] for sample in raster.values())
-            # Source Han's static TTF and VF release paths have their own
-            # whole-glyph translation and quantization differences. Separate
-            # source-parity audits prove that each product follows its actual
-            # upstream; this cross-product check therefore enforces semantics
-            # (one connected glyph and the same 2em advance) and records exact
-            # visual/raster parity as a transparent observation.
             semantic_ok = (
-                len(vf_signature) == 1
-                and len(static_signature) == 1
+                len(vf_signature) == expected_glyph_count
+                and len(static_signature) == expected_glyph_count
                 and vf_bounds is not None
                 and static_bounds is not None
                 and vf_advance == static_advance
             )
-            case_ok = semantic_ok
+            # A mismatched vertical boundary changes real layout. It is a
+            # release failure even when both fonts encode the same advance.
+            case_ok = semantic_ok and (exact_visual_ok and exact_raster_ok if direction == "ttb" else True)
             all_ok = all_ok and case_ok
             cases[name] = {
                 "ok": case_ok,
@@ -4445,9 +4940,9 @@ def audit_vf_em_dash_shaping() -> list[dict[str, Any]]:
                         semantic_failures = {
                             name: case
                             for name, case in parity["cases"].items()
-                            if not case["semantic_ok"]
+                            if not case["ok"]
                         }
-                        parity["source_boundary_observations"] = {
+                        parity["source_boundary_comparison"] = {
                             "exact_visual_mismatches": sum(
                                 not case["exact_visual_ok"]
                                 for case in parity["cases"].values()
@@ -4676,9 +5171,7 @@ def expected_source_punctuation_gsub_template(
     mapping_groups = list(
         dict.fromkeys(
             (
-                "standard"
-                if region == "CL"
-                else "korean" if language == "KOR " else "standard"
+                "korean" if language == "KOR " else "standard"
             )
             for language in sorted(missing_cjk_locl_languages)
         )
@@ -4712,9 +5205,7 @@ def expected_source_punctuation_gsub_template(
                 default=len(indices),
             )
             group = (
-                "standard"
-                if region == "CL"
-                else "korean" if language == "KOR " else "standard"
+                "korean" if language == "KOR " else "standard"
             )
             indices.insert(position, feature_index_by_group[group])
         required = int(getattr(langsys, "ReqFeatureIndex", 0xFFFF))
@@ -4777,20 +5268,36 @@ def expected_upstream_dash_gsub_template(reference: TTFont, region: str) -> tupl
     tags, indices, _tag_signatures = expected_source_punctuation_gsub_template(reference, region)
     if region not in set(b.REGION_ORDER):
         return tags, indices, _tag_signatures
-    insertion = max(index + 1 for index, tag in enumerate(tags) if tag == "locl")
-    tags.insert(insertion, "locl")
+    reference_tags = feature_tag_sequence(reference, "GSUB")
+    missing = {language for _script, language, _required, features in langsys_signatures(reference, "GSUB", False)
+               if language in b.CJK_LOCL_LANGUAGES and not any(reference_tags[index] == "locl" for index in features)}
+    groups = list(dict.fromkeys("korean" if language == "KOR " else "standard" for language in sorted(missing)))
+    wanted = "korean" if region == "K" else "standard"
+    # A newly required CJK locl feature contains only the project punctuation
+    # mappings. Reuse that standard/Korean feature for CJK defaults, including
+    # JAN's standard mapping in CL, instead of inventing another feature index.
+    added = wanted not in groups
+    if added:
+        insertion = max(index + 1 for index, tag in enumerate(tags) if tag == "locl")
+        tags.insert(insertion, "locl")
+    else:
+        insertion = max(index + 1 for index, tag in enumerate(reference_tags) if tag == "locl") + groups.index(wanted)
     result = []
-    existing = {(row[0], row[1]) for row in indices}
+    scripts = {row[0] for row in indices}
+    cjk_scripts = {"bopo", "hang", "hani", "kana"}
     for script, language, required, features in indices:
-        shifted = [index + (index >= insertion) for index in features]
-        required = required + (required >= insertion) if required is not None else None
-        if language == "dflt":
-            if script in {"DFLT", "latn"} and (script, "ENG ") not in existing:
-                result.append([script, "ENG ", required, list(shifted)])
+        shifted = [index + (added and index >= insertion) for index in features]
+        required = required + (added and required >= insertion) if required is not None else None
+        if language == "dflt" and script in cjk_scripts:
             shifted.append(insertion)
         result.append([script, language, required, shifted])
-    script_order = {record.ScriptTag: index for index, record in enumerate(reference["GSUB"].table.ScriptList.ScriptRecord)}
-    result.sort(key=lambda row: (script_order[row[0]], "" if row[1] == "dflt" else row[1]))
+    template_tag = "hani" if "hani" in scripts else "latn"
+    template = [row for row in result if row[0] == template_tag]
+    for script in sorted(cjk_scripts - scripts):
+        for _source, language, required, features in template:
+            inherited = [index for index in features if index != insertion] if language == "dflt" else list(features)
+            result.append([script, language, required, inherited + ([insertion] if language == "dflt" else [])])
+    result.sort(key=lambda row: (row[0], "" if row[1] == "dflt" else row[1]))
     tagged = [[script, language, None if required is None else tags[required], [tags[index] for index in features]] for script, language, required, features in result]
     return tags, result, tagged
 
@@ -5231,17 +5738,112 @@ def post_table_status(font: TTFont) -> dict[str, Any]:
     }
 
 
+def head_bounds_status(font: TTFont) -> dict[str, Any]:
+    boxes = []
+    checked = 0
+    for name in font.getGlyphOrder():
+        coordinates = font["glyf"][name].getCoordinates(font["glyf"])[0]
+        checked += 1
+        if coordinates:
+            boxes.append(coordinates.calcIntBounds())
+    expected = [min(box[0] for box in boxes), min(box[1] for box in boxes),
+                max(box[2] for box in boxes), max(box[3] for box in boxes)]
+    actual = [getattr(font["head"], field) for field in ("xMin", "yMin", "xMax", "yMax")]
+    return {"ok": actual == expected, "actual": actual, "expected": expected, "glyphs_checked": checked}
+
+
+def regular_vertical_bounds_status(font: TTFont, source_path: Path) -> dict[str, Any]:
+    """Bind default-instance padding bounds to the fixed regional Sarasa source."""
+    actual = [font["head"].yMin, font["head"].yMax]
+    if not source_path.is_file():
+        return {"ok": False, "actual": actual, "source_missing": True, "source": display_path(source_path)}
+    with TTFont(source_path, lazy=True) as source:
+        expected = [source["head"].yMin, source["head"].yMax]
+    return {"ok": actual == expected, "actual": actual, "expected": expected, "source": display_path(source_path)}
+
+
+def release_license_document_paths() -> list[Path]:
+    return [ROOT / "LICENSE", ROOT / "NOTICE.md", *(
+        b.static_dir(region, hinted) / "LICENSE-Sarasa-Gothic.txt"
+        for region in b.REGION_ORDER for hinted in (True, False)
+    )]
+
+
+def source_han_license_documents_status() -> dict[str, Any]:
+    """Compare release notices with the pinned upstream, including all copies."""
+    source_path = b.source_han_vf_path("SC")
+    failures: list[dict[str, Any]] = []
+    try:
+        with TTFont(source_path, lazy=True) as source:
+            copyright_values = name_values(source, 0)
+        if len(copyright_values) != 1:
+            raise ValueError("固定 Source Han 来源的版权记录不唯一")
+        copyright_text = copyright_values[0]
+        source_sha256 = b.file_sha256(source_path)
+    except Exception as exc:
+        return {"ok": False, "documents_checked": 0,
+                "failures": [{"kind": "source_han_license_source", "error": type(exc).__name__}]}
+    license_path = ROOT / "LICENSE"
+    license_bytes = license_path.read_bytes() if license_path.is_file() else b""
+    if copyright_text not in license_bytes.decode("utf-8", errors="replace"):
+        failures.append({"kind": "source_han_license_copyright", "file": display_path(license_path),
+                         "expected": copyright_text})
+    notice_path = ROOT / "NOTICE.md"
+    notice = notice_path.read_text(encoding="utf-8") if notice_path.is_file() else ""
+    if copyright_text.split(", with Reserved Font Name", 1)[0] not in notice:
+        failures.append({"kind": "source_han_notice_copyright", "file": display_path(notice_path)})
+    documents_checked = 2
+    for region in b.REGION_ORDER:
+        for hinted in (True, False):
+            path = b.static_dir(region, hinted) / "LICENSE-Sarasa-Gothic.txt"
+            documents_checked += 1
+            if not path.is_file():
+                failures.append({"kind": "source_han_license_copy_missing", "file": display_path(path)})
+            elif path.read_bytes() != license_bytes:
+                failures.append({"kind": "source_han_license_copy_contents", "file": display_path(path)})
+    return {"ok": not failures, "source": display_path(source_path), "source_sha256": source_sha256,
+            "source_copyright": copyright_text, "documents_checked": documents_checked,
+            "documents_sha256": {display_path(path): b.file_sha256(path)
+                                 for path in release_license_document_paths() if path.is_file()},
+            "failures": failures}
+
+
 def audit_metadata() -> dict[str, Any]:
     log("metadata/shaping audit start")
-    failures = []
+    license_documents = source_han_license_documents_status()
+    failures = list(license_documents["failures"])
     static_count = 0
     variable_count = 0
     samples = {"static": [], "variable": []}
+    contextual_calt_reports = []
+    head_bounds_reports = []
+    regular_bounds_reports = []
+    regular_sources = {
+        path: b.reference_font_path(region, "Regular", italic)
+        for region in b.REGION_ORDER for italic in (False, True)
+        for path in (vf_path(region, italic), static_path(region, "Regular", italic, False),
+                     static_path(region, "Regular", italic, True))
+    }
+    proportional_default_reports = []
     for path in release_font_paths():
         if path.exists():
             with TTFont(path, lazy=True) as font:
                 if "glyf" in font and "VORG" in font:
                     failures.append({"kind": "truetype_vorg", "file": display_path(path)})
+                bounds = head_bounds_status(font)
+                head_bounds_reports.append({"file": display_path(path), **bounds})
+                if not bounds["ok"]:
+                    failures.append({"kind": "head_bounds", "file": display_path(path), **bounds})
+                if path in regular_sources:
+                    baseline = regular_vertical_bounds_status(font, regular_sources[path])
+                    regular_bounds_reports.append({"file": display_path(path), **baseline})
+                    if not baseline["ok"]:
+                        failures.append({"kind": "regular_vertical_bounds", "file": display_path(path), **baseline})
+                width_weights = tuple(INTER_POSITION_WEIGHTS) if "fvar" in font else (None,)
+                proportional = proportional_defaults_status(path.read_bytes(), width_weights)
+                proportional_default_reports.append({"file": display_path(path), **proportional})
+                if not proportional["ok"]:
+                    failures.append({"kind": "proportional_defaults", "file": display_path(path), **proportional})
     for region in b.REGION_ORDER:
         for hinted in [True, False]:
             directory = b.static_dir(region, hinted)
@@ -5272,6 +5874,7 @@ def audit_metadata() -> dict[str, Any]:
                                 record.platformID == 1 for record in font["name"].names
                             ),
                             "style_metadata": static_style_metadata_status(font, weight, italic),
+                            "output_identity": b.output_identity_status(font, region, italic, weight, hinted),
                             "post": post_table_status(font),
                             "underline": {
                                 "thickness": int(font["post"].underlineThickness),
@@ -5281,7 +5884,8 @@ def audit_metadata() -> dict[str, Any]:
                             "has_gvar": "gvar" in font,
                             "has_stat": "STAT" in font,
                             "stat_weight": stat_weight_status(font, weight),
-                            "has_hint_tables": any(tag in font for tag in ("fpgm", "prep", "cvt ")),
+                            "has_hint_tables": b.has_grid_fitting_tables(font),
+                            "nonhinting_raster_metadata": b.nonhinting_raster_metadata_status(font) if not hinted else None,
                             "has_glyph_program": has_glyph_program(font) if hinted else None,
                             "raw_simple_glyph_flags": b.raw_simple_glyph_flag_stats(font),
                             "max_zones": int(font["maxp"].maxZones),
@@ -5290,10 +5894,14 @@ def audit_metadata() -> dict[str, Any]:
                             ) if "gasp" in font else [],
                             "uppercase_ui_spelling": name_hits,
                             "colon": colon_status(path),
+                            "contextual_calt": contextual_calt_status(path, region, weight, italic),
                             "digits": digit_width_status(path),
                             "contextual_spacing": contextual_spacing_status(path),
                         }
                         static_count += 1
+                        contextual_calt_reports.append({"file": item["file"], **item["contextual_calt"]})
+                        if not item["output_identity"]["ok"]:
+                            failures.append({"kind": "output_identity", "file": item["file"], "identity": item["output_identity"]})
                         if len(samples["static"]) < 4:
                             samples["static"].append(item)
                         if item["weight"] != expected_weight:
@@ -5325,13 +5933,13 @@ def audit_metadata() -> dict[str, Any]:
                             )
                         if item["vendor"] != b.OS2_VENDOR_ID:
                             failures.append({"kind": "static_vendor", "file": item["file"], "got": item["vendor"]})
-                        if item["codepage_range_1"] != b.OS2_CODEPAGE_RANGE_1:
+                        if item["codepage_range_1"] != expected_codepage_range_1(region):
                             failures.append(
                                 {
                                     "kind": "static_codepage_range_1",
                                     "file": item["file"],
                                     "got": item["codepage_range_1"],
-                                    "expected": b.OS2_CODEPAGE_RANGE_1,
+                                    "expected": expected_codepage_range_1(region),
                                     "bit_31": bool(item["codepage_range_1"] & (1 << 31)),
                                 }
                             )
@@ -5373,6 +5981,8 @@ def audit_metadata() -> dict[str, Any]:
                             failures.append({"kind": "static_missing_hints", "file": item["file"], "has_glyph_program": item["has_glyph_program"]})
                         if (not hinted) and item["has_hint_tables"]:
                             failures.append({"kind": "unhinted_has_hint_tables", "file": item["file"]})
+                        if not hinted and not item["nonhinting_raster_metadata"]["ok"]:
+                            failures.append({"kind": "unhinted_raster_metadata", "file": item["file"], "status": item["nonhinting_raster_metadata"]})
                         raw_flag_stats = item["raw_simple_glyph_flags"]
                         if (
                             not raw_flag_stats["glyphs_checked"]
@@ -5403,6 +6013,8 @@ def audit_metadata() -> dict[str, Any]:
                             failures.append({"kind": "uppercase_ui_spelling", "file": item["file"], "samples": name_hits})
                         if not item["colon"]["ok"]:
                             failures.append({"kind": "colon_shape", "file": item["file"], "colon": item["colon"]})
+                        if not item["contextual_calt"]["ok"]:
+                            failures.append({"kind": "contextual_calt", "file": item["file"], "contextual_calt": item["contextual_calt"]})
                         if not item["digits"]["ok"]:
                             failures.append({"kind": "digit_width_features", "file": item["file"], "digits": item["digits"]})
                         if not item["contextual_spacing"]["ok"]:
@@ -5562,6 +6174,8 @@ def audit_metadata() -> dict[str, Any]:
                     "gpos_variation_store": gpos_variation_status,
                     "uppercase_ui_spelling": name_hits,
                     "colon": colon_status(path),
+                    "contextual_calt": contextual_calt_status(path, region, "Regular", italic),
+                    "output_identity": b.output_identity_status(font, region, italic, None),
                     "digit_width_instances": digit_width_instances,
                     "digit_width_static_parity": digit_width_static_parity,
                     "contextual_spacing": contextual_spacing_status(path, {"wght": 400}),
@@ -5571,6 +6185,9 @@ def audit_metadata() -> dict[str, Any]:
                     },
                 }
                 variable_count += 1
+                contextual_calt_reports.append({"file": item["file"], **item["contextual_calt"]})
+                if not item["output_identity"]["ok"]:
+                    failures.append({"kind": "output_identity", "file": item["file"], "identity": item["output_identity"]})
                 if len(samples["variable"]) < 4:
                     samples["variable"].append(item)
                 if item["vendor"] != b.OS2_VENDOR_ID:
@@ -5583,13 +6200,13 @@ def audit_metadata() -> dict[str, Any]:
                             "status": item["raw_gvar_integrity"],
                         }
                     )
-                if item["codepage_range_1"] != b.OS2_CODEPAGE_RANGE_1:
+                if item["codepage_range_1"] != expected_codepage_range_1(region):
                     failures.append(
                         {
                             "kind": "vf_codepage_range_1",
                             "file": item["file"],
                             "got": item["codepage_range_1"],
-                            "expected": b.OS2_CODEPAGE_RANGE_1,
+                            "expected": expected_codepage_range_1(region),
                         }
                     )
                 if not item["legal_names"]["ok"]:
@@ -5742,6 +6359,8 @@ def audit_metadata() -> dict[str, Any]:
                     failures.append({"kind": "uppercase_ui_spelling", "file": item["file"], "samples": name_hits})
                 if not item["colon"]["ok"]:
                     failures.append({"kind": "colon_shape", "file": item["file"], "colon": item["colon"]})
+                if not item["contextual_calt"]["ok"]:
+                    failures.append({"kind": "contextual_calt", "file": item["file"], "contextual_calt": item["contextual_calt"]})
                 bad_digit_instances = {
                     weight: status
                     for weight, status in item["digit_width_instances"].items()
@@ -5778,7 +6397,20 @@ def audit_metadata() -> dict[str, Any]:
                     )
             finally:
                 font.close()
-    return {"failures": failures, "static_count": static_count, "variable_count": variable_count, "samples": samples}
+    expected_calt_fonts = {display_path(path) for path in release_font_paths()}
+    if len(contextual_calt_reports) != 156 or {item["file"] for item in contextual_calt_reports} != expected_calt_fonts:
+        failures.append({"kind": "contextual_calt_coverage", "fonts_checked": len(contextual_calt_reports)})
+    if len(head_bounds_reports) != 156 or {item["file"] for item in head_bounds_reports} != expected_calt_fonts:
+        failures.append({"kind": "head_bounds_coverage", "fonts_checked": len(head_bounds_reports)})
+    if len(regular_bounds_reports) != 36 or {item["file"] for item in regular_bounds_reports} != {display_path(path) for path in regular_sources}:
+        failures.append({"kind": "regular_vertical_bounds_coverage", "fonts_checked": len(regular_bounds_reports)})
+    if len(proportional_default_reports) != 156 or {item["file"] for item in proportional_default_reports} != expected_calt_fonts:
+        failures.append({"kind": "proportional_defaults_coverage", "fonts_checked": len(proportional_default_reports)})
+    return {"failures": failures, "static_count": static_count, "variable_count": variable_count,
+            "source_han_license_documents": license_documents,
+            "contextual_calt_reports": contextual_calt_reports, "head_bounds_reports": head_bounds_reports,
+            "regular_vertical_bounds_reports": regular_bounds_reports,
+            "proportional_default_reports": proportional_default_reports, "samples": samples}
 
 
 def audit_static_exact() -> list[dict[str, Any]]:
@@ -8404,6 +9036,23 @@ def build_audit_gate(
     }
 
 
+def hint_execution_coverage_failures(items: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    expected = {(region, weight, italic) for region in b.REGION_ORDER for weight in EXPECTED_WEIGHTS for italic in (False, True)}
+    actual = {(item.get("region"), item.get("weight"), item.get("italic")) for item in items}
+    if len(items) != 72 or actual != expected:
+        return [{"kind": "hint_execution_font_coverage", "fonts": len(items)}]
+    failures = []
+    for item in items:
+        status = item.get("native_hint_execution", {})
+        if (status.get("complete") is not True or status.get("full_glyph_ppems") != [12, 16]
+                or status.get("regression_ppems") != list(range(6, 201))
+                or status.get("modes") != ["normal", "mono", "lcd"]
+                or not status.get("glyphs") or not status.get("regression_glyphs")
+                or status.get("loads_checked") != 3 * (2 * status.get("glyphs", 0) + 195 * len(status.get("regression_glyphs", [])))):
+            failures.append({"kind": "hint_execution_glyph_coverage", "region": item["region"], "weight": item["weight"], "italic": item["italic"]})
+    return failures
+
+
 def instruction_raster_coverage_failures(
     static_exact: list[dict[str, Any]],
     static_raster: list[dict[str, Any]],
@@ -8413,6 +9062,21 @@ def instruction_raster_coverage_failures(
         for item in static_raster
     }
     failures: list[dict[str, Any]] = []
+    for raster in static_raster:
+        if raster.get("weight") not in UPSTREAM_EXACT_WEIGHTS:
+            continue
+        policy = raster.get("hint_policy_reference", {})
+        if (raster.get("comparison_mode") != "official-hinted-native-fallback"
+                or policy.get("complete") is not True
+                or policy.get("reference_construction") != "fixed-upstream-instructions-with-native-none-fallback"
+                or policy.get("prefix_glyphs_checked", 0) <= 0
+                or policy.get("source_fallback_glyphs", 0) <= 0
+                or policy.get("fallback_classification") != "independent-native-policy-instructions"
+                or policy.get("control_codepoints") != [f"U+{cp:04X}" for cp in b.UI_AUTOHINT_UNSCALED_CODEPOINTS]
+                or any(not isinstance(policy.get(key), str) or not re.fullmatch(r"[0-9a-f]{64}", policy[key])
+                       for key in ("source_pass1_sha256", "native_policy_source_sha256", "reference_sha256", "original_reference_sha256"))):
+            failures.append({"kind": "missing_independent_hint_policy_reference", "region": raster.get("region"),
+                             "weight": raster.get("weight"), "italic": raster.get("italic")})
     for item in static_exact:
         instruction_differences = item.get("observations", {}).get("instruction_bytecode_differences", 0)
         if not item.get("hinted") or not instruction_differences:
@@ -8551,6 +9215,10 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="复用一次 --skip-raster 生成的完整非栅格报告，只补跑栅格审计并合并输出",
     )
+    parser.add_argument(
+        "--checkpoint-dir", type=Path,
+        help="按章节原子保存中间结果；仅在字体、来源、工具、参数及审计代码完全匹配时续跑",
+    )
     return parser.parse_args()
 
 
@@ -8595,6 +9263,18 @@ def main() -> None:
     raster_weights = parse_csv(args.raster_weights, EXACT_WEIGHTS, "weights")
     input_manifest = audit_input_manifest()
     contract_manifest = audit_contract_manifest()
+    checkpoint_paths: list[Path] = []
+    checkpoint_sources: list[dict[str, Any]] = []
+    checkpoint_tools: dict[str, Any] = {}
+    if args.checkpoint_dir is not None:
+        log("validating checkpoint source and tool provenance")
+        checkpoint_paths, checkpoint_tools = audit_checkpoint_sources()
+        checkpoint_sources = checkpoint_file_manifest(checkpoint_paths)
+    checkpoints = AuditCheckpoints(args.checkpoint_dir, {
+        "input_manifest": input_manifest, "audit_contract": contract_manifest,
+        "source_manifest": checkpoint_sources, "tool_identity": checkpoint_tools,
+    })
+    step = checkpoints.run
     raster_scope_complete = (
         not args.skip_raster
         and raster_regions is None
@@ -8635,6 +9315,7 @@ def main() -> None:
             "vf_source_gpos_variations",
             "input_manifest",
             "audit_contract",
+            "source_han_license_documents",
         }
         missing_sections = sorted(required_sections - set(checkpoint))
         if missing_sections:
@@ -8654,6 +9335,7 @@ def main() -> None:
             "static_count": int(checkpoint_summary["static_fonts_checked"]),
             "variable_count": int(checkpoint_summary["variable_fonts_checked"]),
             "samples": checkpoint["metadata_samples"],
+            "source_han_license_documents": checkpoint["source_han_license_documents"],
         }
         static_exact = checkpoint["static_exact"]
         static_extension_sources = checkpoint["static_extension_sources"]
@@ -8700,33 +9382,33 @@ def main() -> None:
         vf_contextual_spacing: list[dict[str, Any]] = []
         vf_source_gpos_variations: list[dict[str, Any]] = []
     else:
-        metadata = audit_metadata()
-        static_exact = audit_static_exact()
-        static_extension_sources = audit_static_extension_sources()
-        cl_source_outlines = audit_static_cl_source_outlines()
-        cl_boundaries = audit_static_cl_boundaries()
-        static_layout_templates = audit_static_layout_templates()
-        static_propdigits_shaping = audit_static_propdigits_shaping()
-        static_palt_shaping = audit_static_palt_shaping()
-        static_em_dash_shaping = audit_static_em_dash_shaping()
-        static_ellipsis_shaping = audit_static_ellipsis_shaping()
-        static_upstream_dash_sources = audit_static_upstream_dash_sources()
-        vf_em_dash_shaping = audit_vf_em_dash_shaping()
-        vf_ellipsis_shaping = audit_vf_ellipsis_shaping()
-        vf_upstream_dash_sources = audit_vf_upstream_dash_sources()
-        vf_metrics = audit_vf_metrics()
-        vf_engine_metrics = audit_vf_engine_metrics()
+        metadata = step("metadata", audit_metadata)
+        static_exact = step("static_exact", audit_static_exact)
+        static_extension_sources = step("static_extension_source", audit_static_extension_sources)
+        cl_source_outlines = step("cl_source_outline", audit_static_cl_source_outlines)
+        cl_boundaries = step("cl_static_boundary", audit_static_cl_boundaries)
+        static_layout_templates = step("static_layout_template", audit_static_layout_templates)
+        static_propdigits_shaping = step("static_propdigits_shaping", audit_static_propdigits_shaping)
+        static_palt_shaping = step("static_palt_shaping", audit_static_palt_shaping)
+        static_em_dash_shaping = step("static_em_dash_shaping", audit_static_em_dash_shaping)
+        static_ellipsis_shaping = step("static_ellipsis_shaping", audit_static_ellipsis_shaping)
+        static_upstream_dash_sources = step("static_upstream_dash_source", audit_static_upstream_dash_sources)
+        vf_em_dash_shaping = step("vf_em_dash_shaping", audit_vf_em_dash_shaping)
+        vf_ellipsis_shaping = step("vf_ellipsis_shaping", audit_vf_ellipsis_shaping)
+        vf_upstream_dash_sources = step("vf_upstream_dash_source", audit_vf_upstream_dash_sources)
+        vf_metrics = step("vf_metric", audit_vf_metrics)
+        vf_engine_metrics = step("vf_engine_metric", audit_vf_engine_metrics)
         classify_fonttools_vf_metric_observations(
             vf_metrics,
             vf_engine_metrics,
         )
-        vf_source_pairing = audit_vf_source_pairing()
-        vf_weight_curves = audit_vf_weight_curve_continuity()
-        vf_cjk_strokes = audit_vf_cjk_stroke_consistency()
-        vf_contextual_spacing = audit_vf_contextual_spacing()
-        vf_source_gpos_variations = audit_vf_source_gpos_variations()
+        vf_source_pairing = step("vf_source_pairing", audit_vf_source_pairing)
+        vf_weight_curves = step("vf_weight_curve", audit_vf_weight_curve_continuity)
+        vf_cjk_strokes = step("vf_cjk_stroke", audit_vf_cjk_stroke_consistency)
+        vf_contextual_spacing = step("vf_contextual_spacing", audit_vf_contextual_spacing)
+        vf_source_gpos_variations = step("vf_source_gpos_variation", audit_vf_source_gpos_variations)
 
-    static_raster = [] if args.skip_raster else audit_static_raster(
+    static_raster = [] if args.skip_raster else step("static_raster", audit_static_raster,
         ppems,
         args.raster_jobs,
         regions=raster_regions,
@@ -8749,6 +9431,7 @@ def main() -> None:
             )
         )
     if not args.skip_raster and not args.raster_only:
+        coverage_failures.extend(hint_execution_coverage_failures(static_raster))
         coverage_failures.extend(
             instruction_raster_coverage_failures(static_exact, static_raster)
         )
@@ -8806,7 +9489,7 @@ def main() -> None:
         "static_exact_observations": static_exact_observations,
         "static_raster_cases": len(static_raster),
         "static_official_raster_cases": sum(
-            item.get("comparison_mode") == "official-hinted-exact"
+            item.get("comparison_mode") == "official-hinted-native-fallback"
             for item in static_raster
         ),
         "static_extension_nohint_raster_cases": sum(
@@ -8815,6 +9498,10 @@ def main() -> None:
         ),
         "static_raster_coverage": static_raster_coverage,
         "static_raster_renders": sum(item.get("renders_checked", 0) for item in static_raster),
+        "static_raster_original_hint_differences": sum(
+            item.get("hint_policy_reference", {}).get("original_raster_differences", 0)
+            for item in static_raster
+        ),
         "cl_static_boundary_cases": len(cl_boundaries),
         "static_layout_template_cases": len(static_layout_templates),
         "static_propdigits_shaping_cases": len(static_propdigits_shaping),
@@ -8929,9 +9616,9 @@ def main() -> None:
                 "栅格阶段再于 FT_LOAD_NO_HINTING 下逐码位比较同字重 hinted/unhinted，确保重新 hint 未改变基础轮廓。"
             ),
             "dash_static_vf_source_boundary": (
-                "Source Han/Shanggu 的静态 TTF 与 VF 发布路径在破折号轮廓平移、side bearing 和少量量化上并非 exact；"
-                "审计分别要求静态成品与静态源、VF 成品与 VF 源逐角色 exact，并只把跨产品的一字形与 2em advance 语义作为失败项。"
-                "跨产品 exact bounds 与 FreeType 位图差异完整保留为观察数据，不用前缀或过滤隐藏。"
+                "分别按固定静态源与可变源核验破折号。横排来源间的整字平移与量化差异完整记录；"
+                "竖排必须由连续的 1em 片段组成，逐片段检查墨迹边界与接缝，"
+                "在发布字重让 HarfBuzz 同时读取两端，竖排整体边界或栅格连续性不一致均失败。"
             ),
             "vf_source_hmtx_differences": (
                 "Inter 轮廓按 public 200/300/350/400/600/700/900 七个设计控制点核验，并在 "
@@ -8942,7 +9629,7 @@ def main() -> None:
             ),
             "vf_source_alias_handling": (
                 "来源轮廓比较可沿最终字体的 cmap alias 组寻找对应上游 glyph，但不允许回退到另一套轮廓基线；"
-                "同时对除数字和冒号外的完整 cmap alias 分区与同地区官方 Sarasa Ui SemiBold 做严格核验。"
+                "同时对除明确列出的 37 个比例码位和破折号外的完整 cmap alias 分区与同地区官方 Sarasa Ui SemiBold 做严格核验。"
             ),
             "vf_source_gpos_variations": (
                 "Source Han 的静态与 VF 发布物可能包含不同的 kern/palt/vpal 定位值；静态成品按 Sarasa 静态参考同步，"
@@ -9013,7 +9700,23 @@ def main() -> None:
         "vf_contextual_spacing": vf_contextual_spacing,
         "vf_source_gpos_variations": vf_source_gpos_variations,
         "metadata_samples": metadata["samples"],
+        "source_han_license_documents": metadata.get("source_han_license_documents"),
     }
+    if args.checkpoint_dir is not None:
+        final_paths, final_tools = audit_checkpoint_sources()
+        if (
+            audit_input_manifest() != input_manifest
+            or audit_contract_manifest() != contract_manifest
+            or final_paths != checkpoint_paths
+            or checkpoint_file_manifest(final_paths) != checkpoint_sources
+            or final_tools != checkpoint_tools
+        ):
+            raise ValueError("审计期间字体、来源、工具或代码发生变化；不能使用本轮断点结果发布")
+        report["checkpoints"] = {
+            "provenance_sha256": checkpoints.provenance_sha256,
+            "reused_sections": checkpoints.reused, "computed_sections": checkpoints.computed,
+            "inputs_rechecked": True,
+        }
     args.report.parent.mkdir(parents=True, exist_ok=True)
     portable_report = b.sanitize_report_data(report)
     report_text = json.dumps(portable_report, ensure_ascii=False, indent=2)

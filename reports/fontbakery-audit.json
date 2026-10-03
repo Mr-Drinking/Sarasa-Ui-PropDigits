@@ -1,6 +1,6 @@
 {
   "title": "FontBakery 分地区发布检查",
-  "generated_at": "2026-09-13T00:53:08.294133+00:00",
+  "generated_at": "2026-10-03T06:46:18.891225+00:00",
   "toolchain": {
     "fontbakery": "1.1.0",
     "freetype-py": "2.3.0",
@@ -12,635 +12,680 @@
       "freetype-py": "2.3.0",
       "fonttools": "4.63.0"
     },
+    "locked_packages": {
+      "beziers": "0.6.0",
+      "booleanoperations": "0.10.0",
+      "brotli": "1.2.0",
+      "certifi": "2026.7.22",
+      "cffi": "2.1.1",
+      "cffsubr": "0.4.0",
+      "charset-normalizer": "3.5.1",
+      "cmarkgfm": "2025.10.22",
+      "commandlines": "0.4.1",
+      "defcon": "0.12.2",
+      "dehinter": "4.0.0",
+      "fontbakery": "1.1.0",
+      "fontmath": "0.10.0",
+      "fonttools": "4.63.0",
+      "freetype-py": "2.3.0",
+      "idna": "3.19",
+      "jinja2": "3.1.6",
+      "markdown-it-py": "4.2.0",
+      "markupsafe": "3.0.3",
+      "mdurl": "0.1.2",
+      "munkres": "1.1.4",
+      "opentype-sanitizer": "9.2.0",
+      "opentypespec": "1.9.2",
+      "packaging": "26.3",
+      "pip": "26.2.1",
+      "pip-api": "0.0.35",
+      "pyclipper": "1.4.0",
+      "pycparser": "3.0",
+      "pygments": "2.21.0",
+      "pyyaml": "6.0.3",
+      "requests": "2.34.2",
+      "rich": "15.0.0",
+      "toml": "0.10.2",
+      "ufo2ft": "3.9.0",
+      "ufolint": "1.2.0",
+      "uharfbuzz": "0.56.1",
+      "unicodedata2": "17.0.1",
+      "urllib3": "2.7.0",
+      "vharfbuzz": "0.3.1",
+      "zopfli": "0.4.3"
+    },
+    "lockfile": "requirements-fontbakery.lock",
+    "lockfile_sha256": "70fbdd37755e6d6b7d00d25ad5d9abb7f00d2f636458b0f2bac5632f61c5212a",
+    "require_hashes": true,
     "pip_check": {
       "returncode": 0,
       "passed": true
     }
   },
   "input_manifest": {
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-ExtraLight.ttf": {
-      "size": 13326572,
-      "sha256": "7520d02e2e3d7f2e5b3aef97af15fc7d8ac620ae61ea0d87707e8f382f829eb8"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-ExtraLight.ttf": {
+      "size": 13239452,
+      "sha256": "4ea15adaf863a41b82c3e9e835d954ddeb553269dbfebef0b48a135564da9115"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
-      "size": 14119684,
-      "sha256": "11bf5fadd9c9afa9e2e09de7bcbe124737ddee19024903d5ac1879cc55b9b913"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
+      "size": 14032540,
+      "sha256": "4dc47a5f0c213348ab21e7007cfcadb217580a91cd240a55bae4b3508a9ad81a"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Light.ttf": {
-      "size": 13306684,
-      "sha256": "0cc1ee89e8603ccb07447c21605f34c8450b8c46d29e480f5a607a139e747aab"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-Light.ttf": {
+      "size": 13219564,
+      "sha256": "bdc59236108c435aa4f6c54143acb1adc50b387dc618b66d574487a34747ada4"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-LightItalic.ttf": {
-      "size": 14098636,
-      "sha256": "e823a3cf298fd07718f6d4f3dd09e35480353ffa6c607d76363fe2639da32462"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-LightItalic.ttf": {
+      "size": 14011488,
+      "sha256": "1e256822c110472d9698c7d664d76777e9b3e8aca88dab1ebb514d6876618b38"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Regular.ttf": {
-      "size": 13192880,
-      "sha256": "0fdbf207ecab5613e7fff07cd12d4c75eece3a5ff779b2eb6ddc35b5b56e8992"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-Regular.ttf": {
+      "size": 13105792,
+      "sha256": "0dbd873b5595b855787426d66bbbe654e882fde65967dcbd1fb7ab4102f3cab3"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Italic.ttf": {
-      "size": 13985632,
-      "sha256": "97f2b17afb3a9db3ea3abff3b4a2e13c565b11121c9808a287965a7d18a85ff4"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-Italic.ttf": {
+      "size": 13898516,
+      "sha256": "169628662188ae607c38338dd00742c24039568aa0ddc324fb2849418df31218"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-SemiBold.ttf": {
-      "size": 13115800,
-      "sha256": "46ee2284eb4e8fd2b14cf4e59d322375d5a357e83fc5e0ce6420cae774769bd6"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-SemiBold.ttf": {
+      "size": 13028676,
+      "sha256": "866080287d8a0e41f69c3d3e224b84897263192c9d95fc48cd06b3c7062bd393"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
-      "size": 13910024,
-      "sha256": "5bdd32f760eac5571381c2bab1b5e0491892382ad31a1ee77be77c5c792707db"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
+      "size": 13822876,
+      "sha256": "23b5a9c42fe7025fcb1152df3dd2f79d5ecc2ea745bff309bb2921d549e8c823"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Bold.ttf": {
-      "size": 13025220,
-      "sha256": "176ccfd26e04d68fd6f599e522618aba94171b9c9ce0562de6577b1e61ab3afd"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-Bold.ttf": {
+      "size": 12938100,
+      "sha256": "107b1ded338d959dae29d298369061df1f380748f9d31cc0fc0b693b40cc2e81"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-BoldItalic.ttf": {
-      "size": 13819648,
-      "sha256": "ccb9e47b0912f9e24e868b305622bd6849c732bc4f7bd595f29853a5cbd40cae"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-BoldItalic.ttf": {
+      "size": 13732532,
+      "sha256": "31941b8b89eae880b4485e336977bfd05c573eed89a49f3ee55c13d8306fb062"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-Heavy.ttf": {
-      "size": 12912556,
-      "sha256": "24a14aa684e857587014dbf2a83d71a547dd334865f7f267bd163f229cc7e095"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-Heavy.ttf": {
+      "size": 12825440,
+      "sha256": "8f72fb90e0146623763eb5f0d9640be228d46d740a0d0ccdb4ba27453b8a6ce7"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
-      "size": 13714296,
-      "sha256": "22cd6e208544ec3431636a9d495f9b689ca21b693d2dbd0b6510a99d176e0709"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.42/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
+      "size": 13627152,
+      "sha256": "0f08ef2a9958d0b73f6314a117a462187ed1097da4db94e7323ebe0fc05032ad"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-ExtraLight.ttf": {
-      "size": 24286044,
-      "sha256": "b4d615394fc2ebb2e0b27cec2212bead8b4352a825f026bb56d63ca768972177"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-ExtraLight.ttf": {
+      "size": 24054764,
+      "sha256": "86d225e102d2bcf3cf0fc00b47f6f03343ad91907d7b98c5ffd522e89271e075"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
-      "size": 25094008,
-      "sha256": "bf689840eb35b80376d209418cdcdac123d0a24a4969a7176e995a4c494633f9"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
+      "size": 24853212,
+      "sha256": "7ab35a6913c5c466aeb2465bd60f63f0ecbb2242b37aea06db36a6b152b5bf70"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Light.ttf": {
-      "size": 24415400,
-      "sha256": "63f63fa8f4f70a3b395a090314bf55513af128425e93a96b9c04c12d6d1dc1cb"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-Light.ttf": {
+      "size": 24176760,
+      "sha256": "492ef0d8d6b2c265b0417563750161911f3f72a348ec829ffcbf0d73f735cf6a"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-LightItalic.ttf": {
-      "size": 25221480,
-      "sha256": "9a011ca79225582ad62a7248799bee6f7089d67344d2b290db1210a3cf01335a"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-LightItalic.ttf": {
+      "size": 24973980,
+      "sha256": "371fd4135a7e3ca1430af8214e4efc9e422ee619eb4bc3c2e3195dad1cf902fe"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Regular.ttf": {
-      "size": 24317684,
-      "sha256": "ce1398aa78c032aa52727b8180c98ec6246e95278859c80fec86209a323a13c7"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-Regular.ttf": {
+      "size": 24068744,
+      "sha256": "31633e58a92cfa734ddcd7259a835c4b12852551965dc342c4d92362f78ce49c"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Italic.ttf": {
-      "size": 25120508,
-      "sha256": "8df3458d9ad320a4db7be48957a2314cae7fcf62b85e46deb9e540206ded815b"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-Italic.ttf": {
+      "size": 24865412,
+      "sha256": "a58003584fafa5e5557851fa926fa322c82dc07ac284dac65e681d50ae1c9915"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-SemiBold.ttf": {
-      "size": 24261844,
-      "sha256": "518b5797da185ba974278f44102f6e528ca79b54af44bf0d4ab0d8f4d7e94a39"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-SemiBold.ttf": {
+      "size": 24012276,
+      "sha256": "6f437f0134b6103489b49d7f4b02bc7eb575dc3cecad0d9df49fca518f53c457"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
-      "size": 25066684,
-      "sha256": "3535fa0a5c507dba9e4b6a2953baca895289675b897b2e89d4e10cb8ce2d1f00"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
+      "size": 24809180,
+      "sha256": "0690d4c7019873d27243811b337617e8935fbbf699ecd8e00a71434a6eab5ef4"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Bold.ttf": {
-      "size": 24173684,
-      "sha256": "de96d57d50c80d3e3a569a4b201f392b60591c48cd229fa39a0c3ae2ba6bca2c"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-Bold.ttf": {
+      "size": 23929408,
+      "sha256": "b373919b824b6b3770e61560cdab573607af4c15cec70f82d90467dc3b821ee1"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-BoldItalic.ttf": {
-      "size": 24977420,
-      "sha256": "e77e5f3410b3a1f9e611a4bcecb27232d128d1f47c2704154650fc000a439df3"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-BoldItalic.ttf": {
+      "size": 24725700,
+      "sha256": "ffe5bc33d8cb2ce91808a501b14f5c5c8e981d42319fde0f2d8e72a8c098fd95"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-Heavy.ttf": {
-      "size": 23876204,
-      "sha256": "272a99d8b4aa558668a01af8e1800ce4060bdd9c9dff93fb33add022708f0e21"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-Heavy.ttf": {
+      "size": 23631168,
+      "sha256": "c9efb211036ecb7e489d655948e2850e4ab96e72b07370cb520f7ccd8a8668bc"
     },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.40.4/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
-      "size": 24688200,
-      "sha256": "fc476fc68fc1af6234c41f1d8cf4e867582a800dbc2a16461a8fa34b1df3733b"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.42/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
+      "size": 24436580,
+      "sha256": "de9734065b0ff123e56252768abcde69c426219f779c594eea948809097350ba"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf": {
-      "size": 40409492,
-      "sha256": "f30a01095c31be16626a9f49416de3e3b4ea59156bb55dd60d86f5f49dc29bc0"
+      "size": 40423816,
+      "sha256": "d2473ced8f70b605b026185cb0a006ac39d7436c12a234048143dcb1e81d2531"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf": {
-      "size": 54968876,
-      "sha256": "91d09bc20043f6a79923daaaa04af1bdeac82e759940abd02494c19a20f2534f"
+      "size": 54983500,
+      "sha256": "eac0d85ea93eb2d6a079691a2e051bed74c0948de9f4f6105733b6ff3b3c80b9"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-ExtraLight.ttf": {
-      "size": 13367752,
-      "sha256": "fa2497358cca92a558bf76868645d43c979b27835e9360c856d3ccf7d12b86c4"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-ExtraLight.ttf": {
+      "size": 13220056,
+      "sha256": "faf7e0c4220a3f19edea89cc95eef2c07ea3b1d86a0fe2b8a1990f637eac10ec"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
-      "size": 14149548,
-      "sha256": "7115b806161f511f4a3deb0f319058d7a8b6ef65362eec3636ca5e35d2f9edf5"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
+      "size": 14001812,
+      "sha256": "c0f2c4ebb2fe4abf0482578879e1da60e2eb2222311134fc76ac3826e50e4717"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Light.ttf": {
-      "size": 13306320,
-      "sha256": "27dab305eb0a862f1e8100da74fca58f4538663b34e2f0087e177b5375af8dc4"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-Light.ttf": {
+      "size": 13158620,
+      "sha256": "2ed914f8ebf374294683db359baf412e7af2be83adc15fe2112aee0676e26d8b"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-LightItalic.ttf": {
-      "size": 14086864,
-      "sha256": "f862b537b19c4ec643453fda2a768471d86c64ac54e3bcb6d1d835dea7de474e"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-LightItalic.ttf": {
+      "size": 13939128,
+      "sha256": "76de380173251d1c56112519e76afa3d63396d9da59f46271feaff27a1605d1b"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Regular.ttf": {
-      "size": 13183340,
-      "sha256": "ba82b6370a3edb65a117a903b25dfc62fd0d48fd13154455403566bff6f1f6ff"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-Regular.ttf": {
+      "size": 13035672,
+      "sha256": "10c74ea8219f84683cd63872317d430705ae0bd36184ebc46be4ff97404ef4fc"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Italic.ttf": {
-      "size": 13962888,
-      "sha256": "bc72a01b3108250db5dd0cb6de38ff395ab04e6cdda482fc18447f7bbf3ca756"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-Italic.ttf": {
+      "size": 13815180,
+      "sha256": "3b4d8c4c9d843430def8fa39ff1f020383370c44dfebd78d53deead1b84ab2e4"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-SemiBold.ttf": {
-      "size": 13089436,
-      "sha256": "9e21b9e4a71692e21b66ce2808a97de7d199a6be77a57012ed1cfbe3982cddb9"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-SemiBold.ttf": {
+      "size": 12941736,
+      "sha256": "ad4b4dd1d86a7d3e11d12c16adb245f0e3ee0d2e07a7fcdc58a04a9b7eaf7fe1"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
-      "size": 13869992,
-      "sha256": "9586d23926b2822e3bcb97b630a1d103e8fcab02ae6eefa86cd83c6999a3ec07"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
+      "size": 13722256,
+      "sha256": "e59e00ed1502e16e384e0061cde3b1924e709e7f86535af785dae6ecacb9bdc5"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Bold.ttf": {
-      "size": 12981400,
-      "sha256": "059f60e063a2d325a2462bae0f080dc0da934c6b681d214ff8d13ebd30c74d7a"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-Bold.ttf": {
+      "size": 12833700,
+      "sha256": "6ad658db8c9a85a267ab3fe184452b2d72731b5ff5b9fe171d4d1b40b1a6abf7"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-BoldItalic.ttf": {
-      "size": 13761600,
-      "sha256": "9f24813f0b1df5b639369fe1efa62e9736cf1d9c7d6bb1c06070b17147942e25"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-BoldItalic.ttf": {
+      "size": 13613892,
+      "sha256": "ebcb9c45284459aa1c5dac2cce81a44ec14c7f7190b47afe387d8f378f4c64b1"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-Heavy.ttf": {
-      "size": 12886020,
-      "sha256": "2948c3c3ee8eee07cde1555df2fc89e6d728cf1529b87d1af64ce1bbe230a6e0"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-Heavy.ttf": {
+      "size": 12738320,
+      "sha256": "7504fce667e7b1291ed47bf4862472d8ab3f35a8d99100aebabdf261f57732c1"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
-      "size": 13671140,
-      "sha256": "b79a45fa92fdd23adf103fa736cb8d94ffe7570748a591e588146d2ae989b8c9"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
+      "size": 13523404,
+      "sha256": "dedb788b699255edcf20423bb7ca1991a12a660d7380e898fad253af6d7ee712"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-ExtraLight.ttf": {
-      "size": 24151816,
-      "sha256": "eb575c5ab3af10f0f1887c86198fc51cf4f614b938a553e4a9703367c7c9b193"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-ExtraLight.ttf": {
+      "size": 23861440,
+      "sha256": "fc9e9ae083a9a3dcee780512739bee5acc684a4bf9035321b5dfc8c429060470"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
-      "size": 24947716,
-      "sha256": "621638af300c7d6dc3fc06787a870aa3045f0e242397a4ab9063ff34197d0c2d"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
+      "size": 24648968,
+      "sha256": "30cf623f962fd1cabd1f908e85e6426ee30f4a994a35646917336efe8857629f"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Light.ttf": {
-      "size": 24232776,
-      "sha256": "375b78ae72448926d19c89426bd6b663fe3efc2ab4e77cd3e74c568e22e2aa23"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-Light.ttf": {
+      "size": 23936264,
+      "sha256": "fcfcda61d266ccb1415adb4b0b923696ebbe014e800d3db2b4cab4865131c00e"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-LightItalic.ttf": {
-      "size": 25028200,
-      "sha256": "f7debe79a4d772990cfe6ba8f76d8aed88009899fc1989c2f069af8a4d39dd3a"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-LightItalic.ttf": {
+      "size": 24722232,
+      "sha256": "2aa4e05bac1165ee18deacb13a29e3fe9348a1da6fd64db8612d00e319c99a2e"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Regular.ttf": {
-      "size": 24126620,
-      "sha256": "c434c37c5a9c47ed50c2113c76840100f5d7343db5e035dea1b5ec978b26e770"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-Regular.ttf": {
+      "size": 23819724,
+      "sha256": "176cf41ea9911e4a998509257c8fe6845e7185ffdaa6e7dd3c8fb61bdc31eafc"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Italic.ttf": {
-      "size": 24916348,
-      "sha256": "daa6da7589a7adb1fe1ffc91582c88b7cb48cb55ee97ce05b9b2a0cf8449a222"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-Italic.ttf": {
+      "size": 24603416,
+      "sha256": "5c0e09b6c09c1c36f18c29050594db7927b14d1cf7f09f93262533acd80c6a30"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-SemiBold.ttf": {
-      "size": 24054896,
-      "sha256": "e7e45a9c70b0d448fe87f008431c6974bf15cfebc3a0e59f6d498dc1112813b8"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-SemiBold.ttf": {
+      "size": 23747224,
+      "sha256": "07f50b14f610c2bcf85d03edbdd30ee1a1f5bdd1baa1b993da56496090e9a87a"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
-      "size": 24846292,
-      "sha256": "c81355b145952ffc54547dec9e93770ef8f759cda78a45218d08040fce99e20e"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
+      "size": 24531108,
+      "sha256": "886c926a2fb11baeb9ff8fa7d064319eee88006dc4f3edf7c5016ec73be2cb15"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Bold.ttf": {
-      "size": 23972416,
-      "sha256": "459909561670906f26d0fe2d18b24bd4be8045bc16b928af50a113588b93995d"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-Bold.ttf": {
+      "size": 23669856,
+      "sha256": "acd6d83f671c33ddccbddcf20841bb0deada2a0ddd6edd67125604766d5a0646"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-BoldItalic.ttf": {
-      "size": 24761788,
-      "sha256": "3ee99474d1ca0c1372423c0225d771ecfb997a2c98a4f86b47951317bba00004"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-BoldItalic.ttf": {
+      "size": 24452276,
+      "sha256": "a13b7e31175feacd293bbd84542b90b848e3bd4a35cf2497e934ed44284fed1b"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-Heavy.ttf": {
-      "size": 23694704,
-      "sha256": "f5d5c29a9010369de64ae42e3928db581d7997a4adb41d2b9bb56e96722681e1"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-Heavy.ttf": {
+      "size": 23390624,
+      "sha256": "baa4c3a90d9e97e073c64de9d914bd3b1dd330473448845ca9f783b8ab6f3a38"
     },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.40.4/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
-      "size": 24489112,
-      "sha256": "14be7341514362d57e06e3575f1164914c973c960b102a9d4d3a15366d6a32e0"
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.42/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
+      "size": 24179388,
+      "sha256": "25b3e7fe45ecd686d32cdc9cdce52717b0382f4bd674cdfa5de1c8beb27089de"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf": {
-      "size": 40111092,
-      "sha256": "27618e074893dbf6f31f5e96f3cfd69322d3f8085e67ab30c5da7d22a25b8942"
+      "size": 40125276,
+      "sha256": "3c30387e1ba8ade9e45ca73c9be61e0df6d26dd9da7ee0408b8487b4ee2e7105"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf": {
-      "size": 55171932,
-      "sha256": "182f26ddea12a3aeac94202426e4a15d0244abe3aafab89ff13b1593fd251e49"
+      "size": 55186440,
+      "sha256": "f3f52e4499000deb637717cfac40ad92962b5ee6adfb7888fe86bef1293a9db4"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-ExtraLight.ttf": {
-      "size": 13482136,
-      "sha256": "b3a149efae733ed301e3f2a013bc8e3a24d417b9746bc26a1188ce20b9204fbb"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-ExtraLight.ttf": {
+      "size": 13334260,
+      "sha256": "e7facdf700e9f2f4274701d9fa5840baa2a4617f3eee8b9b840b5eb12b97c9de"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
-      "size": 14268192,
-      "sha256": "9cc73aaf10c596a58ae8a48a6d527e05d46ac72e5a19d7248dabdd9642450437"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
+      "size": 14120268,
+      "sha256": "857216d1926fa56ed13b963fb1ced504d9278bc25c0537ddd1afdaf87c5d253c"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Light.ttf": {
-      "size": 13420964,
-      "sha256": "3d1ce78d3ea68a2c3c2dcf091eb036fc560a20e529690a8c7fe7d85822574054"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-Light.ttf": {
+      "size": 13273088,
+      "sha256": "7a3f1d164f612d838c1e55bb619aa9cfe4a12d709d44fd9296fce2ae8db4489e"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-LightItalic.ttf": {
-      "size": 14206084,
-      "sha256": "b5650078c88806cdd715750f0e41b92654398ac3dc84bf56dee9671519d4f453"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-LightItalic.ttf": {
+      "size": 14058164,
+      "sha256": "5c16be3179baf1cb53cc221b20dc08f52d0084ff0fc770533f87b42078a86029"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Regular.ttf": {
-      "size": 13297904,
-      "sha256": "f5586b9772574e39492470681322c2338d10be2b24c6a54d971d29ea4901072f"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-Regular.ttf": {
+      "size": 13150060,
+      "sha256": "362a8cbbe015696d5d4b2fed61522498e13171aab8d37800cb3a4533fb7e772a"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Italic.ttf": {
-      "size": 14082444,
-      "sha256": "f64cfec54847ac55e11b65ca24388369e2b14db36d747829c1815ac0f9639cba"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-Italic.ttf": {
+      "size": 13934556,
+      "sha256": "c833878c695f85dd3d4fba0fc0086865f0e024a1fff967b4d620452632a7dcc9"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-SemiBold.ttf": {
-      "size": 13204960,
-      "sha256": "ea0ea031fd1f22dba7f32b16c424eae2fcb440815b0147fb7f63dd3a7513ff82"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-SemiBold.ttf": {
+      "size": 13057084,
+      "sha256": "019be4549e6d32d36e9edde3454fc4ffd6906485307c28d3716b448cf13e482a"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
-      "size": 13990924,
-      "sha256": "e42f31d134b0ce4b5aecbd02fb58cb3728ecc0aca6ed41e870f0925f582fab06"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
+      "size": 13843004,
+      "sha256": "be0893d7ef09dcf513b9dc77215d95ef732e54965b3fb2a038b14d480fdd195b"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Bold.ttf": {
-      "size": 13095988,
-      "sha256": "8139083fece2a1301a8c738f3f8fe41b9210ab60086669abac124ec67ef3bd68"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-Bold.ttf": {
+      "size": 12948112,
+      "sha256": "3de22406236cd02dedfab1cb94cc5680cce920d6345fc76182121caeb6071145"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-BoldItalic.ttf": {
-      "size": 13882112,
-      "sha256": "5c410c7cd76e2c612165b09809ae5d6b194d257c99b580aed5a3b2f222954805"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-BoldItalic.ttf": {
+      "size": 13734224,
+      "sha256": "59c5fbeb58bd7d4544172997bb160fa2c70a99a4f0e8987df71d08c031f132dc"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-Heavy.ttf": {
-      "size": 12994128,
-      "sha256": "7d59ed3dd30d971dbc1689ace1b010e45fd3bfa20d5b9df604da5964f948356f"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-Heavy.ttf": {
+      "size": 12846256,
+      "sha256": "e238649efba52d5821f782bbd47f9f32841e1908b84e28897c6b77f88ca43901"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
-      "size": 13785200,
-      "sha256": "d7cd536358c2370d7d5aa7c9e84c7b0baecb599a047e7c8560f0271e06a0a166"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
+      "size": 13637280,
+      "sha256": "d4d024837dfd1f7520b6a9648a61fd38d5b99fba7d7d5e15bacb0ee2d8af3f27"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-ExtraLight.ttf": {
-      "size": 24333944,
-      "sha256": "a938f11052c823631e2ae4e6f6b8bb4ec636b9e482b9f731cc8fb057f3565409"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-ExtraLight.ttf": {
+      "size": 24044116,
+      "sha256": "d27cbe126092932555dd11f692ef32dc981729f7905774a4aa52d7f61bcfb78c"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
-      "size": 25134172,
-      "sha256": "e5ce46afaa631abca4d402d7d1113be94cfae67287e4b33419e8b8c88984635e"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
+      "size": 24835744,
+      "sha256": "86f1e0127e76f2d9269a97b79b91954d30eb7fae0e88aa25c694870317f780a0"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Light.ttf": {
-      "size": 24415332,
-      "sha256": "48504b5be0eb6249cef113dce8c46abab0a7eb17e0aa96cd6a19ae1f689f7206"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-Light.ttf": {
+      "size": 24119036,
+      "sha256": "9edbe644f9bbfacf77cedf54fb673894732c422af068cb8dd8dc809233ea58d3"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-LightItalic.ttf": {
-      "size": 25215352,
-      "sha256": "7e7af9d1cd0c338f653e2aa2c5aa75b4baa0f56f4e9d73dcfac76a9cc28cc5be"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-LightItalic.ttf": {
+      "size": 24909512,
+      "sha256": "91cfc69bc47f643443536fa3171798e59a6b6b42ea2437509636740449efc27c"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Regular.ttf": {
-      "size": 24314160,
-      "sha256": "96c9f5a5a089070b530d3c826a3f76b665721b4e86d2418b14973112d7b09f99"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-Regular.ttf": {
+      "size": 24005880,
+      "sha256": "7dcd1590208476629297aa44dacb28e873e3e3ab13d38265598fa9934d2828dc"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Italic.ttf": {
-      "size": 25109044,
-      "sha256": "db94e35e6b13e4e7592a3d800bfc1a1e9a47f024bec9aaba3df093695bc0d6cc"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-Italic.ttf": {
+      "size": 24794536,
+      "sha256": "4d0db899c6b9e77411d3761c9aa74b7a64f0d1fe055e5cb51a2d876f68027f8d"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-SemiBold.ttf": {
-      "size": 24254800,
-      "sha256": "8ce0c46fe4af51e4d82cc92a51bec4140287c85a110537ad718154351d62d13e"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-SemiBold.ttf": {
+      "size": 23946144,
+      "sha256": "386f6f311b06a3b393b244a8e7691a8b8d060f26c88b652eb32d0ff44bcbe59b"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
-      "size": 25051412,
-      "sha256": "8ef6db71b4793cab76b4bf33f91192f65b70eb77d5b0ace784addc688c1555c7"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
+      "size": 24735192,
+      "sha256": "d14d1db1a448f83da6348f91414ff05daeb27637e9c84aaac7e15fe80b478c1f"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Bold.ttf": {
-      "size": 24174788,
-      "sha256": "fd8a837ce4863846f7efed8f22d909269183728ec1e26b73e6e69b8e3a8b133f"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-Bold.ttf": {
+      "size": 23871744,
+      "sha256": "bb62b9aae455e16fd242f2110d37728a50c312c48b02906ffaa91e7110133246"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-BoldItalic.ttf": {
-      "size": 24970172,
-      "sha256": "d77af26b40263d1925351fa86cc23598ede97e10374375cd346fe26fd87fcd33"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-BoldItalic.ttf": {
+      "size": 24660160,
+      "sha256": "7c4a7df9fa59104fdc67a5790f1796330e6d9e2c1d999e67e8eb19085053ec5b"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-Heavy.ttf": {
-      "size": 23897484,
-      "sha256": "cfc7a1b0a842ae38df2774a29b04b40f5528a6e0dc3ae6c054ba91a598561d62"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-Heavy.ttf": {
+      "size": 23592700,
+      "sha256": "7156ab797ed87f47471415ce427d5bcb535e0e83086622432429f1dc7df11769"
     },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.40.4/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
-      "size": 24698884,
-      "sha256": "a4712a653ea43027364c69daae6ce617cce9138efcdd7af8062dc1cd228d54f1"
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.42/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
+      "size": 24388148,
+      "sha256": "6e401ee007a352276a9ceeea306eba0c1e4b7378913281847bf11903d73a99b2"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf": {
-      "size": 40497984,
-      "sha256": "7623ccae5c963ca857641b33ee8fe33795e2abea997e4235fd8edcb51ee07416"
+      "size": 40512056,
+      "sha256": "2ee0cfced97ae26da1576739f256e86a63c5b1e81550f0285c6565d2b03ec485"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf": {
-      "size": 55822968,
-      "sha256": "9f7410b85d4de42afd382c934c8859d8e794d806048432c1c4dc001364c67abc"
+      "size": 55837376,
+      "sha256": "fa6602f06a6395fb79c176a164d874a18ead7579afb269c08c782dfd325295cb"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-ExtraLight.ttf": {
-      "size": 13458716,
-      "sha256": "37408316bdaaaa9dcef2b63f189f6086b9d70d8219906df9b0552134954b8484"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-ExtraLight.ttf": {
+      "size": 13310904,
+      "sha256": "ca9247f57845f80fa949b0318c56aa4df89c9c18d73f317724838628b9c19841"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
-      "size": 14244576,
-      "sha256": "4365542e190977487397b2d612dffde8a6db3e3386753405d9b3d3371c08d7f2"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
+      "size": 14096716,
+      "sha256": "9d4fbeedc1227d1d8c3ee2e56bef8cb271b4b85f7d82701150342173940d08f2"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Light.ttf": {
-      "size": 13397012,
-      "sha256": "1401b4a60c41016da62d453b176e0ba6aa912f62c537d5b449b3f40e18b743e5"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-Light.ttf": {
+      "size": 13249204,
+      "sha256": "35e7d6fb9e763153f254d09cbb7128972c08f389307bb6912f5d7ff7c3f8ef65"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-LightItalic.ttf": {
-      "size": 14182024,
-      "sha256": "c3a0345ea2479f148f99a719d73ea04ac080c8d581bdeccca6d0f6389234b635"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-LightItalic.ttf": {
+      "size": 14034168,
+      "sha256": "1943b78a7f36f6e4d5c6e6a74180f11e23b8f981ac1e58a968733431feaaa166"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Regular.ttf": {
-      "size": 13271688,
-      "sha256": "80077caa3664ee792d7e706daa27287a24fcb119ec84b308dbd73bb074328a02"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-Regular.ttf": {
+      "size": 13123912,
+      "sha256": "70d5b4f05a309a8c43cacdb2303c8df5679073c766a0e6a7e4951c27eadb2e58"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Italic.ttf": {
-      "size": 14056304,
-      "sha256": "776e65c9e67220a6df67660c2b91bf825f8af53cb02ceed1ce18b27448942744"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-Italic.ttf": {
+      "size": 13908480,
+      "sha256": "5bcd56410262ef63862d33b9190582e235ae189bbd95afdcc767cb762f9120ab"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-SemiBold.ttf": {
-      "size": 13178180,
-      "sha256": "47b646391bb1144b7914d19858ae42e563dbc468f21a0797ed904b13487412ec"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-SemiBold.ttf": {
+      "size": 13030372,
+      "sha256": "97a78256cd98eab922b9fd4f9d44009b51a2d1763ad4aad88965f4a7839feb86"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
-      "size": 13964052,
-      "sha256": "4679bc91eb5defb78c355271d51761dcf7987d1f6d9884c74b8aaebc9eb64744"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
+      "size": 13816196,
+      "sha256": "b031542f4c4a73793fbc0b1a685a8219054e3b2d909de3fec70eb63849d9d51a"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Bold.ttf": {
-      "size": 13068784,
-      "sha256": "c080bb901fd77d286ac99dc7d5de2d135d52da5454b02741f23bf68ae8f8a8ba"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-Bold.ttf": {
+      "size": 12920972,
+      "sha256": "cc8ebcd9346416895bbdd192b70bda140afbeb89ac7f4a758530b809e37ae75b"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-BoldItalic.ttf": {
-      "size": 13854744,
-      "sha256": "3951d6f0920c0c4702dc0b4d85eacbc008330e632381f33b605e405c83df694a"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-BoldItalic.ttf": {
+      "size": 13706920,
+      "sha256": "2ee18235a6cce16731624543b20d84d3a48f97ff33859ee6084f90a60868da97"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-Heavy.ttf": {
-      "size": 12966200,
-      "sha256": "0fafbb568675e9af556e192cdc9338d7e119ac86c7c454f76fee6ae6de99f71d"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-Heavy.ttf": {
+      "size": 12818388,
+      "sha256": "872afcee7ff26d87f75441931e649710a3a079544d0a35f8de78e23cec0ad519"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
-      "size": 13756864,
-      "sha256": "5cefd33c939124f5a9a7edf1c01c093d68377377b2cd02d7bac3c2c606b804cb"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.42/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
+      "size": 13609008,
+      "sha256": "f02c64ca0852ae61e8e2986e49e5d57a423f5f61812a0448588c50eb14aaf58a"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-ExtraLight.ttf": {
-      "size": 24307276,
-      "sha256": "63136b9ecd79b7de55fb41ddd0e039f28c2849bf4061bfa2ba52ab0ea2027456"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-ExtraLight.ttf": {
+      "size": 24017456,
+      "sha256": "406b80823a3316e48ad6f3e9d0ddbce8516e7803df971e13cbf7d9b9e07d0901"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
-      "size": 25107392,
-      "sha256": "a14bd85a2831135ab6583c218b51badee292bb97ce26730cde250d86e2c96786"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
+      "size": 24808972,
+      "sha256": "5a178aff317e2270bfcc497cef413c5c6123a95d44a01dcaee922e2767142d5b"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Light.ttf": {
-      "size": 24386388,
-      "sha256": "fbe9d594cdadbbf7d9d825624d33bfdf6637c0b26e8b48d646be3340020c305a"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-Light.ttf": {
+      "size": 24090000,
+      "sha256": "87c88b91f034a29ca3c7ab712d587664fa79fd3c01e3a4e749f861d685acc018"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-LightItalic.ttf": {
-      "size": 25186384,
-      "sha256": "954ca75ecd7afb30468e83c885d052cbb50be053793c6b59169c0924b969b294"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-LightItalic.ttf": {
+      "size": 24880460,
+      "sha256": "56a3f071a19f0188e2046845158c4a5b74ab78eb2730721b4a3b64ee09eee34e"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Regular.ttf": {
-      "size": 24283956,
-      "sha256": "aeff6b10463ae1527c42d8084b99ad73feba5b9eb6532964769f879b0264b262"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-Regular.ttf": {
+      "size": 23976264,
+      "sha256": "83a34a719cfc7ad9e72fae67f96ee7fac08223017c0adc00dbc8c0287640f3a8"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Italic.ttf": {
-      "size": 25078860,
-      "sha256": "9e4c695f758d73dabf2ad36bc705f6cdd8e983d32d327e4fe6fdc94436d60631"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-Italic.ttf": {
+      "size": 24764940,
+      "sha256": "9fa9376757eb5d54e8a2dace826fd9da544d52bae758a4f9a4fecdc80bf0969b"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-SemiBold.ttf": {
-      "size": 24221528,
-      "sha256": "9e4aed0fbad07b958c7cb1a6343363f96e1271928d0ca03b9713127501904a0f"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-SemiBold.ttf": {
+      "size": 23912788,
+      "sha256": "957bd91cc480688eb08c9af683786daa1cc4173183ed5dead67185c64fc43b20"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
-      "size": 25018044,
-      "sha256": "0a57fa62e3c794ee148db96632f7348af920a4ec00c0c4691e397fb78e5ee170"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
+      "size": 24701736,
+      "sha256": "bb9a41600e8959ba968c2499f382f469a1f7b9eba0822036e5f09ad49c66296d"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Bold.ttf": {
-      "size": 24137192,
-      "sha256": "ee0de8ac49a3d49b81a7609d5101f83b6a1ea8ae98084530243638ed1aede636"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-Bold.ttf": {
+      "size": 23834332,
+      "sha256": "c754d5b6d707a30e020d336259ee1ae21f2b57ce628cf3d45a98a7aa78982984"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-BoldItalic.ttf": {
-      "size": 24932408,
-      "sha256": "9f85ef27d3c0f3d0b405b7b16ac8a3cb020d6f53044eb4b5a3176b283e21c7ee"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-BoldItalic.ttf": {
+      "size": 24622572,
+      "sha256": "42fc4c189e421e83ec4e04e5bae009c43eb7465f6ed0e9b62a08998194356199"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-Heavy.ttf": {
-      "size": 23855260,
-      "sha256": "98a0e866232fbe91c1c2a67700bc79ecc78efdb6ef9a624140f6b1491679d84e"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-Heavy.ttf": {
+      "size": 23550476,
+      "sha256": "82df3431331332cb72eb1517c72ba52cc7e2c1cf93ecde2dbdf623f5cb60f100"
     },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.40.4/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
-      "size": 24656136,
-      "sha256": "6c96437428750a70fc843835826f3294896398413dcc3ffabfc2a6af65562f8b"
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.42/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
+      "size": 24345408,
+      "sha256": "156f24e25d1904bfcc71813abaef45aa41535c71889ca2df5036be4b8997fa07"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf": {
-      "size": 40425756,
-      "sha256": "7b8135bacfeef1ca3c24b53168be057534ba06afc39add0320786e547544c2b6"
+      "size": 40439836,
+      "sha256": "cf9d8b1c5c1894c75a43613cf8f693b7628db55277f364c26e0a13dde57e56b9"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf": {
-      "size": 55731580,
-      "sha256": "b0719ca5d949c341b422c4d7a518c278b248a173abb62d30f311976df1954d58"
+      "size": 55745992,
+      "sha256": "9e4ebceb6270b86243ea8c6d299ef6191c194127654d7d3b839efcbc019e0e4a"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-ExtraLight.ttf": {
-      "size": 13270668,
-      "sha256": "26a3d85ce8bbe3009b505df7cfea4e2644384f29daf568d2fd5f9cc6d8e81008"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-ExtraLight.ttf": {
+      "size": 13123604,
+      "sha256": "b0a1e6da36fc3db491b93caa7f59e71b3b42a5880011828db6c972065c6954f9"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
-      "size": 14061884,
-      "sha256": "28fec7d6e8a3e2d5cffc87cb69b41312d18f0c8ed859a29f8062f056392c055a"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
+      "size": 13914776,
+      "sha256": "ab6e39194a2302cdd0e32ce886ff7ad4fb66aed2786fa9c1a4d9736a0ce4113e"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Light.ttf": {
-      "size": 13208260,
-      "sha256": "76efb62fe61db4147bd9fa75e7beef73c5fc391a4c253a26685f9df863c39525"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-Light.ttf": {
+      "size": 13061196,
+      "sha256": "f31df2e4b873d52b2de21514b5abd7ea721f42f03fbc8bbf6513697b1a6b47f7"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-LightItalic.ttf": {
-      "size": 13997668,
-      "sha256": "18ffd86578aee6d6d6fe7d07118c4ba61345a1d848f1ac2a8e3efb8c79fb66f2"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-LightItalic.ttf": {
+      "size": 13850560,
+      "sha256": "3dc9b2d137212d8a19b7db8ac0dfe421080791bf0bb75eb49aa4f44e3a4e5afd"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Regular.ttf": {
-      "size": 13085552,
-      "sha256": "877272638462440d13f8c1f1c77b9935c18500d69ef2dec21f7e130105690e80"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-Regular.ttf": {
+      "size": 12938520,
+      "sha256": "27472ca5954b69b1a5d1d49c0f3bcb9a27dc6fee0c806092ab8b2eb3e63025a1"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Italic.ttf": {
-      "size": 13874336,
-      "sha256": "1bd62a0006720a3684a72fe79162f97126dce482622a44da2077b58adb954bda"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-Italic.ttf": {
+      "size": 13727256,
+      "sha256": "6bc2a8b058dbd507698d3c4a40db60862ea70caf7af16c5f10ea4b9e66de948d"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-SemiBold.ttf": {
-      "size": 12994268,
-      "sha256": "ca350a30872532908970122113e707a8d3daa69672f9b24347799b5aa890bef6"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-SemiBold.ttf": {
+      "size": 12847208,
+      "sha256": "a95b0443b0740d39e9899fcb80a9cc0d602dcec716dd50065855fa7ffafeafb7"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
-      "size": 13783580,
-      "sha256": "f14c5dc196bacecf77a665a188b67698776d102c561c607c940ff428d7b65954"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
+      "size": 13636472,
+      "sha256": "a35244666cefb413df03fcb878809bf085ccb00d757a078798304996d144259b"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Bold.ttf": {
-      "size": 12881164,
-      "sha256": "14377e022a7752acd913f32199240b3f60ad12554192f273212515c08dd361fd"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-Bold.ttf": {
+      "size": 12734100,
+      "sha256": "61621152afb7516d15ac68079fac5ec6863a434d4ec7dec4380b8b2a9118f12d"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-BoldItalic.ttf": {
-      "size": 13669620,
-      "sha256": "7106fdedbe26d477a743b16955c7dd1f0c55464c2d1da9a5de90b2cb4cfa461d"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-BoldItalic.ttf": {
+      "size": 13522544,
+      "sha256": "e445a562ac7e2163c58357d59b299b03d83e7565bc2487105a00f5b809a6bbfd"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-Heavy.ttf": {
-      "size": 12778532,
-      "sha256": "99c7f4f0babe5652a2bb677b86531dede2ba5ee67ca74f36dd6495e335fad8eb"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-Heavy.ttf": {
+      "size": 12631144,
+      "sha256": "e500eda18f4a2fa356add0acde823f0156544a980c04552c340c7cf1d3328864"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
-      "size": 13572760,
-      "sha256": "3ee8fed004c252d7e0a02c76f8f223697bf8b319750ee5ac37643a56e499ea2b"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.42/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
+      "size": 13425336,
+      "sha256": "67c3e588ab5a24925d38e7eeb51d27de7ad2bba89234a2e57139eb4c954f5322"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-ExtraLight.ttf": {
-      "size": 24097516,
-      "sha256": "0ff09e873eff8e18d36a5e5bd514b5da8517e836c693d8e1f95fda15a4a6f6bd"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-ExtraLight.ttf": {
+      "size": 23806200,
+      "sha256": "9896cd11d7236b99c6d416c498f9d4e68567d5c56de3db4386ff21393f35156c"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
-      "size": 24903584,
-      "sha256": "edd8262c5c3dd67b33e1a6ee9cf49fd638b673759b8f56bbf6ee1371c05332f3"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
+      "size": 24602736,
+      "sha256": "ec2f7986b4aaa9fbd07bae4dd9d95deaba354e563a2fbbb48a9bacccd6fc0afb"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Light.ttf": {
-      "size": 24180080,
-      "sha256": "dcba571bb1b21beb6884ff0b52259daffb4e2898a16080578d52fd8a30ab8317"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-Light.ttf": {
+      "size": 23881404,
+      "sha256": "f078f285ad2e06576e273655ace089cdedfe2413776b4045b48f16d9cc80616c"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-LightItalic.ttf": {
-      "size": 24983616,
-      "sha256": "2ff77b63b6fb0abbc0cac4e5332113b3a13b1c1867aad8ebf89c9f34afa2f811"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-LightItalic.ttf": {
+      "size": 24676064,
+      "sha256": "ff19456295e0b894314748a61c5d355b3cdfd25cf72f5a3410d82eb493c595ea"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Regular.ttf": {
-      "size": 24072488,
-      "sha256": "a1317871e46657d8c213dcd777b9ac76bdb6d3b06d31bc0bafd3adb2b8132a9c"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-Regular.ttf": {
+      "size": 23763516,
+      "sha256": "6d30f4c6b8e05df6de18912f39a5f5c8f6114d4969574fb40c85b5fc413fa7f0"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Italic.ttf": {
-      "size": 24871344,
-      "sha256": "6456ad1a94493655279ae67a08abd2e32ec4b7b7839734c7d40c7c6783dda761"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-Italic.ttf": {
+      "size": 24556196,
+      "sha256": "f698254112d018389fead0ad2fa4190dc2a9c41ff767d27b1436317ea9483828"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-SemiBold.ttf": {
-      "size": 24002760,
-      "sha256": "c73933574b9af78293648236505f957b2cd873abf9f085910a8b054bbcebcd97"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-SemiBold.ttf": {
+      "size": 23693156,
+      "sha256": "c9716523c57cf24c735b8a9bbfa7972b5a6479631d3f098ca679fb2eaa7bb304"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
-      "size": 24802684,
-      "sha256": "c27a6072004a404873ac305f858191857e97e52c336f364a53e42f2a40610fb4"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
+      "size": 24485132,
+      "sha256": "e00cabd2754cfb66ff54945c892455ba6c6c9fe2d48a7cbab447c61e8c107849"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Bold.ttf": {
-      "size": 23899964,
-      "sha256": "ca35cc1a607dfe993e41a19852a86e337250bfac058693a26a7b4796dbc7f76e"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-Bold.ttf": {
+      "size": 23595652,
+      "sha256": "e6782fb87a2426895ebc3b72b9f38308d2ec6b8e3aab53317adcfa47d7e1b9da"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-BoldItalic.ttf": {
-      "size": 24697728,
-      "sha256": "2ba616fe47c2073bb910e89793527829095237c4b9215ec790a5e26a6e83b854"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-BoldItalic.ttf": {
+      "size": 24385960,
+      "sha256": "838d3eaa912ed5f9b238251734180da3ba3410961a82a4d7e8858f984e73569c"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-Heavy.ttf": {
-      "size": 23615732,
-      "sha256": "5b2b46c7b07192e908451bbaa4a2f0f0f1254f6bead7dba38491b8edb5deb46e"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-Heavy.ttf": {
+      "size": 23310252,
+      "sha256": "d42ade09f186e801e46848f8f20b00fdc05c37cebb44aa35380fc5052e9ad087"
     },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.40.4/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
-      "size": 24420204,
-      "sha256": "8628314cd86e8a60cb40fff83dae74cbbcb9b63e4bdb7bd0e894522aad93dd36"
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.42/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
+      "size": 24108144,
+      "sha256": "cc30df8e8bb8f60982e36d5cee76fb656c948b91c2e0c3a2e3e39a721e395703"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf": {
-      "size": 39670360,
-      "sha256": "e24e09d535133eae99ecc70d0c970ab1d678df3688b4d4b9dda50a4cdc409f6a"
+      "size": 39684484,
+      "sha256": "f0698f317ecc654fa25dc6208008acbeb9a8a761e47a9c26a8e6c6e8a0031f79"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf": {
-      "size": 54551824,
-      "sha256": "5767a4e27ee89a21ccc92efbf43a2c171ccea3ac4e30c3b1afe66398aa42b502"
+      "size": 54566284,
+      "sha256": "47ef3a054f323d509867d9c8b47be93df00f1607ace749a9438508cca5c6fc4b"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-ExtraLight.ttf": {
-      "size": 13246300,
-      "sha256": "be84065ffef9b7020a18a329c771d6764819bf161d537568cd4f62baf7679d6c"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-ExtraLight.ttf": {
+      "size": 13099560,
+      "sha256": "026aef4099b56154488df78daef9c3bc5a0348a0543241116f5341c0da292bff"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
-      "size": 14036008,
-      "sha256": "a261d5959a0c87814fcd580f9a21d46ee21662ade7f47b03992b2009d255677d"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
+      "size": 13889224,
+      "sha256": "5e1547020f6913b55d6faebdaa370b7f8aa91a033d93e4849a105a784f921528"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Light.ttf": {
-      "size": 13184048,
-      "sha256": "87c3c554ae1fb77f40b723dc585c15d036e12629c35ece3430b29d0d62ad4d12"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-Light.ttf": {
+      "size": 13037312,
+      "sha256": "63493b25c4e01e23a0fded11293810666026e645cc0b2abc79673a43acd537e5"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-LightItalic.ttf": {
-      "size": 13972016,
-      "sha256": "13ee8e039a2a25320338b8e9fd258a2d51910900132cc71f2df60e39264e44a3"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-LightItalic.ttf": {
+      "size": 13825236,
+      "sha256": "f08e719d4eac5f463cebc9b3da8df6e9850aa2ff8a7b4a6b5df93166b18aa255"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Regular.ttf": {
-      "size": 13061660,
-      "sha256": "33d5ba7b3bdf74f6447f0bec55a6efeb537b0bd2333f268882c9c5a8f88edd38"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-Regular.ttf": {
+      "size": 12914952,
+      "sha256": "d1eb2b423de004b479caac2dee1dbbab49882d05ae73250a0c2ffd7d2f65cb56"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Italic.ttf": {
-      "size": 13849016,
-      "sha256": "a26ef465fa17d8d38d962fe2cc0c73876a7643b1ed1eecd44d3df09ecca071e4"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-Italic.ttf": {
+      "size": 13702268,
+      "sha256": "14162580a4a8c537fa1b2c206db95d5f54fdcec88b984d708bbcd197f1ca7747"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-SemiBold.ttf": {
-      "size": 12970652,
-      "sha256": "de06c413e0087eb13c232e4f1c735c23ed27b0129a28021c2616e70163429c36"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-SemiBold.ttf": {
+      "size": 12823916,
+      "sha256": "f5d55db40166046e8f8a5088e22c37b40d5ebd95550ef5aa4a9183075c077d35"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
-      "size": 13758504,
-      "sha256": "ded7ffcafbaf4437acca8d106593bc148c88ece2b455f52a29e4bd7eb13dc243"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
+      "size": 13611724,
+      "sha256": "511f5e198fc2b4e73c69410efe5d937efb70b040c8649f3986b2673af566f26f"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Bold.ttf": {
-      "size": 12857792,
-      "sha256": "ecd360e193b03f040516abeaa2551e41f3b3017b8b7f1b23902e0b6c51825b9d"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-Bold.ttf": {
+      "size": 12711052,
+      "sha256": "5c8dcb3747a7fb6ef179bcdb1a6369b53580b502d649094666bde60966d18714"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-BoldItalic.ttf": {
-      "size": 13644848,
-      "sha256": "bdf4cfb7e6673b6c2b3faeaa0059269e9d62ebdc3d579cd9323e820715f068f4"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-BoldItalic.ttf": {
+      "size": 13498096,
+      "sha256": "6077dc6f242d33234a9f76d94d14cb8b83fec9999c140676a7c9e0f51fc82385"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-Heavy.ttf": {
-      "size": 12755708,
-      "sha256": "8cc11778e22a98f575f0f4e2d90183b9fe94846659fbcf6c11233269beae7786"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-Heavy.ttf": {
+      "size": 12608644,
+      "sha256": "b59354f3e865ecf57fda40f2c6262ca9cf33fa2a376cbffc35ffa1d6dda47081"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.40.4/SarasaUiPropDigitsK-HeavyItalic.ttf": {
-      "size": 13548552,
-      "sha256": "ab0cca2a042fa7555361eff34ef8c1fc95f8444e05acd78295dff8c6aea918ed"
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.42/SarasaUiPropDigitsK-HeavyItalic.ttf": {
+      "size": 13401456,
+      "sha256": "ec71bcd6112791a75471a156f0026d2647aebe5702024b68c3785408923d12d1"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-ExtraLight.ttf": {
-      "size": 24051524,
-      "sha256": "d76d4192fa65254dc29586edb57ae025a538363c81d454780070b946b5e57f9f"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-ExtraLight.ttf": {
+      "size": 23760532,
+      "sha256": "f000281c312a8c2a4bdc982b783bdbecfbbf41b620731363d6aa061709029284"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
-      "size": 24856080,
-      "sha256": "564bc579666f4e2d15615bcbe9a4feb909bb241a42cf55a905d67d1e1eca511d"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
+      "size": 24555560,
+      "sha256": "d9a7764eea2a321faab2a4c1e4eb0a6866da6d0bf285dddb1e1a0379ff8fe434"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Light.ttf": {
-      "size": 24134388,
-      "sha256": "cb103aaf7a3e0d562bbaddca2539e6938c6a0550011008993bf531398b07f9bb"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-Light.ttf": {
+      "size": 23836040,
+      "sha256": "d125812623046feee450f18aa687b205ef573e2cb82e6d744f6b26c448bacb75"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-LightItalic.ttf": {
-      "size": 24936484,
-      "sha256": "e1624e0420cfb0a9afd2182c1bcdbcbcb119ae7803289b70f8ca1f035fad9c82"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-LightItalic.ttf": {
+      "size": 24629260,
+      "sha256": "bccd697b855997ab8a483bd4451d6a8e5a504fa53d067441dde36a6a79058fe4"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Regular.ttf": {
-      "size": 24027284,
-      "sha256": "e1fcc6a2a6328da960da15b556f07b2b62dec9e2778ba1d71f78c8d6b037ea34"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-Regular.ttf": {
+      "size": 23718636,
+      "sha256": "6ac37334bf8988a9d5bd35b32ffb355a3d4b0259b16badab2d4f19f765bf468a"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Italic.ttf": {
-      "size": 24824716,
-      "sha256": "36e406f39fe122ec2b9fa91123af38a91c3a21da034fe03ef1c3f923438a0115"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-Italic.ttf": {
+      "size": 24509896,
+      "sha256": "c9eae7dadc6e6e111b574787ef301f7551600bedd11cf1d138966d053d78faa8"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-SemiBold.ttf": {
-      "size": 23957784,
-      "sha256": "9f1248a94421c4b4998bd38e9f061d2d80e4a0a7dfdf2de44bdcc6247a472c71"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-SemiBold.ttf": {
+      "size": 23648504,
+      "sha256": "5005469cd5bdc36abde519dd4e2860d750be7c82fe1c16cfa4a7ff39295eb1f4"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
-      "size": 24756244,
-      "sha256": "4590c536225d802da4dd4a223f25000b007e931f8742ad8be2b8b5c805fa85ff"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
+      "size": 24439020,
+      "sha256": "b02f98ee4effc5c0ba6405ff709f744587e4ca653d4f68ad626a923865ea4740"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Bold.ttf": {
-      "size": 23855948,
-      "sha256": "4ea1c474748bbfa34fda43cc33d7824ac52b1896651105e7953b67a89f363133"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-Bold.ttf": {
+      "size": 23551964,
+      "sha256": "7f967e2b218282327dbf66b7988e8000ecdb5c8dd490894d960c5868acac5531"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-BoldItalic.ttf": {
-      "size": 24652312,
-      "sha256": "cb4b0324aba63cb3a9d33abf37c48b3fafc908becb308e67f4e3a7b3ba4339b2"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-BoldItalic.ttf": {
+      "size": 24340872,
+      "sha256": "3b12bf538342aed15e10598656ef6b1f9bbf5c056a3da4ce79274de7de546794"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-Heavy.ttf": {
-      "size": 23572188,
-      "sha256": "988385d7bc6ff688bb8ef100aa5a593427968b24f9e5590df3c0372d52f41033"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-Heavy.ttf": {
+      "size": 23267028,
+      "sha256": "67739191ba2dfa39e0c522cbeeded906493f7b6e63aa94727d1a5219cf86c929"
     },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.40.4/SarasaUiPropDigitsK-HeavyItalic.ttf": {
-      "size": 24375276,
-      "sha256": "586ad830924e86d83e74e243eae79388d7012ba640539864f6d62517c0d1bb86"
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.42/SarasaUiPropDigitsK-HeavyItalic.ttf": {
+      "size": 24063540,
+      "sha256": "eab755c4b35073c757baf4ce8528f83af76089ce2cb3c54f653018697e842bc9"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf": {
-      "size": 39636728,
-      "sha256": "12444109946f2c3cf101bf49d95793cf680031895f923d069990b8a732f09194"
+      "size": 39650848,
+      "sha256": "da570bcb2c4c148ef3342113acc89dfdb0606b48e7c86d833e12458c3b71c9b5"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf": {
-      "size": 54473360,
-      "sha256": "96a63a627b2b13181cd763778af39d0727e40c26a9237c84ca363db19eeb10e4"
+      "size": 54487812,
+      "sha256": "383a77874719b60793e93b8045426da9a0732d96b8dfdcd206e700192f0ce064"
     }
   },
   "inputs_unchanged": true,
@@ -655,6 +700,12 @@
       },
       "opentype/STAT/ital_axis": {
         "PASS": 6
+      },
+      "name/family_and_style_max_length": {
+        "PASS": 156
+      },
+      "smart_dropout": {
+        "PASS": 156
       }
     },
     "per_region_batches": {
@@ -663,7 +714,7 @@
         "jobs": 4,
         "exit_code": 0,
         "result_counts": {
-          "PASS": 53
+          "PASS": 105
         }
       },
       "SC": {
@@ -671,7 +722,7 @@
         "jobs": 4,
         "exit_code": 0,
         "result_counts": {
-          "PASS": 53
+          "PASS": 105
         }
       },
       "TC": {
@@ -679,7 +730,7 @@
         "jobs": 4,
         "exit_code": 0,
         "result_counts": {
-          "PASS": 53
+          "PASS": 105
         }
       },
       "HC": {
@@ -687,7 +738,7 @@
         "jobs": 4,
         "exit_code": 0,
         "result_counts": {
-          "PASS": 53
+          "PASS": 105
         }
       },
       "J": {
@@ -695,7 +746,7 @@
         "jobs": 4,
         "exit_code": 0,
         "result_counts": {
-          "PASS": 53
+          "PASS": 105
         }
       },
       "K": {
@@ -703,12 +754,12 @@
         "jobs": 4,
         "exit_code": 0,
         "result_counts": {
-          "PASS": 53
+          "PASS": 105
         }
       }
     },
     "total_result_counts": {
-      "PASS": 318
+      "PASS": 630
     },
     "all_batches_exit_zero": true,
     "passed": true
@@ -1094,6 +1145,342 @@
         ]
       },
       {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
         "check": "no_mac_entries",
         "font": "Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
         "result": "PASS",
@@ -1456,6 +1843,398 @@
             "status": "PASS"
           }
         ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsCL-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
       }
     ],
     "SC": [
@@ -1699,20 +2478,6 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsSC-Bold.ttf",
-        "result": "PASS",
-        "logs": [
-          {
-            "message": {
-              "code": "ok",
-              "message": "All looks good!"
-            },
-            "status": "PASS"
-          }
-        ]
-      },
-      {
-        "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
         "result": "PASS",
         "logs": [
@@ -1727,7 +2492,7 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -1755,7 +2520,7 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -1783,7 +2548,7 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -1798,6 +2563,20 @@
       {
         "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -1826,6 +2605,342 @@
       {
         "check": "opentype/STAT/ital_axis",
         "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -2161,20 +3276,6 @@
       },
       {
         "check": "no_mac_entries",
-        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
-        "result": "PASS",
-        "logs": [
-          {
-            "message": {
-              "code": "ok",
-              "message": "All looks good!"
-            },
-            "status": "PASS"
-          }
-        ]
-      },
-      {
-        "check": "no_mac_entries",
         "font": "SarasaUiPropDigitsSC-Heavy.ttf",
         "result": "PASS",
         "logs": [
@@ -2189,6 +3290,412 @@
       },
       {
         "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
         "font": "SarasaUiPropDigitsSC-HeavyItalic.ttf",
         "result": "PASS",
         "logs": [
@@ -2582,6 +4089,342 @@
         ]
       },
       {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
         "check": "no_mac_entries",
         "font": "Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
         "result": "PASS",
@@ -2944,6 +4787,398 @@
             "status": "PASS"
           }
         ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsTC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
       }
     ],
     "HC": [
@@ -3103,6 +5338,20 @@
       },
       {
         "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsHC-Regular.ttf",
         "result": "PASS",
         "logs": [
@@ -3131,7 +5380,7 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -3160,20 +5409,6 @@
       {
         "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-        "result": "PASS",
-        "logs": [
-          {
-            "message": {
-              "code": "ok",
-              "message": "All looks good!"
-            },
-            "status": "PASS"
-          }
-        ]
-      },
-      {
-        "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -3314,6 +5549,342 @@
       {
         "check": "opentype/STAT/ital_axis",
         "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -3677,6 +6248,398 @@
       },
       {
         "check": "no_mac_entries",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
         "font": "SarasaUiPropDigitsHC-HeavyItalic.ttf",
         "result": "PASS",
         "logs": [
@@ -3959,6 +6922,20 @@
       },
       {
         "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsJ-Bold.ttf",
         "result": "PASS",
         "logs": [
@@ -3987,49 +6964,35 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
-        "result": "PASS",
-        "logs": [
-          {
-            "message": {
-              "code": "ok",
-              "message": "All looks good!"
-            },
-            "status": "PASS"
-          }
-        ]
-      },
-      {
-        "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
-        "result": "PASS",
-        "logs": [
-          {
-            "message": {
-              "code": "ok",
-              "message": "All looks good!"
-            },
-            "status": "PASS"
-          }
-        ]
-      },
-      {
-        "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
-        "result": "PASS",
-        "logs": [
-          {
-            "message": {
-              "code": "ok",
-              "message": "All looks good!"
-            },
-            "status": "PASS"
-          }
-        ]
-      },
-      {
-        "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -4058,6 +7021,342 @@
       {
         "check": "opentype/STAT/ital_axis",
         "font": null,
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -4432,6 +7731,398 @@
             "status": "PASS"
           }
         ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-J[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsJ-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
       }
     ],
     "K": [
@@ -4465,7 +8156,7 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "font": "Sarasa-Ui-VF-PropDigits-K[wght].ttf",
         "result": "PASS",
         "logs": [
           {
@@ -4479,7 +8170,7 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -4535,20 +8226,6 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
-        "result": "PASS",
-        "logs": [
-          {
-            "message": {
-              "code": "ok",
-              "message": "All looks good!"
-            },
-            "status": "PASS"
-          }
-        ]
-      },
-      {
-        "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsK-Light.ttf",
         "result": "PASS",
         "logs": [
@@ -4577,7 +8254,7 @@
       },
       {
         "check": "opentype/font_version",
-        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -4606,6 +8283,20 @@
       {
         "check": "opentype/font_version",
         "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "opentype/font_version",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
         "result": "PASS",
         "logs": [
           {
@@ -4814,6 +8505,342 @@
         ]
       },
       {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
         "check": "no_mac_entries",
         "font": "Sarasa-Ui-VF-PropDigits-K[wght].ttf",
         "result": "PASS",
@@ -5176,7 +9203,400 @@
             "status": "PASS"
           }
         ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-K[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-ExtraLight.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Light.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-LightItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Regular.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Italic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-SemiBold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Bold.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-BoldItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-Heavy.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "smart_dropout",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
+      },
+      {
+        "check": "name/family_and_style_max_length",
+        "font": "SarasaUiPropDigitsK-HeavyItalic.ttf",
+        "result": "PASS",
+        "logs": [
+          {
+            "message": {
+              "code": "ok",
+              "message": "All looks good!"
+            },
+            "status": "PASS"
+          }
+        ]
       }
     ]
-  }
+  },
+  "approved_upstream_failures": []
 }

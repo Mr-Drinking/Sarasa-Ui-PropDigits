@@ -14,9 +14,13 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 
+from python_env_bootstrap import AUDIT_DEPENDENCIES, ensure_project_python, isolated_tool_python
+
+if __name__ == "__main__":
+    ensure_project_python(AUDIT_DEPENDENCIES, project_root=Path(__file__).resolve().parents[1], label="release")
+
 import audit_sarasa_ui_propdigits as audit
 import build_sarasa_ui_propdigits_sc as build
-from python_env_bootstrap import isolated_tool_python
 from fontTools.ttLib import TTFont
 
 
@@ -26,7 +30,17 @@ OTS_ARCHIVES = {
     "Linux": "1caab4037806688203efd124b97443694794ca69a3dddd9a42b4833a4f8c4967",
     "Darwin": "b674ab7a57f54799d37c8f6d28c825f8292ec264c18b537241b367d6eef8d928",
 }
-CHECKS = ("opentype/font_version", "no_mac_entries", "opentype/STAT/ital_axis")
+CHECK_EXPECTED_COUNTS = {
+    "opentype/font_version": 156,
+    "no_mac_entries": 156,
+    "opentype/STAT/ital_axis": 6,
+    "name/family_and_style_max_length": 156,
+    "smart_dropout": 156,
+}
+CHECKS = tuple(CHECK_EXPECTED_COUNTS)
+# No identified defect is waived. Any future upstream exemption must name the
+# exact check, affected font hashes, and independently reproduced source result.
+APPROVED_UPSTREAM_FAILURES: tuple[dict, ...] = ()
 
 
 def save_report(name: str, report: dict) -> None:
@@ -93,7 +107,7 @@ def run_ots(manifest: dict) -> bool:
 def run_fontbakery(manifest: dict) -> bool:
     python, environment = isolated_tool_python(
         Path(os.environ.get("SARASA_FONTBAKERY_VENV", build.ROOT / ".build-cache" / "fontbakery-venv")),
-        build.ROOT / "requirements-fontbakery.txt",
+        build.ROOT / "requirements-fontbakery.lock",
         {"fontbakery": "1.1.0", "freetype-py": "2.3.0", "fonttools": "4.63.0"},
     )
     directory = build.ROOT / ".build-cache" / "fontbakery"
@@ -125,8 +139,12 @@ def run_fontbakery(manifest: dict) -> bool:
                 selected[identifier][check["result"]] += 1
                 records[region].append({"check": identifier, "font": check.get("filename"), "result": check["result"], "logs": check["logs"]})
     unchanged = audit.audit_input_manifest() == manifest
-    success = unchanged and dict(totals) == {"PASS": 318} and all(batch["exit_code"] == 0 for batch in batches.values())
+    expected_results = {name: {"PASS": count} for name, count in CHECK_EXPECTED_COUNTS.items()}
+    success = (unchanged and dict(totals) == {"PASS": sum(CHECK_EXPECTED_COUNTS.values())}
+               and {name: dict(value) for name, value in selected.items()} == expected_results
+               and all(batch["exit_code"] == 0 for batch in batches.values()))
     report = {"title": "FontBakery 分地区发布检查", "generated_at": datetime.now(timezone.utc).isoformat(), "toolchain": environment["versions"], "environment": environment, "input_manifest": manifest, "inputs_unchanged": unchanged, "release_gate": {"fonts": 156, "selected_checks": {name: dict(value) for name, value in selected.items()}, "per_region_batches": batches, "total_result_counts": dict(totals), "all_batches_exit_zero": all(batch["exit_code"] == 0 for batch in batches.values()), "passed": success}, "results": records}
+    report["approved_upstream_failures"] = list(APPROVED_UPSTREAM_FAILURES)
     save_report("fontbakery-audit.json", report)
     return success
 
