@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import struct
+import json
 import shutil
 import sys
 import tempfile
@@ -549,8 +550,46 @@ class ArchiveSafetyTests(unittest.TestCase):
 
 
 class ReleasePackageTests(unittest.TestCase):
+    def test_release_manifest_is_generated_from_the_verified_matrix(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp_name:
+            root = Path(tmp_name)
+            with patch.multiple(build, ROOT=root, STATIC_ROOT=root/'fonts/static', VARIABLE_DIR=root/'fonts/variable'), patch.object(package_release, 'ROOT', root):
+                for source, _name in package_release.documentation_files():
+                    source.write_text('文档夹具', encoding='utf-8')
+                (root/'reports').mkdir()
+                for name in ('release-audit.json', 'ots-audit.json', 'fontbakery-audit.json', 'visual-audit.json'):
+                    (root/'reports'/name).write_text('{}', encoding='utf-8')
+                build.VARIABLE_DIR.mkdir(parents=True)
+                for region in build.REGION_ORDER:
+                    for italic in (False, True):
+                        (build.VARIABLE_DIR/build.variable_output_name(region, italic)).write_bytes(f'VF {region} {italic}'.encode())
+                    for hinted in (False, True):
+                        directory=build.static_dir(region, hinted); directory.mkdir(parents=True)
+                        for stop in build.SOURCE_HAN_WEIGHT_STOPS:
+                            for italic in (False, True):
+                                name=build.static_output_name(region, str(stop['name']), italic)
+                                (directory/name).write_bytes(f'{region} {stop["name"]} {italic} {hinted}'.encode())
+                packages=package_release.release_packages()
+                results=[package_release.write_package(package, root/'dist') for package in packages]
+                package_release.write_release_manifest(packages, results, independently_verified=True)
+                report=json.loads((root/'reports/release-packages.json').read_text(encoding='utf-8'))
+                self.assertEqual((report['package_count'], report['unique_fonts'], report['font_occurrences']), (21, 156, 312))
+                self.assertEqual(len(report['font_sha256']), 156)
+                self.assertTrue(report['independent_verify_only_completed'])
+                self.assertEqual(len(report['audit_report_sha256']), 4)
+                with self.assertRaises(ValueError):
+                    package_release.write_release_manifest(packages[:-1], results[:-1], independently_verified=True)
+
     def test_release_matrix_has_21_documented_packages(self) -> None:
-        packages = package_release.release_packages()
+        with tempfile.TemporaryDirectory() as tmp_name, patch.object(build, "STATIC_ROOT", Path(tmp_name)):
+            for region in build.REGION_ORDER:
+                for hinted in (False, True):
+                    directory = build.static_dir(region, hinted)
+                    directory.mkdir(parents=True)
+                    for stop in build.SOURCE_HAN_WEIGHT_STOPS:
+                        for italic in (False, True):
+                            (directory / build.static_output_name(region, str(stop["name"]), italic)).touch()
+            packages = package_release.release_packages()
         self.assertEqual(len(packages), 21)
         self.assertEqual(len({package.filename for package in packages}), 21)
         for package in packages:

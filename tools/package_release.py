@@ -6,11 +6,17 @@ import json
 import sys
 import zipfile
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
+
+from python_env_bootstrap import AUDIT_DEPENDENCIES, ensure_project_python
+
+if __name__ == "__main__":
+    ensure_project_python(AUDIT_DEPENDENCIES, project_root=ROOT, label="package")
 
 import build_sarasa_ui_propdigits_sc as build  # noqa: E402
 
@@ -223,12 +229,39 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
         if item["file"].endswith("-static.png"):
             expected = {(audit.display_path(audit.static_path(region, str(stop["name"]), italic, hinted)), int(stop["value"]), italic, hinted) for stop in build.SOURCE_HAN_WEIGHT_STOPS for italic in (False, True) for hinted in (False, True)}
             actual = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("hinted")) for case in cases]
+            expected_small = {(audit.display_path(audit.static_path(region, str(stop["name"]), italic, True)), int(stop["value"]), italic, pixels, 2)
+                              for stop in build.SOURCE_HAN_WEIGHT_STOPS for italic in (False, True) for pixels in (9, 12, 16)}
+            actual_small = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("pixels"), case.get("magnification")) for case in item.get("small_size_cases", [])]
+            if len(actual_small) != len(expected_small) or set(actual_small) != expected_small:
+                raise ValueError("视觉图片缺少 hinted 字体的 9、12、16 px 检查")
         elif item["file"].endswith("-variable.png"):
             expected = {(audit.display_path(audit.vf_path(region, italic)), weight, italic, None) for weight in audit.INTER_POSITION_WEIGHTS for italic in (False, True)}
             actual = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("hinted")) for case in cases]
         else:
             expected = {(audit.display_path(audit.vf_path(region, False)), weight) for weight in (200, 400, 600, 900)}
             actual = [(case.get("font"), case.get("weight")) for case in cases]
+            regular_vf = audit.display_path(audit.vf_path(region, False))
+            language_expected = {(regular_vf, 400, script, language, "… — —— ⸺ ——— ⸻", 28)
+                                 for script, language in (("Latn", None), ("Latn", "de"), ("Cyrl", "ru"), ("Grek", "el"),
+                                                          ("Latn", "zh-Hans"), ("Latn", "ko"), ("Hani", None))}
+            language_actual = [(case.get("font"), case.get("weight"), case.get("script"), case.get("language"), case.get("text"), case.get("pixels"))
+                               for case in item.get("language_cases", [])]
+            width_text = "".join(chr(cp) for cp in sorted(audit.INTENTIONAL_CPS))
+            width_expected = {(regular_vf, 400, json.dumps(features, sort_keys=True), width_text, 25)
+                              for features in ({}, {"pnum": True}, {"tnum": True})}
+            width_actual = [(case.get("font"), case.get("weight"), json.dumps(case.get("features"), sort_keys=True), case.get("text"), case.get("pixels"))
+                            for case in item.get("width_cases", [])]
+            vertical_expected = {(audit.display_path(audit.vf_path(region, italic) if variable else audit.static_path(region, "Regular", italic, False)),
+                                  400, italic, variable, "Hani", "ttb", text, 34)
+                                 for variable in (True, False) for italic in (False, True)
+                                 for text in ("甲……乙——丙⸺丁", "甲……乙———丙⸻丁")}
+            vertical_actual = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("variable"), case.get("script"),
+                                case.get("direction"), case.get("text"), case.get("pixels")) for case in item.get("vertical_cases", [])]
+            for label, present, required in (("语言路由", language_actual, language_expected),
+                                             ("37 个比例码位", width_actual, width_expected),
+                                             ("静态与 VF 竖排对照", vertical_actual, vertical_expected)):
+                if len(present) != len(required) or set(present) != required:
+                    raise ValueError(f"视觉细节图缺少完整的{label}检查")
         if len(actual) != len(expected) or set(actual) != expected or any(not isinstance(case.get("pixels"), int) or case["pixels"] <= 0 for case in cases):
             raise ValueError("视觉图片的字体、字重或样式覆盖不完整")
         reviewed.update(case[0] for case in actual)
@@ -236,6 +269,20 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
         raise ValueError("视觉图片没有覆盖全部成品")
     for screenshot in visual.get("runtime_screenshots", []):
         verify_image(screenshot)
+
+
+def validate_license_documentation(main_report: dict) -> None:
+    import audit_sarasa_ui_propdigits as audit
+
+    record = main_report.get("source_han_license_documents", {})
+    paths = audit.release_license_document_paths()
+    if (record.get("ok") is not True or record.get("failures")
+            or record.get("documents_checked") != len(paths) or len(paths) != 14
+            or any(not path.is_file() for path in paths)):
+        raise ValueError("版权声明文档尚未完整通过固定来源校验")
+    current = {audit.display_path(path): package_sha256(path) for path in paths}
+    if record.get("documents_sha256") != current:
+        raise ValueError("版权声明文档在审计后发生变化，报告已过期")
 
 
 def validate_release_audits(packages: list[Package]) -> None:
@@ -267,20 +314,28 @@ def validate_release_audits(packages: list[Package]) -> None:
         or main_report.get("audit_contract") != audit.audit_contract_manifest()
     ):
         raise ValueError("当前构建与审计代码没有完整通过主审计")
+    validate_license_documentation(main_report)
     ots = reports["ots-audit"]
     if ots.get("fonts_checked") != 156 or ots.get("successful") != 156 or ots.get("failures") or ots.get("unexpected_messages"):
         raise ValueError("OTS 尚未完整通过 156 个字体")
     fb = reports["fontbakery-audit"].get("release_gate", {})
-    if fb.get("total_result_counts") != {"PASS": 318} or fb.get("all_batches_exit_zero") is not True:
-        raise ValueError("FontBakery 发布门尚未取得 318 PASS")
-    if fb.get("selected_checks") != {"opentype/font_version": {"PASS": 156}, "no_mac_entries": {"PASS": 156}, "opentype/STAT/ital_axis": {"PASS": 6}}:
+    expected_fb = {"opentype/font_version": {"PASS": 156}, "no_mac_entries": {"PASS": 156},
+                   "opentype/STAT/ital_axis": {"PASS": 6}, "name/family_and_style_max_length": {"PASS": 156},
+                   "smart_dropout": {"PASS": 156}}
+    if fb.get("total_result_counts") != {"PASS": 630} or fb.get("all_batches_exit_zero") is not True:
+        raise ValueError("FontBakery 发布门尚未取得 630 PASS")
+    if fb.get("selected_checks") != expected_fb:
         raise ValueError("FontBakery 的逐字体及正斜体配对检查覆盖不完整")
+    if reports["fontbakery-audit"].get("approved_upstream_failures") != []:
+        raise ValueError("当前发布门没有批准的上游 FAIL 豁免")
     batches = fb.get("per_region_batches", {})
     if set(batches) != set(build.REGION_ORDER) or any(batch.get("fonts") != 26 or batch.get("jobs") != 4 for batch in batches.values()):
         raise ValueError("FontBakery 必须按六地区、每批 26 字体、-J 4 运行")
     environment = reports["fontbakery-audit"].get("environment", {})
     if environment.get("versions", {}).get("freetype-py") != "2.3.0" or environment.get("pip_check") != {"returncode": 0, "passed": True}:
         raise ValueError("FontBakery 独立环境尚未通过固定依赖与 pip check 检查")
+    if environment.get("require_hashes") is not True or environment.get("lockfile_sha256") != package_sha256(ROOT / "requirements-fontbakery.lock"):
+        raise ValueError("FontBakery 完整依赖锁或哈希验证不匹配")
     validate_visual_report(reports["visual-audit"], manifest)
 
 
@@ -347,6 +402,25 @@ def write_checksums(output_dir: Path, results: list[dict[str, object]]) -> Path:
     return path
 
 
+def write_release_manifest(packages: list[Package], results: list[dict[str, object]], *, independently_verified: bool) -> None:
+    fonts = {source for package in packages for source, _name in package.files if source.suffix.lower() == ".ttf"}
+    font_occurrences = sum(source.suffix.lower() == ".ttf" for package in packages for source, _name in package.files)
+    if len(packages) != 21 or len(results) != 21 or len(fonts) != 156 or font_occurrences != 312:
+        raise ValueError("发布包矩阵不完整，不能写入发布清单")
+    audits = {name: package_sha256(ROOT / "reports" / name) for name in (
+        "release-audit.json", "ots-audit.json", "fontbakery-audit.json", "visual-audit.json")}
+    report = {"title": "Sarasa Ui PD 发布包校验", "version": build.VERSION,
+              "generated_at": datetime.now(timezone.utc).isoformat(), "package_count": 21,
+              "unique_fonts": 156, "font_occurrences": 312,
+              "independent_verify_only_completed": independently_verified,
+              "audit_report_sha256": audits,
+              "documentation_sha256": {name: package_sha256(source) for source, name in documentation_files()},
+              "font_sha256": {build.portable_report_path(source): package_sha256(source) for source in sorted(fonts)},
+              "packages": sorted(results, key=lambda item: str(item["file"]))}
+    build.assert_portable_report_text(json.dumps(report, ensure_ascii=False))
+    build.write_json_atomic(ROOT / "reports/release-packages.json", report)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="生成并核验 21 个可复现 Release ZIP。")
     parser.add_argument(
@@ -390,6 +464,7 @@ def main() -> None:
     # file changed while the packages were being compressed.
     validate_release_audits(packages)
     checksums = write_checksums(args.output_dir, results)
+    write_release_manifest(packages, results, independently_verified=args.verify_only)
     print(f"[package] wrote {checksums}", flush=True)
 
 

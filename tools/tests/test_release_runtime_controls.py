@@ -4,6 +4,7 @@ import copy
 import io
 import json
 import os
+import re
 import sys
 import tempfile
 import unittest
@@ -56,6 +57,53 @@ def font_bytes(font):
 
 
 class RuntimeControls(unittest.TestCase):
+    def test_invalid_instructions_stop_before_expensive_bitmap_rendering(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "candidate.ttf"
+            path.touch()
+            task = {"target_path": str(path), "reference_path": str(path), "target": "candidate.ttf",
+                    "reference": "reference.ttf", "region": "SC", "weight": "Bold", "italic": False,
+                    "comparison_mode": "official-hinted-native-fallback", "ppems": (9, 12)}
+            with patch.object(build, "native_hint_execution_status", return_value={"ok": False, "complete": False, "failures": 1}), patch.object(audit, "TTFont", side_effect=AssertionError("must not continue rendering")):
+                result = audit.raster_compare_worker(task)
+            self.assertGreater(result["counts"]["hint_execution_error"], 0)
+            self.assertEqual(result["renders_checked"], 0)
+            self.assertEqual(result["raster_aborted"], "native-hint-execution-failed")
+
+    def test_punctuation_advance_calibration_preserves_other_glyphs_and_native_controls(self):
+        target = variable_fixture()
+        for table in target["cmap"].tables:
+            if table.isUnicode():
+                table.cmap.update({ord(char): "G" for char in "…—⸺⸻"})
+        source = copy.deepcopy(target)
+        source["fvar"].axes[0].minValue = 250
+        add_metric_tables(target)
+        add_metric_tables(source, ("G", 1))
+        region = source["HVAR"].table.VarStore.VarRegionList.Region[0].VarRegionAxis[0]
+        region.StartCoord, region.PeakCoord, region.EndCoord = 0.2, 0.4, 0.6
+        original = font_bytes(target)
+        old_runtime = hb.Font(hb.Face(original))
+        protected = {tag: target.getTableData(tag) for tag in ("glyf", "gvar", "hmtx", "GSUB", "GPOS")}
+        with tempfile.TemporaryDirectory() as directory:
+            source_path = Path(directory) / "source.ttf"; source.save(source_path)
+            with patch.object(build, "source_han_vf_path", return_value=source_path):
+                report = build.align_source_punctuation_advances(target, "SC")
+                self.assertEqual(report["source_punctuation_advance_glyphs_aligned"], 1)
+                first = target.getTableData("HVAR")
+                self.assertEqual(build.align_source_punctuation_advances(target, "SC")["source_punctuation_advance_glyphs_aligned"], 0)
+                self.assertEqual(target.getTableData("HVAR"), first)
+        self.assertEqual({tag: target.getTableData(tag) for tag in protected}, protected)
+        changed = hb.Font(hb.Face(font_bytes(target)))
+        freetype_font = freetype.Face(io.BytesIO(font_bytes(target)))
+        for weight in audit.INTER_POSITION_WEIGHTS:
+            old_runtime.set_variations({"wght": weight}); changed.set_variations({"wght": weight})
+            freetype_font.set_var_design_coords([weight])
+            for gid, name in enumerate(target.getGlyphOrder()):
+                expected = old_runtime.get_glyph_h_advance(gid) + int(name == "G" and weight == 650)
+                self.assertEqual(changed.get_glyph_h_advance(gid), expected, (name, weight))
+                freetype_font.load_glyph(gid, freetype.FT_LOAD_NO_SCALE | freetype.FT_LOAD_NO_HINTING)
+                self.assertEqual(freetype_font.glyph.metrics.horiAdvance, expected, (name, weight))
+
     def test_origin_normalization_preserves_fractional_iup_shape(self):
         font = variable_fixture()
         pen = TTGlyphPen(None); pen.moveTo((0, 0)); pen.qCurveTo((101, 0), (300, 200)); pen.lineTo((300, 700)); pen.lineTo((0, 700)); pen.closePath()
@@ -169,10 +217,10 @@ class RuntimeControls(unittest.TestCase):
 
 class VisualControls(unittest.TestCase):
     def test_platform_independent_label_font_and_explicit_override(self):
-        with patch.object(visual, "LABEL_FONT", None), patch.dict(os.environ, {"SARASA_VISUAL_LABEL_FONT": ""}):
-            self.assertEqual(visual.label_font_path(), audit.static_path("SC", "Regular", False, False))
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "labels.ttf"; path.touch()
+            with patch.object(visual, "LABEL_FONT", None), patch.dict(os.environ, {"SARASA_VISUAL_LABEL_FONT": ""}), patch.object(audit, "static_path", return_value=path):
+                self.assertEqual(visual.label_font_path(), path)
             with patch.object(visual, "LABEL_FONT", path):
                 self.assertEqual(visual.label_font_path(), path)
 
@@ -180,7 +228,11 @@ class VisualControls(unittest.TestCase):
         path = package.ROOT / "reports" / "visual-audit.json"
         if not path.exists():
             self.skipTest("需要仓库中的已发布视觉记录作为结构夹具")
-        report = json.loads(path.read_text(encoding="utf-8"))
+        # Reuse the published image structure with the current directory
+        # naming contract. This fixture never writes a review to the repository.
+        text = re.sub(r"(SarasaUiPropDigits[A-Z]+-TTF(?:-Unhinted)?-)\d+(?:\.\d+)+/",
+                      lambda match: match.group(1) + build.VERSION + "/", path.read_text(encoding="utf-8"))
+        report = json.loads(text)
         manifest = report["input_manifest"]
         report["reviewed_fonts"] = sorted(manifest)
         report["generator_sha256"] = package.package_sha256(package.ROOT / report["generator"])
@@ -188,6 +240,24 @@ class VisualControls(unittest.TestCase):
         # development may have regenerated the example image files in place.
         for item in [*report["images"], *report.get("runtime_screenshots", [])]:
             item["sha256"] = package.package_sha256(package.ROOT / item["file"])
+            if item["file"].endswith("-static.png"):
+                item["small_size_cases"] = [
+                    {"font": case["font"], "weight": case["weight"], "italic": case["italic"], "pixels": pixels, "magnification": 2}
+                    for case in item["cases"] if case["hinted"] for pixels in (9, 12, 16)
+                ]
+            elif item["file"].endswith("-detail.png"):
+                region=item["region"]; vf=audit.display_path(audit.vf_path(region, False))
+                item["language_cases"]=[{"font":vf,"weight":400,"script":script,"language":language,
+                                         "text":"… — —— ⸺ ——— ⸻","pixels":28}
+                                        for script,language in (("Latn",None),("Latn","de"),("Cyrl","ru"),("Grek","el"),
+                                                                ("Latn","zh-Hans"),("Latn","ko"),("Hani",None))]
+                item["width_cases"]=[{"font":vf,"weight":400,"features":features,
+                                      "text":"".join(chr(cp) for cp in sorted(audit.INTENTIONAL_CPS)),"pixels":25}
+                                     for features in ({},{"pnum":True},{"tnum":True})]
+                item["vertical_cases"]=[{"font":audit.display_path(audit.vf_path(region,italic) if variable else audit.static_path(region,"Regular",italic,False)),
+                                         "weight":400,"italic":italic,"variable":variable,"script":"Hani","direction":"ttb","text":text,"pixels":34}
+                                        for variable in (True,False) for italic in (False,True)
+                                        for text in ("甲……乙——丙⸺丁","甲……乙———丙⸻丁")]
         package.validate_visual_report(report, manifest)
         mutations = (
             lambda value: value.update(images=[]),
@@ -198,6 +268,10 @@ class VisualControls(unittest.TestCase):
             lambda value: value["images"][0].update(passed=False),
             lambda value: value["images"][0].update(cases=[]),
             lambda value: value["images"][0].update(observations=[]),
+            lambda value: next(item for item in value["images"] if item["file"].endswith("-static.png")).update(small_size_cases=[]),
+            lambda value: next(item for item in value["images"] if item["file"].endswith("-detail.png")).update(language_cases=[]),
+            lambda value: next(item for item in value["images"] if item["file"].endswith("-detail.png")).update(width_cases=[]),
+            lambda value: next(item for item in value["images"] if item["file"].endswith("-detail.png")).update(vertical_cases=[]),
         )
         for mutate in mutations:
             with self.subTest(mutate=mutate):

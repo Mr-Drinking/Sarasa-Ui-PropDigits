@@ -1,0 +1,206 @@
+{
+  "title": "仅省略号指令判定修正后的审计断点源码等价验证",
+  "generated_at": "2026-10-03T08:27:28.949810+00:00",
+  "old_audit_sha256": "607c0f5da82003ee63139f9f5d3e91afbe5dba1a386b63bf8c4f50e5f85c432f",
+  "new_audit_sha256": "09290b8bfec9508bc6236e26b711e1e7341ddbca1b795afbc97ac7c1b067c28e",
+  "changed_operation": "audit_static_upstream_dash_sources",
+  "added_helpers": [
+    "ellipsis_instruction_presence_matches",
+    "native_ellipsis_instruction_expectation"
+  ],
+  "unchanged_module_ast_sha256": "3182b4aa79d071bf33fd9b6ae7ad486ee3f0ede370e69676b3b1732368495d38",
+  "proof": "除列出的一个独立章节与两个新增专用函数外，整个模块 AST 完全相同；其他函数没有对修改节点的直接或字符串引用，也没有动态全局调用。共享常量修改的反向试验被拒绝。",
+  "font_manifest_sha256": "3971081287eb37a8699df370f2be990d6b8bf075686ae066aeb82c55291794f9",
+  "source_manifest_sha256": "ee86addf574d38db9d8219cf87812288a6d6a8d2c3b302bac96a745475f03b1f",
+  "tool_identity_sha256": "8f562be06b852a7881bf56ee49c02bb2946fb5dcc90b0ef91f38581d15cc6c16",
+  "old_provenance_sha256": "b01d38cfd33834fdd40074095df3ba9a92fa7adc0a0956423563a01e98f78afa",
+  "new_provenance_sha256": "2d60ccdc3ab69eeadec66b91284b1d3aba142db4dd15230a8a88081edbd9cf38",
+  "unchanged_results": [
+    {
+      "section": "cl_source_outline",
+      "result_sha256": "191f8ba5cd8cb95918785114af6595467ae8a004138cf373e6c2261371eb7534"
+    },
+    {
+      "section": "cl_static_boundary",
+      "result_sha256": "3177d0c7db1a7bf4b062ca4c0da92d389b3618818944cde578918ff079ef694e"
+    },
+    {
+      "section": "metadata",
+      "result_sha256": "8e6680186e43bcde6bbac84cb0e2e93cf7d32345e30f0c6cb213164b7cf63a44"
+    },
+    {
+      "section": "static_ellipsis_shaping",
+      "result_sha256": "ee93b6b3634428299b4fbeccb9e6eabcb6a50c43c998feb57c76aebdfeeab60c"
+    },
+    {
+      "section": "static_em_dash_shaping",
+      "result_sha256": "61547f85156d20bab67a964b4188cf583fd8b88491aeb09bee4129553c515e89"
+    },
+    {
+      "section": "static_exact",
+      "result_sha256": "d5fbdb703bbbb033e40e950cf44be03d2f22e0e25c096688ab02b35b4988b576"
+    },
+    {
+      "section": "static_extension_source",
+      "result_sha256": "2bf79dd8ac4d82e0836e0aab4095319359e0815a5144beb1e9c7fcfab171be51"
+    },
+    {
+      "section": "static_layout_template",
+      "result_sha256": "3111d7e06dc63d1dd929a6146ac41fa73d28d0c62f58aeda97df93c23e072bfa"
+    },
+    {
+      "section": "static_palt_shaping",
+      "result_sha256": "86b19316e4d31b6de06931705f001c1ba2fcb8bb5f620c5b799807e9abe9814e"
+    },
+    {
+      "section": "static_propdigits_shaping",
+      "result_sha256": "e5b7a87d460ec95572edf3c95d2dcf09b00514afa26f3336c0d2d85382887912"
+    },
+    {
+      "section": "vf_cjk_stroke",
+      "result_sha256": "309d0d5eb07c8feb7d4626ba7b7c82f92b1c8554d786eaaa334d7c65fbaac5ee"
+    },
+    {
+      "section": "vf_contextual_spacing",
+      "result_sha256": "ef6506eb93ac31932d85e9f47948e43b35ab6cbe1722df650789ae38f817dd21"
+    },
+    {
+      "section": "vf_ellipsis_shaping",
+      "result_sha256": "fbcebe65494f5927d386e35e055b60b11d832ca42f996f78bd319c6ccffffaf1"
+    },
+    {
+      "section": "vf_em_dash_shaping",
+      "result_sha256": "fd9a76290895d1bd5c3e4df772a687737f9c91bd3a15b3804c2c4dee988bb39f"
+    },
+    {
+      "section": "vf_engine_metric",
+      "result_sha256": "78042f8515eb2a5899dee7a604065501db4960071892b7b04e98b0a38adfe008"
+    },
+    {
+      "section": "vf_metric",
+      "result_sha256": "c5c6b4d5dc60dfe356794368659d7dcd40d640ba122452b53ba3ea45a6302327"
+    },
+    {
+      "section": "vf_source_gpos_variation",
+      "result_sha256": "72672de0f09a24a893c0062fdc52f885e1d8d9b7d9f9c18b2b9cabe50dc9ad33"
+    },
+    {
+      "section": "vf_source_pairing",
+      "result_sha256": "879fb2d031e2ee4c23b54a353ae1d488b7f92106595292bfcf17e3cbda447efd"
+    },
+    {
+      "section": "vf_upstream_dash_source",
+      "result_sha256": "4f1510ad70c29b52d3d14723089fdea313cfe27d14e7377257f4afb023da6774"
+    },
+    {
+      "section": "vf_weight_curve",
+      "result_sha256": "b54807778545ce657cecd87e5ebd4ce62f2620663d219942f283f0465dfc7b9f"
+    },
+    {
+      "section": "static_raster",
+      "result_sha256": "f0950ed0fb3629b72d458dcd763595ccfe24efb76f596888fc75e8cdf184d1a6"
+    }
+  ],
+  "changed_section_recomputed": true,
+  "official_main_passed": true,
+  "changed_section_cases": 456,
+  "changed_section_failures": 0,
+  "official_main_exit_code": 0,
+  "coverage_validation_transition": {
+    "changed_function": "instruction_raster_coverage_failures",
+    "old_audit_sha256": "09290b8bfec9508bc6236e26b711e1e7341ddbca1b795afbc97ac7c1b067c28e",
+    "new_audit_sha256": "f66c5323b4363f3fdd18d5c56effd0098c9eb64a381290218e2db3c7c08a4608",
+    "new_provenance_sha256": "03240e38752ed95952919ccc760d7c7a422dca6ae9b20a863d70c51f1a39a410",
+    "proof": "仅覆盖汇总函数发生变化；其他全部模块 AST 节点完全一致，测量函数不调用该汇总函数。全部 22 个完整测量结果与其哈希保持不变，输入、来源和工具重新核对一致。",
+    "unchanged_results": [
+      {
+        "section": "cl_source_outline",
+        "result_sha256": "191f8ba5cd8cb95918785114af6595467ae8a004138cf373e6c2261371eb7534"
+      },
+      {
+        "section": "cl_static_boundary",
+        "result_sha256": "3177d0c7db1a7bf4b062ca4c0da92d389b3618818944cde578918ff079ef694e"
+      },
+      {
+        "section": "metadata",
+        "result_sha256": "8e6680186e43bcde6bbac84cb0e2e93cf7d32345e30f0c6cb213164b7cf63a44"
+      },
+      {
+        "section": "static_ellipsis_shaping",
+        "result_sha256": "ee93b6b3634428299b4fbeccb9e6eabcb6a50c43c998feb57c76aebdfeeab60c"
+      },
+      {
+        "section": "static_em_dash_shaping",
+        "result_sha256": "61547f85156d20bab67a964b4188cf583fd8b88491aeb09bee4129553c515e89"
+      },
+      {
+        "section": "static_exact",
+        "result_sha256": "d5fbdb703bbbb033e40e950cf44be03d2f22e0e25c096688ab02b35b4988b576"
+      },
+      {
+        "section": "static_extension_source",
+        "result_sha256": "2bf79dd8ac4d82e0836e0aab4095319359e0815a5144beb1e9c7fcfab171be51"
+      },
+      {
+        "section": "static_layout_template",
+        "result_sha256": "3111d7e06dc63d1dd929a6146ac41fa73d28d0c62f58aeda97df93c23e072bfa"
+      },
+      {
+        "section": "static_palt_shaping",
+        "result_sha256": "86b19316e4d31b6de06931705f001c1ba2fcb8bb5f620c5b799807e9abe9814e"
+      },
+      {
+        "section": "static_propdigits_shaping",
+        "result_sha256": "e5b7a87d460ec95572edf3c95d2dcf09b00514afa26f3336c0d2d85382887912"
+      },
+      {
+        "section": "static_raster",
+        "result_sha256": "f0950ed0fb3629b72d458dcd763595ccfe24efb76f596888fc75e8cdf184d1a6"
+      },
+      {
+        "section": "static_upstream_dash_source",
+        "result_sha256": "99a3b56719a8658de047cf23cd28dd7d33e0131d3692760889a95fa80e61439c"
+      },
+      {
+        "section": "vf_cjk_stroke",
+        "result_sha256": "309d0d5eb07c8feb7d4626ba7b7c82f92b1c8554d786eaaa334d7c65fbaac5ee"
+      },
+      {
+        "section": "vf_contextual_spacing",
+        "result_sha256": "ef6506eb93ac31932d85e9f47948e43b35ab6cbe1722df650789ae38f817dd21"
+      },
+      {
+        "section": "vf_ellipsis_shaping",
+        "result_sha256": "fbcebe65494f5927d386e35e055b60b11d832ca42f996f78bd319c6ccffffaf1"
+      },
+      {
+        "section": "vf_em_dash_shaping",
+        "result_sha256": "fd9a76290895d1bd5c3e4df772a687737f9c91bd3a15b3804c2c4dee988bb39f"
+      },
+      {
+        "section": "vf_engine_metric",
+        "result_sha256": "78042f8515eb2a5899dee7a604065501db4960071892b7b04e98b0a38adfe008"
+      },
+      {
+        "section": "vf_metric",
+        "result_sha256": "c5c6b4d5dc60dfe356794368659d7dcd40d640ba122452b53ba3ea45a6302327"
+      },
+      {
+        "section": "vf_source_gpos_variation",
+        "result_sha256": "72672de0f09a24a893c0062fdc52f885e1d8d9b7d9f9c18b2b9cabe50dc9ad33"
+      },
+      {
+        "section": "vf_source_pairing",
+        "result_sha256": "879fb2d031e2ee4c23b54a353ae1d488b7f92106595292bfcf17e3cbda447efd"
+      },
+      {
+        "section": "vf_upstream_dash_source",
+        "result_sha256": "4f1510ad70c29b52d3d14723089fdea313cfe27d14e7377257f4afb023da6774"
+      },
+      {
+        "section": "vf_weight_curve",
+        "result_sha256": "b54807778545ce657cecd87e5ebd4ce62f2620663d219942f283f0465dfc7b9f"
+      }
+    ]
+  }
+}

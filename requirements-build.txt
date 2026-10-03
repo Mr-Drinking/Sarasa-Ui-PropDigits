@@ -1,5 +1,6 @@
 fonttools[woff]==4.63.0
 uharfbuzz==0.56.0
+freetype-py==2.5.1
 brotli==1.2.0
 ttfautohint-py==0.6.1
 py7zr==1.1.3

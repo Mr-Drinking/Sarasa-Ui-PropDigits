@@ -1,5 +1,8 @@
 * text=auto eol=lf
 
+# 发布清单绑定报告的原始字节，提交和检出时保留报告的换行。
+reports/*.json -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+
 *.ttf binary
 *.otf binary
 *.woff binary
