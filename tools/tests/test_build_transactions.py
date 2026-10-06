@@ -24,7 +24,7 @@ class BuildTransactionTests(unittest.TestCase):
                 with b.staged_build_outputs(['SC'],static_only=True,variable_only=False,unhinted_only=True,
                                            resume_static=False,resume_variable=False):
                     other.write_text('updated by another build')
-                    b.REPORT_DIR.mkdir(parents=True)
+                    b.REPORT_DIR.mkdir(parents=True, exist_ok=True)
                     for stop in b.SOURCE_HAN_WEIGHT_STOPS:
                         for italic in (False,True):
                             path=b.static_dir('SC',False)/b.static_output_name('SC',str(stop['name']),italic)

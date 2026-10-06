@@ -257,7 +257,7 @@ class VisualControls(unittest.TestCase):
                 item["vertical_cases"]=[{"font":audit.display_path(audit.vf_path(region,italic) if variable else audit.static_path(region,"Regular",italic,False)),
                                          "weight":400,"italic":italic,"variable":variable,"script":"Hani","direction":"ttb","text":text,"pixels":34}
                                         for variable in (True,False) for italic in (False,True)
-                                        for text in ("甲……乙——丙⸺丁","甲……乙———丙⸻丁")]
+                                        for text in build.VISUAL_VERTICAL_RUN_TEXTS]
         package.validate_visual_report(report, manifest)
         mutations = (
             lambda value: value.update(images=[]),

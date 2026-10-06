@@ -565,6 +565,8 @@ class ReleasePackageTests(unittest.TestCase):
                         (build.VARIABLE_DIR/build.variable_output_name(region, italic)).write_bytes(f'VF {region} {italic}'.encode())
                     for hinted in (False, True):
                         directory=build.static_dir(region, hinted); directory.mkdir(parents=True)
+                        for document in ("README.txt", "LICENSE-Sarasa-Gothic.txt"):
+                            (directory/document).write_text("文档夹具", encoding="utf-8")
                         for stop in build.SOURCE_HAN_WEIGHT_STOPS:
                             for italic in (False, True):
                                 name=build.static_output_name(region, str(stop['name']), italic)
@@ -586,6 +588,8 @@ class ReleasePackageTests(unittest.TestCase):
                 for hinted in (False, True):
                     directory = build.static_dir(region, hinted)
                     directory.mkdir(parents=True)
+                    for document in ("README.txt", "LICENSE-Sarasa-Gothic.txt"):
+                        (directory/document).write_text("文档夹具", encoding="utf-8")
                     for stop in build.SOURCE_HAN_WEIGHT_STOPS:
                         for italic in (False, True):
                             (directory / build.static_output_name(region, str(stop["name"]), italic)).touch()

@@ -163,12 +163,14 @@ SARASA_VERSION = "1.0.42"
 VERSION = "1.0.42"
 FONT_REVISION = 1.042
 OPENTYPE_VERSION = "1.042"
+VISUAL_VERTICAL_RUN_TEXTS = ("甲……乙——丙⸺丁", "甲……乙———丙⸻丁",
+                           "甲————乙⸺⸻丁", "甲————————————————乙")
 SARASA_TAG = f"v{SARASA_VERSION}"
 SARASA_COMMIT = "f31c230af7fb4854f40d96560e2616eafdd85926"
 # Generated GitHub archives are not stable source identities. Git is the normal
 # transport; an archive fallback is permitted only with an explicitly pinned hash.
 SARASA_SOURCE_ARCHIVE_SHA256: str | None = None
-SARASA_PACKAGE_LOCK_SHA256 = "d69918eb8b7c0bc975f5f018a9626a3ad5f69edb79a3b874b932b2e55d3ce9fb"
+SARASA_PACKAGE_LOCK_SHA256 = "e6d2198068bdd1f82d4dba37ab4a314046ea25497cf9fa88ff13ecdf90b8e570"
 SARASA_UI_ARCHIVE_SHA256 = {
     "CL": {
         "hinted": "fe6fca24801fe89d4b2f55bc2016441d86cfcb5a31812c820b077e63d778ceb5",
@@ -424,7 +426,7 @@ SARASA_HINT_CONFIGS = {
 }
 CHLOROPHYTUM_HINT_STORE_ORDER = "numeric-gid-hcfg-shared-v3"
 STATIC_HINT_WORK_VERSION = 5
-STATIC_POSTPROCESS_VERSION = 14
+STATIC_POSTPROCESS_VERSION = 15
 STATIC_HINT_RECIPE = {
     "version": STATIC_HINT_WORK_VERSION,
     "fragments": "sarasa-pass1-kanji-hangul",
@@ -7832,6 +7834,191 @@ def install_vertical_dash_segment_layout(font: TTFont, roles: dict[str, str], na
         classes.update({name: 1 for name in names.values()})
 
 
+def cursive_anchor_signature(anchor: Any, store: Any) -> Any:
+    if anchor is None:
+        return None
+    result = [int(anchor.XCoordinate), int(anchor.YCoordinate)]
+    for field in ("XDeviceTable", "YDeviceTable"):
+        device = getattr(anchor, field, None)
+        if device is None:
+            result.append(())
+        elif device.DeltaFormat != 0x8000:
+            result.append((device.DeltaFormat, device.StartSize, device.EndSize, tuple(device.DeltaValue)))
+        else:
+            if store is None:
+                raise ValueError("连接锚点缺少 GDEF 变化存储")
+            data = store.VarData[device.StartSize]
+            deltas = {}
+            for region, delta in zip(data.VarRegionIndex, data.Item[device.EndSize]):
+                key = tuple((axis.StartCoord, axis.PeakCoord, axis.EndCoord)
+                            for axis in store.VarRegionList.Region[region].VarRegionAxis)
+                deltas[key] = deltas.get(key, 0) + delta
+            result.append(tuple(sorted((key, value) for key, value in deltas.items() if value)))
+    return tuple(result)
+
+
+def install_continuous_vertical_dash_layout(font: TTFont) -> dict[str, Any]:
+    """Join any number of existing segments without changing outlines or hint."""
+    roles = upstream_dash_roles(font)
+    names = vertical_dash_segments(font, roles)
+    if not names:
+        raise ValueError("缺少竖排分段，不能安装连续连接规则")
+    if "GPOS" not in font:
+        font["GPOS"] = newTable("GPOS"); font["GPOS"].table = ot.GPOS()
+        table = font["GPOS"].table; table.Version = 0x00010000
+        table.ScriptList = copy.deepcopy(font["GSUB"].table.ScriptList)
+        table.FeatureList = ot.FeatureList(); table.FeatureList.FeatureRecord = []; table.FeatureList.FeatureCount = 0
+        table.LookupList = ot.LookupList(); table.LookupList.Lookup = []; table.LookupList.LookupCount = 0
+        for script in table.ScriptList.ScriptRecord:
+            for langsys in ([script.Script.DefaultLangSys] if script.Script.DefaultLangSys else []) + [row.LangSys for row in script.Script.LangSysRecord]:
+                langsys.ReqFeatureIndex = 0xFFFF; langsys.FeatureIndex = []; langsys.FeatureCount = 0
+    singles = {roles[key] for key in ("proportional", "fullwidth", "vertical_single", "korean_single") if key in roles}
+    for mapping in dash_locl_mappings_by_language(font, roles).values():
+        if roles["proportional"] in mapping:
+            singles.add(mapping[roles["proportional"]])
+    segments = set(names.values())
+    members = segments | singles
+    original_gpos = {
+        index: copy.deepcopy(lookup) for index, lookup in enumerate(font["GPOS"].table.LookupList.Lookup)
+        if not (lookup.LookupType == 3 and len(lookup.SubTable) == 1
+                and set(lookup.SubTable[0].Coverage.glyphs) == segments)
+    }
+    original_store = copy.deepcopy(getattr(font["GDEF"].table, "VarStore", None)) if "GDEF" in font else None
+    lookups = font["GSUB"].table.LookupList.Lookup
+
+    def context(mapping, backtrack=(), lookahead=()):
+        inputs = set(mapping)
+        expected = ([set(backtrack)] if backtrack else [], [inputs], [set(lookahead)] if lookahead else [])
+        for index, existing in enumerate(lookups):
+            if existing.LookupType != 6 or len(existing.SubTable) != 1:
+                continue
+            part = existing.SubTable[0]
+            if getattr(part, "Format", None) != 3 or part.SubstCount != 1:
+                continue
+            actual = tuple([set(cov.glyphs) for cov in getattr(part, field)]
+                           for field in ("BacktrackCoverage", "InputCoverage", "LookAheadCoverage"))
+            if actual == expected and part.SubstLookupRecord[0].SequenceIndex == 0:
+                child = lookups[part.SubstLookupRecord[0].LookupListIndex]
+                current = {key: value for table in child.SubTable for key, value in getattr(table, "mapping", {}).items()}
+                if child.LookupType == 1 and current == mapping:
+                    return index
+        substitution = append_gsub_lookup(font, make_single_substitution_lookup(mapping))
+        part = ot.ChainContextSubst(); part.Format = 3
+        part.BacktrackCoverage = [coverage(font, backtrack)] if backtrack else []
+        part.InputCoverage = [coverage(font, inputs)]
+        part.LookAheadCoverage = [coverage(font, lookahead)] if lookahead else []
+        part.BacktrackGlyphCount = len(part.BacktrackCoverage); part.InputGlyphCount = 1
+        part.LookAheadGlyphCount = len(part.LookAheadCoverage)
+        record = ot.SubstLookupRecord(); record.SequenceIndex = 0; record.LookupListIndex = substitution
+        part.SubstLookupRecord = [record]; part.SubstCount = 1
+        lookup = ot.Lookup(); lookup.LookupType = 6; lookup.LookupFlag = 0
+        lookup.SubTable = [part]; lookup.SubTableCount = 1
+        return append_gsub_lookup(font, lookup)
+
+    indices = [
+        context({names["begin"]: names["middle"], **{name: names["end2"] for name in singles}}, backtrack=members),
+        context({name: names["begin"] for name in singles}, lookahead=members),
+        context({names["end2"]: names["middle"], names["end3"]: names["middle"]}, lookahead=members),
+    ]
+    for tag in ("vert", "vrt2"):
+        for index in indices:
+            link_lookup_to_all_gsub_features(font, tag, index)
+
+    # Contour-point anchors alone do not follow gvar when an engine has no
+    # ppem. Carry the actual point deltas in GDEF, preserving Inter's store.
+    variable = "gvar" in font and "fvar" in font
+    store_builder = OnlineVarStoreBuilder([axis.axisTag for axis in font["fvar"].axes]) if variable else None
+    devices = []
+    subtable = ot.CursivePos(); subtable.Format = 1; subtable.Coverage = coverage(font, segments)
+    subtable.EntryExitRecord = []
+    for name in subtable.Coverage.glyphs:
+        coordinates, controls = font["glyf"]._getCoordinatesAndControls(name, font["hmtx"].metrics, font["vmtx"].metrics)
+        outline = coordinates[:-4]
+        top = min((i for i, point in enumerate(outline) if point[1] == max(y for x, y in outline)), key=lambda i: outline[i][0])
+        bottom = min((i for i, point in enumerate(outline) if point[1] == min(y for x, y in outline)), key=lambda i: outline[i][0])
+        variations = copy.deepcopy(font["gvar"].variations.get(name, [])) if variable else []
+        for variation in variations:
+            variation.calcInferredDeltas(coordinates, controls.endPts)
+        if store_builder is not None:
+            store_builder.setSupports([variation.axes for variation in variations])
+        def anchor(point):
+            result = ot.Anchor(); result.Format = 1
+            result.XCoordinate, result.YCoordinate = outline[point]
+            if variations:
+                result.Format = 3; result.XDeviceTable = None; result.YDeviceTable = None
+                for coordinate, field in enumerate(("XDeviceTable", "YDeviceTable")):
+                    deltas = [variation.coordinates[point][coordinate] for variation in variations]
+                    if any(deltas):
+                        device = buildVarDevTable(store_builder.storeDeltas(deltas, round=otRound))
+                        setattr(result, field, device); devices.append(device)
+            return result
+        record = ot.EntryExitRecord()
+        record.EntryAnchor = None if name == names["begin"] else anchor(top)
+        record.ExitAnchor = anchor(bottom) if name in {names["begin"], names["middle"]} else None
+        subtable.EntryExitRecord.append(record)
+    subtable.EntryExitCount = len(subtable.EntryExitRecord)
+    additional = store_builder.finish() if devices else None
+    gpos = font["GPOS"].table
+    existing_indices = [index for index, item in enumerate(gpos.LookupList.Lookup)
+                        if item.LookupType == 3 and len(item.SubTable) == 1
+                        and set(item.SubTable[0].Coverage.glyphs) == segments]
+    if len(existing_indices) > 1:
+        raise ValueError("竖排连接定位记录重复")
+    existing_store = getattr(font["GDEF"].table, "VarStore", None) if "GDEF" in font else None
+    def signature(part, store):
+        return [(name, cursive_anchor_signature(record.EntryAnchor, store),
+                 cursive_anchor_signature(record.ExitAnchor, store))
+                for name, record in zip(part.Coverage.glyphs, part.EntryExitRecord)]
+    unchanged = bool(existing_indices and signature(gpos.LookupList.Lookup[existing_indices[0]].SubTable[0], existing_store)
+                     == signature(subtable, additional))
+    if devices and not unchanged:
+        if "GDEF" not in font:
+            font["GDEF"] = newTable("GDEF"); font["GDEF"].table = ot.GDEF()
+            for field in ("GlyphClassDef", "AttachList", "LigCaretList", "MarkAttachClassDef", "MarkGlyphSetsDef"):
+                setattr(font["GDEF"].table, field, None)
+        gdef = font["GDEF"].table
+        existing = getattr(gdef, "VarStore", None)
+        values = [(device.StartSize << 16) | device.EndSize for device in devices]
+        if existing is not None:
+            additional, values = append_item_variation_store(existing, additional, values)
+        gdef.Version = 0x00010003; gdef.VarStore = additional
+        for device, value in zip(devices, values):
+            device.StartSize, device.EndSize = value >> 16, value & 0xFFFF
+    lookup = ot.Lookup(); lookup.LookupType = 3; lookup.LookupFlag = 0
+    lookup.SubTable = [subtable]; lookup.SubTableCount = 1
+    if existing_indices:
+        index = existing_indices[0]
+        if not unchanged:
+            gpos.LookupList.Lookup[index] = lookup
+    else:
+        index = append_gpos_lookup(font, lookup)
+    feature_indices = [i for i, record in enumerate(gpos.FeatureList.FeatureRecord) if record.FeatureTag == "curs"]
+    feature_index = feature_indices[0] if feature_indices else insert_gpos_feature(font, "curs", [index])
+    feature = gpos.FeatureList.FeatureRecord[feature_index].Feature
+    if index not in feature.LookupListIndex:
+        feature.LookupListIndex.append(index); feature.LookupCount = len(feature.LookupListIndex)
+    # Joining is required positioning, including engines which do not enable
+    # optional vertical kerning. Existing required features retain their rules.
+    for script in gpos.ScriptList.ScriptRecord:
+        for langsys in ([script.Script.DefaultLangSys] if script.Script.DefaultLangSys else []) + [row.LangSys for row in script.Script.LangSysRecord]:
+            if langsys.ReqFeatureIndex == 0xFFFF:
+                langsys.ReqFeatureIndex = feature_index
+            elif langsys.ReqFeatureIndex != feature_index:
+                required = gpos.FeatureList.FeatureRecord[langsys.ReqFeatureIndex].Feature
+                if index not in required.LookupListIndex:
+                    required.LookupListIndex.append(index); required.LookupCount = len(required.LookupListIndex)
+    if any(lookup != gpos.LookupList.Lookup[index] for index, lookup in original_gpos.items()):
+        raise RuntimeError("连续竖排连接修改了已有的非连接 GPOS lookup")
+    if original_store is not None:
+        current = font["GDEF"].table.VarStore
+        if (list(current.VarData[:len(original_store.VarData)]) != list(original_store.VarData)
+                or list(current.VarRegionList.Region[:len(original_store.VarRegionList.Region)]) != list(original_store.VarRegionList.Region)):
+            raise RuntimeError("连续竖排连接修改了已有的 GPOS 变化数据")
+    return {"continuous_vertical_dash_joining": True, "vertical_join_substitution_lookups": indices,
+            "vertical_join_positioning_lookup": index, "vertical_join_variable_anchors": len(devices),
+            "existing_positioning_lookups_preserved": len(original_gpos), "existing_layout_variations_preserved": True}
+
+
 def recalculate_head_bounds(font: TTFont) -> dict[str, Any]:
     boxes = []
     for name in font.getGlyphOrder():
@@ -7852,6 +8039,24 @@ def recalculate_head_bounds(font: TTFont) -> dict[str, Any]:
     for attribute, value in zip(("xMin", "yMin", "xMax", "yMax"), bounds):
         setattr(font["head"], attribute, value)
     return {"head_bounds_recalculated": list(bounds), "head_bounds_glyphs_checked": len(font.getGlyphOrder())}
+
+
+def continuous_vertical_dash_structure_status(font: TTFont) -> dict[str, Any]:
+    try:
+        tags = ("GSUB", "GPOS", "GDEF")
+        before = {tag: font.getTableData(tag) for tag in tags if tag in font}
+        probe = TTFont(); probe.setGlyphOrder(font.getGlyphOrder())
+        for tag in tags:
+            if tag in font:
+                probe[tag] = copy.deepcopy(font[tag])
+        for tag in ("cmap", "glyf", "hmtx", "vmtx", "head", "fvar", "gvar"):
+            if tag in font:
+                probe[tag] = font[tag]
+        install_continuous_vertical_dash_layout(probe)
+        after = {tag: probe.getTableData(tag) for tag in tags if tag in probe}
+        return {"ok": before == after, "reason": "" if before == after else "连续竖排连接规则、变化锚点或必要特性引用不完整"}
+    except (KeyError, ValueError, AttributeError) as error:
+        return {"ok": False, "reason": str(error)}
 
 
 def align_vertical_dash_geometry_to_static(font: TTFont, reference_fonts: dict[int, TTFont]) -> dict[str, Any]:
@@ -8619,7 +8824,7 @@ def em_dash_chain_lookup_indices(font: TTFont) -> set[int]:
         return set()
     return {
         lookup_index
-        for lookup_index in range(len(font["GSUB"].table.LookupList.Lookup))
+        for lookup_index in calt_referenced_substitution_lookups(font)
         if is_em_dash_chain_lookup(font, lookup_index)
     }
 
@@ -8654,7 +8859,8 @@ def em_dash_pair_start_chain_lookup_indices(font: TTFont) -> set[int]:
         return set()
     gsub = font["GSUB"].table
     result: set[int] = set()
-    for lookup_index, lookup in enumerate(gsub.LookupList.Lookup):
+    for lookup_index in sorted(calt_referenced_substitution_lookups(font)):
+        lookup = gsub.LookupList.Lookup[lookup_index]
         if lookup.LookupType != 6:
             continue
         for subtable in lookup.SubTable:
@@ -9286,7 +9492,7 @@ def strip_legacy_dash_layout(
 
 def link_lookup_to_all_gsub_features(font: TTFont, tag: str, lookup_index: int) -> int:
     linked = add_lookup_to_all_features(font, tag, lookup_index)
-    if linked:
+    if linked or has_feature(font, tag):
         return linked
     feature_index = insert_gsub_feature_record(font, tag, [lookup_index])
     if not font["GSUB"].table.ScriptList:
@@ -11721,6 +11927,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     vorgless_report.update(normalize_variable_raster_metadata(base))
     vorgless_report.update(prune_unreferenced_variable_names(base))
     vorgless_report.update(recalculate_head_bounds(base))
+    vorgless_report.update(install_continuous_vertical_dash_layout(base))
     base.save(out_path, reorderTables=True)
     base.close()
     base = TTFont(out_path)
@@ -12178,6 +12385,10 @@ def bootstrap_sarasa_source_tree() -> None:
                 "-c",
                 "core.autocrlf=false",
                 "clone",
+                "--config",
+                "core.autocrlf=false",
+                "--config",
+                "core.eol=lf",
                 "--filter=blob:none",
                 "--depth",
                 "1",
@@ -12360,6 +12571,35 @@ def ensure_locked_npm_dependencies(lock_sha256: str) -> None:
     write_json_atomic(receipt, {"identity": expected_identity, "files": snapshot})
 
 
+def verify_git_source_bytes(directory: Path, expected_commit: str) -> dict[str, Any]:
+    def git(*arguments, input=None):
+        return subprocess.run(["git", *arguments], cwd=directory, input=input,
+                              capture_output=True, check=True).stdout
+    if git("rev-parse", "HEAD").decode().strip() != expected_commit:
+        raise RuntimeError("上游源码提交不匹配")
+    records = []
+    for entry in git("ls-tree", "-rz", "--full-tree", "HEAD").split(b"\0"):
+        if not entry:
+            continue
+        info, name = entry.split(b"\t", 1)
+        mode, kind, digest = info.split()
+        relative = name.decode("utf-8")
+        path = directory / relative
+        if (kind != b"blob" or mode not in {b"100644", b"100755"} or b"\n" in name
+                or not path.is_file() or path.is_symlink() or not path.resolve().is_relative_to(directory.resolve())):
+            raise RuntimeError(f"上游源码文件类型或路径无效：{relative}")
+        records.append((name, digest))
+    hashes = git("hash-object", "--no-filters", "--stdin-paths",
+                 input=b"\n".join(name for name, _digest in records) + b"\n").splitlines()
+    if len(hashes) != len(records):
+        raise RuntimeError("上游源码内容校验覆盖不完整")
+    changed = [name.decode("utf-8") for (name, expected), actual in zip(records, hashes) if expected != actual]
+    if changed or git("ls-files", "--others", "--exclude-standard", "-z"):
+        raise RuntimeError(f"上游源码字节与固定提交不符或含额外文件：{changed[:8]}")
+    git("diff-index", "--cached", "--quiet", "HEAD", "--")
+    return {"commit": expected_commit, "tracked_files_verified": len(records), "raw_git_object_bytes": True}
+
+
 def ensure_sarasa_source_tree() -> None:
     required = [
         SARASA_SOURCE_DIR / "sources" / "shs" / "SourceHanSans-Regular.ttc",
@@ -12406,12 +12646,7 @@ def ensure_sarasa_source_tree() -> None:
                 f"Sarasa Gothic source commit mismatch at {SARASA_SOURCE_DIR}: "
                 f"expected {SARASA_COMMIT}, got {actual_commit}"
             )
-        result = subprocess.run(
-            ["git", "status", "--porcelain=v1", "--untracked-files=all"],
-            cwd=SARASA_SOURCE_DIR, capture_output=True, text=True,
-        )
-        if result.returncode or result.stdout.strip():
-            raise RuntimeError("Sarasa 固定提交的源码或字体缓存已被修改")
+        verify_git_source_bytes(SARASA_SOURCE_DIR, SARASA_COMMIT)
     else:
         if not SARASA_SOURCE_ARCHIVE_SHA256:
             raise RuntimeError("上游源码必须是已固定提交的 Git checkout；不能信任无校验来源的目录")
@@ -13130,20 +13365,16 @@ def sarasa_hint_latin_config(family: str) -> dict[str, Any]:
 
 def sarasa_module_runner(tmp_dir: Path) -> Path:
     runner = tmp_dir / "run-sarasa-module.mjs"
-    if not runner.exists():
-        runner.write_text(
-            "\n".join(
-                [
-                    'import { pathToFileURL } from "node:url";',
-                    "const recipe = process.argv[2];",
-                    "const args = JSON.parse(process.argv[3]);",
-                    "const mod = await import(pathToFileURL(recipe).href);",
-                    "await mod.default(args);",
-                    "",
-                ]
-            ),
-            encoding="utf-8",
-        )
+    content = "\n".join([
+        'import { pathToFileURL } from "node:url";',
+        "const recipe = process.argv[2];",
+        "const args = JSON.parse(process.argv[3]);",
+        "const mod = await import(pathToFileURL(recipe).href);",
+        "await mod.default(args);",
+        "",
+    ])
+    if not runner.is_file() or runner.read_text(encoding="utf-8") != content:
+        runner.write_text(content, encoding="utf-8", newline="\n")
     return runner
 
 
@@ -13156,6 +13387,41 @@ def run_sarasa_module(tmp_dir: Path, recipe: str, args: dict[str, Any]) -> None:
         json.dumps(args, ensure_ascii=False),
     ]
     run_checked(cmd, cwd=SARASA_SOURCE_DIR)
+
+
+def cached_static_artifact(output: Path, inputs: dict[str, Path], recipe: dict[str, Any], producer: Any) -> bool:
+    """Reuse only content-bound artifacts; never attest to preexisting bytes."""
+    payload = {"schema": 1, "file": output.name, "recipe": recipe,
+               "inputs": {name: file_sha256(path) for name, path in sorted(inputs.items())}}
+    key = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    receipt = output.with_name(output.name + ".cache.json")
+    try:
+        saved = json.loads(receipt.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        saved = None
+    if output.is_file() and saved == {"key": key, "sha256": file_sha256(output), "size": output.stat().st_size}:
+        return True
+    output.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix=".artifact-", dir=output.parent) as temporary:
+        pending = Path(temporary) / output.name
+        producer(pending)
+        if not pending.is_file() or not pending.stat().st_size:
+            raise RuntimeError(f"静态缓存生成失败：{output.name}")
+        value = {"key": key, "sha256": file_sha256(pending), "size": pending.stat().st_size}
+        pending.replace(output)
+        write_json_atomic(receipt, value)
+    return False
+
+
+def run_cached_sarasa_module(tmp_dir: Path, recipe: str, args: dict[str, Any]) -> None:
+    input_names = {"main", "lgc", "as", "ws", "feMisc", "kanji", "hangul", "classicalOverride"}
+    inputs = {name: Path(value) for name, value in args.items() if name in input_names and value is not None}
+    inputs["module"] = SARASA_SOURCE_DIR / recipe
+    parameters = {name: value for name, value in args.items() if name not in input_names | {"o"}}
+    cached_static_artifact(Path(args["o"]), inputs,
+                           {"module": recipe, "parameters": parameters, "sarasa_commit": SARASA_COMMIT,
+                            "npm_lock_sha256": SARASA_PACKAGE_LOCK_SHA256, "node": NODE_VERSION},
+                           lambda output: run_sarasa_module(tmp_dir, recipe, {**args, "o": str(output)}))
 
 
 def otc2otf_executable() -> str:
@@ -13173,30 +13439,27 @@ def build_shs_ttf(region: str, weight_name: str, tmp_dir: Path) -> Path:
     out_dir = tmp_dir / "shs"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_ttf = out_dir / f"{region}-{shs_weight}.ttf"
-    if out_ttf.exists():
-        return out_ttf
-
     source_ttc = SARASA_SOURCE_DIR / "sources" / "shs" / f"SourceHanSans-{shs_weight}.ttc"
     if not source_ttc.exists():
         raise FileNotFoundError(source_ttc)
-    extract_dir = tmp_dir / "shs-extract" / shs_weight
-    extract_dir.mkdir(parents=True, exist_ok=True)
-    copied_ttc = extract_dir / source_ttc.name
-    if not copied_ttc.exists():
-        shutil.copy2(source_ttc, copied_ttc)
     shs_prefix = source_han_static_prefix(region)
-    expected_otf = extract_dir / f"{shs_prefix}-{shs_weight}.otf"
-    if not expected_otf.exists():
-        run_checked([otc2otf_executable(), str(copied_ttc)], cwd=extract_dir)
-    if not expected_otf.exists():
-        candidates = list(extract_dir.rglob(f"{shs_prefix}-{shs_weight}.otf"))
-        if candidates:
-            expected_otf = candidates[0]
-    if not expected_otf.exists():
-        raise FileNotFoundError(expected_otf)
-    if out_ttf.exists():
-        out_ttf.unlink()
-    run_checked([otf2ttf_executable(), "-o", str(out_ttf), str(expected_otf)])
+    extractor, converter = otc2otf_executable(), otf2ttf_executable()
+    inputs = {"source": source_ttc,
+              "extractor": Path(shutil.which(extractor) or extractor),
+              "converter": Path(shutil.which(converter) or converter)}
+    def produce(output):
+        with tempfile.TemporaryDirectory(prefix="sarasa-shs-") as temporary:
+            stage = Path(temporary)
+            copied_ttc = stage / source_ttc.name
+            link_or_copy(source_ttc, copied_ttc)
+            run_checked([extractor, str(copied_ttc)], cwd=stage)
+            expected_otf = stage / f"{shs_prefix}-{shs_weight}.otf"
+            if not expected_otf.is_file():
+                raise FileNotFoundError(expected_otf)
+            run_checked([converter, "-o", str(output), str(expected_otf)])
+    cached_static_artifact(out_ttf, inputs,
+                           {"kind": "source-han-static", "region": region, "weight": shs_weight,
+                            "afdko": importlib.metadata.version("afdko")}, produce)
     return out_ttf
 
 
@@ -13238,17 +13501,20 @@ def build_inter_source(weight_name: str, weight_value: int, italic: bool, tmp_di
         suffix = "Italic" if italic else ""
         raw_path = out_dir / f"Inter-{weight_name}{suffix}.vf-instance.ttf"
         out_path = out_dir / f"Inter-{weight_name}{suffix}.dehint.ttf"
-        if not raw_path.exists():
+        def instantiate(output):
             inter = TTFont(INTER_ITALIC if italic else INTER_UPRIGHT)
             inter = instantiateVariableFont(inter, {"opsz": 14, "wght": weight_value}, inplace=False, optimize=True)
             try:
                 remove_variable_tables(inter)
                 inter.flavor = None
-                inter.save(raw_path, reorderTables=True)
+                inter.save(output, reorderTables=True)
             finally:
                 inter.close()
-    if not out_path.exists():
-        run_ttfautohint(["-d", str(raw_path), str(out_path)])
+        cached_static_artifact(raw_path, {"source": INTER_ITALIC if italic else INTER_UPRIGHT},
+                               {"kind": "inter-static-instance", "wght": weight_value, "opsz": 14,
+                                "fonttools": importlib.metadata.version("fonttools")}, instantiate)
+    cached_static_artifact(out_path, {"source": raw_path}, {"kind": "dehint", "tool": ttfautohint_identity()},
+                           lambda output: run_ttfautohint(["-d", str(raw_path), str(output)]))
     return out_path
 
 
@@ -13271,16 +13537,14 @@ def build_sarasa_hint_latin_source(
     out_dir = tmp_dir / "hint-environment" / f"latin-{group}"
     out_dir.mkdir(parents=True, exist_ok=True)
     out_path = out_dir / f"{group}-{style}.ttf"
-    if out_path.exists():
-        return out_path
-
     if group == "Inter" and family == "Ui":
         source = build_inter_source(weight_name, weight_value, italic, tmp_dir)
     else:
         source = SARASA_SOURCE_DIR / "sources" / group / f"{group}-{style}.ttf"
         if not source.exists():
             raise FileNotFoundError(source)
-    run_ttfautohint(["-d", str(source), str(out_path)])
+    cached_static_artifact(out_path, {"source": source}, {"kind": "dehint", "tool": ttfautohint_identity()},
+                           lambda output: run_ttfautohint(["-d", str(source), str(output)]))
     return out_path
 
 
@@ -13316,33 +13580,29 @@ def build_sarasa_hint_environment_pass1(
     ws = work_dir / "ws0.ttf"
     as_punct = work_dir / "as0.ttf"
     fe_misc = work_dir / "fe-misc0.ttf"
-    if not ws.exists():
-        run_sarasa_module(tmp_dir, "make/punct/ws.mjs", {**punct_args, "o": str(ws)})
-    if not as_punct.exists():
-        run_sarasa_module(tmp_dir, "make/punct/as.mjs", {**punct_args, "o": str(as_punct)})
-    if not fe_misc.exists():
-        run_sarasa_module(tmp_dir, "make/punct/fe-misc.mjs", {**punct_args, "o": str(fe_misc)})
+    run_cached_sarasa_module(tmp_dir, "make/punct/ws.mjs", {**punct_args, "o": str(ws)})
+    run_cached_sarasa_module(tmp_dir, "make/punct/as.mjs", {**punct_args, "o": str(as_punct)})
+    run_cached_sarasa_module(tmp_dir, "make/punct/fe-misc.mjs", {**punct_args, "o": str(fe_misc)})
 
     pass1 = work_dir / "pass1.ttf"
-    if not pass1.exists():
-        run_sarasa_module(
-            tmp_dir,
-            "make/pass1/index.mjs",
-            {
-                "main": str(latin),
-                "as": str(as_punct),
-                "ws": str(ws),
-                "feMisc": str(fe_misc),
-                "o": str(pass1),
-                "family": family,
-                "subfamily": region,
-                "style": style,
-                "italize": italic,
-                "version": VERSION,
-                "latinCfg": sarasa_hint_latin_config(family),
-                **flags,
-            },
-        )
+    run_cached_sarasa_module(
+        tmp_dir,
+        "make/pass1/index.mjs",
+        {
+            "main": str(latin),
+            "as": str(as_punct),
+            "ws": str(ws),
+            "feMisc": str(fe_misc),
+            "o": str(pass1),
+            "family": family,
+            "subfamily": region,
+            "style": style,
+            "italize": italic,
+            "version": VERSION,
+            "latinCfg": sarasa_hint_latin_config(family),
+            **flags,
+        },
+    )
     return pass1
 
 
@@ -13373,13 +13633,12 @@ def build_sarasa_hint_environment(
             / "non-kanji"
             / f"{region}-{STATIC_STYLE_SOURCES[weight_name]['sarasa']}.ttf"
         )
-        if not non_kanji.exists():
-            non_kanji.parent.mkdir(parents=True, exist_ok=True)
-            run_sarasa_module(
-                tmp_dir,
-                "make/non-kanji/build.mjs",
-                {"main": str(shs_ttf), "o": str(non_kanji)},
-            )
+        non_kanji.parent.mkdir(parents=True, exist_ok=True)
+        run_cached_sarasa_module(
+            tmp_dir,
+            "make/non-kanji/build.mjs",
+            {"main": str(shs_ttf), "o": str(non_kanji)},
+        )
     for family in SARASA_HINT_FAMILY_ORDER:
         if family != "Ui":
             for italic in (False, True):
@@ -13429,10 +13688,20 @@ def build_sarasa_hint_environment(
                 "output": out_path,
             }
         )
-    pending_hint_items = [item for item in result if not Path(item["hinted"]).exists()]
+    pending_hint_items = [item for item in result if item["family"] != "Ui"]
+    def prepare_environment_hint(item):
+        source = Path(item["source"]); output = Path(item["hinted"])
+        generated = {}
+        cached = cached_static_artifact(
+            output, {"source": source}, {"kind": "sarasa-non-ui-autohint", "tool": ttfautohint_identity(),
+                                        "hint_recipe": static_hint_recipe_fingerprint()},
+            lambda pending: generated.update(hint_static_font(source, pending)))
+        return generated or {"hinted": True, "hint_tool": "verified-full-group-preparation",
+                             "input_sha256": file_sha256(source), "output_sha256": file_sha256(output),
+                             "cache_reused": cached}
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, SARASA_HINT_PREP_JOBS)) as executor:
         future_map = {
-            executor.submit(hint_static_font, Path(item["source"]), Path(item["hinted"])): item
+            executor.submit(prepare_environment_hint, item): item
             for item in pending_hint_items
         }
         for future in concurrent.futures.as_completed(future_map):
@@ -13481,16 +13750,13 @@ def build_sarasa_static_fragments(
     fe_misc = work_dir / "fe-misc0.ttf"
     pass1 = work_dir / "pass1.ttf"
 
-    if not kanji.exists():
-        run_sarasa_module(
-            tmp_dir,
-            "make/kanji/build.mjs",
-            {"main": str(shs_ttf), "classicalOverride": str(classical_override) if classical_override else None, "o": str(kanji)},
-        )
-    if not hangul.exists():
-        run_sarasa_module(tmp_dir, "make/hangul/build.mjs", {"main": str(shs_ttf), "o": str(hangul)})
-    if not non_kanji.exists():
-        run_sarasa_module(tmp_dir, "make/non-kanji/build.mjs", {"main": str(shs_ttf), "o": str(non_kanji)})
+    run_cached_sarasa_module(
+        tmp_dir,
+        "make/kanji/build.mjs",
+        {"main": str(shs_ttf), "classicalOverride": str(classical_override) if classical_override else None, "o": str(kanji)},
+    )
+    run_cached_sarasa_module(tmp_dir, "make/hangul/build.mjs", {"main": str(shs_ttf), "o": str(hangul)})
+    run_cached_sarasa_module(tmp_dir, "make/non-kanji/build.mjs", {"main": str(shs_ttf), "o": str(non_kanji)})
 
     punct_args = {
         "family": "Ui",
@@ -13500,32 +13766,28 @@ def build_sarasa_static_fragments(
         "lgc": str(inter_ttf),
         **flags,
     }
-    if not ws.exists():
-        run_sarasa_module(tmp_dir, "make/punct/ws.mjs", {**punct_args, "o": str(ws)})
-    if not as_punct.exists():
-        run_sarasa_module(tmp_dir, "make/punct/as.mjs", {**punct_args, "o": str(as_punct)})
-    if not fe_misc.exists():
-        run_sarasa_module(tmp_dir, "make/punct/fe-misc.mjs", {**punct_args, "o": str(fe_misc)})
+    run_cached_sarasa_module(tmp_dir, "make/punct/ws.mjs", {**punct_args, "o": str(ws)})
+    run_cached_sarasa_module(tmp_dir, "make/punct/as.mjs", {**punct_args, "o": str(as_punct)})
+    run_cached_sarasa_module(tmp_dir, "make/punct/fe-misc.mjs", {**punct_args, "o": str(fe_misc)})
 
-    if not pass1.exists():
-        run_sarasa_module(
-            tmp_dir,
-            "make/pass1/index.mjs",
-            {
-                "main": str(inter_ttf),
-                "as": str(as_punct),
-                "ws": str(ws),
-                "feMisc": str(fe_misc),
-                "o": str(pass1),
-                "family": "Ui",
-                "subfamily": region,
-                "style": style_name,
-                "italize": italic,
-                "version": VERSION,
-                "latinCfg": sarasa_latin_config(),
-                **flags,
-            },
-        )
+    run_cached_sarasa_module(
+        tmp_dir,
+        "make/pass1/index.mjs",
+        {
+            "main": str(inter_ttf),
+            "as": str(as_punct),
+            "ws": str(ws),
+            "feMisc": str(fe_misc),
+            "o": str(pass1),
+            "family": "Ui",
+            "subfamily": region,
+            "style": style_name,
+            "italize": italic,
+            "version": VERSION,
+            "latinCfg": sarasa_latin_config(),
+            **flags,
+        },
+    )
     return {
         "pass1": pass1,
         "kanji": kanji,
@@ -13765,8 +14027,9 @@ def record_verified_output(path: Path, region: str, italic: bool, weight_name: s
     with TTFont(path, recalcTimestamp=False) as font:
         identity = output_identity_status(font, region, italic, weight_name, hinted)
         layout = contextual_case_structure_status(font)
-        if not identity["ok"] or not layout["ok"]:
-            raise RuntimeError(f"不能记录不完整的增量成品：{path.name}；{identity}；{layout}")
+        joining = continuous_vertical_dash_structure_status(font)
+        if not identity["ok"] or not layout["ok"] or not joining["ok"]:
+            raise RuntimeError(f"不能记录不完整的增量成品：{path.name}；{identity}；{layout}；{joining}")
     if hinted:
         execution = native_hint_execution_status(path, full_ppems=())
         if not execution["ok"]:
@@ -14021,7 +14284,7 @@ def refresh_static_finalization_font(
 ) -> dict[str, Any]:
     if not path.exists():
         raise FileNotFoundError(path)
-    intentionally_changed = {"head", "maxp", "OS/2", "name", "gasp", "GSUB", "VORG"}
+    intentionally_changed = {"head", "maxp", "OS/2", "name", "gasp", "GSUB", "GPOS", "GDEF", "VORG"}
     if not hinted:
         intentionally_changed.add("prep")
     before = sfnt_table_hashes(path, intentionally_changed)
@@ -14047,6 +14310,7 @@ def refresh_static_finalization_font(
         ellipsis_report.update(apply_default_regional_punctuation(font, region))
         vertical_report = normalize_static_vertical_origin(font)
         colon_report = add_digit_colon_feature(font)
+        colon_report.update(install_continuous_vertical_dash_layout(font))
         font.save(tmp_path, reorderTables=True)
     finally:
         font.close()
@@ -14252,12 +14516,12 @@ def normalize_cross_engine_metrics(font: TTFont) -> dict[str, Any]:
 
 
 
-def refresh_variable_finalization_outputs(regions: list[str], italic_styles: tuple[bool, ...] = (False, True)) -> list[dict[str, Any]]:
+def _refresh_variable_finalization_outputs(regions: list[str], italic_styles: tuple[bool, ...] = (False, True)) -> list[dict[str, Any]]:
     outputs = []
     for region in regions:
         for italic in italic_styles:
             path = VARIABLE_DIR / variable_output_name(region, italic)
-            allowed = {"GSUB", "name", "head", "OS/2", "VORG", "VVAR", "HVAR", "hmtx", "vmtx", "glyf", "loca", "gvar", "prep", "gasp", "maxp", "fpgm", "cvt "}
+            allowed = {"GSUB", "GPOS", "GDEF", "name", "head", "OS/2", "VORG", "VVAR", "HVAR", "hmtx", "vmtx", "glyf", "loca", "gvar", "prep", "gasp", "maxp", "fpgm", "cvt "}
             before = sfnt_table_hashes(path, allowed)
             pending = path.with_name(path.name + ".finalization.tmp")
             font = TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False)
@@ -14285,6 +14549,7 @@ def refresh_variable_finalization_outputs(regions: list[str], italic_styles: tup
                 update_head_project_revision(font)
                 report.update(normalize_variable_raster_metadata(font))
                 report.update(prune_unreferenced_variable_names(font))
+                report.update(install_continuous_vertical_dash_layout(font))
                 font.save(pending)
             finally:
                 font.close()
@@ -14299,7 +14564,7 @@ def refresh_variable_finalization_outputs(regions: list[str], italic_styles: tup
     return outputs
 
 
-def refresh_static_finalization_outputs(regions: list[str]) -> list[dict[str, Any]]:
+def _refresh_static_finalization_outputs(regions: list[str]) -> list[dict[str, Any]]:
     outputs: list[dict[str, Any]] = []
     for region in regions:
         for stop in SOURCE_HAN_WEIGHT_STOPS:
@@ -14321,6 +14586,109 @@ def refresh_static_finalization_outputs(regions: list[str]) -> list[dict[str, An
                     )
                 )
     return outputs
+
+
+def refresh_variable_finalization_outputs(regions: list[str], italic_styles: tuple[bool, ...] = (False, True)) -> list[dict[str, Any]]:
+    with staged_build_outputs(regions, static_only=False, variable_only=True, unhinted_only=False,
+                              resume_static=False, resume_variable=True, include_static=False,
+                              italic_styles=italic_styles):
+        return _refresh_variable_finalization_outputs(regions, italic_styles)
+
+
+def refresh_static_finalization_outputs(regions: list[str]) -> list[dict[str, Any]]:
+    with staged_build_outputs(regions, static_only=True, variable_only=False, unhinted_only=False,
+                              resume_static=True, resume_variable=False):
+        outputs = _refresh_static_finalization_outputs(regions)
+        write_static_readme(regions)
+        return outputs
+
+
+def refresh_layout_outputs(regions: list[str]) -> dict[str, Any]:
+    """Atomically refresh layout with byte-for-byte outline/hint preservation."""
+    import audit_sarasa_ui_propdigits as audit
+
+    regions = parse_regions(",".join(regions))
+    original_report = json.loads((REPORT_DIR / "Sarasa-Ui-PropDigits-report.json").read_text(encoding="utf-8"))
+    ots = json.loads((REPORT_DIR / "ots-audit.json").read_text(encoding="utf-8"))
+    if original_report.get("version") != VERSION:
+        raise ValueError("布局刷新只能处理当前项目版本")
+    inputs = [(static_dir(region, hinted) / static_output_name(region, str(stop["name"]), italic),
+               region, str(stop["name"]), italic, hinted)
+              for region in regions for stop in SOURCE_HAN_WEIGHT_STOPS for italic in (False, True) for hinted in (False, True)]
+    inputs.extend((VARIABLE_DIR / variable_output_name(region, italic), region, None, italic, False)
+                  for region in regions for italic in (False, True))
+    inputs.sort(key=lambda item: item[2] is not None)
+    verified = {}
+    for path, region, weight, italic, hinted in inputs:
+        digest = file_sha256(path)
+        original = ots.get("input_manifest", {}).get(portable_report_path(path), {})
+        try:
+            receipt = json.loads(output_validation_record_path(path).read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            receipt = {}
+        receipt_matches = all(receipt.get(key) == value for key, value in
+                              {"file": path.name, "sha256": digest, "region": region, "weight": weight,
+                               "italic": italic, "hinted": hinted}.items())
+        if digest != original.get("sha256") and not receipt_matches:
+            raise ValueError(f"布局刷新来源没有匹配的成品哈希：{path.name}")
+        verified[path] = digest
+    report = copy.deepcopy(original_report)
+    report["source_lockfile_normalization"] = {
+        "previous_sha256": report["bootstrap_sources"].get("sarasa_package_lock_sha256"),
+        "canonical_git_blob_sha256": SARASA_PACKAGE_LOCK_SHA256,
+        "policy": "使用固定 Git 提交的原始 LF 字节；依赖版本不变",
+    }
+    report["bootstrap_sources"]["sarasa_package_lock_sha256"] = SARASA_PACKAGE_LOCK_SHA256
+    updated = {}
+    with staged_build_outputs(regions, static_only=False, variable_only=False, unhinted_only=False,
+                              resume_static=True, resume_variable=True):
+        for original_path, region, weight, italic, hinted in inputs:
+            path = (VARIABLE_DIR / original_path.name if weight is None else static_dir(region, hinted) / original_path.name)
+            if file_sha256(path) != verified[original_path]:
+                raise RuntimeError("布局刷新暂存期间输入字体发生变化")
+            protected = sfnt_table_hashes(path, {"head", "GSUB", "GPOS", "GDEF"})
+            pending = path.with_name(path.name + ".finalization.tmp")
+            log_step(f"layout-only {len(updated) + 1}/{len(inputs)}: {original_path.name}")
+            try:
+                with TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False) as font:
+                    original_head = font.reader["head"]
+                    details = install_continuous_vertical_dash_layout(font)
+                    font.save(pending, reorderTables=True)
+                with TTFont(pending, lazy=True) as candidate:
+                    candidate_head = candidate.reader["head"]
+                if original_head[:8] + original_head[12:] != candidate_head[:8] + candidate_head[12:]:
+                    raise RuntimeError("布局刷新改变了 head 校验和之外的字段")
+                if protected != sfnt_table_hashes(pending, {"head", "GSUB", "GPOS", "GDEF"}):
+                    raise RuntimeError("布局刷新改变了受保护的轮廓、度量或 hint 表")
+                weights = audit.INTER_POSITION_WEIGHTS if weight is None else (None,)
+                runtime_cases = 0
+                for axis_weight in weights:
+                    status = audit.vertical_segment_runtime_status(pending, {"wght": axis_weight} if axis_weight else None)
+                    runtime_cases += status["cases"]
+                    if not status["ok"]:
+                        raise RuntimeError(f"连续竖排连接没有通过运行时校验：{original_path.name}；{status['samples'][:2]}")
+                pending.replace(path)
+                record_verified_output(path, region, italic, weight, hinted)
+                updated[portable_report_path(path)] = {
+                    **details, "layout_only_refresh": True, "hint_rerun": False,
+                    "previous_sha256": verified[original_path], "sha256": file_sha256(path),
+                    "protected_table_sha256": protected, "continuous_vertical_runtime_cases": runtime_cases,
+                    "head_fields_preserved": True,
+                }
+            finally:
+                pending.unlink(missing_ok=True)
+        for field in ("static_outputs", "variable_outputs"):
+            for item in report[field]:
+                if item["file"] in updated:
+                    item.update(updated[item["file"]])
+        report["layout_refresh"] = {"fonts": len(updated), "version": VERSION, "hint_rerun": False,
+                                    "protected_tables_verified": True}
+        report["method"] = production_method_description()
+        write_static_readme(regions)
+        write_reports(report)
+        if any(file_sha256(path) != digest for path, digest in verified.items()):
+            raise RuntimeError("布局刷新期间原成品发生变化，拒绝覆盖")
+    return report
 
 
 def postprocess_static_font(
@@ -14507,6 +14875,7 @@ def postprocess_static_font(
         report.update(apply_default_regional_punctuation(font, region))
         report.update(add_digit_colon_feature(font))
         report.update(recalculate_head_bounds(font))
+        report.update(install_continuous_vertical_dash_layout(font))
         font.save(path, reorderTables=True)
     finally:
         if post_layout_reference is not None:
@@ -14552,13 +14921,20 @@ def prepare_static_style(
         unhinted_report_path = unhinted_tmp.with_suffix(".report.json")
         unhinted_tmp.parent.mkdir(parents=True, exist_ok=True)
         unhinted_path = static_dir(region, False) / static_output_name(region, weight_name, italic)
-        unhinted_report = (
-            json.loads(unhinted_report_path.read_text(encoding="utf-8"))
-            if unhinted_tmp.exists() and unhinted_report_path.exists()
-            else None
-        )
+        try:
+            unhinted_report = json.loads(unhinted_report_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            unhinted_report = None
+        cache_inputs = {name: file_sha256(Path(fragments[name])) for name in
+                        ("pass1", "kanji", "hangul", "dash_source_path", "western_dash_source_path")}
         if (
-            unhinted_report is not None
+            isinstance(unhinted_report, dict)
+            and unhinted_tmp.is_file()
+            and unhinted_report.get("cache_binding") == {
+                "schema": 1, "builder_sha256": BUILDER_CODE_SHA256,
+                "inputs": cache_inputs, "output_sha256": file_sha256(unhinted_tmp),
+                "output_size": unhinted_tmp.stat().st_size,
+            }
             and unhinted_report.get("static_postprocess_cache_key")
             == static_postprocess_cache_key(
                 region,
@@ -14593,6 +14969,10 @@ def prepare_static_style(
                 False,
                 Path(fragments["dash_source_path"]),
             )
+            unhinted_report["cache_binding"] = {
+                "schema": 1, "builder_sha256": BUILDER_CODE_SHA256, "inputs": cache_inputs,
+                "output_sha256": file_sha256(unhinted_tmp), "output_size": unhinted_tmp.stat().st_size,
+            }
             write_json_atomic(unhinted_report_path, unhinted_report)
         shutil.copy2(unhinted_tmp, unhinted_path)
         record_verified_output(unhinted_path, region, italic, weight_name, False)
@@ -14897,8 +15277,7 @@ def build_static_weight_group(
 
 def build_unhinted_fonts(regions: list[str], *, only_missing: bool = False) -> list[dict[str, Any]]:
     outputs = []
-    for region in regions:
-        static_dir(region, False).mkdir(parents=True, exist_ok=True)
+    write_static_readme(regions, (False,))
     with tempfile.TemporaryDirectory(prefix="sarasa-unhinted-") as tmp_name:
         for stop in SOURCE_HAN_WEIGHT_STOPS:
             for region in regions:
@@ -15263,6 +15642,7 @@ def write_static_readme(regions: list[str], variants: tuple[bool, ...] = (True, 
         for hinted in variants:
             directory = static_dir(region, hinted)
             directory.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / "LICENSE", directory / "LICENSE-Sarasa-Gothic.txt")
             (directory / "README.txt").write_text(static_readme_text(region, hinted), encoding="utf-8", newline="\n")
 
 
@@ -16078,16 +16458,22 @@ def _build_all_in_workspace(
     return report
 
 
-def promote_build_outputs(pairs: list[tuple[Path, Path]], backup_root: Path) -> None:
+def promote_build_outputs(pairs: list[tuple[Path, Path]], backup_root: Path, *,
+                          validation_root: Path | None = None,
+                          validation_backup_root: Path | None = None) -> None:
     """Promote completed files/directories, rolling back every rename on error."""
     completed: list[tuple[Path, Path, Path, bool]] = []
     try:
         for index, (source, destination) in enumerate(pairs):
-            if not destination.resolve().is_relative_to(ROOT.resolve()):
+            is_receipt = (validation_root is not None
+                          and destination.resolve().parent == validation_root.resolve()
+                          and re.fullmatch(r"[0-9a-f]{64}\.json", destination.name) is not None)
+            if not destination.resolve().is_relative_to(ROOT.resolve()) and not is_receipt:
                 raise ValueError("构建成品目的路径越界")
             if not source.exists():
                 raise FileNotFoundError(source)
-            backup = backup_root / str(index)
+            backup = (validation_backup_root if is_receipt and validation_backup_root is not None
+                      else backup_root) / str(index)
             backup.parent.mkdir(parents=True, exist_ok=True)
             destination.parent.mkdir(parents=True, exist_ok=True)
             existed = destination.exists()
@@ -16107,13 +16493,18 @@ def promote_build_outputs(pairs: list[tuple[Path, Path]], backup_root: Path) -> 
 
 @contextmanager
 def staged_build_outputs(regions: list[str], *, static_only: bool, variable_only: bool,
-                         unhinted_only: bool, resume_static: bool, resume_variable: bool):
+                         unhinted_only: bool, resume_static: bool, resume_variable: bool,
+                         include_static: bool = True, italic_styles: tuple[bool, ...] = (False, True)):
     global STATIC_ROOT, VARIABLE_DIR, REPORT_DIR, OUTPUT_STAGING_ROOT, OUTPUT_VALIDATION_DIR
     saved = (STATIC_ROOT, VARIABLE_DIR, REPORT_DIR, OUTPUT_STAGING_ROOT, OUTPUT_VALIDATION_DIR)
-    transaction = Path(tempfile.mkdtemp(prefix=f"build-{VERSION}-", dir=BUILD_CACHE_DIR))
+    # Font replacements stay on the repository's filesystem even when the
+    # build cache is on another volume. Receipts use their own local stage.
+    transaction_root = ROOT / ".build-cache" / "transactions"
+    transaction_root.mkdir(parents=True, exist_ok=True)
+    transaction = Path(tempfile.mkdtemp(prefix=f"build-{VERSION}-", dir=transaction_root))
     stage = transaction / "candidate"
     variants = (False,) if variable_only or unhinted_only else (False, True)
-    destinations = [static_dir(region, hinted) for region in regions for hinted in variants]
+    destinations = [static_dir(region, hinted) for region in regions for hinted in variants] if include_static else []
     seed_static = resume_static or variable_only
     try:
         for destination in destinations:
@@ -16123,7 +16514,7 @@ def staged_build_outputs(regions: list[str], *, static_only: bool, variable_only
                 shutil.copytree(destination, candidate, dirs_exist_ok=True)
         if resume_variable and not (static_only or unhinted_only):
             for region in regions:
-                for italic in (False, True):
+                for italic in italic_styles:
                     destination = VARIABLE_DIR / variable_output_name(region, italic)
                     if destination.is_file():
                         candidate = stage / destination.relative_to(ROOT)
@@ -16133,9 +16524,10 @@ def staged_build_outputs(regions: list[str], *, static_only: bool, variable_only
         validation.mkdir(parents=True, exist_ok=True)
         if OUTPUT_VALIDATION_DIR.exists():
             shutil.copytree(OUTPUT_VALIDATION_DIR, validation, dirs_exist_ok=True)
-        STATIC_ROOT = stage / "fonts" / "static"
+        STATIC_ROOT = stage / "fonts" / "static" if include_static else saved[0]
         VARIABLE_DIR = stage / "fonts" / "variable"
         REPORT_DIR = stage / "reports"
+        REPORT_DIR.mkdir(parents=True, exist_ok=True)
         OUTPUT_STAGING_ROOT = stage
         OUTPUT_VALIDATION_DIR = validation
         write_json_atomic(transaction / "status.json", {"version": VERSION, "status": "building"})
@@ -16144,7 +16536,7 @@ def staged_build_outputs(regions: list[str], *, static_only: bool, variable_only
         if not (static_only or unhinted_only):
             pairs.extend((VARIABLE_DIR / variable_output_name(region, italic),
                           saved[1] / variable_output_name(region, italic))
-                         for region in regions for italic in (False, True))
+                         for region in regions for italic in italic_styles)
         # Each candidate must carry an attestation to its current bytes. The
         # main release audit remains a separate, mandatory gate after building.
         candidate_receipts: set[Path] = set()
@@ -16164,8 +16556,15 @@ def staged_build_outputs(regions: list[str], *, static_only: bool, variable_only
         pairs.extend((path, saved[2] / path.name) for path in REPORT_DIR.iterdir() if path.is_file())
         # Another region/format may finish while this transaction is building.
         # Its fresh receipt must not be overwritten by our initial snapshot.
-        pairs.extend((path, saved[4] / path.name) for path in sorted(candidate_receipts))
-        promote_build_outputs(pairs, transaction / "previous")
+        saved[4].parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix=".output-validation-", dir=saved[4].parent) as receipt_stage_raw:
+            receipt_stage = Path(receipt_stage_raw)
+            for path in sorted(candidate_receipts):
+                local_candidate = receipt_stage / path.name
+                shutil.copy2(path, local_candidate)
+                pairs.append((local_candidate, saved[4] / path.name))
+            promote_build_outputs(pairs, transaction / "previous", validation_root=saved[4],
+                                  validation_backup_root=receipt_stage / "previous")
         write_json_atomic(transaction / "status.json", {"version": VERSION, "status": "promoted"})
     except BaseException:
         write_json_atomic(transaction / "status.json", {"version": VERSION, "status": "failed", "candidate_retained": True})
@@ -16257,6 +16656,7 @@ def main() -> None:
     modes.add_argument("--static-only", action="store_true", help="只重建静态 hinted/unhinted TTF，不重建 VF 输出。")
     modes.add_argument("--variable-only", action="store_true", help="只重建所选地区 VF；缺少静态度量参考时自动准备 unhinted，完全跳过 hint 流程。")
     modes.add_argument("--unhinted-only", action="store_true", help="只按 Sarasa 静态片段路径重建所选地区 unhinted TTF，完全跳过 hint 流程。")
+    modes.add_argument("--refresh-layout-only", action="store_true", help="整组刷新现有静态与 VF 的连续竖排连接；逐表保护轮廓、度量及 hint，并验证长串运行时后提交。")
     parser.add_argument("--refresh-version-from", help="将有完整 OTS 输入记录的旧版本整组迁移到当前版本，只改 head/name；不重画轮廓、不重新 hint，仍须重新通过发布审计。")
     parser.add_argument(
         "--refresh-static-finalization-only",
@@ -16288,6 +16688,12 @@ def main() -> None:
     force_static_weights = parse_static_weights(args.force_static_weights)
     if force_static_weights and not args.resume_static:
         parser.error("--force-static-weights requires --resume-static")
+    if args.refresh_layout_only:
+        if args.refresh_version_from or args.refresh_static_finalization_only or args.refresh_variable_finalization_only or args.resume_static or args.resume_variable or force_static_weights:
+            parser.error("布局刷新不能与其他构建模式组合")
+        report = refresh_layout_outputs(parse_regions(args.regions))
+        print(json.dumps({"version": VERSION, "mode": "layout-only", **report["layout_refresh"]}, ensure_ascii=False))
+        return
     if args.refresh_version_from:
         if (args.static_only or args.variable_only or args.unhinted_only or args.resume_static
                 or args.resume_variable or args.refresh_static_finalization_only
@@ -16310,7 +16716,6 @@ def main() -> None:
             )
         regions = parse_regions(args.regions)
         outputs = refresh_static_finalization_outputs(regions)
-        write_static_readme(regions)
         print(
             json.dumps(
                 {

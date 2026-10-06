@@ -16,7 +16,7 @@
 
 ## 简介
 
-Sarasa Ui PropDigits 是面向中西文混排的更纱 Ui 衍生字体。当前版本为 **v1.0.42**，上游同步到 Sarasa Gothic 1.0.42；本版新建 tag，旧 tag 和旧 Release 保持不变。
+Sarasa Ui PropDigits 是面向中西文混排的更纱 Ui 衍生字体。当前版本为 **v1.0.42**，上游同步到 Sarasa Gothic 1.0.42；2026-10-06 修订版同步更新该 tag 的源码和 Release 发布文件。
 
 字体菜单中的家族名缩写为 **Sarasa Ui PD <地区>**，可变系列为 **Sarasa Ui VF PD <地区>**，本地化名称同样使用 PD。字重名称不缩写；文件名和 ZIP 名仍保留 PropDigits。
 
@@ -87,7 +87,7 @@ Inter 的 `ss03`、`cv10` 按 Sarasa 的顺序烘焙为 cmap 字形身份，保�
 
 `hani/kana/hang/bopo` 未指定语言时使用所选地区的 CJK 标点；K 默认采用韩文规则，单破折号保留韩文比例形态，显式中文或日文语言按上表切换为全宽。两个 U+2026 严格占 2em。CL 的中文破折号使用 Shanggu 全宽形态。独立标点若没有被应用分配到 CJK 文字系统，会使用西文默认路径；应用传入的 script 与 language 仍然影响结果。原先人为添加的 `ENG ` 例外记录不再需要。
 
-竖排连续破折号使用依次接续的 **1em 片段**，`⸺`、`⸻` 也分别展开为两个、三个片段。每段墨迹位于自己的 advance 范围内，连接边完全重合；横排的 2em/3em 形式保留。分段轮廓在静态 hint 之前生成，pass2 后仅恢复布局引用，禁止重新绘制已 hint 的轮廓。最终 `head` 包围盒按全部字形重新计算；Regular 静态与 VF 默认实例的上下界另与固定的同地区 Sarasa Regular 对照，不能继续保留被长竖排字形撑大或已经过期的值。
+竖排连续破折号使用依次接续的 **1em 片段**，`⸺`、`⸻` 也分别展开为两个、三个片段。每段仍占 1em；上下片段在连接截面相交，纵向没有空隙，后续普通字符也不随斜体连接横向漂移。已有 2em/3em 路径继续要求连接边逐点一致；长串复用原始整数轮廓，斜体在部分字重下允许原轮廓至多 1 unit 的宽度取整差，但连接左边缘必须完全一致且横截面必须重合。横排的 2em/3em 形式保留。分段轮廓在静态 hint 之前生成，pass2 后仅恢复布局引用，禁止重新绘制已 hint 的轮廓。长串通过上下文替换复用已有片段，再以必要的 GPOS `curs` 定位逐段连接；可变连接锚点保留实际 `gvar` 变化，并追加到现有 GDEF 变化存储，原有 Inter 定位数据不变。连接不依赖应用另外开启可选竖排字偶距。主审计覆盖 2–16、32、64、257 段及混合编码，栅格检查另覆盖 4、5、8、16、32 段。最终 `head` 包围盒按全部字形重新计算；Regular 静态与 VF 默认实例的上下界另与固定的同地区 Sarasa Regular 对照，不能继续保留被长竖排字形撑大或已经过期的值。
 
 `chws/vchw` 来自 Noto CJK 交付阶段的 `add-chws` 逻辑，固定 `chws_tool` 与 `east-asian-spacing` 1.4.5。特性存在不等于应用会自动开启标点压缩；HarfBuzz、CoreText、浏览器及具体 Android/Windows 应用需分别验收。
 
@@ -109,7 +109,7 @@ Windows 的 win 度量仍沿用上游的 968/241。部分字形墨迹超出该�
 
 ## 固定来源
 
-2026-10-03 已重新联网检查四个上游：
+2026-10-06 已重新联网检查四个上游，固定版本均未变化：
 
 | 上游 | 本轮查到的最新发布 | 本项目固定来源 |
 | --- | --- | --- |
@@ -122,7 +122,7 @@ Node.js 固定为 26.7.0。下一轮仍需重新联网复核，不能将上述�
 
 Sarasa 1.0.42 于北京时间 2026-09-26 22:58 发布。[1.0.41 至 1.0.42 的源码差异](https://github.com/be5invis/Sarasa-Gothic/compare/v1.0.41...v1.0.42)仅涉及版本字段和 Iosevka 系列来源。六地区 60 个 hinted 与 60 个 unhinted 官方 Ui 成品逐表比较后，除 head/name 元数据外全部相同，含轮廓、度量、布局与 hint 表；[完整对照记录](https://github.com/Mr-Drinking/Sarasa-Ui-PropDigits/blob/v1.0.42/reports/upstream-ui-1.0.41-to-1.0.42.json)绑定两份下载归档和全部字体哈希。因此这次上游同步只刷新版本元数据，保留现有轮廓与 hint，再通过新版发布检查。
 
-下载归档、Source Han VF、Inter、Shanggu 与 Node 均核对固定 SHA-256；已解包文件也逐字节对照已验证的归档。Sarasa 优先使用 Git 固定提交，检查版本、lockfile、已跟踪及未跟踪变动；源码 ZIP 只有另外提供固定哈希后才能作为后备，不接受无验证的归档。
+下载归档、Source Han VF、Inter、Shanggu 与 Node 均核对固定 SHA-256；已解包文件也逐字节对照已验证的归档。Sarasa 优先使用 Git 固定提交，按 Git 对象的原始字节核验全部已跟踪文件，并检查索引及额外文件；源码缓存固定使用 LF，package-lock 的 SHA-256 为 `e6d2198068bdd1f82d4dba37ab4a314046ea25497cf9fa88ff13ecdf90b8e570`。这也修正了此前固定 Windows CRLF 副本导致的跨平台准备失败，依赖版本不变；源码 ZIP 只有另外提供固定哈希后才能作为后备，不接受无验证的归档。
 
 npm 使用已核验的 Node 运行时执行 `npm ci --ignore-scripts`。本次固定依赖没有安装脚本，项目自身脚本仅检查工具是否存在，由正式入口完成相应准备。每次构建重新核对完整 `node_modules` 文件清单与内容哈希，缺失、变更或额外文件都会拒绝复用。
 
@@ -143,11 +143,13 @@ python tools\build_sarasa_ui_propdigits_sc.py --variable-only --regions SC
 python tools\build_sarasa_ui_propdigits_sc.py --unhinted-only --regions SC,TC
 ```
 
-VF 入口先检查原生 unhinted 度量参考的版本、哈希、样式与布局；缺失或无效时重建所选地区参考，全程跳过 hint。其他入口包括 `--static-only`、`--resume-static`、`--resume-variable` 和 `--force-static-weights`。增量文件必须具有与当前代码和实际工具相符的校验记录，不能仅凭文件存在跳过构建。
+VF 入口先检查原生 unhinted 度量参考的版本、哈希、样式与布局；缺失或无效时重建所选地区参考，全程跳过 hint。其他入口包括 `--static-only`、`--resume-static`、`--resume-variable` 和 `--force-static-weights`。增量文件必须具有与当前代码和实际工具相符的校验记录，不能仅凭文件存在跳过构建。静态中间字体和最终化缓存同时绑定输入、配方、实际工具及输出 SHA-256；缓存内容损坏、缺少记录或来源改变时重新生成，不能把已有未知字节补写成新校验记录。`--unhinted-only` 和 VF 参考准备也会写入 README 与固定许可证副本。
 
 仅刷新项目版本时可用 `--refresh-version-from <原项目版本>`。入口要求原有整组 156 个字体与完整 OTS 输入记录匹配，在暂存目录更新 nameID 3、5 和 head 版本，逐表证明其他数据未改变；原版本记录与保护表哈希一并保留。它不重新 hint，也不能代替新版的完整发布审计。
 
-构建先写入暂存目录，整组完成并验证后再替换对应成品；失败保留候选文件，既有成品不被提前删除。替换中途发生错误时回滚已完成的替换。静态最终化入口 `--refresh-static-finalization-only` 保护真实轮廓、度量和 hint，仅修改白名单内的元数据及路由。VF 最终化入口 `--refresh-variable-finalization-only` 还会校准数字等宽、跨引擎度量表示及四个竖排片段的原生静态控制点，保护 GPOS 等非白名单表，并检查 13 个轴点的运行时结果。
+构建先写入暂存目录，整组完成并验证后再替换对应成品；失败保留候选文件，既有成品不被提前删除。替换中途发生错误时回滚已完成的替换，包括字体、文档、报告和校验记录。静态与 VF 的最终化入口也使用整组事务；字体暂存与仓库在同一文件系统，外置 `SARASA_BUILD_CACHE` 的校验记录在其自身文件系统暂存，因此不会因路径越界或跨卷 rename 失败而留下混合状态。静态最终化入口 `--refresh-static-finalization-only` 保护真实轮廓、度量和 hint，仅修改白名单内的元数据及路由。VF 最终化入口 `--refresh-variable-finalization-only` 还会校准数字等宽、跨引擎度量表示及四个竖排片段的原生静态控制点，保护原有非连接定位规则及其他非白名单表，并检查 13 个轴点的运行时结果。连续竖排连接只新增必要的 GSUB/GPOS 路由与变化锚点。
+
+仅更新连续竖排布局可使用 `--refresh-layout-only`。该入口整组处理所选地区的静态和 VF，要求来源字体匹配既有哈希记录，只修改 GSUB、GPOS、GDEF 和必要的字体总校验和；逐表证明轮廓、hint、度量及其余 head 字段未变，并验证长串运行时后提交。它不重新 hint，也不能代替发布审计。
 
 网络较慢时使用系统代理：
 
@@ -167,7 +169,7 @@ python tools\check_external_release.py
 python tools\render_visual_checks.py
 ```
 
-主审计有显式 **23 节 gate registry**。未注册、跳过、覆盖不完整均不能得到 PASSED；完整发布要求 `total_failures=0`。保留全码位 metrics、轮廓与 raster、GSUB/GPOS、地区边界、Inter 可变定位、两端真实 HarfBuzz、跨引擎和视觉检查。`--skip-raster`、`--raster-only` 只能生成 PARTIAL。
+主审计有显式 **23 节 gate registry**。未注册、跳过、覆盖不完整均不能得到 PASSED；完整发布要求 `total_failures=0`。schema 2 发布门从实际明细重新计算每节应有的地区、字重、样式和格式用例矩阵，拒绝空章节、缺项、重复或身份错误的记录，同时核验完整码位、轴点、语言、栅格和实际执行的排版用例。打包器独立重算同一套门槛，不信任报告里的总通过标志或汇总计数。保留全码位 metrics、轮廓与 raster、GSUB/GPOS、地区边界、Inter 可变定位、两端真实 HarfBuzz、跨引擎和视觉检查。`--skip-raster`、`--raster-only` 只能生成 PARTIAL。
 
 `--checkpoint-dir` 在每个章节完整返回后原子保存结果。续跑时核对成品字体、固定来源、原生片段、许可证、实际工具、调用参数和审计代码的哈希；损坏或不完整的记录重新计算。已保存的失败项仍然是失败，最终还要重新检查来源和成品未被改动，并通过同一套 23 节覆盖与失败门槛。中间文件不能作为发布报告使用。
 
@@ -185,7 +187,7 @@ OTS 9.3.0 必须 **156/156** 成功，无意外输出或丢表。FontBakery 1.1.
 
 视觉生成器为六地区各生成静态、可变、放大细节三张样张，共 **18 张**。静态样张覆盖全部 72 个 hinted 字体的 9、12、16 px。候选报告始终标记为未审阅；生成图片不等于完成验收。中文标签默认使用本项目 SC Regular unhinted，也可指定 `--label-font` 或 `SARASA_VISUAL_LABEL_FONT`，不依赖写死的系统路径。
 
-每张细节图另含七种文字系统／语言组合、37 个字符的默认／pnum／tnum 对照，以及正斜体、静态／VF 的 2em 与 3em 竖排分段对照。打包门要求这些用例及对应字体记录完整，不能只保留旧图的总通过标记。
+每张细节图另含七种文字系统／语言组合、37 个字符的默认／pnum／tnum 对照，以及正斜体、静态／VF 的 2em、3em、4 段、16 段与混合编码竖排对照。打包门要求这些用例及对应字体记录完整，不能只保留旧图的总通过标记。
 
 本轮 Android 与 Unigram 实测均按用户决定暂缓，当前状态均为“未实测”。Android 可按[仓库中的验收清单](https://github.com/Mr-Drinking/Sarasa-Ui-PropDigits/blob/v1.0.42/docs/Android验收.md)后续补测；字体审计和样张检查不代替上述目标应用的实测结论。
 
@@ -198,4 +200,4 @@ python tools\package_release.py
 python tools\package_release.py --verify-only
 ```
 
-打包器要求字体完整、发布审计完整且哈希匹配。默认输出到 `dist/v1.0.42`；21 个 ZIP 全部核验字体与文档内容，并自动生成 `SHA256SUMS.txt` 和 `reports/release-packages.json`。随后创建 **v1.0.42** tag 与全中文 Release，不移动或替换旧 tag。
+打包器要求字体完整、发布审计完整且哈希匹配。每个静态目录仅允许 12 个确定名称的 TTF、README.txt 和 LICENSE-Sarasa-Gothic.txt；额外文件、临时文件、嵌套文件或链接均拒绝入包。默认输出到 `dist/v1.0.42`；21 个 ZIP 全部核验字体与文档内容，并自动生成 `SHA256SUMS.txt` 和 `reports/release-packages.json`。
