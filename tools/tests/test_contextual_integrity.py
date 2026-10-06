@@ -122,6 +122,7 @@ class ContextualIntegrity(unittest.TestCase):
 
     def test_incremental_record_rejects_changed_bytes_and_style(self):
         font = self.font()
+        b.install_continuous_vertical_dash_layout(font)
         with tempfile.TemporaryDirectory() as directory, patch.object(b, "OUTPUT_VALIDATION_DIR", Path(directory) / "cache"):
             path = Path(directory) / "candidate.ttf"; font.save(path)
             b.record_verified_output(path, "SC", False, "Regular", False)

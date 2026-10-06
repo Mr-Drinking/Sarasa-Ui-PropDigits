@@ -137,7 +137,7 @@ def sheet(region: str, variable: bool) -> dict:
 
 
 def detail_sheet(region: str) -> dict:
-    image = Image.new("RGB", (1880, 2340), "white")
+    image = Image.new("RGB", (1880, 3240), "white")
     draw = ImageDraw.Draw(image); title_font = labels(30); label_font = labels(20)
     draw.text((32, 22), f"{region} · 定位与默认竖排放大检查", font=title_font, fill=(15, 40, 75))
     regular = FontRenderer(audit.vf_path(region, False), 104)
@@ -185,23 +185,25 @@ def detail_sheet(region: str) -> dict:
         width_cases.append({"font": audit.display_path(audit.vf_path(region, False)), "weight": 400,
                             "features": features, "text": width_text, "pixels": 25})
     draw.text((32, 1790), "400：竖排 1em 片段与静态 / VF 对照（两组分别检查 2em 与 3em）", font=label_font, fill=(15, 40, 75))
+    draw.text((32, 2420), "400：长串连续连接（4 段与混合编码、16 段）", font=label_font, fill=(15, 40, 75))
     vertical_cases = []
-    column = 0
-    for variable in (True, False):
-        for is_italic in (False, True):
-            path = audit.vf_path(region, is_italic) if variable else audit.static_path(region, "Regular", is_italic, False)
-            renderer = FontRenderer(path, 34)
-            if variable: renderer.weight(400)
-            for text in ("甲……乙——丙⸺丁", "甲……乙———丙⸻丁"):
-                x = 120 + 218 * column; column += 1
-                dash_length = 3 if "⸻" in text else 2
-                draw.text((x - 80, 1840), f"{'VF' if variable else '静态'} {'斜体' if is_italic else '正体'} · {dash_length}em", font=label_font, fill=(65, 80, 100))
-                for line in range(13):
-                    draw.line((x - 55, 1890 + line * 34, x + 55, 1890 + line * 34), fill=(231, 237, 243))
-                _, end = renderer.draw(image, text, (x, 1890), script="Hani", direction="ttb")
-                if end > 2310: raise RuntimeError("竖排分段样张超出画布")
-                vertical_cases.append({"font": audit.display_path(path), "weight": 400, "italic": is_italic,
-                                       "variable": variable, "script": "Hani", "direction": "ttb", "text": text, "pixels": 34})
+    for panel, baseline in enumerate((1890, 2520)):
+        column = 0
+        for variable in (True, False):
+            for is_italic in (False, True):
+                path = audit.vf_path(region, is_italic) if variable else audit.static_path(region, "Regular", is_italic, False)
+                renderer = FontRenderer(path, 34)
+                if variable: renderer.weight(400)
+                for offset, text in enumerate(build.VISUAL_VERTICAL_RUN_TEXTS[panel * 2:panel * 2 + 2]):
+                    x = 120 + 218 * column; column += 1
+                    label = ("2em", "3em", "4 段＋混合", "16 段")[panel * 2 + offset]
+                    draw.text((x - 80, baseline - 50), f"{'VF' if variable else '静态'} {'斜体' if is_italic else '正体'} · {label}", font=label_font, fill=(65, 80, 100))
+                    for line in range(13 if panel == 0 else 19):
+                        draw.line((x - 55, baseline + line * 34, x + 55, baseline + line * 34), fill=(231, 237, 243))
+                    _, end = renderer.draw(image, text, (x, baseline), script="Hani", direction="ttb")
+                    if end > (2310 if panel == 0 else 3210): raise RuntimeError("竖排分段样张超出画布")
+                    vertical_cases.append({"font": audit.display_path(path), "weight": 400, "italic": is_italic,
+                                           "variable": variable, "script": "Hani", "direction": "ttb", "text": text, "pixels": 34})
     file = OUT / f"{region}-detail.png"; image.save(file)
     return {"file": audit.display_path(file), "sha256": build.file_sha256(file), "region": region, "cases": cases,
             "language_cases": language_cases, "width_cases": width_cases, "vertical_cases": vertical_cases}

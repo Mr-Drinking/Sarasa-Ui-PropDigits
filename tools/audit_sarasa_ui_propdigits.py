@@ -270,8 +270,7 @@ def audit_checkpoint_sources() -> tuple[list[Path], dict[str, Any]]:
                     paths.add(static_reference_path(region, weight, italic, hinted))
                 if weight not in UPSTREAM_EXACT_WEIGHTS:
                     # Materialize this derived reference before freezing inputs.
-                    native = work / "audit-raw-pass2-v1" / region / b.static_output_name(region, weight, italic)
-                    paths.add(native if native.is_file() else static_extension_raw_reference_path(region, weight, italic))
+                    paths.add(static_extension_raw_reference_path(region, weight, italic))
     work_keys = {weight: key for weight, (key, _work) in work_directories.items()}
     for weight in EXACT_WEIGHTS:
         work = work_directories[weight][1]
@@ -2259,16 +2258,12 @@ def static_extension_raw_reference_path(
         / region
         / b.static_output_name(region, weight_name, italic)
     )
-    if not output.exists():
-        output.parent.mkdir(parents=True, exist_ok=True)
-        b.build_sarasa_pass2(
-            Path(fragments["pass1"]),
-            Path(fragments["kanji"]),
-            Path(fragments["hangul"]),
-            output,
-            italic,
-            work_dir,
-        )
+    b.cached_static_artifact(
+        output, {key: Path(fragments[key]) for key in ("pass1", "kanji", "hangul")},
+        {"kind": "independent-native-pass2", "sarasa_commit": b.SARASA_COMMIT, "italic": italic,
+         "version": b.VERSION, "module_sha256": b.file_sha256(b.SARASA_SOURCE_DIR / "make/pass2/index.mjs")},
+        lambda pending: b.build_sarasa_pass2(Path(fragments["pass1"]), Path(fragments["kanji"]),
+                                             Path(fragments["hangul"]), pending, italic, work_dir))
     EXTENSION_RAW_REFERENCE_CACHE[key] = output
     return output
 
@@ -3371,6 +3366,34 @@ def audit_vf_upstream_dash_sources() -> list[dict[str, Any]]:
     return out
 
 
+DASH_RASTER_BASE_CASE_NAMES = (
+    "default", "ccmp", "vertical-default", "vert", "vrt2-only", "vert-plus-vrt2",
+    "triple-default", "triple-vertical-default", "triple-vrt2-only",
+    "encoded-two-em-default", "encoded-two-em-vertical-default",
+    "encoded-three-em-default", "encoded-three-em-vertical-default",
+)
+VERTICAL_DASH_RASTER_LENGTHS = (4, 5, 8, 16, 32)
+DASH_LANGUAGE_SHAPES = ("single", "pair", "triple", "vertical_pair", "vertical_triple",
+                        "encoded_pair", "encoded_triple", "encoded_vertical_pair", "encoded_vertical_triple")
+
+
+def expected_dash_raster_cases() -> list[str]:
+    names = [*DASH_RASTER_BASE_CASE_NAMES,
+             *(f"run-{count}-{mode}" for count in VERTICAL_DASH_RASTER_LENGTHS
+               for mode in ("vertical-default", "vert", "vrt2-only"))]
+    return sorted(f"{ppem}:{name}" for ppem in (*DEFAULT_RASTER_PPEMS, 48) for name in names)
+
+
+def dash_case_coverage(shaping: dict[str, Any], raster: dict[str, Any]) -> dict[str, Any]:
+    cases = shaping.get("cases", {})
+    return {"shaping": sorted(cases), "raster": sorted(raster.get("cases", {})),
+            "vertical_run_cases": cases.get("vertical-segment-cells-and-joins", {}).get("cases", 0),
+            "language_shapes": {language: {name: len(case[name].get("glyphs", []))
+                                           for name in DASH_LANGUAGE_SHAPES if name in case}
+                                for language, case in cases.items()
+                                if language in {"default", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"}}}
+
+
 def em_dash_raster_status(
     path: Path,
     variations: dict[str, float] | None = None,
@@ -3441,6 +3464,11 @@ def em_dash_raster_status(
                 ("encoded-three-em-default", "⸻", "ltr", {}, (1,), 3),
                 ("encoded-three-em-vertical-default", "⸻", "ttb", {}, (3,), 3),
             ]
+        case_definitions.extend(
+            (f"run-{count}-{mode}", "—" * count, "ttb", features, (count,), count)
+            for count in VERTICAL_DASH_RASTER_LENGTHS
+            for mode, features in (("vertical-default", {}), ("vert", {"vert": True, "vrt2": False}),
+                                   ("vrt2-only", {"vert": False, "vrt2": True})))
         for ppem in ppems:
             face.set_pixel_sizes(0, ppem)
             for (
@@ -3853,6 +3881,7 @@ def static_propdigits_shape_status(
             "tnum_reference_mismatch": (target_tnum, reference_tnum),
         }
     return {
+        "checked_tests": sorted(checks),
         "counts": {key: int(value) for key, value in checks.items()},
         "samples": {
             key: sample_pair(*pairs[key])
@@ -3955,6 +3984,7 @@ def audit_static_palt_shaping() -> list[dict[str, Any]]:
                         continue
                     target_shape = shape_semantic_signature(target_path, "かなカナ", "kana", {"palt": True})
                     reference_shape = shape_semantic_signature(ref_path, "かなカナ", "kana", {"palt": True})
+                    item["checked_tests"] = ["palt_kana_shape"]
                     if target_shape != reference_shape:
                         item["counts"]["palt_kana_shape"] = 1
                         item["samples"]["palt_kana_shape"] = sample_pair(target_shape, reference_shape)
@@ -4000,6 +4030,7 @@ def audit_static_palt_shaping() -> list[dict[str, Any]]:
                                 target_values["reachable_entries"],
                                 reference_values["reachable_entries"],
                             )
+                        item["checked_tests"].append("palt_lookup_values")
                     finally:
                         target_font.close()
                         reference_font.close()
@@ -4069,6 +4100,7 @@ def audit_static_em_dash_shaping() -> list[dict[str, Any]]:
                         )
                         item["samples"]["em_dash_upstream_shaping"] = shaping_failures
                     raster_status = em_dash_raster_status(target_path)
+                    item["case_coverage"] = dash_case_coverage(status, raster_status)
                     raster_failures = {
                         key: value
                         for key, value in raster_status["cases"].items()
@@ -4362,6 +4394,11 @@ def public_weight_to_source_han_weight(weight: float, source: TTFont) -> float:
     return axis.defaultValue + normalized * ((axis.defaultValue - axis.minValue) if normalized < 0 else (axis.maxValue - axis.defaultValue))
 
 
+VERTICAL_DASH_RUN_TEXTS = tuple("—" * count for count in (*range(2, 17), 32, 64, 257)) + (
+    "⸺", "⸻", "⸺⸺", "⸺—", "—⸻", "⸻⸺—", "⸺⸻⸺",
+)
+
+
 def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | None = None) -> dict[str, Any]:
     data = path.read_bytes()
     runtime = hb.Font(hb.Face(data))
@@ -4373,7 +4410,8 @@ def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | N
         for script in ("Latn", "Cyrl", "Grek", "Hani", "Kana", "Hang", "Bopo"):
             for language in (None, "en", "de", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"):
                 for features in ({}, {"vert": True, "vrt2": False}, {"vert": False, "vrt2": True}):
-                    for text, count in (("——", 2), ("———", 3), ("⸺", 2), ("⸻", 3)):
+                    for text in VERTICAL_DASH_RUN_TEXTS:
+                        count = sum({"—": 1, "⸺": 2, "⸻": 3}[character] for character in text)
                         buf = hb.Buffer(); buf.add_str(text); buf.script = script; buf.direction = "ttb"
                         if language: buf.language = language
                         hb.shape(runtime, buf, features)
@@ -4401,8 +4439,19 @@ def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | N
                             high = max(y for x, y in points); low = min(y for x, y in points)
                             top = sorted((x, y) for x, y in points if abs(y - high) < 1e-6)
                             bottom = sorted((x, y) for x, y in points if abs(y - low) < 1e-6)
-                            if previous_bottom is not None and top != previous_bottom:
-                                reasons.append("adjacent ink edges do not meet exactly")
+                            if previous_bottom is not None:
+                                if text in {"——", "———", "⸺", "⸻"}:
+                                    if top != previous_bottom:
+                                        reasons.append("adjacent ink edges do not meet exactly")
+                                elif (len(top) != 2 or len(previous_bottom) != 2
+                                      or top[0] != previous_bottom[0]
+                                      or min(top[1][0], previous_bottom[1][0]) <= top[0][0]
+                                      or abs(top[1][0] - previous_bottom[1][0]) > 1):
+                                    # Repeated italic middles retain the source's
+                                    # integer-rounded width (at most 1 unit of
+                                    # taper). Their left edges coincide exactly;
+                                    # the joining cross-sections must overlap.
+                                    reasons.append("continuous run has an ink gap or unexpected edge-width change")
                             previous_bottom = bottom
                         cases += 1
                         if reasons:
@@ -4909,6 +4958,7 @@ def audit_vf_em_dash_shaping() -> list[dict[str, Any]]:
                     )
                     item["samples"]["em_dash_upstream_shaping"] = shaping_failures
                 raster_status = em_dash_raster_status(target_path, {"wght": weight_value})
+                item["case_coverage"] = dash_case_coverage(status, raster_status)
                 raster_failures = {
                     key: value
                     for key, value in raster_status["cases"].items()
@@ -5000,12 +5050,32 @@ def feature_lookup_signature(font: TTFont, table_tag: str) -> list[list[Any]]:
     ]
 
 
+def vertical_joining_lookup_indices(font: TTFont) -> set[int]:
+    if "GPOS" not in font:
+        return set()
+    try:
+        names = b.vertical_dash_segments(font, b.upstream_dash_roles(font))
+    except (ValueError, KeyError):
+        return set()
+    if not names:
+        return set()
+    result = set()
+    for index, lookup in enumerate(font["GPOS"].table.LookupList.Lookup):
+        parts = [part.ExtSubTable if lookup.LookupType == 9 and part.ExtensionLookupType == 3 else part
+                 for part in lookup.SubTable]
+        if (len(parts) == 1 and isinstance(parts[0], b.ot.CursivePos)
+                and set(parts[0].Coverage.glyphs) == set(names.values())):
+            result.add(index)
+    return result
+
+
 def base_gpos_feature_lookup_signature(font: TTFont) -> list[list[Any]]:
     dash_lookup_indices = {
         item["lookup_index"]
         for records in b.vertical_em_dash_positioning_records(font).values()
         for item in records
     }
+    dash_lookup_indices.update(vertical_joining_lookup_indices(font))
     result = []
     for record in feature_records(font, "GPOS"):
         if record.FeatureTag in CONTEXTUAL_SPACING_FEATURES:
@@ -5048,6 +5118,7 @@ def base_gpos_langsys_signatures(font: TTFont) -> list[list[Any]]:
         for items in b.vertical_em_dash_positioning_records(font).values()
         for item in items
     }
+    dash_lookup_indices.update(vertical_joining_lookup_indices(font))
     excluded = {
         index
         for index, record in enumerate(records)
@@ -5466,7 +5537,8 @@ def audit_static_layout_templates() -> list[dict[str, Any]]:
                             "vchw": [[base_lookup_count + 3, base_lookup_count + 5]],
                         }
                         lookup_prefix_ok = target_gpos_lookup[:base_lookup_count] == reference_gpos_lookup
-                        contextual_lookup_count_ok = len(target_gpos_lookup) == base_lookup_count + 6
+                        contextual_lookup_count_ok = (len(target_gpos_lookup) == base_lookup_count + 7
+                                                      and vertical_joining_lookup_indices(target) == {base_lookup_count + 6})
                         contextual_feature_links_ok = contextual_features == expected_contextual_features
                         dash_feature_links_ok = dash_features == {"vert": [], "vrt2": []}
                         if not (
@@ -5485,7 +5557,7 @@ def audit_static_layout_templates() -> list[dict[str, Any]]:
                                 },
                                 {
                                     "base_prefix": reference_gpos_lookup,
-                                    "appended_count": 6,
+                                    "appended_count": 7,
                                     "contextual_features": expected_contextual_features,
                                     "vertical_em_dash_features": {"vert": [], "vrt2": []},
                                 },
@@ -5530,6 +5602,7 @@ def audit_static_layout_templates() -> list[dict[str, Any]]:
                     finally:
                         target.close()
                         reference.close()
+                    item["tables_checked"] = ["GSUB", "GPOS"]
                     out.append(item)
     return out
 
@@ -5817,6 +5890,7 @@ def audit_metadata() -> dict[str, Any]:
     samples = {"static": [], "variable": []}
     contextual_calt_reports = []
     head_bounds_reports = []
+    vertical_joining_reports = []
     regular_bounds_reports = []
     regular_sources = {
         path: b.reference_font_path(region, "Regular", italic)
@@ -5831,7 +5905,14 @@ def audit_metadata() -> dict[str, Any]:
                 if "glyf" in font and "VORG" in font:
                     failures.append({"kind": "truetype_vorg", "file": display_path(path)})
                 bounds = head_bounds_status(font)
-                head_bounds_reports.append({"file": display_path(path), **bounds})
+                cmap = font.getBestCmap() or {}
+                head_bounds_reports.append({"file": display_path(path), "cmap_codepoints": len(cmap),
+                                            "ideograph_codepoints": sum(b.is_ideograph(cp) and not name.startswith(b.INTER_PREFIX)
+                                                                        for cp, name in cmap.items()), **bounds})
+                joining = b.continuous_vertical_dash_structure_status(font)
+                vertical_joining_reports.append({"file": display_path(path), **joining})
+                if not joining["ok"]:
+                    failures.append({"kind": "continuous_vertical_joining", "file": display_path(path), **joining})
                 if not bounds["ok"]:
                     failures.append({"kind": "head_bounds", "file": display_path(path), **bounds})
                 if path in regular_sources:
@@ -6409,6 +6490,7 @@ def audit_metadata() -> dict[str, Any]:
     return {"failures": failures, "static_count": static_count, "variable_count": variable_count,
             "source_han_license_documents": license_documents,
             "contextual_calt_reports": contextual_calt_reports, "head_bounds_reports": head_bounds_reports,
+            "vertical_joining_reports": vertical_joining_reports,
             "regular_vertical_bounds_reports": regular_bounds_reports,
             "proportional_default_reports": proportional_default_reports, "samples": samples}
 
@@ -6865,6 +6947,7 @@ def audit_static_cl_boundaries() -> list[dict[str, Any]]:
                     target_cmap = target.getBestCmap() or {}
                     reference_cmap = reference.getBestCmap() or {}
                     advance_reference_cmap = advance_reference.getBestCmap() or {}
+                    item["coverage"] = {"cmap_codepoints_checked": len(target_cmap), "advance_codepoints_checked": 0}
                     extra_cmap = sorted(set(target_cmap) - set(reference_cmap))
                     missing_cmap = sorted(set(reference_cmap) - set(target_cmap))
                     extra_gsub = sorted(layout_feature_tags(target, "GSUB") - layout_feature_tags(reference, "GSUB"))
@@ -6873,6 +6956,8 @@ def audit_static_cl_boundaries() -> list[dict[str, Any]]:
                         for tag, records in b.vertical_em_dash_positioning_records(target).items()
                         if records
                     }
+                    if vertical_joining_lookup_indices(target):
+                        intentional_dash_gpos.add("curs")
                     extra_gpos = sorted(
                         layout_feature_tags(target, "GPOS")
                         - layout_feature_tags(reference, "GPOS")
@@ -6901,6 +6986,8 @@ def audit_static_cl_boundaries() -> list[dict[str, Any]]:
                         reference_h = advance_reference["hmtx"].metrics.get(
                             reference_glyph
                         )
+                        if target_h and reference_h:
+                            item["coverage"]["advance_codepoints_checked"] += 1
                         if target_h and reference_h and target_h[0] != reference_h[0]:
                             item["counts"]["advance_mismatch"] += 1
                             advance_samples.append([f"U+{codepoint:04X}", target_h[0], reference_h[0]])
@@ -8597,6 +8684,9 @@ def audit_vf_contextual_spacing() -> list[dict[str, Any]]:
                     item["missing"] = True
                 else:
                     status = contextual_spacing_status(path, {"wght": weight})
+                    item["spacing_evidence"] = {key: status[key] for key in
+                                                ("features", "horizontal_reduction", "vertical_reduction",
+                                                 "isolated_horizontal_unchanged", "isolated_vertical_unchanged")}
                     if not status["ok"]:
                         item["counts"]["contextual_spacing_shape"] = 1
                         item["samples"]["contextual_spacing_shape"] = status
@@ -8706,6 +8796,7 @@ def audit_source_han_gpos_variations() -> list[dict[str, Any]]:
                             item["missing"] = True
                             out.append(item)
                             continue
+                        item["checked_features"] = []
                         for feature_tag, text, script, direction, features, disabled_features in cases:
                             target_enabled = positioning_signature(
                                 shape_signature_data(
@@ -8759,6 +8850,7 @@ def audit_source_han_gpos_variations() -> list[dict[str, Any]]:
                                 source_enabled,
                                 source_disabled,
                             )
+                            item["checked_features"].append(feature_tag)
                             same_length = (
                                 target_signature is not None
                                 and source_signature is not None
@@ -8993,9 +9085,295 @@ AUDIT_GATE_SECTIONS = (
 )
 
 
+AUDIT_RESULT_FIELDS = dict(zip(AUDIT_GATE_SECTIONS[2:], (
+    "static_exact", "static_extension_sources", "cl_source_outlines", "static_raster",
+    "cl_static_boundaries", "static_layout_templates", "static_propdigits_shaping",
+    "static_palt_shaping", "static_em_dash_shaping", "static_ellipsis_shaping",
+    "static_upstream_dash_sources", "vf_em_dash_shaping", "vf_ellipsis_shaping",
+    "vf_upstream_dash_sources", "vf_metrics", "vf_engine_metrics", "vf_source_pairing",
+    "vf_weight_curves", "vf_cjk_strokes", "vf_contextual_spacing", "vf_source_gpos_variations",
+), strict=True))
+
+
+def audit_case_coverage(report: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Reconstruct coverage from case records, never from their summary or gate."""
+    regions = list(b.REGION_ORDER)
+    static = [(r, w, i, h) for r in regions for w in EXPECTED_WEIGHTS
+              for i in (False, True) for h in (False, True)]
+    variable = [(r, i) for r in regions for i in (False, True)]
+    named = [*EXPECTED_WEIGHTS.values()]
+    controls = sorted(b.SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT)
+    dash_roles = {"proportional", "fullwidth", "encoded_two", "encoded_three", "fullwidth_two",
+                  "fullwidth_three", "vertical_single", "vertical_two", "vertical_three", "korean_single"}
+    ellipsis_roles = {"proportional", "fullwidth", "vertical"}
+    font_evidence = {row.get("file"): row for row in report.get("metadata", {}).get("head_bounds_reports", [])}
+    specs = {}
+    for section in ("static_exact", "static_layout_template", "static_propdigits_shaping",
+                    "static_palt_shaping", "static_em_dash_shaping", "static_ellipsis_shaping"):
+        specs[section] = ("region weight italic hinted".split(), static)
+    specs["static_extension_source"] = ("region weight italic hinted".split(),
+                                        [row for row in static if row[1] not in UPSTREAM_EXACT_WEIGHTS])
+    for section in ("cl_source_outline", "cl_static_boundary"):
+        specs[section] = ("region weight italic hinted".split(), [row for row in static if row[0] == "CL"])
+    specs["static_raster"] = ("region weight italic hinted".split(), [row for row in static if row[3]])
+    for section in ("vf_ellipsis_shaping", "vf_upstream_dash_source", "vf_source_pairing", "vf_weight_curve"):
+        specs[section] = (["region", "italic"], variable)
+    for section, weights in (("vf_em_dash_shaping", INTER_POSITION_WEIGHTS),
+                             ("vf_metric", named), ("vf_engine_metric", controls),
+                             ("vf_contextual_spacing", CONTEXTUAL_SPACING_VF_WEIGHTS)):
+        specs[section] = (["region", "italic", "wght"], [(r, i, w) for r, i in variable for w in weights])
+    specs["vf_cjk_stroke"] = (["region"], [(r,) for r in regions])
+    specs["static_upstream_dash_source"] = (
+        ["kind", "region", "weight", "italic", "hinted", "role"],
+        [("source-parity", r, w, i, h, None) for r, w, i, h in static] +
+        [("weight-curve", r, None, i, h, role) for r, i in variable for h in (False, True)
+         for role in sorted(dash_roles | {"ellipsis:" + role for role in ellipsis_roles})])
+    specs["vf_source_gpos_variation"] = (
+        ["kind", "region", "italic", "public_wght", "wght"],
+        [(None, r, i, w, None) for r, i in variable for w in named] +
+        [("inter-positioning", r, i, None, w) for r, i in variable for w in INTER_POSITION_WEIGHTS])
+    if set(specs) != set(AUDIT_RESULT_FIELDS):
+        raise ValueError("audit coverage registry mismatch")
+
+    def positive(value):
+        return type(value) is int and value > 0
+
+    def measured(section, item):
+        counts = item.get("counts")
+        if (item.get("missing") or not isinstance(counts, dict) or not counts
+                or any(type(value) is not int or value < 0 for value in counts.values())):
+            return False
+        cov = item.get("coverage", {})
+        if item.get("kind") != "weight-curve":
+            expected_path = (" + ".join(display_path(vf_path(item["region"], i)) for i in (False, True))
+                             if section == "vf_cjk_stroke" else
+                             display_path(vf_path(item["region"], item["italic"])) if section.startswith("vf_") else
+                             display_path(static_path(item["region"], item["weight"], item["italic"], item["hinted"])))
+            if item.get("target") != expected_path:
+                return False
+        if "codepoints_total" in cov or "target_codepoints" in cov:
+            if cov.get("codepoints_total", cov.get("target_codepoints")) != font_evidence.get(item.get("target"), {}).get("cmap_codepoints"):
+                return False
+        if section == "static_exact" and item.get("weight") not in UPSTREAM_EXACT_WEIGHTS:
+            return (item.get("comparison_mode") == "official-boundary-cmap-only"
+                    and positive(cov.get("codepoints_boundary_compared"))
+                    and cov["codepoints_boundary_compared"] == cov.get("codepoints_total"))
+        if section in {"static_exact", "vf_metric"}:
+            return (positive(cov.get("codepoints_total")) and positive(cov.get("codepoints_metrics_compared"))
+                    and cov["codepoints_metrics_compared"] + cov.get("product_exceptions", -1) == cov["codepoints_total"]
+                    and (section == "vf_metric" or (positive(cov.get("codepoints_outlines_compared"))
+                         and cov["codepoints_outlines_compared"] + cov.get("classical_outline_exceptions", -1)
+                         == cov["codepoints_metrics_compared"])))
+        if section == "static_extension_source":
+            return (positive(cov.get("codepoints_compared")) and cov["codepoints_compared"]
+                    + cov.get("product_exceptions", -1) + cov.get("dedicated_dash_exceptions", -1)
+                    == cov.get("target_codepoints"))
+        if section == "cl_source_outline":
+            return (positive(cov.get("classical_exceptions_compared"))
+                    and cov["classical_exceptions_compared"] == cov.get("classical_exceptions_expected"))
+        if section == "static_raster":
+            return (item.get("ppems") == list(DEFAULT_RASTER_PPEMS) and positive(item.get("renders_checked"))
+                    and positive(cov.get("codepoints_compared"))
+                    and item.get("renders_checked") >= cov["codepoints_compared"] * len(DEFAULT_RASTER_PPEMS)
+                    and item.get("native_hint_execution", {}).get("glyphs") == font_evidence.get(item.get("target"), {}).get("glyphs_checked"))
+        if section == "cl_static_boundary":
+            return (cov.get("cmap_codepoints_checked") == font_evidence.get(item.get("target"), {}).get("cmap_codepoints")
+                    and cov.get("advance_codepoints_checked") == len(CL_BOUNDARY_ADVANCE_CODEPOINTS))
+        if section == "static_layout_template":
+            return item.get("tables_checked") == ["GSUB", "GPOS"]
+        if section == "static_propdigits_shaping":
+            required = ({"default_not_pnum", "pnum_reference_mismatch", "tnum_reference_mismatch"}
+                        if item["weight"] in UPSTREAM_EXACT_WEIGHTS else
+                        {"default_not_pnum", "pnum_not_proportional", "tnum_not_tabular", "pnum_tnum_same", "digit_count"})
+            return item.get("checked_tests") == sorted(required)
+        if section == "static_palt_shaping":
+            return item.get("checked_tests") == ["palt_kana_shape", "palt_lookup_values"]
+        if section in {"static_em_dash_shaping", "vf_em_dash_shaping"}:
+            evidence = item.get("case_coverage", {})
+            languages = {"default", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"}
+            required_shapes = {name: (3 if "triple" in name else 2) if "vertical" in name else 1
+                               for name in DASH_LANGUAGE_SHAPES}
+            complete = (evidence.get("shaping") == sorted(languages | {"vertical-segment-cells-and-joins", "single-calt-invariant"})
+                        and evidence.get("raster") == expected_dash_raster_cases()
+                        and evidence.get("vertical_run_cases") == 7 * 8 * 3 * len(VERTICAL_DASH_RUN_TEXTS)
+                        and evidence.get("language_shapes") == {language: required_shapes for language in languages})
+            if section == "vf_em_dash_shaping" and item["wght"] == INTER_POSITION_WEIGHTS[0]:
+                sweep = item.get("axis_advance_sweep", {})
+                complete = complete and sweep.get("locations_checked") == 1401 and sweep.get("shapes_checked") == 54639
+            return complete
+        if section == "static_upstream_dash_source":
+            if item["kind"] == "weight-curve":
+                return set(item.get("areas", {})) == {str(w) for w in named}
+            return (item.get("roles_checked") == len(dash_roles) and item.get("ellipsis_roles_checked") == 3
+                    and set(item.get("role_details", {})) == dash_roles
+                    and set(item.get("ellipsis_role_details", {})) == ellipsis_roles)
+        if section == "vf_engine_metric":
+            return positive(cov.get("codepoints_compared")) and cov["codepoints_compared"] == cov.get("glyph_extents_compared")
+        if section == "vf_source_pairing":
+            return (set(item.get("inter_controls", {})) == {str(w) for w in controls}
+                    and set(item.get("inter_probes", {})) == {str(w) for w in INTER_POSITION_WEIGHTS if w not in controls}
+                    and positive(cov.get("inter_cmap_codepoints"))
+                    and all(value.get("compared") == cov["inter_cmap_codepoints"] for field in ("inter_controls", "inter_probes")
+                            for value in item.get(field, {}).values())
+                    and cov.get("inter_control_outline_comparisons") == cov["inter_cmap_codepoints"] * len(controls)
+                    and cov.get("inter_probe_outline_comparisons") == cov["inter_cmap_codepoints"] * (len(INTER_POSITION_WEIGHTS) - len(controls))
+                    and positive(cov.get("cjk_codepoints"))
+                    and item.get("cjk_source_han_500", {}).get("compared") == cov["cjk_codepoints"])
+        if section == "vf_upstream_dash_source":
+            return (item.get("controls") == controls and item.get("ellipsis_roles_checked") == 3
+                    and set(item.get("control_details", {})) == {str(w) for w in controls}
+                    and set(item.get("ellipsis_control_details", {})) == {str(w) for w in controls}
+                    and all(set(value) == dash_roles for value in item["control_details"].values())
+                    and all(set(value) == ellipsis_roles for value in item["ellipsis_control_details"].values())
+                    and set(item.get("area_curves", {})) == dash_roles
+                    and set(item.get("ellipsis_area_curves", {})) == ellipsis_roles
+                    and item.get("curve_step") == 25
+                    and all(set(values) == {str(w) for w in range(200, 901, 25)}
+                            for field in ("area_curves", "ellipsis_area_curves") for values in item[field].values()))
+        if section == "vf_weight_curve":
+            return (item.get("weights") == list(WEIGHT_HARMONY_WEIGHTS)
+                    and cov.get("latin_codepoints") == len(WEIGHT_HARMONY_LATIN_TEXT)
+                    and cov.get("cjk_codepoints") == WEIGHT_HARMONY_CJK_SAMPLES
+                    and item.get("inter_axis_alignment", {}).get("weights") == list(WEIGHT_HARMONY_WEIGHTS)
+                    and item.get("inter_axis_alignment", {}).get("coverage", {}).get("compared_instances")
+                    == len(WEIGHT_HARMONY_LATIN_TEXT) * len(WEIGHT_HARMONY_WEIGHTS)
+                    and all(set(item.get("named_points", {}).get(kind, {})) == {str(w) for w in named}
+                            for kind in ("latin", "cjk")))
+        if section == "vf_cjk_stroke":
+            return (positive(item.get("checked_codepoints"))
+                    and all(item["checked_codepoints"] == font_evidence.get(display_path(vf_path(item["region"], italic)), {}).get("ideograph_codepoints")
+                            for italic in (False, True))
+                    and set(item.get("mismatch_by_weight", {})) == set(EXPECTED_WEIGHTS)
+                    and set(item.get("outline_mismatch_by_weight", {})) == set(EXPECTED_WEIGHTS))
+        if section == "vf_ellipsis_shaping":
+            return (set(item.get("control_status", {})) == {str(w) for w in controls}
+                    and all(set(value.get("language_cases", {})) == set(ELLIPSIS_CJK_LANGUAGES)
+                            and len(value.get("english_horizontal", {}).get("glyphs", [])) == 2
+                            for value in item["control_status"].values())
+                    and punctuation_coverage(item.get("default_punctuation", {}), len(INTER_POSITION_WEIGHTS))
+                    and item.get("axis_sweep", {}).get("locations_checked") == 1401
+                    and item.get("axis_sweep", {}).get("shapes_checked") == 30822)
+        if section == "static_ellipsis_shaping":
+            return punctuation_coverage(item.get("default_punctuation", {}), 1)
+        if section == "vf_contextual_spacing":
+            evidence = item.get("spacing_evidence", {})
+            return (set(evidence.get("features", [])) == CONTEXTUAL_SPACING_FEATURES
+                    and all(type(evidence.get(key)) is int for key in ("horizontal_reduction", "vertical_reduction"))
+                    and all(type(evidence.get(key)) is bool for key in ("isolated_horizontal_unchanged", "isolated_vertical_unchanged")))
+        if section == "vf_source_gpos_variation":
+            if item.get("kind") == "inter-positioning":
+                return cov.get("kern", 0) >= 3744 and cov.get("mark", 0) >= 70
+            return item.get("checked_features") == ["palt", "vpal", "kern"]
+        return True
+
+    def punctuation_coverage(status, weights):
+        return (status.get("cases") == 1456 * weights
+                and status.get("scripts") == [None, "Latn", "Cyrl", "Grek", "Hani", "Kana", "Hang", "Bopo"]
+                and status.get("languages") == [None, "en", "de", "fr", "ru", "el", "ca", "ro", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"])
+
+    result = {}
+    for section, (fields, expected) in specs.items():
+        rows = report.get(AUDIT_RESULT_FIELDS[section])
+        valid_rows = isinstance(rows, list) and all(isinstance(row, dict) for row in rows)
+        rows = rows if valid_rows else []
+        encode = lambda values: json.dumps(values, ensure_ascii=False, separators=(",", ":"))
+        wanted = {encode(row) for row in expected}
+        actual = [encode([row.get(field) for field in fields]) for row in rows]
+        frequencies = Counter(actual)
+        invalid = []
+        for identity, row in zip(actual, rows):
+            try:
+                if not measured(section, row):
+                    invalid.append(identity)
+            except (KeyError, TypeError, ValueError, AttributeError):
+                invalid.append(identity)
+        result[section] = {
+            "expected_cases": len(wanted), "checked_cases": len(rows),
+            "missing": sorted(wanted - set(actual)), "unexpected": sorted(set(actual) - wanted),
+            "duplicates": sorted(key for key, count in frequencies.items() if count != 1),
+            "unmeasured": invalid,
+            "complete": valid_rows and len(actual) == len(wanted) and set(actual) == wanted and not invalid,
+        }
+    metadata = report.get("metadata", {})
+    fonts = {display_path(path) for path in release_font_paths()}
+    variable_paths = {display_path(vf_path(r, i)) for r, i in variable}
+    static_weights = {display_path(static_path(r, w, i, h)): EXPECTED_WEIGHTS[w] for r, w, i, h in static}
+    meta_valid = metadata.get("static_count") == 144 and metadata.get("variable_count") == 12
+    checked = []
+    for field in ("head_bounds_reports", "contextual_calt_reports", "proportional_default_reports"):
+        rows = metadata.get(field, [])
+        identities = [row.get("file") for row in rows if isinstance(row, dict)]
+        meta_valid = (meta_valid and len(identities) == 156 and set(identities) == fonts
+                      and all(type(row.get("ok")) is bool for row in rows))
+        if field == "head_bounds_reports":
+            checked = identities
+            meta_valid = meta_valid and all(positive(row.get("glyphs_checked")) and positive(row.get("cmap_codepoints")) for row in rows)
+        elif field == "contextual_calt_reports":
+            meta_valid = meta_valid and all(row.get("cases") == 153 * len(row.get("weights", []))
+                                           and row.get("weights") == (list(INTER_POSITION_WEIGHTS) if row.get("file") in variable_paths else [static_weights.get(row.get("file"))])
+                                           and row.get("structure", {}).get("expected_rules") == 58
+                                           for row in rows)
+        else:
+            meta_valid = meta_valid and all(row.get("cases") == 37 * len(row.get("weights", []))
+                                           and row.get("weights") == (list(INTER_POSITION_WEIGHTS) if row.get("file") in variable_paths else [None])
+                                           and row.get("codepoints") == sorted(INTENTIONAL_CPS)
+                                           for row in rows)
+    regular_paths = {display_path(path) for r in regions for i in (False, True)
+                     for path in (vf_path(r, i), static_path(r, "Regular", i, False), static_path(r, "Regular", i, True))}
+    regular = metadata.get("regular_vertical_bounds_reports", [])
+    meta_valid = (meta_valid and len(regular) == 36 and {row.get("file") for row in regular} == regular_paths
+                  and all(type(row.get("ok")) is bool and len(row.get("actual", [])) == 2
+                          and len(row.get("expected", [])) == 2 for row in regular))
+    joining = metadata.get("vertical_joining_reports", [])
+    meta_valid = (meta_valid and len(joining) == 156 and {row.get("file") for row in joining} == fonts
+                  and all(type(row.get("ok")) is bool for row in joining))
+    result["metadata"] = {"expected_cases": 156, "checked_cases": len(checked), "complete": bool(meta_valid)}
+    result["audit_coverage"] = {"expected_cases": 22, "checked_cases": len(result),
+                                "complete": len(result) == 22 and all(row["complete"] for row in result.values())}
+    return {name: result[name] for name in AUDIT_GATE_SECTIONS}
+
+
+def recompute_audit_gate(report: dict[str, Any], executed: dict[str, bool] | None = None) -> dict[str, Any]:
+    coverage = audit_case_coverage(report)
+    counts = {}
+    for section, field in AUDIT_RESULT_FIELDS.items():
+        try:
+            counts[section] = len(nonzero(report.get(field, [])))
+        except (TypeError, ValueError, AttributeError):
+            counts[section] = 1
+    metadata = report.get("metadata", {})
+    recorded = metadata.get("failures", [])
+    counts["metadata"] = max(len(report.get("metadata_failures", [])), len(recorded),
+                             int(recorded != report.get("metadata_failures", [])),
+                             int(any(row.get("ok") is False for field in
+                                     ("head_bounds_reports", "contextual_calt_reports", "proportional_default_reports", "regular_vertical_bounds_reports", "vertical_joining_reports")
+                                     for row in metadata.get(field, []))))
+    # Recompute the cross-section conditions as well as the case matrices.
+    checks = (
+        (classical_outline_coverage_failures, ("static_exact", "cl_source_outlines")),
+        (inter_positioning_coverage_failures, ("vf_source_gpos_variations",)),
+        (cross_engine_coverage_failures, ("vf_engine_metrics",)),
+        (vf_source_metric_coverage_failures, ("vf_source_pairing", "vf_engine_metrics")),
+        (hint_execution_coverage_failures, ("static_raster",)),
+        (instruction_raster_coverage_failures, ("static_exact", "static_raster")),
+    )
+    failures = []
+    for check, fields in checks:
+        try:
+            failures.extend(check(*(report.get(field, []) for field in fields)))
+        except (KeyError, TypeError, ValueError, AttributeError):
+            failures.append({"kind": "malformed_coverage_evidence", "check": check.__name__})
+    failures.extend({"kind": "case_matrix_incomplete", "section": name}
+                    for name, value in coverage.items() if name != "audit_coverage" and not value["complete"]
+                    and (executed is None or executed.get(name)))
+    counts["audit_coverage"] = len(failures)
+    return build_audit_gate(counts, executed or {name: True for name in AUDIT_GATE_SECTIONS}, coverage)
+
+
 def build_audit_gate(
     failure_counts: dict[str, int],
     executed: dict[str, bool],
+    coverage: dict[str, dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
     expected = set(AUDIT_GATE_SECTIONS)
     if set(failure_counts) != expected or set(executed) != expected:
@@ -9013,9 +9391,12 @@ def build_audit_gate(
                 if not executed[name]
                 else "failed"
                 if int(failure_counts[name])
+                else "incomplete"
+                if not (coverage or {}).get(name, {}).get("complete")
                 else "passed"
             ),
             "failure_count": int(failure_counts[name]),
+            "coverage": (coverage or {}).get(name, {"complete": False}),
         }
         for name in AUDIT_GATE_SECTIONS
     }
@@ -9026,13 +9407,13 @@ def build_audit_gate(
         if item["status"] != "skipped"
     )
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "sections": sections,
         "executed_sections": sum(item["status"] != "skipped" for item in sections.values()),
         "skipped_sections": skipped_sections,
         "total_failures": total_failures,
-        "complete": skipped_sections == 0,
-        "passed": skipped_sections == 0 and total_failures == 0,
+        "complete": skipped_sections == 0 and all(item["coverage"].get("complete") is True for item in sections.values()),
+        "passed": skipped_sections == 0 and total_failures == 0 and all(item["coverage"].get("complete") is True for item in sections.values()),
     }
 
 
@@ -9289,6 +9670,7 @@ def main() -> None:
         checkpoint_path = args.reuse_non_raster_report.resolve()
         checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
         required_sections = {
+            "metadata",
             "summary",
             "gate",
             "metadata_failures",
@@ -9330,13 +9712,7 @@ def main() -> None:
             input_manifest,
             contract_manifest,
         )
-        metadata = {
-            "failures": checkpoint["metadata_failures"],
-            "static_count": int(checkpoint_summary["static_fonts_checked"]),
-            "variable_count": int(checkpoint_summary["variable_fonts_checked"]),
-            "samples": checkpoint["metadata_samples"],
-            "source_han_license_documents": checkpoint["source_han_license_documents"],
-        }
+        metadata = checkpoint["metadata"]
         static_exact = checkpoint["static_exact"]
         static_extension_sources = checkpoint["static_extension_sources"]
         cl_source_outlines = checkpoint["cl_source_outlines"]
@@ -9602,6 +9978,7 @@ def main() -> None:
         "summary": summary,
         "gate": gate,
         "metadata_failures": metadata["failures"],
+        "metadata": metadata,
         "audit_coverage_failures": coverage_failures,
         "non_failing_observation_policy": {
             "cross_engine_rounding": "FreeType 未缩放轮廓边界和竖排原点逐项与 HarfBuzz 比较，各项仅允许 1 unit 的独立坐标取整。横向 advance 的 1 unit 差异必须由独立 HVAR 插值、正负一个 F2Dot14 坐标量化范围内的半整数边界解释；其他 advance 差异失败。原始计数、最大值和插值区间保留。tnum 与 zero 组合在每个引擎内仍要求严格等宽。",
@@ -9702,6 +10079,13 @@ def main() -> None:
         "metadata_samples": metadata["samples"],
         "source_han_license_documents": metadata.get("source_han_license_documents"),
     }
+    gate = recompute_audit_gate(report, executed)
+    report["gate"] = gate
+    summary["audit_coverage_failures"] = gate["sections"]["audit_coverage"]["failure_count"]
+    report["audit_coverage_failures"].extend(
+        {"kind": "case_matrix_incomplete", "section": name}
+        for name, item in gate["sections"].items()
+        if name != "audit_coverage" and executed[name] and not item["coverage"].get("complete"))
     if args.checkpoint_dir is not None:
         final_paths, final_tools = audit_checkpoint_sources()
         if (

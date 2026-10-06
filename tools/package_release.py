@@ -44,9 +44,12 @@ def documentation_files() -> tuple[tuple[Path, str], ...]:
 def directory_files(directory: Path, prefix: str = "") -> tuple[tuple[Path, str], ...]:
     if not directory.is_dir():
         raise FileNotFoundError(directory)
+    paths = sorted(directory.rglob("*"))
+    if any(path.is_symlink() or path.is_junction() for path in (directory, *paths)):
+        raise ValueError(f"打包目录不允许链接：{directory.name}")
     return tuple(
         (path, f"{prefix}{path.relative_to(directory).as_posix()}")
-        for path in sorted(directory.rglob("*"))
+        for path in paths
         if path.is_file()
     )
 
@@ -69,16 +72,16 @@ def static_files(region: str, hinted: bool, prefix: str = "") -> tuple[tuple[Pat
         for stop in build.SOURCE_HAN_WEIGHT_STOPS
         for italic in (False, True)
     }
-    actual = {
-        path.relative_to(directory).as_posix()
-        for path, _name in files
-        if path.suffix.lower() == ".ttf"
-    }
+    expected.update({"README.txt", "LICENSE-Sarasa-Gothic.txt"})
+    actual = {path.relative_to(directory).as_posix() for path, _name in files}
     if actual != expected:
         raise ValueError(
-            f"静态字体清单不完整：{directory.name}；"
+            f"静态目录清单不完整或含未声明文件：{directory.name}；"
             f"缺少 {sorted(expected - actual)}，多出 {sorted(actual - expected)}"
         )
+    if any(path.is_symlink() or not path.resolve().is_relative_to(directory.resolve())
+           for path, _name in files):
+        raise ValueError(f"静态目录包含链接或越界文件：{directory.name}")
     return files
 
 
@@ -254,7 +257,7 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
             vertical_expected = {(audit.display_path(audit.vf_path(region, italic) if variable else audit.static_path(region, "Regular", italic, False)),
                                   400, italic, variable, "Hani", "ttb", text, 34)
                                  for variable in (True, False) for italic in (False, True)
-                                 for text in ("甲……乙——丙⸺丁", "甲……乙———丙⸻丁")}
+                                 for text in build.VISUAL_VERTICAL_RUN_TEXTS}
             vertical_actual = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("variable"), case.get("script"),
                                 case.get("direction"), case.get("text"), case.get("pixels")) for case in item.get("vertical_cases", [])]
             for label, present, required in (("语言路由", language_actual, language_expected),
@@ -262,6 +265,8 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
                                              ("静态与 VF 竖排对照", vertical_actual, vertical_expected)):
                 if len(present) != len(required) or set(present) != required:
                     raise ValueError(f"视觉细节图缺少完整的{label}检查")
+            if len(vertical_actual) != 16:
+                raise ValueError("视觉细节图必须包含短串、长串和混合编码的 16 个竖排对照")
         if len(actual) != len(expected) or set(actual) != expected or any(not isinstance(case.get("pixels"), int) or case["pixels"] <= 0 for case in cases):
             raise ValueError("视觉图片的字体、字重或样式覆盖不完整")
         reviewed.update(case[0] for case in actual)
@@ -285,6 +290,29 @@ def validate_license_documentation(main_report: dict) -> None:
         raise ValueError("版权声明文档在审计后发生变化，报告已过期")
 
 
+def validate_main_audit_report(main_report: dict) -> None:
+    import audit_sarasa_ui_propdigits as audit
+
+    gate = main_report.get("gate", {})
+    expected_sections = set(audit.AUDIT_GATE_SECTIONS)
+    try:
+        recomputed = audit.recompute_audit_gate(main_report)
+    except (KeyError, TypeError, ValueError, AttributeError) as error:
+        raise ValueError("主审计覆盖证据损坏或不完整") from error
+    if (
+        gate.get("complete") is not True
+        or gate.get("passed") is not True
+        or gate.get("total_failures") != 0
+        or gate.get("skipped_sections") != 0
+        or gate.get("executed_sections") != len(expected_sections)
+        or set(gate.get("sections", {})) != expected_sections
+        or gate.get("schema_version") != 2
+        or gate != recomputed
+        or main_report.get("audit_contract") != audit.audit_contract_manifest()
+    ):
+        raise ValueError("当前构建与审计代码没有完整通过主审计")
+
+
 def validate_release_audits(packages: list[Package]) -> None:
     import audit_sarasa_ui_propdigits as audit
 
@@ -301,19 +329,7 @@ def validate_release_audits(packages: list[Package]) -> None:
         build.assert_portable_report_text(json.dumps(report, ensure_ascii=False))
         reports[name] = report
     main_report = reports["release-audit"]
-    gate = main_report.get("gate", {})
-    expected_sections = set(audit.AUDIT_GATE_SECTIONS)
-    if (
-        gate.get("complete") is not True
-        or gate.get("passed") is not True
-        or gate.get("total_failures") != 0
-        or gate.get("skipped_sections") != 0
-        or gate.get("executed_sections") != len(expected_sections)
-        or set(gate.get("sections", {})) != expected_sections
-        or any(item != {"status": "passed", "failure_count": 0} for item in gate["sections"].values())
-        or main_report.get("audit_contract") != audit.audit_contract_manifest()
-    ):
-        raise ValueError("当前构建与审计代码没有完整通过主审计")
+    validate_main_audit_report(main_report)
     validate_license_documentation(main_report)
     ots = reports["ots-audit"]
     if ots.get("fonts_checked") != 156 or ots.get("successful") != 156 or ots.get("failures") or ots.get("unexpected_messages"):
