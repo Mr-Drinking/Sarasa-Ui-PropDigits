@@ -13,6 +13,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build_sarasa_ui_propdigits_sc as b
+from font_audit import contract as audit
 import package_release as package
 from test_runtime_regressions import fixture_font
 
@@ -44,6 +45,18 @@ class ReleaseIntegrityRegressions(unittest.TestCase):
             (root / "unexpected.mjs").write_text("unexpected", encoding="utf-8")
             with self.assertRaises(RuntimeError):
                 b.verify_git_source_bytes(root, commit)
+
+    def test_files_bound_by_raw_hashes_keep_checkout_line_endings(self):
+        # The audit report, the build record and the release packages hash these files' raw bytes,
+        # and .gitattributes gives every checkout LF. A CRLF working copy (five audit-contract files
+        # on Windows before v1.0.43) binds hashes that a fresh checkout cannot reproduce.
+        paths = {audit.ROOT / name for name in audit.audit_contract_manifest()}
+        paths.update(Path(b.__file__).with_name(name) for name in b.BUILD_COMPONENT_SHA256)
+        paths.update(source for item in package.release_packages() for source, _name in item.files
+                     if source.suffix != ".ttf")
+        carriage_returns = sorted(Path(os.path.relpath(path, b.ROOT)).as_posix()
+                                  for path in paths if b"\r" in path.read_bytes())
+        self.assertEqual(carriage_returns, [])
 
     def test_intermediate_cache_rejects_changed_bytes_inputs_and_missing_receipts(self):
         with tempfile.TemporaryDirectory() as temporary:
