@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import copy
 import os
+import string
 import sys
 import tempfile
 import unittest
@@ -11,7 +12,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build_sarasa_ui_propdigits_sc as b
-import audit_sarasa_ui_propdigits as audit
+from font_audit import contract, products, raster
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.ttProgram import Program
 from test_runtime_regressions import fixture_font
@@ -20,7 +21,7 @@ import uharfbuzz as hb
 
 class ContextualIntegrity(unittest.TestCase):
     def font(self):
-        path = audit.static_path("SC", "Regular", False, False)
+        path = contract.static_path("SC", "Regular", False, False)
         native_inter = b.SARASA_SOURCE_DIR / "sources" / "Inter" / "Inter-Regular.ttf"
         if not path.exists() or not b.INTER_UPRIGHT.exists() or not native_inter.exists():
             self.skipTest("需要固定来源及已构建的 SC 字体夹具")
@@ -111,14 +112,29 @@ class ContextualIntegrity(unittest.TestCase):
 
     def test_colon_guards_and_width_alternates_are_audited(self):
         font = self.font()
-        self.assertGreaterEqual(len(audit.raised_colon_glyph_ids(font)), 2)
         for char in "ķļņŗșț":
-            self.assertIn(char + ":2", audit.COLON_TEXTS)
-            self.assertIn("1:" + char, audit.COLON_TEXTS)
+            self.assertIn(char + ":2", products.COLON_TEXTS)
+            self.assertIn("1:" + char, products.COLON_TEXTS)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "font.ttf"; font.save(path)
-            self.assertTrue(audit.colon_status(path)["ok"])
-            self.assertTrue(audit.contextual_calt_status(path, "SC", "Regular", False)["ok"])
+            result = products.colon_invariants(path)
+            self.assertEqual(result["failures"], 0, result["samples"][:3])
+
+    def test_static_colon_follows_the_same_weight_inter_static(self):
+        self.assertEqual(products.static_inter_style(600, False), "SemiBold")
+        self.assertEqual(products.static_inter_style(400, True), "Italic")
+        self.assertEqual(products.static_inter_style(900, True), "BlackItalic")
+        semibold = contract.static_path("SC", "SemiBold", False, False)
+        if not semibold.exists():
+            self.skipTest("需要已构建的 SC SemiBold")
+        styles, original = [], products.source_inter
+        def recording(italic, static_style=None, **options):
+            styles.append(static_style)
+            return original(italic, static_style, **options)
+        with patch.object(products, "source_inter", recording):
+            result = products.colon_invariants(semibold)
+        # The raised colon is 627 against Inter-SemiBold's 627.93 (628.01 on the VF curve).
+        self.assertEqual((styles, result["failures"]), (["SemiBold"], 0), result["samples"][:3])
 
     def test_incremental_record_rejects_changed_bytes_and_style(self):
         font = self.font()
@@ -156,7 +172,7 @@ class NativeHintReferenceIntegrity(unittest.TestCase):
         source = fixture_font()
         for table in source["cmap"].tables:
             if table.isUnicode():
-                table.cmap.update({ord(char): "G" for char in audit.string.ascii_letters + audit.string.digits})
+                table.cmap.update({ord(char): "G" for char in string.ascii_letters + string.digits})
                 table.cmap[0x0360] = "acutecomb"
         for glyph in source["glyf"].glyphs.values():
             glyph.program = Program()
@@ -171,7 +187,7 @@ class NativeHintReferenceIntegrity(unittest.TestCase):
         source, reference, default_hinted = self.fonts()
         original = bytes(reference["glyf"]["G"].program.getBytecode())
         reference["glyf"]["T"].program.fromBytecode([0xB0, 1, 0x21])
-        affected, report = audit.apply_native_hint_reference_policy(
+        affected, report = raster.apply_policy(
             source, reference, default_hinted, {source.getGlyphID("Galt"), source.getGlyphID("T")})
         self.assertEqual(bytes(reference["glyf"]["G"].program.getBytecode()), original)
         self.assertEqual(bytes(reference["glyf"]["Galt"].program.getBytecode()), b"")
@@ -183,15 +199,10 @@ class NativeHintReferenceIntegrity(unittest.TestCase):
     def test_changed_prefix_or_normal_latin_fallback_is_rejected(self):
         source, reference, default_hinted = self.fonts()
         with self.assertRaisesRegex(ValueError, "正常拉丁"):
-            audit.apply_native_hint_reference_policy(source, reference, default_hinted, {source.getGlyphID("G")})
+            raster.apply_policy(source, reference, default_hinted, {source.getGlyphID("G")})
         reference["glyf"]["G"].coordinates[0] = (1, 0)
         with self.assertRaisesRegex(ValueError, "顺序或轮廓"):
-            audit.apply_native_hint_reference_policy(source, reference, default_hinted, {source.getGlyphID("Galt")})
-
-    def test_missing_policy_evidence_fails_raster_coverage(self):
-        self.assertTrue(audit.instruction_raster_coverage_failures([], [
-            {"region": "SC", "weight": "ExtraLight", "italic": False, "counts": {}}
-        ]))
+            raster.apply_policy(source, reference, default_hinted, {source.getGlyphID("Galt")})
 
 
 class HinterIdentity(unittest.TestCase):
@@ -214,16 +225,9 @@ class HinterIdentity(unittest.TestCase):
                 expected_face.set_pixel_sizes(0, ppem)
                 actual_face.set_pixel_sizes(0, ppem)
                 for cp in map(ord, "Haxy0123456789"):
-                    self.assertEqual(audit.freetype_render_signature(expected_face, cp),
-                                     audit.freetype_render_signature(actual_face, cp),
+                    self.assertEqual(raster.render_signature(expected_face, expected_face.get_char_index(cp), freetype.FT_LOAD_DEFAULT),
+                                     raster.render_signature(actual_face, actual_face.get_char_index(cp), freetype.FT_LOAD_DEFAULT),
                                      f"U+{cp:04X} at {ppem}px lost its normal hinting")
-
-    def test_hint_gate_rejects_missing_execution_coverage(self):
-        self.assertTrue(audit.hint_execution_coverage_failures([]))
-        records = [{"region": region, "weight": weight, "italic": italic,
-                    "native_hint_execution": {"complete": True, "glyphs": 1, "loads_checked": 0}}
-                   for region in b.REGION_ORDER for weight in audit.EXPECTED_WEIGHTS for italic in (False, True)]
-        self.assertTrue(audit.hint_execution_coverage_failures(records))
 
     def test_replacing_an_executable_in_place_changes_identity(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -1,0 +1,76 @@
+{
+  "schema": 1,
+  "rule": "每项差异必须满足指定的独立来源检查；这份清单不能直接跳过比较，也不能把未解释的差异计为通过。",
+  "differences": [
+    {
+      "id": "proportional-defaults",
+      "codepoints": [32, 40, 41, 42, 43, 44, 46, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 91, 93, 123, 125, 126, 160, 177, 215, 247, 8200, 8722, 8776, 8800, 8804, 8805],
+      "oracle": "固定 Inter 的比例及等宽字形；默认必须等于 pnum，tnum 与后续 zero 必须严格等宽。"
+    },
+    {
+      "id": "inter-context",
+      "feature": "calt",
+      "oracle": "原始 Inter 的上下文行为，包括冒号边界、连续冒号、非冒号规则与箭头；同时比较形态、步进和位置。"
+    },
+    {
+      "id": "regional-punctuation",
+      "codepoints": [8212, 8213, 8230, 8943, 11834, 11835, 65073],
+      "oracle": "固定 Source Han 的 ccmp、locl、vert/vrt2 运行时；CL 中文形态另对照尚古 TC。"
+    },
+    {
+      "id": "vertical-dash-segments",
+      "codepoints": [8212, 11834, 11835],
+      "direction": "ttb",
+      "oracle": "每段步进恰为 1em，墨迹不越出单元；正体连接边完全一致，斜体仅允许原始整数轮廓的 1 单位边宽差，连接截面不得有空隙。"
+    },
+    {
+      "id": "classical-overrides",
+      "regions": ["CL"],
+      "oracle": "公开 cmap 保持 Sarasa Ui CL 边界；实际覆盖的统一码和兼容码分别对照固定尚古 TC 字形，禁止按 Source Han 的共享 glyph 合并覆盖。静态字体中与 Sarasa Ui CL 字形不同者（上游只覆盖尚古 1.025 子集，例如 㓱 仍为 Source Han K）必须与固定尚古 1.028 静态来源的排版完全一致：相同坐标上的同一轮廓（斜体为存储点按 em/3 剪切取整），步进与偏移相同；不得沿用官方成品为另一字形设定的边距与竖排原点。"
+    },
+    {
+      "id": "hangul-width",
+      "oracle": "遵循 Sarasa 原生韩文片段规则：正步进字形扩展并居中到整 em，零步进字形保留零步进；包含非 cmap 的组合与位置变体。"
+    },
+    {
+      "id": "cjk-static-variable-source",
+      "formats": ["variable"],
+      "oracle": "仅认可在固定 Source Han 静态与可变来源之间也独立复现的轮廓、定位或语言路由差异；CL 汉字对照尚古 TC 的静态与可变来源（例如 㒶 在可变来源有六个轮廓、静态来源五个）。项目 VF 还必须匹配可变来源，静态必须匹配静态来源。不得仅凭 VF 与自身实例一致放行。"
+    },
+    {
+      "id": "heavy-language-routing",
+      "formats": ["static"],
+      "oracle": "Heavy 没有上游成品。Sarasa Ui 收窄了 Source Han 的语言系统路由（例如 latn、ROM、MOL 下不组合韩文与假名）；若 Heavy 与 Source Han Heavy 的字形序列结构不同，只接受与固定 Bold 成品完全相同的序列与 cluster，并改以该成品的定位效果对照；若 Source Han 有定位而 Bold 成品不路由同一定位，按字形判定：这些字形在 Heavy 也必须没有定位效果，同一串的其余字形仍须与 Source Han Heavy 一致，且其中至少一处是 Bold 来源有定位、Bold 成品去掉了（例如 ROM 下整串假名字偶距；J 竖排的 ！？ 换用 Sarasa 竖排形而没有 vpal，同一串的 ： 保留 vpal）。竖排连接的破折号片段一律不得有定位。定位效果在保留空 GPOS 的对照下测量，避免把 HarfBuzz 的回退附加符号定位当作字体数据。"
+    },
+    {
+      "id": "upstream-pair-order",
+      "formats": ["static"],
+      "oracle": "固定 Sarasa Ui 成品中部分 GPOS PairSet 未按第二字形编号排序，HarfBuzz 的二分查找会漏掉其中已存储的字偶距（例如 ExtraLight、Light 的 とっ）。本项目按 OpenType 规范排序；对照前把上游参照的 PairSet 同样排序，不改动任何存储值。"
+    },
+    {
+      "id": "upstream-hint-execution",
+      "formats": ["static"],
+      "oracle": "固定 Sarasa Ui 1.0.43 hinted CL 的 龍（U+9F8D）在 FreeType 严格模式 57–59 px 超出循环上限，非严格渲染与相邻字号一致。只有成品字形的轮廓、字形指令与 CVT 都和同字重固定上游逐字节相同，且上游在同一 ppem 与模式下给出相同错误时，才记为沿用上游，报告保留数量与样本；fpgm、prep 因本项目追加的拉丁 hint 可以不同。其余执行失败一律计为失败。"
+    },
+    {
+      "id": "inter-static-variable-source",
+      "formats": ["variable"],
+      "oracle": "固定 Inter 的静态字体与可变字体在少数字形上本身不同（例如 U+01B3）。VF 必须匹配 Inter 可变来源，静态字体必须匹配同字重的 Inter 静态来源，两者的墨迹位置差必须与两份来源之间的差一致。"
+    },
+    {
+      "id": "integer-source-scaling",
+      "oracle": "Inter 由 2048 em 换算为 1000 em 的步进允许至多 1 单位差异；附加符号的相对墨迹坐标允许两端各一次整数取整。数字等宽、原生公开字重指标和正体竖排连接不适用此容差。"
+    },
+    {
+      "id": "engine-integer-bearings",
+      "oracle": "FreeType NO_SCALE 与 HarfBuzz 的整数边距允许 1 单位差异，并完整保留计数及样本；横竖步进必须完全一致，数字在每个引擎内严格等宽。另记录按 em 字号且不 hint 的 FreeType 分数单位度量，避免把两个加载路径的整数处理阶段混为一谈。",
+      "reference": "https://freetype.org/freetype2/docs/reference/ft2-glyph_retrieval.html#ft_glyphslotrec"
+    },
+    {
+      "id": "classical-spacing-bases",
+      "regions": ["CL"],
+      "codepoints": [14985, 15000, 15011, 15024],
+      "oracle": "㪉㪘㪣㪰 是有间距的汉字，保持来源轮廓与 1000 单位步进，修正上游将其误标记为 GDEF mark 的错误。"
+    }
+  ]
+}

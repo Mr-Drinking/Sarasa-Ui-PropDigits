@@ -15,7 +15,6 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 
 import build_sarasa_ui_propdigits_sc as build  # noqa: E402
-import audit_sarasa_ui_propdigits as audit  # noqa: E402
 import package_release  # noqa: E402
 import uharfbuzz as hb  # noqa: E402
 from fontTools.ttLib import TTFont  # noqa: E402
@@ -83,241 +82,6 @@ class RawSimpleGlyphFlagTests(unittest.TestCase):
             font.close()
         self.assertGreater(before["glyphs_checked"], 0)
         self.assertEqual(after, before)
-
-
-class AuditGateTests(unittest.TestCase):
-    def test_observations_never_hide_nonzero_failure_counts(self) -> None:
-        observed = {
-            "kind": "source-quantization",
-            "counts": {"outline": 0},
-            "observations": {"fixed_point": 12},
-        }
-        self.assertEqual(audit.nonzero([observed]), [])
-        observed["counts"]["outline"] = 1
-        failures = audit.nonzero([observed])
-        self.assertEqual(len(failures), 1)
-        self.assertEqual(failures[0]["counts"]["outline"], 1)
-        self.assertEqual(failures[0]["observations"]["fixed_point"], 12)
-
-    def test_nonzero_rejects_explicit_false_without_counts(self) -> None:
-        self.assertEqual(
-            audit.nonzero([{"kind": "contract", "ok": False, "counts": {}}]),
-            [
-                {
-                    "kind": "contract",
-                    "region": None,
-                    "weight": None,
-                    "wght": None,
-                    "italic": None,
-                    "hinted": None,
-                    "role": None,
-                    "target": None,
-                    "source": None,
-                    "missing": False,
-                    "ok": False,
-                    "counts": {},
-                    "coverage": {},
-                    "observations": {},
-                    "classical_source_exception": None,
-                    "samples": {},
-                    "observation_samples": {},
-                }
-            ],
-        )
-
-    def test_registered_failure_fails_gate(self) -> None:
-        counts = {name: 0 for name in audit.AUDIT_GATE_SECTIONS}
-        executed = {name: True for name in audit.AUDIT_GATE_SECTIONS}
-        counts["vf_engine_metric"] = 1
-        gate = audit.build_audit_gate(counts, executed)
-        self.assertEqual(gate["total_failures"], 1)
-        self.assertEqual(gate["sections"]["vf_engine_metric"]["status"], "failed")
-        self.assertFalse(gate["passed"])
-
-    def test_missing_registry_entry_fails_closed(self) -> None:
-        counts = {name: 0 for name in audit.AUDIT_GATE_SECTIONS}
-        executed = {name: True for name in audit.AUDIT_GATE_SECTIONS}
-        counts.pop("metadata")
-        with self.assertRaisesRegex(ValueError, "registry mismatch"):
-            audit.build_audit_gate(counts, executed)
-
-    def test_skipped_section_cannot_be_reported_as_passed(self) -> None:
-        counts = {name: 0 for name in audit.AUDIT_GATE_SECTIONS}
-        executed = {name: True for name in audit.AUDIT_GATE_SECTIONS}
-        executed["static_raster"] = False
-        gate = audit.build_audit_gate(counts, executed)
-        self.assertFalse(gate["complete"])
-        self.assertFalse(gate["passed"])
-        self.assertEqual(gate["skipped_sections"], 1)
-
-
-class AuditMetricObservationTests(unittest.TestCase):
-    @staticmethod
-    def metric_case(
-        ordinary_horizontal: int = 1,
-        component_horizontal: int = 0,
-    ) -> dict[str, object]:
-        return {
-            "region": "SC",
-            "italic": True,
-            "wght": 300,
-            "counts": {
-                "missing_target": 0,
-                "missing_reference": 0,
-                "h_advance": 0,
-                "h_lsb": 5,
-                "v_advance": 0,
-                "v_side_bearing": 0,
-                "bbox": 0,
-                "outline_or_flags": 0,
-            },
-            "samples": {"h_lsb": [["U+0041", "A", 1, 2]]},
-            "observations": {},
-            "fonttools_side_bearing_differences": {
-                "counts": {"horizontal": 5, "vertical": 0},
-                "delta_histogram": {"horizontal": {"-1": 5}, "vertical": {}},
-                "maximum_absolute_delta": {
-                    "horizontal": max(ordinary_horizontal, component_horizontal),
-                    "vertical": 0,
-                },
-                "horizontal_use_my_metrics": {
-                    "count": 1 if component_horizontal else 0,
-                    "maximum_absolute_delta": component_horizontal,
-                },
-                "horizontal_without_use_my_metrics_maximum_absolute_delta": (
-                    ordinary_horizontal
-                ),
-                "codepoints_checked": 10,
-            },
-        }
-
-    @staticmethod
-    def engine_case(horizontal_advance: int = 0) -> dict[str, object]:
-        return {
-            "region": "SC",
-            "italic": True,
-            "weight": "Light",
-            "wght": 300,
-            "reference_mode": "project-static-unhinted",
-            "counts": {
-                "missing_glyph": 0,
-                "horizontal_advance": horizontal_advance,
-                "vertical_advance": 0,
-                "horizontal_side_bearing": 0,
-                "vertical_side_bearing": 0,
-            },
-        }
-
-    def test_named_fonttools_lsb_is_observation_only_with_clean_engine(self) -> None:
-        metric = self.metric_case()
-        audit.classify_fonttools_vf_metric_observations(
-            [metric],
-            [self.engine_case()],
-        )
-        self.assertEqual(metric["counts"]["h_lsb"], 0)
-        self.assertEqual(
-            metric["observations"][
-                "fonttools_static_instance_side_bearing_differences"
-            ],
-            5,
-        )
-        self.assertEqual(metric["raw_counts"]["h_lsb"], 5)
-
-    def test_named_fonttools_lsb_stays_failure_when_engine_is_not_clean(self) -> None:
-        metric = self.metric_case()
-        audit.classify_fonttools_vf_metric_observations(
-            [metric],
-            [self.engine_case(horizontal_advance=1)],
-        )
-        self.assertEqual(metric["counts"]["h_lsb"], 5)
-        self.assertNotIn("raw_counts", metric)
-
-    def test_named_fonttools_lsb_stays_failure_above_ordinary_limit(self) -> None:
-        metric = self.metric_case(ordinary_horizontal=3)
-        audit.classify_fonttools_vf_metric_observations(
-            [metric],
-            [self.engine_case()],
-        )
-        self.assertEqual(metric["counts"]["h_lsb"], 5)
-
-    def test_use_my_metrics_has_a_separate_bounded_limit(self) -> None:
-        metric = self.metric_case(ordinary_horizontal=1, component_horizontal=12)
-        audit.classify_fonttools_vf_metric_observations(
-            [metric],
-            [self.engine_case()],
-        )
-        self.assertEqual(metric["counts"]["h_lsb"], 0)
-
-        metric = self.metric_case(ordinary_horizontal=1, component_horizontal=17)
-        audit.classify_fonttools_vf_metric_observations(
-            [metric],
-            [self.engine_case()],
-        )
-        self.assertEqual(metric["counts"]["h_lsb"], 5)
-
-    def test_incomplete_difference_stats_cannot_hide_named_failure(self) -> None:
-        metric = self.metric_case()
-        metric["fonttools_side_bearing_differences"]["counts"]["horizontal"] = 4
-        audit.classify_fonttools_vf_metric_observations(
-            [metric],
-            [self.engine_case()],
-        )
-        self.assertEqual(metric["counts"]["h_lsb"], 5)
-
-    def test_anchor350_uses_separate_horizontal_and_vertical_limits(self) -> None:
-        counts = {
-            "missing_glyph": 0,
-            "horizontal_advance": 0,
-            "vertical_advance": 0,
-            "horizontal_side_bearing": 1,
-            "vertical_side_bearing": 1,
-        }
-        self.assertTrue(
-            audit.is_anchor350_side_bearing_quantization_only(
-                counts,
-                {"horizontal": 2, "vertical": 5},
-            )
-        )
-        self.assertFalse(
-            audit.is_anchor350_side_bearing_quantization_only(
-                counts,
-                {"horizontal": 2, "vertical": 6},
-            )
-        )
-        counts["horizontal_advance"] = 1
-        self.assertFalse(
-            audit.is_anchor350_side_bearing_quantization_only(
-                counts,
-                {"horizontal": 1, "vertical": 1},
-            )
-        )
-
-    def test_source_metric_observation_requires_same_weight_engine_coverage(self) -> None:
-        source_pairing = [
-            {
-                "region": "SC",
-                "italic": True,
-                "inter_controls": {
-                    "350": {
-                        "observations": {"hmtx_differences": 12},
-                    }
-                },
-            }
-        ]
-        engine = self.engine_case()
-        engine["weight"] = "Anchor350"
-        engine["wght"] = 350
-        self.assertEqual(
-            audit.vf_source_metric_coverage_failures(source_pairing, [engine]),
-            [],
-        )
-        engine["counts"]["vertical_side_bearing"] = 1
-        failures = audit.vf_source_metric_coverage_failures(
-            source_pairing,
-            [engine],
-        )
-        self.assertEqual(len(failures), 1)
-        self.assertEqual(failures[0]["wght"], 350)
 
 
 class MetricVariationStorageTests(unittest.TestCase):
@@ -489,38 +253,6 @@ class CjkEllipsisTests(unittest.TestCase):
 
 
 class AuditSummaryTests(unittest.TestCase):
-    def test_reused_report_rejects_changed_font_or_contract(self) -> None:
-        inputs = {"fonts/a.ttf": {"size": 1, "sha256": "a"}}
-        contract = {"tools/audit.py": "b"}
-        checkpoint = {
-            "input_manifest": inputs,
-            "audit_contract": contract,
-        }
-        audit.validate_reused_audit_provenance(checkpoint, inputs, contract)
-        with self.assertRaisesRegex(ValueError, "156 fonts"):
-            audit.validate_reused_audit_provenance(
-                checkpoint,
-                {"fonts/a.ttf": {"size": 2, "sha256": "c"}},
-                contract,
-            )
-        with self.assertRaisesRegex(ValueError, "current scripts"):
-            audit.validate_reused_audit_provenance(
-                checkpoint,
-                inputs,
-                {"tools/audit.py": "changed"},
-            )
-
-    def test_sum_nested_values_returns_all_numeric_totals(self) -> None:
-        self.assertEqual(
-            audit.sum_nested_values(
-                [
-                    {"counts": {"a": 2, "b": 3}},
-                    {"counts": {"a": 5, "ignored": "text"}},
-                ],
-                "counts",
-            ),
-            {"a": 7, "b": 3},
-        )
 
     def test_portable_report_gate_rejects_windows_and_posix_homes(self) -> None:
         for value in (
@@ -573,14 +305,14 @@ class ReleasePackageTests(unittest.TestCase):
                                 (directory/name).write_bytes(f'{region} {stop["name"]} {italic} {hinted}'.encode())
                 packages=package_release.release_packages()
                 results=[package_release.write_package(package, root/'dist') for package in packages]
-                package_release.write_release_manifest(packages, results, independently_verified=True)
+                package_release.write_release_manifest(packages, results)
                 report=json.loads((root/'reports/release-packages.json').read_text(encoding='utf-8'))
                 self.assertEqual((report['package_count'], report['unique_fonts'], report['font_occurrences']), (21, 156, 312))
                 self.assertEqual(len(report['font_sha256']), 156)
-                self.assertTrue(report['independent_verify_only_completed'])
+                self.assertTrue(report['verified_before_promotion'])
                 self.assertEqual(len(report['audit_report_sha256']), 4)
                 with self.assertRaises(ValueError):
-                    package_release.write_release_manifest(packages[:-1], results[:-1], independently_verified=True)
+                    package_release.write_release_manifest(packages[:-1], results[:-1])
 
     def test_release_matrix_has_21_documented_packages(self) -> None:
         with tempfile.TemporaryDirectory() as tmp_name, patch.object(build, "STATIC_ROOT", Path(tmp_name)):

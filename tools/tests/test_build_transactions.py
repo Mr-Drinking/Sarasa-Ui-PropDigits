@@ -13,6 +13,56 @@ from test_runtime_regressions import fixture_font
 
 
 class BuildTransactionTests(unittest.TestCase):
+    def test_all_rollback_paths_are_attempted_after_one_restore_error(self):
+        with tempfile.TemporaryDirectory() as directory, patch.object(b, 'ROOT', Path(directory)):
+            root = Path(directory)
+            pairs = [(root / f'candidate-{name}', root / name) for name in ('a', 'b', 'c')]
+            for source, destination in pairs:
+                source.write_bytes(b'new'); destination.write_bytes(b'old')
+            original = Path.replace
+            def replace(path, target):
+                if path == pairs[2][0]: raise OSError('promotion failed')
+                if path == pairs[1][1] and target == pairs[1][0]: raise OSError('one candidate could not be moved back')
+                return original(path, target)
+            with patch.object(Path, 'replace', replace), self.assertRaises(BaseExceptionGroup):
+                b.promote_build_outputs(pairs, root / 'previous')
+            for _source, destination in pairs:
+                self.assertEqual(destination.read_bytes(), b'old')
+
+    def test_refresh_rejects_unattested_or_changed_input_before_processing(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch.multiple(b, ROOT=root, VARIABLE_DIR=root/'fonts/variable', OUTPUT_VALIDATION_DIR=root/'records'):
+                path = b.VARIABLE_DIR/b.variable_output_name('SC', False)
+                path.parent.mkdir(parents=True); path.write_bytes(b'old bytes')
+                with patch.object(b, '_refresh_variable_finalization_outputs') as transform:
+                    with self.assertRaisesRegex(ValueError, '校验记录'):
+                        b.refresh_variable_finalization_outputs(['SC'], (False,))
+                    transform.assert_not_called()
+                record = {'file':path.name,'region':'SC','italic':False,'weight':None,'hinted':False,
+                          'sha256':b.file_sha256(path),'contract':{'schema':2,'builder_sha256':'a'*64}}
+                b.write_json_atomic(b.output_validation_record_path(path), record)
+                b.require_validated_input(path, 'SC', False)
+                path.write_bytes(b'new bytes')
+                with self.assertRaisesRegex(ValueError, '不匹配'):
+                    b.require_validated_input(path, 'SC', False)
+
+    def test_partial_build_cannot_overwrite_full_reports(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch.multiple(b, ROOT=root, VARIABLE_DIR=root/'fonts/variable', STATIC_ROOT=root/'fonts/static', REPORT_DIR=root/'reports'):
+                b.REPORT_DIR.mkdir(); b.VARIABLE_DIR.mkdir(parents=True)
+                full = b.REPORT_DIR/'Sarasa-Ui-PropDigits-report.json'; full.write_bytes(b'full report')
+                inspection = b.REPORT_DIR/'font-inspection.json'; inspection.write_bytes(b'full inspection')
+                path = b.VARIABLE_DIR/b.variable_output_name('SC', False); path.write_bytes(b'font')
+                report = {'variable_outputs':[{'file':b.portable_report_path(path),'region':'SC'}], 'static_outputs':[]}
+                with patch.object(b, 'inspect_font', return_value={'fixture':True}):
+                    b.write_reports(report)
+                self.assertEqual(full.read_bytes(), b'full report')
+                self.assertEqual(inspection.read_bytes(), b'full inspection')
+                partial = json.loads((b.REPORT_DIR/'Sarasa-Ui-PropDigits-report.partial-SC.json').read_text(encoding='utf-8'))
+                self.assertFalse(partial['complete_font_matrix'])
+
     def test_promotion_preserves_concurrently_updated_unrelated_receipts(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);cache=root/'.cache';cache.mkdir()

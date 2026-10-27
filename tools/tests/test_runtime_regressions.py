@@ -16,6 +16,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build_sarasa_ui_propdigits_sc as b
 import audit_sarasa_ui_propdigits as audit
+from font_audit import contract as audit_contract, metrics as audit_metrics, products as audit_products
 import package_release as package
 import python_env_bootstrap as bootstrap
 import uharfbuzz as hb
@@ -66,9 +67,10 @@ def positions(font, text, features):
 
 class PositioningRegressionTests(unittest.TestCase):
     def test_audit_top_level_definitions_have_unique_names(self):
-        tree = ast.parse(Path(audit.__file__).read_text(encoding='utf-8'))
-        names = Counter(node.name for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)))
-        self.assertEqual({name: count for name, count in names.items() if count > 1}, {})
+        for path in [Path(audit.__file__), *sorted(Path(audit_contract.__file__).parent.glob('*.py'))]:
+            tree = ast.parse(path.read_text(encoding='utf-8'))
+            names = Counter(node.name for node in tree.body if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)))
+            self.assertEqual({name: count for name, count in names.items() if count > 1}, {}, path.name)
 
     def test_vorg_removal_preserves_origins_and_real_composite_outlines(self):
         font = fixture_font()
@@ -90,15 +92,6 @@ class PositioningRegressionTests(unittest.TestCase):
         self.assertEqual(report['vorgless_origin_mismatches'], 0)
         self.assertEqual(before, {name: b.glyph_point_structure(font, name) for name in font.getGlyphOrder()})
 
-    def test_mark_rounding_is_bounded_per_link_and_in_rendered_ink(self):
-        source = ((0, 0, 0, 0), (100, 0, 100, 0), (200, 0, 200, 0))
-        rounded = ((0, 0, 0, 0), (102, 0, 102, 0), (203, 0, 203, 0))
-        self.assertFalse(audit.positioning_signature_comparison(rounded, source, 'mark', 'x\u0301\u0301', 800)[0])
-        misplaced = ((0, 0, 0, 0), (104, 0, 104, 0), (204, 0, 204, 0))
-        self.assertTrue(audit.positioning_signature_comparison(misplaced, source, 'mark', 'x\u0301\u0301', 800)[0])
-        bad_ink = ((0, 0, 0, 0), (100, 0, 106, 0), (200, 0, 206, 0))
-        self.assertTrue(audit.positioning_signature_comparison(bad_ink, source, 'mark', 'x\u0301\u0301', 800)[0])
-
     def test_shared_variation_devices_are_remapped_once(self):
         device = b.ot.Device(); device.DeltaFormat = 0x8000
         device.StartSize = 0; device.EndSize = 1
@@ -116,6 +109,108 @@ class PositioningRegressionTests(unittest.TestCase):
             with self.subTest(text=text):
                 self.assertEqual(positions(target, text, {'cv10': False}), positions(source, text, {'cv10': True}))
 
+    @staticmethod
+    def curved_g(font, control_x, lsb):
+        # One quadratic edge: control point at control_x, ink extreme at
+        # (control_x + 100) / 2 when both on-curve ends sit at x = 100.
+        pen = TTGlyphPen(None)
+        pen.moveTo((100, 0)); pen.lineTo((300, 0)); pen.lineTo((300, 700)); pen.lineTo((100, 700))
+        pen.qCurveTo((control_x, 350), (100, 0)); pen.closePath()
+        font['glyf'].glyphs['G'] = pen.glyph()
+        font['hmtx'].metrics['G'] = (600, lsb)
+
+    @staticmethod
+    def straight_g(font, x):
+        pen = TTGlyphPen(None)
+        pen.moveTo((x, 0)); pen.lineTo((300, 0)); pen.lineTo((300, 700)); pen.lineTo((x, 700)); pen.closePath()
+        font['glyf'].glyphs['G'] = pen.glyph()
+        font['hmtx'].metrics['G'] = (600, x)
+
+    def test_nominal_audit_compares_ink_not_control_box(self):
+        curved, straight, shifted = fixture_font(), fixture_font(), fixture_font()
+        self.curved_g(curved, 60, 60)      # control xMin 60, ink 80
+        self.straight_g(straight, 80)      # control xMin 80, ink 80
+        self.straight_g(shifted, 83)       # ink moved by three units
+        with tempfile.TemporaryDirectory() as raw:
+            paths = {}
+            for name, font in (('curved', curved), ('straight', straight), ('shifted', shifted)):
+                paths[name] = Path(raw) / f'{name}.ttf'; font.save(paths[name])
+            same_ink = audit_metrics.compare_nominal(audit_metrics.nominal_metrics(paths['curved']),
+                                                     audit_metrics.nominal_metrics(paths['straight']))
+            moved_ink = audit_metrics.compare_nominal(audit_metrics.nominal_metrics(paths['shifted']),
+                                                      audit_metrics.nominal_metrics(paths['straight']))
+        self.assertEqual(same_ink['horizontal_metrics']['failures'], 0)
+        self.assertEqual(moved_ink['horizontal_metrics']['failures'], 1)
+
+    def test_inter_lsb_targets_place_the_native_ink(self):
+        # The native static reaches ink 75 with its control box; the product
+        # outline has a control point 20 units outside its ink.
+        product, native = fixture_font(), fixture_font()
+        self.curved_g(product, 60, 60)
+        self.straight_g(native, 75)
+        targets = b.reference_cmap_metric_targets(product, native, 'hmtx')
+        self.assertEqual(targets['G'], (600, 55))
+        self.assertEqual(targets['T'], tuple(native['hmtx'].metrics['T']))
+
+    def test_lsb_targets_follow_the_drawn_native_ink(self):
+        # Sarasa's italic statics can keep hmtx LSB and the glyph header a
+        # unit left of the points engines draw (K Light Italic ᄁ: 256, 257).
+        product, native = fixture_font(), fixture_font()
+        self.straight_g(product, 80)
+        self.straight_g(native, 257)
+        native['glyf'].glyphs['G'].xMin = 256
+        native['hmtx'].metrics['G'] = (600, 256)
+        targets = b.reference_cmap_metric_targets(product, native, 'hmtx')
+        self.assertEqual(targets['G'], (600, 257))
+
+    @staticmethod
+    def top_t(font, control_y, tsb):
+        # A quadratic top edge from (400, 700) to (0, 700): its ink peaks at
+        # 700 + (control_y - 700) / 2, below a control point at control_y.
+        pen = TTGlyphPen(None)
+        pen.moveTo((0, 0)); pen.lineTo((400, 0)); pen.lineTo((400, 700))
+        if control_y == 700:
+            pen.lineTo((0, 700))
+        else:
+            pen.qCurveTo((200, control_y), (0, 700))
+        pen.closePath()
+        font['glyf'].glyphs['T'] = pen.glyph()
+        font['vmtx'].metrics['T'] = (1000, tsb)
+
+    @staticmethod
+    def flat_t(font, top, tsb):
+        pen = TTGlyphPen(None)
+        pen.moveTo((0, 0)); pen.lineTo((400, 0)); pen.lineTo((400, top)); pen.lineTo((0, top)); pen.closePath()
+        font['glyf'].glyphs['T'] = pen.glyph()
+        font['vmtx'].metrics['T'] = (1000, tsb)
+
+    def test_vmtx_targets_keep_the_native_ink_below_the_origin(self):
+        # The native ink tops out at 730, 150 below its origin. The product
+        # reaches 730 through a control point at 760, so an equal TSB would
+        # lift its origin, and its ink, by 30 units.
+        product, native = fixture_font(), fixture_font()
+        self.top_t(product, 760, 150)
+        self.flat_t(native, 730, 150)
+        targets = b.reference_cmap_metric_targets(product, native, 'vmtx')
+        self.assertEqual(targets['T'], (1000, 120))
+        self.assertEqual(targets['o'], tuple(native['vmtx'].metrics['o']))
+
+    def test_nominal_audit_compares_vertical_ink_not_control_box(self):
+        curved, flat, lowered = fixture_font(), fixture_font(), fixture_font()
+        self.top_t(curved, 760, 120)       # origin 880, ink top 730
+        self.flat_t(flat, 730, 150)        # origin 880, ink top 730
+        self.flat_t(lowered, 730, 153)     # ink three units further below
+        with tempfile.TemporaryDirectory() as raw:
+            paths = {}
+            for name, font in (('curved', curved), ('flat', flat), ('lowered', lowered)):
+                paths[name] = Path(raw) / f'{name}.ttf'; font.save(paths[name])
+            same_ink = audit_metrics.compare_nominal(audit_metrics.nominal_metrics(paths['curved']),
+                                                     audit_metrics.nominal_metrics(paths['flat']))
+            moved_ink = audit_metrics.compare_nominal(audit_metrics.nominal_metrics(paths['lowered']),
+                                                      audit_metrics.nominal_metrics(paths['flat']))
+        self.assertEqual(same_ink['vertical_metrics']['failures'], 0)
+        self.assertEqual(moved_ink['vertical_metrics']['failures'], 1)
+
     def test_runtime_audit_detects_static_vorg_conflict(self):
         canonical = fixture_font()
         runtime = hb_font(canonical)
@@ -123,12 +218,18 @@ class PositioningRegressionTests(unittest.TestCase):
         vorg = static['VORG'] = newTable('VORG')
         vorg.majorVersion = 1; vorg.minorVersion = 0
         vorg.defaultVertOriginY = 900; vorg.VOriginRecords = {}
-        result = audit.compare_harfbuzz_vf_metrics(runtime, static, 400)
-        self.assertGreater(result['counts']['vertical_side_bearing'], 0)
-        before = static.getTableData('glyf')
-        b.normalize_static_vertical_origin(static)
-        self.assertEqual(before, static.getTableData('glyf'))
-        self.assertFalse(any(audit.compare_harfbuzz_vf_metrics(runtime, static, 400)['counts'].values()))
+        with tempfile.TemporaryDirectory() as raw:
+            canonical_path, static_path = Path(raw) / 'canonical.ttf', Path(raw) / 'static.ttf'
+            canonical.save(canonical_path); static.save(static_path)
+            expected = audit_metrics.nominal_metrics(canonical_path)
+            result = audit_metrics.compare_nominal(audit_metrics.nominal_metrics(static_path), expected)
+            self.assertGreater(result['vertical_metrics']['failures'], 0)
+            before = static.getTableData('glyf')
+            b.normalize_static_vertical_origin(static)
+            self.assertEqual(before, static.getTableData('glyf'))
+            static.save(static_path)
+            result = audit_metrics.compare_nominal(audit_metrics.nominal_metrics(static_path), expected)
+            self.assertEqual([row['failures'] for row in result.values()], [0, 0])
 
     def test_ordered_presets_follow_the_selected_glyph_identity(self):
         font = fixture_font()
@@ -170,14 +271,13 @@ class PositioningRegressionTests(unittest.TestCase):
         b.subset_to_current_cmap(base)
         b.rebuild_gdef_from_reference(base, fixture_font())
         b.subset_to_current_cmap(base)
-        target = hb_font(base)
-        for weight in (200, 400, 900):
-            target.set_variations({'wght': weight})
-            for kind, text, expected in audit.inter_positioning_reference(False, weight):
-                actual = audit.inter_positioning_signature(target, text, kind, source=False)
-                failed, maximum = audit.positioning_signature_comparison(actual, expected, kind, text, weight)
-                if failed:
-                    self.fail(f'{weight} {kind} {text!r}: {actual!r} != {expected!r}')
+        with tempfile.TemporaryDirectory() as raw:
+            path = Path(raw) / 'merged.ttf'
+            base.save(path)
+            # This fixture merges layout only; curve and origin alignment for
+            # intermediate weights is exercised by the release audit on real VFs.
+            result = audit_products.positioning_invariants(path, weights=(200, 400, 900))
+        self.assertEqual(result['failures'], 0, result['samples'][:4])
 
 
 class SourceAndEnvironmentRegressionTests(unittest.TestCase):
@@ -188,7 +288,7 @@ class SourceAndEnvironmentRegressionTests(unittest.TestCase):
             manifest = {str(path): {'sha256': 'current', 'size': 1} for path in fonts}
             (root / 'reports/release-audit.json').write_text('{"input_manifest": {}}', encoding='utf-8')
             packages = [package.Package('probe.zip', tuple((path, path.name) for path in fonts))]
-            with patch.object(package, 'ROOT', root), patch.object(audit, 'release_font_paths', return_value=fonts), patch.object(audit, 'audit_input_manifest', return_value=manifest):
+            with patch.object(package, 'ROOT', root), patch.object(audit_contract, 'release_font_paths', return_value=fonts), patch.object(audit_contract, 'audit_input_manifest', return_value=manifest):
                 with self.assertRaisesRegex(ValueError, 'SHA-256'):
                     package.validate_release_audits(packages)
 

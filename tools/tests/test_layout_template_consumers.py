@@ -9,10 +9,155 @@ from fontTools.ttLib import TTFont
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build_sarasa_ui_propdigits_sc as b
 from fontTools.feaLib.builder import addOpenTypeFeaturesFromString
+from fontTools.fontBuilder import FontBuilder
+from fontTools.pens.ttGlyphPen import TTGlyphPen
 from test_runtime_regressions import fixture_font
 
 
+def dash_font(locl_languages):
+    # Source Han's dash roles; KOR localizes the em dash to its own alternate.
+    order = ['.notdef', 'emdash', 'uni2015', 'uni2E3A', 'uni2E3B', 'uniFE31', 'two', 'three', 'vtwo', 'vthree', 'emdash.kor']
+    builder = FontBuilder(1000, isTTF=True)
+    builder.setupGlyphOrder(order)
+    builder.setupCharacterMap({0x2014: 'emdash', 0x2015: 'uni2015', 0x2E3A: 'uni2E3A', 0x2E3B: 'uni2E3B', 0xFE31: 'uniFE31'})
+    glyphs = {}
+    for name in order:
+        pen = TTGlyphPen(None)
+        pen.moveTo((0, 300)); pen.lineTo((1000, 300)); pen.lineTo((1000, 350)); pen.lineTo((0, 350)); pen.closePath()
+        glyphs[name] = pen.glyph()
+    builder.setupGlyf(glyphs)
+    builder.setupHorizontalMetrics({name: (1000, 0) for name in order})
+    builder.setupHorizontalHeader(ascent=880, descent=-120)
+    builder.setupNameTable({'familyName': 'Probe', 'styleName': 'Regular'})
+    builder.setupOS2(); builder.setupPost(); builder.setupMaxp()
+    locl = ''.join(f'language {language} exclude_dflt; sub emdash by {"emdash.kor" if language == "KOR" else "uni2015"}; '
+                   'sub uni2E3A by two; sub uni2E3B by three; ' for language in locl_languages)
+    addOpenTypeFeaturesFromString(builder.font, 'languagesystem DFLT dflt; languagesystem hani dflt; '
+                                  + ''.join(f'languagesystem hani {language}; ' for language in ('JAN', 'KOR', 'ZHH', 'ZHS', 'ZHT'))
+                                  + f'''
+        feature ccmp {{ sub uni2015 uni2015 uni2015 by three; sub uni2015 uni2015 by two; }} ccmp;
+        feature locl {{ script hani; {locl} }} locl;
+        feature vert {{ sub uni2015 by uniFE31; sub two by vtwo; sub three by vthree; }} vert;
+    ''')
+    return builder.font
+
+
+def vertical_punctuation_font(vert):
+    # Sarasa K substitutes ！ and ： for every language; Source Han's Korean
+    # VF routes them per language and rotates the Japanese colon instead.
+    order = ['.notdef', 'uni3001', 'uniFE11', 'uniFF01', 'uniFE15', 'uniFF1A', 'uniFE13', 'colon.jan', 'colon.bad']
+    builder = FontBuilder(1000, isTTF=True)
+    builder.setupGlyphOrder(order)
+    builder.setupCharacterMap({0x3001: 'uni3001', 0xFE11: 'uniFE11', 0xFF01: 'uniFF01',
+                               0xFE15: 'uniFE15', 0xFF1A: 'uniFF1A', 0xFE13: 'uniFE13'})
+    glyphs = {}
+    for index, name in enumerate(order):
+        # Each form draws apart from the others, as an upright and a rotated colon do.
+        pen = TTGlyphPen(None)
+        pen.moveTo((10 + 100 * index, 100)); pen.lineTo((60 + 100 * index, 100))
+        pen.lineTo((60 + 100 * index, 700)); pen.lineTo((10 + 100 * index, 700)); pen.closePath()
+        glyphs[name] = pen.glyph()
+    builder.setupGlyf(glyphs)
+    builder.setupHorizontalMetrics({name: (1000, 10 + 100 * index) for index, name in enumerate(order)})
+    builder.setupHorizontalHeader(ascent=880, descent=-120)
+    builder.setupNameTable({'familyName': 'Probe', 'styleName': 'Regular'})
+    builder.setupOS2(); builder.setupPost(); builder.setupMaxp()
+    addOpenTypeFeaturesFromString(builder.font, 'languagesystem DFLT dflt; languagesystem hani dflt; '
+                                  'languagesystem hani JAN; languagesystem hani ZHT; ' + vert)
+    return builder.font
+
+
+def vertical_glyphs(font, text, language):
+    stream = io.BytesIO(); font.save(stream)
+    runtime = hb.Font(hb.Face(stream.getvalue()))
+    buffer = hb.Buffer(); buffer.add_str(text); buffer.script = 'Hani'; buffer.language = language; buffer.direction = 'ttb'
+    hb.shape(runtime, buffer, {})
+    return [font.getGlyphName(info.codepoint) for info in buffer.glyph_infos]
+
+
+SOURCE_HAN_VERTICAL = '''
+    lookup common { sub uni3001 by uniFE11; } common;
+    lookup punctuation { sub uniFF01 by uniFE15; sub uniFF1A by uniFE13; } punctuation;
+    lookup jan { sub uniFF1A by colon.jan; } jan;
+    feature vert {
+        script DFLT; language dflt; lookup common; lookup punctuation;
+        script hani; language dflt; lookup common; lookup punctuation;
+        language JAN exclude_dflt; lookup common; lookup jan;
+        language ZHT exclude_dflt; lookup common;
+    } vert;
+'''
+
+
 class LayoutTemplateConsumerTests(unittest.TestCase):
+    def test_vertical_routes_follow_the_native_static_for_every_language(self):
+        reference = vertical_punctuation_font(
+            'feature vert { sub uni3001 by uniFE11; sub uniFF01 by uniFE15; sub uniFF1A by uniFE13; } vert;')
+        target = vertical_punctuation_font(SOURCE_HAN_VERTICAL)
+        self.assertEqual(vertical_glyphs(target, '！：', 'ja'), ['uniFF01', 'colon.jan'])
+        report = b.unify_reference_vertical_routes(target, reference)
+        self.assertEqual(report['vertical_routes_unified'], 2)
+        for language in ('und', 'ja', 'zh-Hant'):
+            with self.subTest(language=language):
+                self.assertEqual(vertical_glyphs(target, '！：、', language), ['uniFE15', 'uniFE13', 'uniFE11'])
+
+    def test_vertical_routes_may_come_from_another_script(self):
+        # Source Han's TC VF substitutes ！ only for KOR/ZHS, never in DFLT.
+        reference = vertical_punctuation_font(
+            'feature vert { sub uni3001 by uniFE11; sub uniFF01 by uniFE15; sub uniFF1A by uniFE13; } vert;')
+        target = vertical_punctuation_font(SOURCE_HAN_VERTICAL.replace(
+            'script DFLT; language dflt; lookup common; lookup punctuation;', 'script DFLT; language dflt; lookup common;'))
+        stream = io.BytesIO(); target.save(stream)
+        runtime = hb.Font(hb.Face(stream.getvalue()))
+        buffer = hb.Buffer(); buffer.add_str('！'); buffer.direction = 'ttb'; buffer.script = 'Zyyy'
+        hb.shape(runtime, buffer, {})
+        self.assertEqual([target.getGlyphName(info.codepoint) for info in buffer.glyph_infos], ['uniFF01'])
+        b.unify_reference_vertical_routes(target, reference)
+        stream = io.BytesIO(); target.save(stream)
+        runtime = hb.Font(hb.Face(stream.getvalue()))
+        buffer = hb.Buffer(); buffer.add_str('！'); buffer.direction = 'ttb'; buffer.script = 'Zyyy'
+        hb.shape(runtime, buffer, {})
+        self.assertEqual([target.getGlyphName(info.codepoint) for info in buffer.glyph_infos], ['uniFE15'])
+
+    def test_vertical_routes_combine_two_source_routes(self):
+        # Sarasa J rotates the colon (Source Han J's JAN lookup) and takes ！
+        # from its KOR lookup, for every language; no single route does both.
+        reference = vertical_punctuation_font(
+            'feature vert { sub uni3001 by uniFE11; sub uniFF01 by uniFE15; sub uniFF1A by colon.jan; } vert;')
+        target = vertical_punctuation_font('''
+            lookup common { sub uni3001 by uniFE11; } common;
+            lookup jan { sub uniFF1A by colon.jan; } jan;
+            lookup kor { sub uniFF01 by uniFE15; sub uniFF1A by uniFE13; } kor;
+            feature vert {
+                script DFLT; language dflt; lookup common; lookup jan;
+                script hani; language dflt; lookup common; lookup jan;
+                language JAN exclude_dflt; lookup common; lookup jan;
+                language ZHT exclude_dflt; lookup common; lookup kor;
+            } vert;
+        ''')
+        b.unify_reference_vertical_routes(target, reference)
+        for language in ('und', 'ja', 'zh-Hant'):
+            with self.subTest(language=language):
+                self.assertEqual(vertical_glyphs(target, '！：、', language), ['uniFE15', 'colon.jan', 'uniFE11'])
+
+    def test_vertical_routes_reject_forms_no_route_combination_reaches(self):
+        # Each route reaches one native form and breaks the other, and the
+        # earlier lookup wins either combination.
+        reference = vertical_punctuation_font(
+            'feature vert { sub uni3001 by uniFE11; sub uniFF01 by uniFE15; sub uniFF1A by uniFE13; } vert;')
+        target = vertical_punctuation_font('''
+            lookup first { sub uniFF01 by uniFE15; sub uniFF1A by colon.bad; } first;
+            lookup second { sub uniFF01 by uniFE11; sub uniFF1A by uniFE13; } second;
+            lookup common { sub uni3001 by uniFE11; } common;
+            feature vert {
+                script DFLT; language dflt; lookup common; lookup first;
+                script hani; language dflt; lookup common; lookup first;
+                language JAN exclude_dflt; lookup common; lookup second;
+                language ZHT exclude_dflt; lookup common; lookup first;
+            } vert;
+        ''')
+        with self.assertRaisesRegex(ValueError, 'U\\+FF1A'):
+            b.unify_reference_vertical_routes(target, reference)
+
     def test_inter_arrows_remain_enabled_when_a_regional_calt_record_is_selected(self):
         if not b.INTER_UPRIGHT.is_file():
             self.skipTest('需要固定 Inter 来源')
@@ -73,6 +218,22 @@ class LayoutTemplateConsumerTests(unittest.TestCase):
                                              pos.x_offset, pos.y_offset)
                                             for info, pos in zip(buffer.glyph_infos, buffer.glyph_positions)])
                         self.assertEqual(*results, (weight, text, features))
+
+    def test_variable_template_carries_source_han_dash_forms_it_does_not_route(self):
+        # Sarasa Ui K, J and CL route no locl for JAN/KOR. The final dash pass
+        # still needs Source Han's KOR single-dash alternate from the VF.
+        reference = dash_font(['ZHH', 'ZHS', 'ZHT'])
+        routed_only = dash_font(['JAN', 'KOR', 'ZHH', 'ZHS', 'ZHT'])
+        b.align_layout_feature_template(routed_only, reference, 'GSUB')
+        with self.assertRaisesRegex(ValueError, 'Korean single-dash alternate'):
+            b.normalized_source_han_dash_locl_mappings(routed_only)
+        target = dash_font(['JAN', 'KOR', 'ZHH', 'ZHS', 'ZHT'])
+        report = b.align_variable_layout_to_reference(target, reference)
+        self.assertEqual(report['source_dash_locl_languages_carried'], 2)
+        self.assertEqual(b.normalized_source_han_dash_locl_mappings(target)['KOR ']['emdash'], 'emdash.kor')
+        carried = b.source_dash_locl_by_language(target, b.upstream_dash_roles(target))
+        self.assertEqual(carried['JAN '], {'emdash': 'uni2015', 'uni2E3A': 'two', 'uni2E3B': 'three'})
+        self.assertEqual(carried['KOR ']['emdash'], 'emdash.kor')
 
     def test_added_feature_does_not_shift_romanian_into_chinese_rules(self):
         reference = fixture_font()

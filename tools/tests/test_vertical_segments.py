@@ -10,7 +10,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build_sarasa_ui_propdigits_sc as b
-import audit_sarasa_ui_propdigits as a
+import uharfbuzz as hb
+from font_audit import contract, metadata as audit_metadata, products
 from fontTools.feaLib.builder import addOpenTypeFeaturesFromString
 from test_runtime_regressions import fixture_font
 from test_release_runtime_controls import variable_fixture
@@ -95,13 +96,13 @@ class VerticalSegmentTests(unittest.TestCase):
             self.assertTrue(font['glyf'][name].flags[0] & b.glyf_table.flagOverlapSimple)
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/'variable-segments.ttf';font.save(path)
-            runtime=a.hb.Font(a.hb.Face(path.read_bytes()))
+            runtime=hb.Font(hb.Face(path.read_bytes()))
             name=b.vertical_dash_segments(font,b.upstream_dash_roles(font))['begin']
             for weight,width in widths.items():
                 runtime.set_variations({'wght':weight})
                 self.assertEqual(runtime.get_glyph_extents(font.getGlyphID(name)).width,width)
-            for weight in a.INTER_POSITION_WEIGHTS:
-                self.assertTrue(a.vertical_segment_runtime_status(path,{'wght':weight})['ok'],weight)
+            for weight in contract.AXIS_POINTS:
+                self.assertTrue(products.vertical_segment_runtime_status(path,{'wght':weight})['ok'],weight)
 
     def test_metric_calibration_includes_unencoded_segments_after_post3(self):
         target = dash_fixture(True)
@@ -124,12 +125,12 @@ class VerticalSegmentTests(unittest.TestCase):
             for italic in (False, True):
                 font = dash_fixture(italic)
                 path = Path(directory) / f'{italic}.ttf'; font.save(path)
-                status = a.vertical_segment_runtime_status(path)
+                status = products.vertical_segment_runtime_status(path)
                 self.assertTrue(status['ok'], status)
                 self.assertEqual(status['cases'], 4200)
                 self.assertEqual(font['head'].yMax, 880)
                 self.assertEqual(font['head'].yMin, -120)
-                self.assertTrue(a.head_bounds_status(font)['ok'])
+                self.assertTrue(audit_metadata.head_bounds_status(font)['ok'])
 
     def test_runtime_rejects_an_actual_vertical_origin_error(self):
         font = dash_fixture()
@@ -138,7 +139,7 @@ class VerticalSegmentTests(unittest.TestCase):
         font['vmtx'].metrics[segment] = (advance, bearing + 1)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'wrong-origin.ttf'; font.save(path)
-            status = a.vertical_segment_runtime_status(path)
+            status = products.vertical_segment_runtime_status(path)
             self.assertFalse(status['ok'])
             self.assertTrue(any('ink exceeds its own vertical cell' in row['reasons'] for row in status['samples']))
 
@@ -163,16 +164,16 @@ class VerticalSegmentTests(unittest.TestCase):
                     part.mapping.pop(source, None)
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'missing-rule.ttf'; font.save(path)
-            self.assertFalse(a.vertical_segment_runtime_status(path)['ok'])
+            self.assertFalse(products.vertical_segment_runtime_status(path)['ok'])
 
     def test_old_grouped_layout_fails_four_dash_regression(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'old.ttf'
             dash_fixture(continuous=False).save(path)
-            with patch.object(a, 'VERTICAL_DASH_RUN_TEXTS', ('——', '———')):
-                self.assertTrue(a.vertical_segment_runtime_status(path)['ok'])
-            with patch.object(a, 'VERTICAL_DASH_RUN_TEXTS', ('————',)):
-                self.assertFalse(a.vertical_segment_runtime_status(path)['ok'])
+            with patch.object(products, 'VERTICAL_DASH_RUN_TEXTS', ('——', '———')):
+                self.assertTrue(products.vertical_segment_runtime_status(path)['ok'])
+            with patch.object(products, 'VERTICAL_DASH_RUN_TEXTS', ('————',)):
+                self.assertFalse(products.vertical_segment_runtime_status(path)['ok'])
 
     def test_joining_is_idempotent_and_keeps_all_existing_outlines(self):
         for italic in (False, True):
@@ -186,7 +187,7 @@ class VerticalSegmentTests(unittest.TestCase):
                 self.assertEqual(outlines, {name: b.glyph_point_structure(font, name) for name in font.getGlyphOrder()})
 
     def test_lazy_variable_store_preservation_compares_records_not_container_identity(self):
-        path = a.vf_path('CL', False)
+        path = contract.vf_path('CL', False)
         if not path.is_file():
             self.skipTest('需要已构建的 CL VF 夹具')
         with b.TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False) as font:
@@ -200,8 +201,8 @@ class VerticalSegmentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'long.ttf'
             dash_fixture(True).save(path)
-            with patch.object(a, 'VERTICAL_DASH_RUN_TEXTS', ('—' * 1024,)):
-                self.assertTrue(a.vertical_segment_runtime_status(path)['ok'])
+            with patch.object(products, 'VERTICAL_DASH_RUN_TEXTS', ('—' * 1024,)):
+                self.assertTrue(products.vertical_segment_runtime_status(path)['ok'])
 
 
 if __name__ == '__main__':

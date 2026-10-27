@@ -132,7 +132,7 @@ class ReleaseIntegrityRegressions(unittest.TestCase):
                         raise RuntimeError("second font failed")
                     implementation = "_refresh_variable_finalization_outputs" if variable else "_refresh_static_finalization_outputs"
                     public = b.refresh_variable_finalization_outputs if variable else b.refresh_static_finalization_outputs
-                    with patch.object(b, implementation, side_effect=fail_after_first), self.assertRaisesRegex(RuntimeError, "second font"):
+                    with patch.object(b, 'require_validated_input'), patch.object(b, implementation, side_effect=fail_after_first), self.assertRaisesRegex(RuntimeError, "second font"):
                         public(["SC"])
                     self.assertEqual(current.read_bytes(), b"old font")
                     self.assertEqual(receipt.read_bytes(), b"old receipt")
@@ -201,7 +201,7 @@ class ReleaseIntegrityRegressions(unittest.TestCase):
                         return original_replace(path, destination)
                     implementation = "_refresh_variable_finalization_outputs" if variable else "_refresh_static_finalization_outputs"
                     public = b.refresh_variable_finalization_outputs if variable else b.refresh_static_finalization_outputs
-                    with patch.object(b, implementation, side_effect=refresh), patch.object(Path, "replace", replace):
+                    with patch.object(b, 'require_validated_input'), patch.object(b, implementation, side_effect=refresh), patch.object(Path, "replace", replace):
                         with self.assertRaisesRegex(OSError, "second receipt"):
                             public(["SC"])
                     for path, data in before.items():

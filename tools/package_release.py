@@ -185,7 +185,7 @@ def validate_package_sources(package: Package) -> None:
 
 
 def validate_visual_report(visual: dict, manifest: dict) -> None:
-    import audit_sarasa_ui_propdigits as audit
+    from font_audit import contract as audit
 
     if visual.get("complete") is not True or visual.get("passed") is not True or visual.get("review_required") is not False:
         raise ValueError("视觉检查尚未完整通过")
@@ -223,7 +223,8 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
     reviewed = set()
     for item in images:
         verify_image(item, expected_png=True)
-        if not item.get("observations") or not all(isinstance(value, str) and value.strip() for value in item["observations"]):
+        if (not isinstance(item.get("observations"), list) or not item["observations"]
+                or not all(isinstance(value, str) and value.strip() for value in item["observations"])):
             raise ValueError("视觉图片缺少具体审阅记录")
         region = item.get("region")
         if region not in build.REGION_ORDER or not item["file"].startswith(f"assets/checks/{region}-"):
@@ -238,7 +239,7 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
             if len(actual_small) != len(expected_small) or set(actual_small) != expected_small:
                 raise ValueError("视觉图片缺少 hinted 字体的 9、12、16 px 检查")
         elif item["file"].endswith("-variable.png"):
-            expected = {(audit.display_path(audit.vf_path(region, italic)), weight, italic, None) for weight in audit.INTER_POSITION_WEIGHTS for italic in (False, True)}
+            expected = {(audit.display_path(audit.vf_path(region, italic)), weight, italic, None) for weight in audit.AXIS_POINTS for italic in (False, True)}
             actual = [(case.get("font"), case.get("weight"), case.get("italic"), case.get("hinted")) for case in cases]
         else:
             expected = {(audit.display_path(audit.vf_path(region, False)), weight) for weight in (200, 400, 600, 900)}
@@ -277,44 +278,48 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
 
 
 def validate_license_documentation(main_report: dict) -> None:
-    import audit_sarasa_ui_propdigits as audit
+    from font_audit import contract
 
-    record = main_report.get("source_han_license_documents", {})
-    paths = audit.release_license_document_paths()
-    if (record.get("ok") is not True or record.get("failures")
+    rows = main_report.get("records", {}).get("licenses", [])
+    paths = contract.release_license_document_paths()
+    record = rows[0] if len(rows) == 1 else {}
+    if (record.get("ok") is not True or record.get("failures") != 0
             or record.get("documents_checked") != len(paths) or len(paths) != 14
             or any(not path.is_file() for path in paths)):
         raise ValueError("版权声明文档尚未完整通过固定来源校验")
-    current = {audit.display_path(path): package_sha256(path) for path in paths}
-    if record.get("documents_sha256") != current:
+    if record.get("document_manifest") != contract.manifest(paths):
         raise ValueError("版权声明文档在审计后发生变化，报告已过期")
 
 
 def validate_main_audit_report(main_report: dict) -> None:
-    import audit_sarasa_ui_propdigits as audit
+    from font_audit import contract, pipeline
+    from font_audit.gate import SECTIONS, summarize
+    from font_audit.provenance import validate_reuse
 
-    gate = main_report.get("gate", {})
-    expected_sections = set(audit.AUDIT_GATE_SECTIONS)
+    if (main_report.get("schema") != 3 or main_report.get("complete_scope") is not True
+            or set(main_report.get("regions", [])) != set(contract.REGIONS)
+            or set(main_report.get("sections", [])) != set(SECTIONS)):
+        raise ValueError("主审计报告不是完整范围的独立审计")
+    validate_reuse(main_report)
+    # Recompute the plan from the fonts being packaged; never trust the
+    # report's own counts or completion flags.
     try:
-        recomputed = audit.recompute_audit_gate(main_report)
+        recomputed = summarize(main_report["records"], pipeline.plan(), executed=set(SECTIONS))
     except (KeyError, TypeError, ValueError, AttributeError) as error:
         raise ValueError("主审计覆盖证据损坏或不完整") from error
     if (
-        gate.get("complete") is not True
-        or gate.get("passed") is not True
-        or gate.get("total_failures") != 0
-        or gate.get("skipped_sections") != 0
-        or gate.get("executed_sections") != len(expected_sections)
-        or set(gate.get("sections", {})) != expected_sections
-        or gate.get("schema_version") != 2
-        or gate != recomputed
-        or main_report.get("audit_contract") != audit.audit_contract_manifest()
+        main_report.get("gate") != recomputed
+        or recomputed["complete"] is not True
+        or recomputed["passed"] is not True
+        or recomputed["total_failures"] != 0
+        or recomputed["skipped_sections"] != 0
+        or main_report.get("audit_contract") != contract.audit_contract_manifest()
     ):
         raise ValueError("当前构建与审计代码没有完整通过主审计")
 
 
 def validate_release_audits(packages: list[Package]) -> None:
-    import audit_sarasa_ui_propdigits as audit
+    from font_audit import contract as audit
 
     paths = {path for package in packages for path, _name in package.files if path.suffix.lower() == ".ttf"}
     if paths != set(audit.release_font_paths()) or len(paths) != 156:
@@ -338,7 +343,7 @@ def validate_release_audits(packages: list[Package]) -> None:
     expected_fb = {"opentype/font_version": {"PASS": 156}, "no_mac_entries": {"PASS": 156},
                    "opentype/STAT/ital_axis": {"PASS": 6}, "name/family_and_style_max_length": {"PASS": 156},
                    "smart_dropout": {"PASS": 156}}
-    if fb.get("total_result_counts") != {"PASS": 630} or fb.get("all_batches_exit_zero") is not True:
+    if fb.get("passed") is not True or fb.get("total_result_counts") != {"PASS": 630} or fb.get("all_batches_exit_zero") is not True:
         raise ValueError("FontBakery 发布门尚未取得 630 PASS")
     if fb.get("selected_checks") != expected_fb:
         raise ValueError("FontBakery 的逐字体及正斜体配对检查覆盖不完整")
@@ -375,8 +380,8 @@ def write_package(package: Package, output_dir: Path) -> dict[str, object]:
                 compress_type=zipfile.ZIP_DEFLATED,
                 compresslevel=9,
             )
+    verify_package(pending, package)
     pending.replace(output)
-    verify_package(output, package)
     return {
         "file": output.name,
         "bytes": output.stat().st_size,
@@ -418,7 +423,7 @@ def write_checksums(output_dir: Path, results: list[dict[str, object]]) -> Path:
     return path
 
 
-def write_release_manifest(packages: list[Package], results: list[dict[str, object]], *, independently_verified: bool) -> None:
+def write_release_manifest(packages: list[Package], results: list[dict[str, object]]) -> None:
     fonts = {source for package in packages for source, _name in package.files if source.suffix.lower() == ".ttf"}
     font_occurrences = sum(source.suffix.lower() == ".ttf" for package in packages for source, _name in package.files)
     if len(packages) != 21 or len(results) != 21 or len(fonts) != 156 or font_occurrences != 312:
@@ -428,7 +433,7 @@ def write_release_manifest(packages: list[Package], results: list[dict[str, obje
     report = {"title": "Sarasa Ui PD 发布包校验", "version": build.VERSION,
               "generated_at": datetime.now(timezone.utc).isoformat(), "package_count": 21,
               "unique_fonts": 156, "font_occurrences": 312,
-              "independent_verify_only_completed": independently_verified,
+              "verified_before_promotion": True,
               "audit_report_sha256": audits,
               "documentation_sha256": {name: package_sha256(source) for source, name in documentation_files()},
               "font_sha256": {build.portable_report_path(source): package_sha256(source) for source in sorted(fonts)},
@@ -479,9 +484,12 @@ def main() -> None:
     # Bind the completed archives to the same audited fonts even if a source
     # file changed while the packages were being compressed.
     validate_release_audits(packages)
-    checksums = write_checksums(args.output_dir, results)
-    write_release_manifest(packages, results, independently_verified=args.verify_only)
-    print(f"[package] wrote {checksums}", flush=True)
+    if args.verify_only:
+        print("[package] 全部 ZIP 核验通过；未改写校验和或发布清单。", flush=True)
+    else:
+        checksums = write_checksums(args.output_dir, results)
+        write_release_manifest(packages, results)
+        print(f"[package] wrote {checksums}", flush=True)
 
 
 if __name__ == "__main__":

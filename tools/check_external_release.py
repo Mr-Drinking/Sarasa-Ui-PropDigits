@@ -19,7 +19,7 @@ from python_env_bootstrap import AUDIT_DEPENDENCIES, ensure_project_python, isol
 if __name__ == "__main__":
     ensure_project_python(AUDIT_DEPENDENCIES, project_root=Path(__file__).resolve().parents[1], label="release")
 
-import audit_sarasa_ui_propdigits as audit
+from font_audit import contract as audit
 import build_sarasa_ui_propdigits_sc as build
 from fontTools.ttLib import TTFont
 
@@ -108,7 +108,7 @@ def run_fontbakery(manifest: dict) -> bool:
     python, environment = isolated_tool_python(
         Path(os.environ.get("SARASA_FONTBAKERY_VENV", build.ROOT / ".build-cache" / "fontbakery-venv")),
         build.ROOT / "requirements-fontbakery.lock",
-        {"fontbakery": "1.1.0", "freetype-py": "2.3.0", "fonttools": "4.63.0"},
+        {"fontbakery": "1.1.0", "freetype-py": "2.3.0", "fonttools": "4.67.0"},
     )
     directory = build.ROOT / ".build-cache" / "fontbakery"
     directory.mkdir(parents=True, exist_ok=True)
