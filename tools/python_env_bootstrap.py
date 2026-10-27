@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib
 import importlib.metadata
 import importlib.util
+import base64
 import hashlib
 import json
 import os
@@ -17,18 +18,18 @@ from typing import Mapping
 Dependency = tuple[str, str, str]
 
 BUILD_DEPENDENCIES = {
-    "fontTools": ("fonttools", "fonttools[woff]==4.63.0", "4.63.0"),
-    "uharfbuzz": ("uharfbuzz", "uharfbuzz==0.56.0", "0.56.0"),
+    "fontTools": ("fonttools", "fonttools[woff]==4.67.0", "4.67.0"),
+    "uharfbuzz": ("uharfbuzz", "uharfbuzz==0.57.0", "0.57.0"),
     "freetype": ("freetype-py", "freetype-py==2.5.1", "2.5.1"),
-    "brotli": ("Brotli", "brotli==1.2.0", "1.2.0"),
+    "brotli": ("Brotli", "brotli==1.2.1", "1.2.1"),
     "ttfautohint": ("ttfautohint-py", "ttfautohint-py==0.6.1", "0.6.1"),
-    "py7zr": ("py7zr", "py7zr==1.1.3", "1.1.3"),
+    "py7zr": ("py7zr", "py7zr==1.1.4", "1.1.4"),
     "afdko": ("afdko", "afdko==5.0.1", "5.0.1"),
     "chws_tool": ("chws-tool", "chws-tool==1.4.5", "1.4.5"),
     "east_asian_spacing": ("east-asian-spacing", "east-asian-spacing==1.4.5", "1.4.5"),
 }
-AUDIT_DEPENDENCIES = {**BUILD_DEPENDENCIES, "numpy": ("numpy", "numpy==2.4.2", "2.4.2")}
-VISUAL_DEPENDENCIES = {**AUDIT_DEPENDENCIES, "PIL": ("Pillow", "Pillow==12.3.0", "12.3.0")}
+AUDIT_DEPENDENCIES = {**BUILD_DEPENDENCIES, "numpy": ("numpy", "numpy==2.5.4", "2.5.4")}
+VISUAL_DEPENDENCIES = {**AUDIT_DEPENDENCIES, "PIL": ("Pillow", "Pillow==13.0.0", "13.0.0")}
 
 
 def missing_dependencies(dependencies: Mapping[str, Dependency]) -> list[str]:
@@ -92,8 +93,42 @@ def locked_environment_status(path: Path) -> dict[str, object]:
             actual[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:
             actual[name] = None
-    return {"ok": actual == expected, "expected": expected, "actual": actual,
-            "mismatches": [name for name in expected if actual[name] != expected[name]]}
+    mismatches = [name for name in expected if actual[name] != expected[name]]
+    contents = {}
+    for name in expected:
+        if name in mismatches:
+            continue
+        distribution = importlib.metadata.distribution(name)
+        files = distribution.files
+        errors = []; checked = 0
+        digest = hashlib.sha256()
+        if not files:
+            errors.append("缺少安装文件清单")
+        for relative in files or ():
+            recorded = relative.hash
+            if recorded is None:
+                if not str(relative).endswith((".pyc", ".dist-info/RECORD")):
+                    errors.append(str(relative))
+                continue
+            target = distribution.locate_file(relative)
+            if recorded.mode != "sha256" or not target.is_file():
+                errors.append(str(relative)); continue
+            current = hashlib.sha256()
+            with target.open("rb") as stream:
+                for chunk in iter(lambda: stream.read(1024 * 1024), b""):
+                    current.update(chunk)
+            encoded = base64.urlsafe_b64encode(current.digest()).rstrip(b"=").decode("ascii")
+            if encoded != recorded.value:
+                errors.append(str(relative))
+            digest.update(str(relative).encode("utf-8") + b"\0" + current.digest())
+            checked += 1
+        if not checked:
+            errors.append("没有经过内容校验的文件")
+        contents[name] = {"files_checked": checked, "content_sha256": digest.hexdigest(), "failures": errors}
+        if errors:
+            mismatches.append(name)
+    return {"ok": not mismatches, "expected": expected, "actual": actual,
+            "mismatches": mismatches, "content_verification": contents}
 
 
 def dependency_lock_path(project_root: Path, dependencies: Mapping[str, Dependency]) -> Path:
@@ -123,11 +158,15 @@ def ensure_project_python(
     # environment prefix, not the executable or an inherited marker, owns pip.
     active = Path(sys.prefix).resolve() == venv_dir
     if not active:
+        attempted = os.environ.get("SARASA_PYTHON_REEXEC_TARGET")
+        if attempted and Path(attempted).resolve() == venv_dir:
+            raise RuntimeError("目标虚拟环境未提供正确的 sys.prefix；停止重复启动，请修复该环境")
         if not python.exists():
             print(f"[{label}] create project Python environment: {venv_dir}", flush=True)
             venv.EnvBuilder(with_pip=True, clear=False).create(venv_dir)
         env = dict(os.environ)
         env["SARASA_PYTHON_ENV_ACTIVE"] = "1"
+        env["SARASA_PYTHON_REEXEC_TARGET"] = str(venv_dir)
         original_args = list(getattr(sys, "orig_argv", [sys.executable, *sys.argv]))
         argv = [str(python), *original_args[1:]]
         if os.name == "nt":
@@ -156,6 +195,7 @@ def ensure_project_python(
             "--disable-pip-version-check",
             "--no-input",
             "--require-hashes",
+            "--force-reinstall",
             "-r",
             str(lockfile),
         ]
@@ -192,7 +232,7 @@ def isolated_tool_python(
         return json.loads(result.stdout)
     actual = installed()
     if not actual["ok"]:
-        subprocess.check_call([str(python), "-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--require-hashes", "-r", str(requirements)])
+        subprocess.check_call([str(python), "-m", "pip", "install", "--disable-pip-version-check", "--no-input", "--require-hashes", "--force-reinstall", "-r", str(requirements)])
         actual = installed()
     selected = {name: actual["actual"].get(name) for name in versions}
     if not actual["ok"] or selected != dict(versions):
@@ -201,5 +241,6 @@ def isolated_tool_python(
     if checked.returncode:
         raise RuntimeError("独立发布工具环境存在依赖冲突：" + checked.stdout + checked.stderr)
     return python, {"versions": selected, "locked_packages": actual["actual"],
+                    "content_verification": actual["content_verification"],
                     "lockfile": requirements.name, "lockfile_sha256": hashlib.sha256(requirements.read_bytes()).hexdigest(),
                     "require_hashes": True, "pip_check": {"returncode": 0, "passed": True}}

@@ -1,0 +1,3184 @@
+{
+  "title": "固定 Sarasa 1.0.42 与 1.0.43 官方 Ui 成品逐表对照",
+  "checked_at": "2026-10-25T23:39:08.953084+00:00",
+  "old_version": "1.0.42",
+  "new_version": "1.0.43",
+  "old_commit": "f31c230af7fb4854f40d96560e2616eafdd85926",
+  "new_commit": "61e74fda253a1bec0c6f5b09d32a0944bb96b814",
+  "download_archive_sha256": {
+    "SarasaUi-TTF-1.0.43.7z": "980a4fc33c95f1a65494612f508d76ad1892c9d20e76078692013b22c153bf30",
+    "SarasaUi-TTF-Unhinted-1.0.43.7z": "c17173820f91ecd774ed484eb6ea7689fc14fbef0f6740e9d7a23e265dd83354"
+  },
+  "fonts_compared": 120,
+  "regions": [
+    "CL",
+    "SC",
+    "TC",
+    "HC",
+    "J",
+    "K"
+  ],
+  "hinted_fonts": 60,
+  "unhinted_fonts": 60,
+  "comparison": "全部 SFNT 表原始字节逐一比较；head 仅允许版本、总校验和及时间戳变化，name 仅允许 1.0.42/1.042 到 1.0.43/1.043 的版本替换。",
+  "non_metadata_difference_fonts": 0,
+  "results": [
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-ExtraLight.ttf",
+      "old_sha256": "fa80ad6178240999e783ddd0947a3f1739d0e2aae66b79bc862d0d732e111f64",
+      "new_sha256": "0b157543f79aaaadc0e558205fa36b767c78079fe840bc80918744e988add72f",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          552280095,
+          547429961
+        ],
+        "modified": [
+          3873274773,
+          3875699839
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-ExtraLightItalic.ttf",
+      "old_sha256": "bf46d0a7310e8527772e241eb6e18dd28730362b1424fc36a7cd2c81d29b6b84",
+      "new_sha256": "f09aca24b01ef3fe92a2f7105b814c9cedcff13ef30657eddb7363f0a1f29f70",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1796623377,
+          1791773243
+        ],
+        "modified": [
+          3873274773,
+          3875699839
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-Light.ttf",
+      "old_sha256": "2051593c4ea8e548bdc3caa1461e43238a5cf1c74d04403b72846e9a04a3d1d9",
+      "new_sha256": "ff2b7e6f0b9dd4e20a1e1818ad5151948bd6220e34ebeb081599b5a2ec30b3b7",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2445563261,
+          2440582005
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-LightItalic.ttf",
+      "old_sha256": "6394e02d8005124fd7580c1263f89391bd7937247b71e89f0768a266c35c29e8",
+      "new_sha256": "80c0a88cf1dc5b33cc06b45adc761cd818a7b55dc8ed871d77747195e735f9f9",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4102520299,
+          4097539043
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-Regular.ttf",
+      "old_sha256": "0ed65ebdcbcd922227ee92c320f1385f58bfbd8ddc30eb61696292ba2c613549",
+      "new_sha256": "0cdee5ec9c56e9a250c0df3f2c1a5f5b8b283f8e3d0d030023fdfac234d87d0a",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3136021311,
+          3131171119
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-Italic.ttf",
+      "old_sha256": "b3955af1dc4df6111a36e823de677862949a858af09e6351f6ce778a60fa8af6",
+      "new_sha256": "82d7c302f691a3a8b8d57f88013334a5c391cbfdd6e5562724602a5bb7e6bba8",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4243995669,
+          4239014407
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-SemiBold.ttf",
+      "old_sha256": "1f3c4df452000d032d136bca6f60e09cc17b66649257af6182e13030bd706290",
+      "new_sha256": "7f9169901e2b60d7052fd9b49acd3c86457dc8e96aba7c619b57f970fa4baf1c",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2528235455,
+          2523385245
+        ],
+        "modified": [
+          3873275014,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-SemiBoldItalic.ttf",
+      "old_sha256": "8dc3b95e36b48c8b031a0d559a212015d23fcd0d438e827f1bd444f9a3abbcff",
+      "new_sha256": "7b8229dfd67d903b9b49eb7b4a75e23834e2802f8fcedf6f55b8c2e9a450dafb",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1300791517,
+          1295941307
+        ],
+        "modified": [
+          3873275014,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-Bold.ttf",
+      "old_sha256": "14fcf1c8612f51e14873cd25d7ea5a464ee7dc92b259cb764f2700ffabcb7a83",
+      "new_sha256": "0095d215472b84d108d4487e61b4d9b11303e5d56c4e61bf2c9bd0044ddf1816",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1144938155,
+          1139956873
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "hinted",
+      "font": "SarasaUiCL-BoldItalic.ttf",
+      "old_sha256": "2a4fe37c09b27a0ed1d0902eb349aee050849a5958d34d86e9ff3cdbb1c8d817",
+      "new_sha256": "728e811689433d05cf6351cb46befe9e0110b3fae7913b5e5cd9ef993610d9f3",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2614555841,
+          2609705629
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-ExtraLight.ttf",
+      "old_sha256": "8af02cfe920e2317f4fe9821130a2bca29c0fc36ea22442d6a18b550f1496038",
+      "new_sha256": "ae85a9aff9d6094658f7bc4e42573a119e225aede8a189193495b55905f29de4",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          806609887,
+          786014573
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-ExtraLightItalic.ttf",
+      "old_sha256": "5c007a1460628fd22ac07fef9e196f005a4685073f9291ecfaf6986edda6ff88",
+      "new_sha256": "07ecdf0cc18badf703fe1bc2dec36eb115af2ee4a348c5479474d6feb87a06a8",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2549286707,
+          2528691393
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-Light.ttf",
+      "old_sha256": "33470dcfcb8f35c146b2cd1a61dfa350280c277d533b52c16da21e9ebcdfe482",
+      "new_sha256": "27a1b5f9ba3ae2db7217b9e406e1fb4f3bb5900b193f639fb874e145654fabf7",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1474815113,
+          1454088733
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-LightItalic.ttf",
+      "old_sha256": "b92ac58cc10389cd44b30374831710f00936ad8c7d0151be68eb873f90e92b12",
+      "new_sha256": "08c91876802075793ed7cec6aa7af6d3444dfa32aed9a09cb543eda587238bb5",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3710035039,
+          3689308659
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-Regular.ttf",
+      "old_sha256": "2d62e98d5cc3674e33ebb605e6bc5d32e594b7fc186aa6bbe42996d9f9752bc4",
+      "new_sha256": "58a58ccceb61ebb92c4aae67b5980d86fab4fb9ab218ba6416e2097ca3d3f2cb",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3568152829,
+          3547557521
+        ],
+        "modified": [
+          3865401206,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-Italic.ttf",
+      "old_sha256": "d70a7dcc5e9120ac9700cee33460633db39297d0bf44cc434b00a99657fb1eae",
+      "new_sha256": "8bd394f94fbd4ffca7f3648bc1276954e9a2394b49f9453f79b0f7cd1289135a",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2195483769,
+          2174757387
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-SemiBold.ttf",
+      "old_sha256": "a391a7de9345dfafcfe6b81a6a2467963d21363baa890db31122e263a42fef6a",
+      "new_sha256": "16ede93c4cd43b057c3376f45bcc74832b7ae11d22a3241bc13fc2daa9cf129e",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1140531513,
+          1119936201
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-SemiBoldItalic.ttf",
+      "old_sha256": "a24d3638254336671a0c23b2bd50f208d68b2720eb9efbce2cac58a998326f7a",
+      "new_sha256": "c202a6b910c0314f3e4626c06fd8c06a92ce805598f10cb32e08c4afa886faf8",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2761676573,
+          2741081261
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-Bold.ttf",
+      "old_sha256": "44a1b709842dde7c4efde49d9e3ec26fb4bd653c907658b557bc9f0ff5cd11b5",
+      "new_sha256": "85f1e640c5772d7c0a8e64f49c0fe513594d3ba537c0110c98ae6bb9e45597e4",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3615697327,
+          3594970945
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "CL",
+      "variant": "unhinted",
+      "font": "SarasaUiCL-BoldItalic.ttf",
+      "old_sha256": "bc9bd7bc15eae30810d77fcb112022e4549aca28ef8c0dfca6fcec34290eb15e",
+      "new_sha256": "7d16a738efe42f5d0fde01bbe4591acb2b95266d0c21001f8314aae35965e7a3",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1518174565,
+          1497579251
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-ExtraLight.ttf",
+      "old_sha256": "9672dc93c3d74a1d0e4d4e9a3ead7398062729067eabcce004060cc4b2f2dea6",
+      "new_sha256": "fce4e6d7b4c6445de49e70e923bc70fc18194659bd49d40e9ee6cb9d626b5af7",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          840055156,
+          835205022
+        ],
+        "modified": [
+          3873274773,
+          3875699839
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-ExtraLightItalic.ttf",
+      "old_sha256": "9939bfcbd6b91902949b17c70408e0d8d576bf5b03b51182da2d4b818ea73ca0",
+      "new_sha256": "14be196e1b7c788ea77f8ae3721863df1a4e76e7b5512c9e5379e4998746de51",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2951362278,
+          2946512144
+        ],
+        "modified": [
+          3873274773,
+          3875699839
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-Light.ttf",
+      "old_sha256": "aa35816491632974825a69e64ef6d06e32ccf141f6bb3c3c3dc2119652d60aa5",
+      "new_sha256": "c600138c6283593dce87d2847ba1c556fa4c88a8a83c5fc784fa995fab73e0ca",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3877647326,
+          3872797140
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-LightItalic.ttf",
+      "old_sha256": "0dd2e9d730d4f483f33a825fbcc2fab2d7777990abe9dc74cd2a3e86bf278d3e",
+      "new_sha256": "9d1032e1310a95d95e232a49cf6cb65e3b3d5c23a92c364655353732f8964ff2",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          139780418,
+          134930232
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-Regular.ttf",
+      "old_sha256": "81fc5857cbc9b05a16a75c7ad3e848032df52dddd29192f14b48d4b449c973f7",
+      "new_sha256": "a50953ae631ba84ca5902b1c46463ce83068a37ea721131c025136e59174b68f",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1129846336,
+          1124996144
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-Italic.ttf",
+      "old_sha256": "9597361c082923e6e06808503c04469ef2a2d70f5bdf4df2652946a65a7b15a7",
+      "new_sha256": "e1a1dbfb8c139b5db574ae17ea3eb0ec5b640132a3fd3cefad5d5ee6cc0f2964",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1653792588,
+          1648942396
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-SemiBold.ttf",
+      "old_sha256": "1e11a0a06f4eb8f3256858b6ae085ea0b5c5eef9e216f153e152b868d741ae62",
+      "new_sha256": "608443658d77bc8eb41fdb42db1cbdfadc46392a32aa6b75c575a7c8135dbc5c",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3410672006,
+          3405690726
+        ],
+        "modified": [
+          3873275014,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-SemiBoldItalic.ttf",
+      "old_sha256": "b57aa4e448f229214fa290f0a3ebb95ffc17cde0b63d54e88bb13292ad140e71",
+      "new_sha256": "07b8be0528caa5f7b1bb56e6d369f3e5124eab63765be1cd4eb5e892ac657946",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2428874728,
+          2424024518
+        ],
+        "modified": [
+          3873275014,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-Bold.ttf",
+      "old_sha256": "b3e6ef6ce5df339d103fcfa9a146d8338c67eb48333308397861d97b4408aca9",
+      "new_sha256": "d1e3628a5d78a2b15c8b4f361872cb2ec7df3f73bd14aabb1565a817684596ad",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4167160942,
+          4162310730
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "hinted",
+      "font": "SarasaUiSC-BoldItalic.ttf",
+      "old_sha256": "043eb968d32791fbacd01989f6cacf3c57f3864e986ca3560eaba58887386da3",
+      "new_sha256": "380774fc33dd1d1ef6a810a4f57bdb8c26666373014c00dc49ec307698d11872",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1349036474,
+          1344186262
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-ExtraLight.ttf",
+      "old_sha256": "13e9a463a3634939f38fbb8f873ace6cc275800badad1dec90772892f7331303",
+      "new_sha256": "c6badb8c3100f877b8114de8ee9818cd5aa2ce6a49c353052cc0ef0035174faa",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3171110442,
+          3150515128
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-ExtraLightItalic.ttf",
+      "old_sha256": "9e18518755037d2b4c752e1ab5061c8a0243fcc810af95f5f51f50b4e02f1154",
+      "new_sha256": "485905eaf0da6bee1d562fcde1331d6759f9933fc40fff0eb131587479a67c74",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1358511286,
+          1337915972
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-Light.ttf",
+      "old_sha256": "2468d996a9bd9fd2bd81a0ee933429df3e628e3ff471dbef44e9f72a878bace4",
+      "new_sha256": "42ec7dd07314c5397747a26344cf96c8f68064f9d841f92a9c11ea971cc0541e",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2731501974,
+          2710906664
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-LightItalic.ttf",
+      "old_sha256": "a17f30c4d6d708bb9bd9e79a16a25b9a89cf568c98c87c293ce73c7cee9e714a",
+      "new_sha256": "56deac97cc9e64d8af3f3ab73c6c3e2e761d4cf382ab1773c8f33187867790cd",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          438939176,
+          418343866
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-Regular.ttf",
+      "old_sha256": "812eed1d25d6599bf83e811d705635900ae7b458dee93ef61bf437c6afe74a99",
+      "new_sha256": "f5d4abd5a4b01084598590f01c084cc86794603674a6899b190c9225b754a213",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3484201718,
+          3463606410
+        ],
+        "modified": [
+          3865401206,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-Italic.ttf",
+      "old_sha256": "914c4778073b181feec8efecd27ff06fccfc1eb818f8f818e3ef5a6452d7dd07",
+      "new_sha256": "9ad1aa6fec8ceb91ccd6bade1140eebb0207f845d04ab38a8d33dba4edacb540",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1862651320,
+          1842056008
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-SemiBold.ttf",
+      "old_sha256": "b5dcd89ff56f817938ab4833dbfb63c75b3a04fca74f1dc4d0d28b60f6e2f76b",
+      "new_sha256": "e5664bb2451673000b89633a4760a99e12ab1041b3fb49c0660a4e915227dda3",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3934141838,
+          3913415456
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-SemiBoldItalic.ttf",
+      "old_sha256": "63144869ea9313be4ef63bbfbeca93f8278dd117cace931c2c050048f29c1dc9",
+      "new_sha256": "a73d1567726365325b672c31b22e2342e6f538af80727267b672a56820575044",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1747876596,
+          1727281284
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-Bold.ttf",
+      "old_sha256": "bce02524045c31db78261a6c67f047d631e40754155c4b87d5acd82728d643e3",
+      "new_sha256": "00199abc2b5e839e6ba68f26338532d60415a5f2407fa4218f71c4217b27c200",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          604873602,
+          584278290
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "SC",
+      "variant": "unhinted",
+      "font": "SarasaUiSC-BoldItalic.ttf",
+      "old_sha256": "27f592744127a87e27e674ad8fa6c4afea0b6d05fc41f64dfd20cb996e7e994a",
+      "new_sha256": "bb5e6ddcd9423287e4c4d2d086a7c4b93a53e47d2b525df66ae965cb82a2491f",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3758428896,
+          3737833582
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-ExtraLight.ttf",
+      "old_sha256": "1151029a5446e4b69c272f095d1750b97744aca1e5d9a0ff731b0d72b1e7e750",
+      "new_sha256": "90fd16c96fc243353c98366e4a0dbddc5704d2d571f7c865e2c0cc78c460448d",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3741330741,
+          3736480605
+        ],
+        "modified": [
+          3873274773,
+          3875699840
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-ExtraLightItalic.ttf",
+      "old_sha256": "f0cc0f76484de6ed41ad4d198c6e1a225b08cbb9d26556a7a652a695b7572bd1",
+      "new_sha256": "3bf9f052bda8b23241aef03bf1d48c3c8c47da28951b0b0cbba42d17e9af3de9",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2784524275,
+          2779674139
+        ],
+        "modified": [
+          3873274773,
+          3875699840
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-Light.ttf",
+      "old_sha256": "4c0fe4a4d357c6c89d91201b4b17cc45174cafcd9f3b7302d82fc72eeaae262a",
+      "new_sha256": "83599b80a7e4d6d3d89eabff1f42125aa5fb438944b1b35d599fe04062b36e92",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2589513913,
+          2584532657
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-LightItalic.ttf",
+      "old_sha256": "8fc0c3d3eaa5a61f604590a867c46dd8fed2418227f36fdc3ee585a7664dc4c6",
+      "new_sha256": "e0023ee307b534dbb0b9d60d8e1589871adf8ee70b2a402e95731e9ed2159251",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          19977811,
+          14996555
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-Regular.ttf",
+      "old_sha256": "fe4c95e1ca834326c92376ec05cd95f64fecf4870bd6aaf9f073cecd36453fe4",
+      "new_sha256": "c6b87d43e3e7f0baa07089ec7d0926d50a5d2649f1ba6624ce99c37aa2239d33",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1171470421,
+          1166620229
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-Italic.ttf",
+      "old_sha256": "7c0b52250d664818177a20e985045da92ffe263acce56d78773b6d5a87ff85f7",
+      "new_sha256": "22dfb7e2863a551d177ac7df2e73f788b52719995225f8fed99cbe516412fd8d",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          222801917,
+          217820655
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-SemiBold.ttf",
+      "old_sha256": "3d00bd8cd3c99c9991f5b0c4e0b159a562243a0bc26d470259a493f24516b668",
+      "new_sha256": "5f297da6d5ec91bad92cb6f6c0a471155969ecd244a9462e28b382a6db90a70d",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3630781425,
+          3625931217
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-SemiBoldItalic.ttf",
+      "old_sha256": "22068c8c12547f95e4b206bdf981f344eb2f3e29ddc8e3b9271937866f015ffd",
+      "new_sha256": "6a9b48fee54e972c59b1cf25075a185abc8142d3f53e548da3f1d8d01fd28c1a",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1561820799,
+          1556970591
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-Bold.ttf",
+      "old_sha256": "0c3af6984aa205d731f6f6308a6d5add72ba45efe93a70a6245a6e851584de16",
+      "new_sha256": "5bcdd4ce8bb343f0c1cee8cd0d96e174c2ce4309db9543fc455e1e9e00848a27",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2299660135,
+          2294678853
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "hinted",
+      "font": "SarasaUiTC-BoldItalic.ttf",
+      "old_sha256": "6901d91e8e9fe3ef9347e4c5dc23ab177feb105dc3624f818283f52d4a16b4e1",
+      "new_sha256": "285aeb1f47608083b1ab9cc18d72e2f0e0033957a985820b7c34c7fbad3b035c",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          383690813,
+          378840601
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-ExtraLight.ttf",
+      "old_sha256": "8ffc7c286a5a1419f196485542a6f0e9e82b38126f101781d150499c48577fe3",
+      "new_sha256": "7e32602186a5a5d17ff84845373dd27221ea1799d2fbf20bcc02445291ebf5c4",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          499233431,
+          478638117
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-ExtraLightItalic.ttf",
+      "old_sha256": "4fa305d29854a7dfa1bff8cd919b09f399b8dd8f87d7048dae7585fffb3399f2",
+      "new_sha256": "03c4653301bcdf96df96d3b6a5517d6d44a65653c07766bafcd4c93853d6b93b",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2722354881,
+          2701759567
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-Light.ttf",
+      "old_sha256": "2bcad952b7ee40d0e79329b6ba0b4339c7ece82148a2fc63ba3d417c57ee0e93",
+      "new_sha256": "e7d45c4a2c891547565f40556c8eb24fdf2c6135b4a1b236f129d99a5cb772db",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2938635413,
+          2917909033
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-LightItalic.ttf",
+      "old_sha256": "88f6b41962e3202fcc5727971ffdc7b396b22654f9c634fda71abf875e8d045f",
+      "new_sha256": "eba4f99d694004cf05cd4a06fd46d235c9707cfde6488d8b6f4fafe5756189b4",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1037154333,
+          1016427953
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-Regular.ttf",
+      "old_sha256": "a82966caa4fc96ab7fef74af3da26a6627b57abd5f5a19dbb77482544d1182fc",
+      "new_sha256": "8cdbd365cf38d609650d24947f5ec8abd4697756721152bf465efa70b9a5ccd5",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3922297331,
+          3901702023
+        ],
+        "modified": [
+          3865401206,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-Italic.ttf",
+      "old_sha256": "c5c51241b07452dc01d3454d0e6d21883c51f5ab6f285d5e60ae915c6a8dbe3e",
+      "new_sha256": "4e3cf8243d81ce3d3b3b43892b803eecff35126b95dd7674b34142bae09980b1",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1928533707,
+          1907807325
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-SemiBold.ttf",
+      "old_sha256": "981d0b9b59fc582b0ac6c684e806973b7f6c9dde950a67d7ac7347112a2fb341",
+      "new_sha256": "8e684490894d28a4c8503ea4344e3e062fb65db85ab9ef3144019943ded1e6f1",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3427890747,
+          3407295435
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-SemiBoldItalic.ttf",
+      "old_sha256": "156efd810023af0fa2d41077826d52e85c58630f665ac6a1118a812dbac702e0",
+      "new_sha256": "1f4bcbd1a442442618ad6720bfa3292db2902cd7e2200cd1e3e0913be625ca7f",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4182484611,
+          4161889299
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-Bold.ttf",
+      "old_sha256": "0316da3f3774af611f6b13ae011e4bc463e6adcbf92186828f967f7efb77a3f2",
+      "new_sha256": "5d25f7e8009ca7c3891c3823744fceda1f9c5d5a69e595e94ace6700f9bcdaa0",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2020101945,
+          1999375563
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "TC",
+      "variant": "unhinted",
+      "font": "SarasaUiTC-BoldItalic.ttf",
+      "old_sha256": "2809b04ea27f40fc4f956161f423537cf4ae688d1dcfd7ffb0e3465cee8b65e2",
+      "new_sha256": "d6650a7f2885e8d6753c94b5df7b3a75b6f71e2e3fa14c87ff789c52cea5bf61",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3332553209,
+          3311957895
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-ExtraLight.ttf",
+      "old_sha256": "413515eb2918a84d586a7aa5492d66afed2904fb185e14fc4b0cb04ae1eafdb7",
+      "new_sha256": "f3dc0ff9ee1ce610dd819117686c887c4ece0c0cb81a52cd42fb61bb2089e5af",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2001421727,
+          1996571593
+        ],
+        "modified": [
+          3873274774,
+          3875699840
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-ExtraLightItalic.ttf",
+      "old_sha256": "13d74629593b8744b25434dafdec53c33e4b904486becef8e49e31cd223ddea4",
+      "new_sha256": "d410e187090ebcdf6298dbf66c592069c7cc61f945c1295c0d0a439b083fc7f4",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          886930903,
+          882080767
+        ],
+        "modified": [
+          3873274773,
+          3875699840
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-Light.ttf",
+      "old_sha256": "c31a14f94e02bea00c4e8cc885583ad46b482522d429f78131f69603c8ad7394",
+      "new_sha256": "31a815d3fcd40ed1860622fcd722a42e51863a78169f1d289f19303c90e59e74",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1095523079,
+          1090672893
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-LightItalic.ttf",
+      "old_sha256": "cbd60aa5df3e7b2c8123edc7e4f022f24f05ca7e2690b1df89faedb05659ccbd",
+      "new_sha256": "4e3557784e329494716e6c960081b8e98067b825e52ae29e4ed975e473233910",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          15198157,
+          10347971
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-Regular.ttf",
+      "old_sha256": "6b6b28f9fbb914a98121d9c1f1d5b3500b9eae1747ccb2016fd5df76b8aab7a6",
+      "new_sha256": "1160bc4bd097dc1c962bb52d9e2382be8415f7a871f21011242a366b19ebe84d",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3580430463,
+          3575580271
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-Italic.ttf",
+      "old_sha256": "d48be3366d4406e257b0d49bbe2151e546a2ad56ab9b7bfbe5050a7c3151b64f",
+      "new_sha256": "10d064cfa2add6558e5e0bb1a2d1868fb3a55d73c745c1a097902040993d972c",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2990894461,
+          2986044269
+        ],
+        "modified": [
+          3873274929,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-SemiBold.ttf",
+      "old_sha256": "3812372d1ef1739f54a5f57028694bbbe4ca0c5230bfda6006407f32f4ca89d5",
+      "new_sha256": "2520f786f2ea1e176ac26110f4a3d1b89235cc0e4d62d6f8399ecbc9564debe5",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1567388667,
+          1562407389
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-SemiBoldItalic.ttf",
+      "old_sha256": "30d4622f3bce502d1408e00fc1ec11df24617bf3bee2d84a02e8d6d82db128cc",
+      "new_sha256": "e725db52ad11067fc3475c31655684e9ff7eaf2a062d07ab6de6e51b2aea2adb",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          190930795,
+          186080587
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-Bold.ttf",
+      "old_sha256": "5a00e36a5e224bb865edb45f21918b4cb3897821316822483eb2c5af232014c7",
+      "new_sha256": "6116032ba551393c2a4faafdc955702e408dcd40d848584eb64536b33ccc9900",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3500775347,
+          3495925135
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "hinted",
+      "font": "SarasaUiHC-BoldItalic.ttf",
+      "old_sha256": "220fa49dcef4dc391d360fae7aca69bcf7756db85af13df39ef19fdd417efa99",
+      "new_sha256": "7b95c7c4fc84a480088e0b3ba20f4aafe0a21c1af0e45c8c9918c5e16e4d619c",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          822995479,
+          818145267
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-ExtraLight.ttf",
+      "old_sha256": "69e091cc51821e4394602da42d5a94c1848e3df7068aa576c7216212f446398d",
+      "new_sha256": "c9cd8023fa830eafb60969aba65404a8e027d8e374bcb2e72b5eb9d70c8e9ec1",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1610004877,
+          1589409563
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-ExtraLightItalic.ttf",
+      "old_sha256": "e26ce253910e0438b7637ff5d42464ad775a7001b7af2bbbee05e42c022f78bc",
+      "new_sha256": "5d2def9274c4ea865f3ae27b7f422061615f940edfe1117df4fc4938e3f471f9",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3827528137,
+          3806932823
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-Light.ttf",
+      "old_sha256": "24e52a68c6e3139497464595e8119538fa25f0025674040290a7c62d0009f304",
+      "new_sha256": "7efdbb5742422206d269fc2222925c99d5e6e32152988e1c90939dfa41ebcd7c",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3801500271,
+          3780904961
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-LightItalic.ttf",
+      "old_sha256": "2cd49a0ea6a19b88d57d0e6d6a5b3db9a5c5ab5780496550670929599e48fdef",
+      "new_sha256": "e1f0bea58e2d9ab6ed217f96c8b7b8e2232055adfdcc00369405f1c5d1915ae8",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          795887425,
+          775292115
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-Regular.ttf",
+      "old_sha256": "4fcb2ad05e2768572594e7cf5be47e0ce7f34b87e2380229fcad0f89dc8b0080",
+      "new_sha256": "ce5c0071039ec0bab59bc519c11f826996cd9cffc169d0c2aa873f0eb9324d38",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1424174361,
+          1403579053
+        ],
+        "modified": [
+          3865401206,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-Italic.ttf",
+      "old_sha256": "6f8f0c959b4411fdde057ebfadd132f389846a694efaa07b86ba0106f80ce475",
+      "new_sha256": "5119db996f1e0821c0d6a6bb5636ce643ef9a12de69e05765c4cdb8883935a24",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3182144699,
+          3161549387
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-SemiBold.ttf",
+      "old_sha256": "ca7ee3a9fd0c4019d680925d1e3becc02921046dc84c8882256356226379c7ae",
+      "new_sha256": "f2d04ec18af2f486dfebc4fc2c9a31e91f42c14d93c65fbc2a9bd3192a5f74d9",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          193919217,
+          173192835
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-SemiBoldItalic.ttf",
+      "old_sha256": "2f5f22c7dfa09ff96e5c36273e5a2861eb85cfa316de1d079035b1a4de4e9556",
+      "new_sha256": "c50486144198739dda6b92a332e26c93643a5c263fcca291e09ad9131de83a43",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2433966135,
+          2413370823
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-Bold.ttf",
+      "old_sha256": "494e58ce9facbc920296f14456277fb00608b40761d104a3cf5f5cfa31fded5f",
+      "new_sha256": "3dcf695586218e7214f62a5e2fe28c34dabe9a337bcbdec67d5bab2067676dea",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3635298361,
+          3614703049
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "HC",
+      "variant": "unhinted",
+      "font": "SarasaUiHC-BoldItalic.ttf",
+      "old_sha256": "41d499843cd23709b816794db67ec37a0ab026902f9bb2b0aefe2d4c013b034c",
+      "new_sha256": "d45aa71f93420d33a603f355762f8b4973a9c01daaa48c1be2cfb881397b1398",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3256511899,
+          3235916585
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-ExtraLight.ttf",
+      "old_sha256": "b9fcc68dcc77a0492291f55627622ecfd35da5a63e09d4093bcf17a7586b03bc",
+      "new_sha256": "1fe69af7b6b4d1f0eb0ff11e605954ff55a07dca3e7b50314291b683a1c51263",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4171852767,
+          4167002633
+        ],
+        "modified": [
+          3873274774,
+          3875699840
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-ExtraLightItalic.ttf",
+      "old_sha256": "29c757865c508dff2d05bf66f294dad4018d53ef48d8cc5e1c150b859efceedb",
+      "new_sha256": "c75286386c72e677c91e0a65476d52e499f04afe167d28cc1510e69e2ac88068",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2070377063,
+          2065395859
+        ],
+        "modified": [
+          3873274774,
+          3875699840
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-Light.ttf",
+      "old_sha256": "413c827c14c36728755e4b915b439d84af90871b05038d6ca81516e39054a9cc",
+      "new_sha256": "11083532d1b1e2fc2d32b64315eecc482faadd8952f98855d695266002193c5d",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3278599251,
+          3273617995
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-LightItalic.ttf",
+      "old_sha256": "2e1e31702aa17ecdcecf41c2cc7ca7bf926fe42cfb37fd36d9bce2c088777b3e",
+      "new_sha256": "e3338c9715366403f0c94261578e6345bcb0fd8c2d950cbb27e764190bb10859",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1939654767,
+          1934804581
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-Regular.ttf",
+      "old_sha256": "3e46ca05bf1f390bdd8b0ebb491fa95882e7ae1b5a31b367934e7a55cd347da3",
+      "new_sha256": "58d845916c7e26c530d129df479df5c9735248d9182fd7ee28db2db79d47838f",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2538155773,
+          2533305583
+        ],
+        "modified": [
+          3873274930,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-Italic.ttf",
+      "old_sha256": "d8598515c473a1da1133209e1c6419bea75639181826b05bfc6a217fa13fdfb2",
+      "new_sha256": "cd44c8cf28661bf18f7e354a29107e9760f6850f2fe238eeaa0d512e9e4b3fc7",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2039774925,
+          2034924735
+        ],
+        "modified": [
+          3873274930,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-SemiBold.ttf",
+      "old_sha256": "4114602d6dd8093feca6036e16fd4e9a3e36b840a53d40d99119cf190d2bcd11",
+      "new_sha256": "1fd62452197879ac578ad62daa769f4b41d00e1237a7d734b98b732a84de1095",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2743923705,
+          2739073497
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-SemiBoldItalic.ttf",
+      "old_sha256": "2d774c9029fc1bc8ad3b114b1596a06ef4f08a8902251e174b402dae8ede615f",
+      "new_sha256": "a7e6c563ef469a568c8a4363efd66b20ffb47ba13d35536de99bbadc92dc603a",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1716412511,
+          1711562303
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-Bold.ttf",
+      "old_sha256": "dfa02ccdeab8152bfc23ef9538e9087c6ddaf39fde353a0463d3fc9c49d6acf9",
+      "new_sha256": "2c292a3b1af4ef12ea7365e656256b1f7021522a2cb44c97ad9550d77833e524",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          788858077,
+          784007865
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "hinted",
+      "font": "SarasaUiJ-BoldItalic.ttf",
+      "old_sha256": "34768ac287353b8d4329d1eb397969fa1e2553da9ed3878c458f021f1f7ffc09",
+      "new_sha256": "a02a539c4353821bb7325d64b7e30d4b673667d7a52f8efea79a8b35280c324d",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1146050923,
+          1141200711
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-ExtraLight.ttf",
+      "old_sha256": "13e5f32029c3967c4b8fd39fb3abee5aed64b42d6a5353519efd0e42dceea079",
+      "new_sha256": "f9ec0342f9743237c3c736b7782e5e423c6e9ec221d438946b0a8336a39f58d0",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1761254525,
+          1740659211
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-ExtraLightItalic.ttf",
+      "old_sha256": "c7074526130180c7a76ad5e4e929c0bb1680507307b7115f0282e18e00e13742",
+      "new_sha256": "7a5cbc09e97121d488f4273da1f5b66a1cde8299b155daf682c1f6b4ed17d136",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4182524497,
+          4161798113
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-Light.ttf",
+      "old_sha256": "032dcd07e419f11c3452166365820d66d94599d095ab1b99ff8b1371de7268c8",
+      "new_sha256": "76babc3ef4d357c129c3b3518c4eff3a6f4af56b486e1b9b638ad5e2861ff0de",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2947587811,
+          2926861431
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-LightItalic.ttf",
+      "old_sha256": "e4bf585d3f37e586c1f0346986363421375242014db91dfe1852c5081b1f7b1f",
+      "new_sha256": "c5cc07c8a43f2bd44009f6833924cc32b9e76f926089dea7f48266af11f80f0a",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          571519337,
+          550924027
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-Regular.ttf",
+      "old_sha256": "39f45aa9eefd2a4311cd15506e25265266c570fdd5c6660c20eb8602666bd5b4",
+      "new_sha256": "bdf6bbc874ceb269c0a2c4ce61cf8dc362bce47615eaf4daf99d0eb6f8bab8a6",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2717574985,
+          2696979677
+        ],
+        "modified": [
+          3865401206,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-Italic.ttf",
+      "old_sha256": "02fea94b995473bf3db6581d6104e8774bc31af00f7cf6d7f7696ad0f6382af9",
+      "new_sha256": "9c5ef4eb1cbef82da3cdf3c7af2a1fa5eb1aef8af15f2640e309239395e223c4",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2283110005,
+          2262514693
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-SemiBold.ttf",
+      "old_sha256": "e620be0db2250a36c2cdc67270dde473198a1e5b69f79dccc2187cee870c9bbd",
+      "new_sha256": "b1219dd862247aa23c677129c70c6726b89fdfc40ed1bf82e4cfbe5e38788505",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2293668207,
+          2273072895
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-SemiBoldItalic.ttf",
+      "old_sha256": "ae1a0a30266b86ef1baa3f46394b1e449fe6d8a22710c5cdcaf1630f582da23b",
+      "new_sha256": "8c07962830c7b2ce4c8b86cc6716ec50c71a91966b44b48e5955cee4b32cbd61",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3925798113,
+          3905202801
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-Bold.ttf",
+      "old_sha256": "802a6a04ed2d296f7162c65f3556e3eb3e9c325309f27b89a6c1348364a31b39",
+      "new_sha256": "e17fe82c3d513ed66a0b12e91d8cdcfac68af42234511c65df52d1c3f1fd35a1",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4106139861,
+          4085544549
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "J",
+      "variant": "unhinted",
+      "font": "SarasaUiJ-BoldItalic.ttf",
+      "old_sha256": "244ea84affb54e573d45ddefd18a008ee5a75d72c24de02dad05e04ead6f6284",
+      "new_sha256": "4f53d08d7516c1430cf81fab6755c8ff06b01e4adf53225084aaa45671b32902",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4135294127,
+          4114698813
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-ExtraLight.ttf",
+      "old_sha256": "13b4dfd922a68af85788f4d002b2d531d03ba242537b6be96bb5f501405e786c",
+      "new_sha256": "4219dbbda3237c549f00aaef37c29d5df9f98316daadc7ee509840a371867a62",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          92105090,
+          87254956
+        ],
+        "modified": [
+          3873274774,
+          3875699840
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-ExtraLightItalic.ttf",
+      "old_sha256": "83186f5d1f947c2b81313c86215c5a8aef55bdd6d0262b25889adce5d939b77e",
+      "new_sha256": "1bf66b75d3f0a920c886d2b849c5f0051ad499b910e1b445071ca87f581f30cc",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4012520128,
+          4007538922
+        ],
+        "modified": [
+          3873274774,
+          3875699841
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-Light.ttf",
+      "old_sha256": "e1a213cbc2c9205e9acf1dd2b51038087fc884f083e4a76d06a0ef97795a2761",
+      "new_sha256": "99c86d4f784067aff4d29bec49f6134a22c648949b4d0c06ebe4977185038964",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3092031968,
+          3087050712
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-LightItalic.ttf",
+      "old_sha256": "abae8331f89c81baea03d4f93de443c74a78b497644280c78f77a34cec36a331",
+      "new_sha256": "f8141a2fc7cf448c45640ac56b5f418783e3d85410e2d5daede754cbb2cabb22",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1425581176,
+          1420730990
+        ],
+        "modified": [
+          3873274846,
+          3875699938
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-Regular.ttf",
+      "old_sha256": "840fbc60ec22380b3036bdf941bfedcf62326c6fff562ead1168dafcdc003cad",
+      "new_sha256": "b82450f1869dca62b23f4d39ee9a44920625d8b3ea5ec2f3a62075dcb4bc2724",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1323381394,
+          1318531204
+        ],
+        "modified": [
+          3873274930,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-Italic.ttf",
+      "old_sha256": "7d3a82b3a6fd472549e7d1121038bbb0fdfe87638cd9e1c8b70281c9fb1f446c",
+      "new_sha256": "e7aecf940ad8113c5bade1390ced6da5ed2e17624f15e3945b2ccde1b08a0d64",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1277182668,
+          1272332478
+        ],
+        "modified": [
+          3873274930,
+          3875700024
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-SemiBold.ttf",
+      "old_sha256": "8c5b0c5d15411732a01648ad0430446eb9677e1c5e9cbd26a647f2f0fbca88b5",
+      "new_sha256": "2a4dad7e8f6b7f3589d36511df0d3c6283ffe789a5e036fdc6102e269f93a99e",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2667409008,
+          2662558800
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-SemiBoldItalic.ttf",
+      "old_sha256": "514ab3239cdb0d38a0e8cac3a38967eb132c786750cdf7c36c257ae4847225e1",
+      "new_sha256": "98a3237d2d594365db83da893f1efe8c77042630000bcb905f58d4e22fcad74a",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3940437668,
+          3935587460
+        ],
+        "modified": [
+          3873275015,
+          3875700118
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-Bold.ttf",
+      "old_sha256": "9b562a9e27500c981f4384d3476462a6e8ade9b13731415996ff88ec14554fba",
+      "new_sha256": "d19f47ccc3544077133e97e76a976360944b5ca72805e3fb9f7e72d188927eb2",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4218654704,
+          4213804492
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "hinted",
+      "font": "SarasaUiK-BoldItalic.ttf",
+      "old_sha256": "4f67f42672abab924a40c25d51b5dea6680a2dd31f71f53a54a81d84385928df",
+      "new_sha256": "afeb581957412bf2a62e1c0232839273c2c3ccf79bcc5c034d03b4e63e8c2f7d",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          4090414714,
+          4085564502
+        ],
+        "modified": [
+          3873275107,
+          3875700212
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-ExtraLight.ttf",
+      "old_sha256": "781ecdcb6f3f47957d26307ca7b67137675676036a606d373df775e9a106f176",
+      "new_sha256": "8b1842b497c608fdf3d24a607f9b0516aeb94b73ff44e57629ed24961075c405",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          984656970,
+          964061656
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-ExtraLightItalic.ttf",
+      "old_sha256": "bac5b4536ee4083c0914e0959ae0af523a2491b17c69fec1e184bcedb57bed66",
+      "new_sha256": "8e79d5bcfaae98af946ba7104cfa052e1e07228877787ef6c9d80b3031afc3a6",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1777916432,
+          1757190048
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-Light.ttf",
+      "old_sha256": "7503e45be8f3a786c8a562dfffee9eb64f30c610d2bf6c1c33ff57c77304eb7f",
+      "new_sha256": "fba3a3b630a2cd0a9a39e99526492d7f0796264cfbbf04d31e4172509a0f80bc",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          635566118,
+          614839738
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-LightItalic.ttf",
+      "old_sha256": "579553d0015cdc8c1d10fbbbecbff037cc9c38f6e6aa55db361f7637df4acdd2",
+      "new_sha256": "c7c19281519b315d8dc9931f3bfd2f7848cd05d4518b19c684f663dca1397673",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          3152838902,
+          3132243592
+        ],
+        "modified": [
+          3865401204,
+          3875698858
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-Regular.ttf",
+      "old_sha256": "ca3b3c6b644755c6b7e84594f5d1e7f0b34de04df3533897e3be9103ebe3deec",
+      "new_sha256": "b31f4691c0752187a1f9710751f74697ebe56aff29c47b9caeda5ca7e25e542f",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          439103960,
+          418508652
+        ],
+        "modified": [
+          3865401206,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-Italic.ttf",
+      "old_sha256": "97d24d8c4dd8de19ba684f3e45823ba677ca348b23d6b01762b937d80af8af6d",
+      "new_sha256": "07e5cda00c1ab0e8c0c5760395c6b5b65706f0c4e7d4403bae30b2cb33ec8071",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2473243176,
+          2452647864
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-SemiBold.ttf",
+      "old_sha256": "da0a2a5d384d3f89ea36211927339641081175d1fad589ada81b5c33223c722b",
+      "new_sha256": "76d291ea034a37553d1c2fc087f8ab226b7154458f5fbfd8f40df3c5f987d83f",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          789743630,
+          769148318
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-SemiBoldItalic.ttf",
+      "old_sha256": "cafee8b53b175bdb06c7d7c4eb28f2f0e0e0d17f2d1e757a0cb78a3d28093165",
+      "new_sha256": "c8ca63bc3a951919d551a260c2a3307aee1cdd13e09ece17ac079c6b1c0d8a10",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          802147866,
+          781552554
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-Bold.ttf",
+      "old_sha256": "393afb4cd89cc3212d3ca80c5a05058457c60385f83067aaf04456d6f99ca9bc",
+      "new_sha256": "97926d37ac9e0e3795e8e2060290023930ad7317ca53e46aab6809fe258417c1",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          1429403772,
+          1408808460
+        ],
+        "modified": [
+          3865401204,
+          3875698859
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    },
+    {
+      "region": "K",
+      "variant": "unhinted",
+      "font": "SarasaUiK-BoldItalic.ttf",
+      "old_sha256": "f2edff031070f6ef789f8813f7358deddc7bc5a46e52a33b306eb855c8a2b4bd",
+      "new_sha256": "041a65c9ab4a8f09acc2dd4e719a609183dbf5ab4f055eec253782dc47d934df",
+      "table_inventory_equal": true,
+      "changed_tables": [
+        "head",
+        "name"
+      ],
+      "changed_non_metadata_tables": [],
+      "head_changes": {
+        "checkSumAdjustment": [
+          2847720702,
+          2827125388
+        ],
+        "modified": [
+          3865401204,
+          3875698860
+        ]
+      },
+      "head_metadata_only": true,
+      "name_version_only": true,
+      "same_font_data_except_version_metadata": true
+    }
+  ],
+  "source_code_diff": {
+    "old_commit": "f31c230af7fb4854f40d96560e2616eafdd85926",
+    "new_commit": "61e74fda253a1bec0c6f5b09d32a0944bb96b814",
+    "commits": 5,
+    "changed_version_files": [
+      "package.json",
+      "package-lock.json"
+    ],
+    "changed_npm_dependencies": {
+      "ot-builder": [
+        "1.8.0",
+        "1.8.1"
+      ],
+      "otb-ttc-bundle": [
+        "1.8.0",
+        "1.8.1"
+      ],
+      "piscina": [
+        "5.2.0",
+        "5.3.2"
+      ],
+      "fs-extra": [
+        "11.3.5",
+        "11.4.1"
+      ],
+      "@biomejs/biome": [
+        "2.5.0",
+        "2.6.2"
+      ]
+    },
+    "changed_iosevka_source_fonts": 120,
+    "other_files_changed": true,
+    "other_files": {
+      "verdafile.mjs": "TTC 与 TTC-Unhinted 的生成顺序改为逐个执行，不涉及 TTF"
+    },
+    "compare_url": "https://github.com/be5invis/Sarasa-Gothic/compare/v1.0.42...v1.0.43"
+  }
+}

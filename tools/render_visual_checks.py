@@ -11,7 +11,7 @@ from python_env_bootstrap import VISUAL_DEPENDENCIES, ensure_project_python
 if __name__ == "__main__":
     ensure_project_python(VISUAL_DEPENDENCIES, project_root=Path(__file__).resolve().parents[1], label="visual")
 
-import audit_sarasa_ui_propdigits as audit
+from font_audit import contract as audit
 import build_sarasa_ui_propdigits_sc as build
 import freetype
 import uharfbuzz as hb
@@ -59,6 +59,18 @@ class FontRenderer:
         return x, baseline
 
 
+def kerning_adjustment(font: hb.Font, text: str) -> int:
+    """First-glyph x-advance change from kern alone, as the sheet labels it."""
+    advances = []
+    for enabled in (False, True):
+        buffer = hb.Buffer(); buffer.add_str(text); buffer.script = "Latn"; buffer.language = "en"; buffer.direction = "ltr"
+        hb.shape(font, buffer, {"kern": enabled, "mark": False, "mkmk": False, "ss03": False, "cv10": False})
+        advances.append([position.x_advance for position in buffer.glyph_positions])
+    if len(advances[0]) != len(advances[1]):
+        raise ValueError("字偶距开关改变了 glyph 数量")
+    return advances[1][0] - advances[0][0]
+
+
 def labels(size: int):
     path = label_font_path()
     return ImageFont.truetype(str(path), size)
@@ -77,7 +89,7 @@ def label_font_path() -> Path:
 def sheet(region: str, variable: bool) -> dict:
     rows = []
     if variable:
-        for weight in audit.INTER_POSITION_WEIGHTS:
+        for weight in audit.AXIS_POINTS:
             for italic in (False, True):
                 rows.append((audit.vf_path(region, italic), weight, italic, None))
     else:
@@ -152,7 +164,7 @@ def detail_sheet(region: str) -> dict:
         regular.draw(image, "LY GT Go ,; G\u0300\u0301", (175, baseline), language="en")
         draw.text((1190, baseline - 126), "斜体标点", font=label_font, fill=(65, 80, 100))
         italic.draw(image, ",; ,;", (1190, baseline), language="en")
-        delta = audit.inter_positioning_signature(regular.font, "LY", "kern", source=False)[0][0]
+        delta = kerning_adjustment(regular.font, "LY")
         draw.text((175, baseline + 25), f"LY 实际字偶距调整：{delta} units", font=label_font, fill=(65, 80, 100))
         tabular.draw(image, "0123456789 1:2 1: :2 ķ:2 ļ:2 ņ:2 ŗ:2 ș:2 ț:2", (175, baseline + 109), features={"tnum": True, "zero": True})
         draw.text((175, baseline + 134), "tnum + zero：数字严格等宽；边界冒号上浮；小写字母旁的冒号保持原位", font=label_font, fill=(65, 80, 100))

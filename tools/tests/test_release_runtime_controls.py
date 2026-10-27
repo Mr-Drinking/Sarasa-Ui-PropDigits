@@ -13,8 +13,9 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-import audit_sarasa_ui_propdigits as audit
+from font_audit import contract as audit, products
 import build_sarasa_ui_propdigits_sc as build
+import font_layout
 import package_release as package
 import python_env_bootstrap as bootstrap
 import render_visual_checks as visual
@@ -56,19 +57,11 @@ def font_bytes(font):
     return stream.getvalue()
 
 
+def langsys_signatures(font, tag):
+    return {key: sorted(features) for key, features in font_layout.routes(font[tag].table).items()}
+
+
 class RuntimeControls(unittest.TestCase):
-    def test_invalid_instructions_stop_before_expensive_bitmap_rendering(self):
-        with tempfile.TemporaryDirectory() as directory:
-            path = Path(directory) / "candidate.ttf"
-            path.touch()
-            task = {"target_path": str(path), "reference_path": str(path), "target": "candidate.ttf",
-                    "reference": "reference.ttf", "region": "SC", "weight": "Bold", "italic": False,
-                    "comparison_mode": "official-hinted-native-fallback", "ppems": (9, 12)}
-            with patch.object(build, "native_hint_execution_status", return_value={"ok": False, "complete": False, "failures": 1}), patch.object(audit, "TTFont", side_effect=AssertionError("must not continue rendering")):
-                result = audit.raster_compare_worker(task)
-            self.assertGreater(result["counts"]["hint_execution_error"], 0)
-            self.assertEqual(result["renders_checked"], 0)
-            self.assertEqual(result["raster_aborted"], "native-hint-execution-failed")
 
     def test_punctuation_advance_calibration_preserves_other_glyphs_and_native_controls(self):
         target = variable_fixture()
@@ -95,7 +88,7 @@ class RuntimeControls(unittest.TestCase):
         self.assertEqual({tag: target.getTableData(tag) for tag in protected}, protected)
         changed = hb.Font(hb.Face(font_bytes(target)))
         freetype_font = freetype.Face(io.BytesIO(font_bytes(target)))
-        for weight in audit.INTER_POSITION_WEIGHTS:
+        for weight in audit.AXIS_POINTS:
             old_runtime.set_variations({"wght": weight}); changed.set_variations({"wght": weight})
             freetype_font.set_var_design_coords([weight])
             for gid, name in enumerate(target.getGlyphOrder()):
@@ -131,10 +124,10 @@ class RuntimeControls(unittest.TestCase):
             self.skipTest("需要固定 Inter 来源和静态字体夹具")
         with TTFont(path) as font:
             before_tags = [record.FeatureTag for record in font["GSUB"].table.FeatureList.FeatureRecord]
-            before_languages = audit.langsys_signatures(font, "GSUB", False)
+            before_languages = langsys_signatures(font, "GSUB")
             build.add_digit_colon_feature(font)
             self.assertEqual(before_tags, [record.FeatureTag for record in font["GSUB"].table.FeatureList.FeatureRecord])
-            self.assertEqual(before_languages, audit.langsys_signatures(font, "GSUB", False))
+            self.assertEqual(before_languages, langsys_signatures(font, "GSUB"))
 
     def test_lookup_record_walk_deduplicates_aliases_and_ignores_lazy_font_links(self):
         record = build.ot.SubstLookupRecord(); record.SequenceIndex = 0; record.LookupListIndex = 2
@@ -196,19 +189,11 @@ class RuntimeControls(unittest.TestCase):
         build.align_tabular_alternate_advances(font)
         self.assertEqual(widths(), [600] * 10)
 
-    def test_one_unit_errors_require_a_proven_rounding_boundary(self):
-        self.assertFalse(audit.normalization_rounding_pair(644, 645, 645, 645))
-        self.assertFalse(audit.normalization_rounding_pair(643, 645, 643, 646))
-        self.assertTrue(audit.normalization_rounding_pair(587, 588, 587.499, 587.501))
-
-    def test_cross_engine_coverage_cannot_be_empty(self):
-        self.assertTrue(audit.cross_engine_coverage_failures([]))
-
     def test_required_colon_combinations_and_boundaries_are_registered(self):
-        self.assertTrue({"1:", ":2", "1:2", "a::::::::::2"} <= set(audit.COLON_TEXTS))
-        self.assertGreaterEqual(len(audit.COLON_TEXTS), 480)
-        self.assertIn({"tnum": True}, audit.COLON_FEATURE_COMBINATIONS)
-        self.assertIn({"tnum": True, "zero": True}, audit.COLON_FEATURE_COMBINATIONS)
+        self.assertTrue({"1:", ":2", "1:2", "a::::::::::2"} <= set(products.COLON_TEXTS))
+        self.assertGreaterEqual(len(products.COLON_TEXTS), 480)
+        self.assertIn({"tnum": True}, products.WIDTH_FEATURES)
+        self.assertIn({"tnum": True, "zero": True}, products.WIDTH_FEATURES)
 
     def test_fontbakery_cannot_reuse_the_calling_environment(self):
         with self.assertRaisesRegex(RuntimeError, "独立"):

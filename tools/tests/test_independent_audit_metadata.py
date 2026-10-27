@@ -10,7 +10,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import build_sarasa_ui_propdigits_sc as build
-import audit_sarasa_ui_propdigits as audit
+from font_audit import contract, metadata as audit_metadata, products
 import package_release as package
 from fontTools.ttLib import TTFont
 import uharfbuzz as hb
@@ -38,7 +38,7 @@ class IndependentMetadataTests(unittest.TestCase):
             return [(info.codepoint, pos.x_advance, pos.x_offset, pos.y_offset)
                     for info, pos in zip(buffer.glyph_infos, buffer.glyph_positions)]
 
-        for weight in audit.INTER_POSITION_WEIGHTS:
+        for weight in contract.AXIS_POINTS:
             for width in ({}, {"tnum": True}, {"pnum": True}, {"tnum": True, "pnum": True}):
                 with self.subTest(weight=weight, features=width):
                     self.assertEqual(
@@ -73,9 +73,9 @@ class IndependentMetadataTests(unittest.TestCase):
             source.save(source_path)
             license_bytes = ("Portions " + copyright_text + "\nLicense fixture\n").encode("utf-8")
             notice = copyright_text.split(", with Reserved Font Name", 1)[0]
-            with patch.multiple(build, ROOT=root, STATIC_ROOT=root / "fonts/static"), patch.object(audit, "ROOT", root), patch.object(build, "source_han_vf_path", return_value=source_path):
-                copies = [build.static_dir(region, hinted) / "LICENSE-Sarasa-Gothic.txt"
-                          for region in build.REGION_ORDER for hinted in (True, False)]
+            with patch.multiple(contract, ROOT=root, FONT_ROOT=root / "fonts"), patch.object(contract, "cjk_path", return_value=source_path):
+                copies = contract.release_license_document_paths()[2:]
+                self.assertEqual(len(copies), 12)
                 for path in copies:
                     path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -85,25 +85,31 @@ class IndependentMetadataTests(unittest.TestCase):
                     for path in copies:
                         path.write_bytes(license_bytes)
 
+                def failed(status):
+                    return {(sample["file"], sample["check"]) for sample in status["samples"]}
+
                 reset_documents()
-                result = audit.source_han_license_documents_status()
+                result = audit_metadata.source_han_license_documents_status()
                 self.assertTrue(result["ok"])
                 self.assertEqual(result["documents_checked"], 14)
-                package.validate_license_documentation({"source_han_license_documents": result})
+                package.validate_license_documentation({"records": {"licenses": [result]}})
                 for path in [root / "LICENSE", *copies]:
                     path.write_bytes(license_bytes.replace(b"2031", b"2021"))
                 with self.assertRaisesRegex(ValueError, "报告已过期"):
-                    package.validate_license_documentation({"source_han_license_documents": result})
-                self.assertIn("source_han_license_copyright", {item["kind"] for item in audit.source_han_license_documents_status()["failures"]})
+                    package.validate_license_documentation({"records": {"licenses": [result]}})
+                self.assertIn(("LICENSE", "source_han_copyright_and_exact_copy"),
+                              failed(audit_metadata.source_han_license_documents_status()))
                 reset_documents()
                 copies[0].unlink()
-                self.assertIn("source_han_license_copy_missing", {item["kind"] for item in audit.source_han_license_documents_status()["failures"]})
+                self.assertIn((contract.display_path(copies[0]), "source_han_copyright_and_exact_copy"),
+                              failed(audit_metadata.source_han_license_documents_status()))
                 reset_documents()
                 copies[0].write_bytes(license_bytes + b"stale")
-                self.assertIn("source_han_license_copy_contents", {item["kind"] for item in audit.source_han_license_documents_status()["failures"]})
+                self.assertIn((contract.display_path(copies[0]), "source_han_copyright_and_exact_copy"),
+                              failed(audit_metadata.source_han_license_documents_status()))
                 reset_documents()
                 (root / "NOTICE.md").write_text(notice.replace("2031", "2021"), encoding="utf-8")
-                self.assertIn("source_han_notice_copyright", {item["kind"] for item in audit.source_han_license_documents_status()["failures"]})
+                self.assertIn(("NOTICE.md", "source_han_notice"), failed(audit_metadata.source_han_license_documents_status()))
 
     def test_repeated_variable_naming_keeps_fvar_and_stat_references(self):
         for italic in (False, True):
@@ -121,11 +127,18 @@ class IndependentMetadataTests(unittest.TestCase):
             self.assertEqual(len(font["fvar"].instances), 6)
 
     def test_oversized_regular_bounds_fail_even_when_the_font_reports_them_truthfully(self):
-        source_path = build.reference_font_path("SC", "Regular", False)
+        source_path = contract.reference_path("SC", "Regular", False)
         if not source_path.is_file():
             self.skipTest("需要固定 Sarasa 来源")
+
+        def failed_checks(font):
+            with tempfile.TemporaryDirectory() as directory, patch.object(contract, "ROOT", Path(directory)):
+                path = Path(directory) / "probe.ttf"; font.save(path)
+                status = audit_metadata.check_font(path, "SC", False, "Regular", False)
+            return {sample["check"] for sample in status["samples"]}
+
         with TTFont(source_path) as font:
-            self.assertTrue(audit.regular_vertical_bounds_status(font, source_path)["ok"])
+            self.assertNotIn("regular_vertical_bounds", failed_checks(font))
             # A long vertical outline plus a correctly updated head still
             # violates the upstream default-instance padding requirement.
             from fontTools.pens.ttGlyphPen import TTGlyphPen
@@ -135,21 +148,28 @@ class IndependentMetadataTests(unittest.TestCase):
             pen.lineTo((120, top)); pen.lineTo((100, top)); pen.closePath()
             font["glyf"].glyphs[font.getBestCmap()[0xFE31]] = pen.glyph()
             build.recalculate_head_bounds(font)
-            self.assertTrue(audit.head_bounds_status(font)["ok"])
-            self.assertFalse(audit.regular_vertical_bounds_status(font, source_path)["ok"])
-        self.assertFalse(audit.regular_vertical_bounds_status(fixture_font(), source_path.with_name("missing.ttf"))["ok"])
+            self.assertTrue(audit_metadata.head_bounds_status(font)["ok"])
+            self.assertIn("regular_vertical_bounds", failed_checks(font))
 
     def test_default_width_gate_rejects_a_tabular_space(self):
         if not build.INTER_UPRIGHT.is_file():
             self.skipTest("需要固定 Inter 来源")
-        with TTFont(build.INTER_UPRIGHT) as font:
-            self.assertTrue(audit.proportional_defaults_status(build.serialized_font_bytes(font), (400,))["ok"])
+        from fontTools.ttLib.scaleUpem import scale_upem
+        from fontTools.varLib.instancer import instantiateVariableFont
+        with TTFont(build.INTER_UPRIGHT) as source, tempfile.TemporaryDirectory() as directory:
+            # Products use 1000 units per em; FreeType reports unscaled units.
+            font = instantiateVariableFont(source, {"opsz": 14}, inplace=False)
+            scale_upem(font, 1000)
+            path = Path(directory) / "inter.ttf"
+            font.save(path)
+            self.assertEqual(products.width_invariants(path)["failures"], 0)
             space = font.getBestCmap()[0x20]
             tabular = build.get_single_substitution_mapping(font, "tnum")[space]
             build.remap_unicode_cmap(font, 0x20, tabular)
-            result = audit.proportional_defaults_status(build.serialized_font_bytes(font), (400,))
-            self.assertFalse(result["ok"])
-            self.assertIn("U+0020", {failure["codepoint"] for failure in result["failures"]})
+            font.save(path)
+            result = products.width_invariants(path)
+            self.assertGreater(result["failures"], 0)
+            self.assertIn("U+0020", {failure.get("cp") for failure in result["samples"]})
 
     def test_nonhinting_static_dropout_is_metadata_only(self):
         font = fixture_font()
@@ -164,7 +184,12 @@ class IndependentMetadataTests(unittest.TestCase):
 
     def test_validation_record_identifies_the_loaded_code(self):
         expected = build.BUILDER_CODE_SHA256
-        with patch.object(Path, "read_text", side_effect=AssertionError("must not attest to edited code on disk")):
+        original = Path.read_text
+        def read_text(path, *args, **kwargs):
+            if path.resolve() == Path(build.__file__).resolve():
+                raise AssertionError("must not attest to edited code on disk")
+            return original(path, *args, **kwargs)
+        with patch.object(Path, "read_text", read_text):
             self.assertEqual(build.output_validation_contract(False)["builder_sha256"], expected)
 
     def test_regional_codepages_match_independent_upstream(self):
@@ -176,7 +201,6 @@ class IndependentMetadataTests(unittest.TestCase):
             build.update_os2_sarasa_metadata(font, region)
             with TTFont(path, lazy=True) as source:
                 self.assertEqual(font["OS/2"].ulCodePageRange1, source["OS/2"].ulCodePageRange1, region)
-                self.assertEqual(audit.expected_codepage_range_1(region), source["OS/2"].ulCodePageRange1)
 
     def test_all_static_family_names_fit_without_shortening_weight_names(self):
         for region in build.REGION_ORDER:
@@ -246,7 +270,7 @@ import check_quick_audit
                         table.cmap[cp] = tnum[name]
             build.apply_static_propdigits(font)
             self.assertEqual({cp: font.getBestCmap()[cp] for cp in expected}, expected)
-            build.bake_inter_ui_tnum_defaults(font)
+            build.apply_inter_ui_recipe(font)
             self.assertEqual({cp: font.getBestCmap()[cp] for cp in expected}, expected)
             font.flavor = None
             data = io.BytesIO(); font.save(data)

@@ -11,7 +11,9 @@ from python_env_bootstrap import AUDIT_DEPENDENCIES, ensure_project_python
 if __name__ == "__main__":
     ensure_project_python(AUDIT_DEPENDENCIES, project_root=Path(__file__).resolve().parents[1], label="audit")
 
-import audit_sarasa_ui_propdigits as audit
+from font_audit import contract as audit
+from font_audit.metadata import head_bounds_status
+from font_audit.products import vertical_segment_runtime_status
 import build_sarasa_ui_propdigits_sc as build
 import uharfbuzz as hb
 from fontTools.ttLib import TTFont
@@ -57,7 +59,7 @@ def main() -> None:
                 failures.append({"file": label, "kind": "missing"}); continue
             data = path.read_bytes(); item = {"file": label, "sha256": build.file_sha256(path)}
             with TTFont(io.BytesIO(data)) as font:
-                item["head_bounds"] = audit.head_bounds_status(font)
+                item["head_bounds"] = head_bounds_status(font)
                 item["dash_structure"] = build.upstream_dash_structure_status(font, region)
                 item["family_length"] = build.family_name_length_status(font)
                 if weight_name is None:
@@ -67,11 +69,11 @@ def main() -> None:
                 family = (build.vf_family(region) if weight_name is None else build.static_family(region))
                 if font["name"].getDebugName(16) != family or f"project {build.VERSION}" not in font["name"].getDebugName(5):
                     failures.append({"file": label, "kind": "family_or_version"})
-            weights = tuple(audit.INTER_POSITION_WEIGHTS) if weight_name is None else (None,)
+            weights = tuple(audit.AXIS_POINTS) if weight_name is None else (None,)
             item["width_features"] = width_feature_status(data, weights)
             # All feature combinations and languages are checked at the default
             # instance here; the full audit covers thirteen variable locations.
-            item["vertical_segments"] = audit.vertical_segment_runtime_status(path)
+            item["vertical_segments"] = vertical_segment_runtime_status(path)
             for kind, status in item.items():
                 if isinstance(status, dict) and status.get("ok") is False:
                     failures.append({"file": label, "kind": kind})

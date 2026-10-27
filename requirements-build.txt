@@ -1,9 +1,9 @@
-fonttools[woff]==4.63.0
-uharfbuzz==0.56.0
+fonttools[woff]==4.67.0
+uharfbuzz==0.57.0
 freetype-py==2.5.1
-brotli==1.2.0
+brotli==1.2.1
 ttfautohint-py==0.6.1
-py7zr==1.1.3
+py7zr==1.1.4
 afdko==5.0.1
 chws-tool==1.4.5
 east-asian-spacing==1.4.5
