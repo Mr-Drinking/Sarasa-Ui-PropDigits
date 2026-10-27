@@ -1,7 +1,9 @@
 name: 单元测试与快速字体审计
 
 on:
+  # tag 指向的提交已在推送分支时检查过；只按分支触发，发布时不再把同一提交跑两遍。
   push:
+    branches: ['**']
   pull_request:
   workflow_dispatch:
 
