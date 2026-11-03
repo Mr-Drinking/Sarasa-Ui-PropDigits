@@ -52,8 +52,14 @@ class ReleaseIntegrityRegressions(unittest.TestCase):
         # on Windows before v1.0.43) binds hashes that a fresh checkout cannot reproduce.
         paths = {audit.ROOT / name for name in audit.audit_contract_manifest()}
         paths.update(Path(b.__file__).with_name(name) for name in b.BUILD_COMPONENT_SHA256)
-        paths.update(source for item in package.release_packages() for source, _name in item.files
-                     if source.suffix != ".ttf")
+        paths.update(source for source, _name in package.documentation_files())
+        try:
+            paths.update(source for item in package.release_packages() for source, _name in item.files
+                         if source.suffix != ".ttf")
+        except FileNotFoundError:
+            # Fonts are not in git: before a release is built or fetched only
+            # the repository's own files exist (the release commit's CI run).
+            pass
         carriage_returns = sorted(Path(os.path.relpath(path, b.ROOT)).as_posix()
                                   for path in paths if b"\r" in path.read_bytes())
         self.assertEqual(carriage_returns, [])
@@ -159,7 +165,8 @@ class ReleaseIntegrityRegressions(unittest.TestCase):
             with patch.multiple(b, ROOT=root, BUILD_CACHE_DIR=cache, STATIC_ROOT=root / "fonts/static",
                                 VARIABLE_DIR=root / "fonts/variable", REPORT_DIR=root / "reports",
                                 OUTPUT_VALIDATION_DIR=receipts), \
-                 patch.object(b, "verified_output_record_status", return_value=(True, "")):
+                 patch.object(b, "verified_output_record_status", return_value=(True, "")), \
+                 patch.object(b, "recycle_completed_transaction") as recycle:
                 with b.staged_build_outputs(["SC"], static_only=True, variable_only=False, unhinted_only=True,
                                            resume_static=False, resume_variable=False):
                     self.assertTrue(b.OUTPUT_STAGING_ROOT.is_relative_to(root))
@@ -172,6 +179,7 @@ class ReleaseIntegrityRegressions(unittest.TestCase):
                 self.assertEqual(len(list(b.static_dir("SC", False).glob("*.ttf"))), 12)
                 self.assertEqual(len(list(receipts.glob("*.json"))), 13)
                 self.assertEqual(unrelated.read_bytes(), b"retain")
+                recycle.assert_called_once()
                 source = root / "candidate"; source.write_bytes(b"unauthorized")
                 with self.assertRaisesRegex(ValueError, "越界"):
                     b.promote_build_outputs([(source, cache / "unrelated.txt")], root / "backup", validation_root=receipts)

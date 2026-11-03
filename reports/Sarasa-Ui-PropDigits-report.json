@@ -1,6 +1,6 @@
 {
   "family": "Sarasa Ui PropDigits",
-  "version": "1.0.43",
+  "version": "1.0.43.1",
   "regions": [
     "CL",
     "SC",
@@ -76,15 +76,16 @@
     "J": ".build-cache/work/official-sarasa-ui-1.0.43/J/unhinted/SarasaUiJ-Regular.ttf",
     "K": ".build-cache/work/official-sarasa-ui-1.0.43/K/unhinted/SarasaUiK-Regular.ttf"
   },
-  "method": "固定 Sarasa Gothic 1.0.43、Source Han Sans 2.005R、Inter 4.1、Shanggu Sans 1.028 与 Node.js 26.7.0；归档和已解包来源均按固定 SHA-256 核验。公开字重为 200/300/400/600/700/900，350 仅为隐藏 avar 锚点。CJK public 200/600 分别使用内部 250/500，Inter 使用公开数字坐标；先应用 Source Han public axis，再重映射 Inter 轮廓和 GPOS 变化。SC/TC/HC/J/K 各用对应地区 Source Han；CL 使用 K 基底与 Shanggu TC 覆盖，公开 cmap/layout 按 Sarasa Ui CL 边界裁剪。静态字体走原生 pass1/kanji/hangul/pass2，绝不由 VF 实例化。每字重建立同序的 96 个 pass1 与 12 个 CJK 输入，统一 instruct 后由 pass2 合成。Ui pass1 使用 --fallback-script=none --fallback-scaling；原生控制文件将 U+0360 归入相同 fallback，正常拉丁字母和数字保留原有 hint。生成后检查全部 Ui pass1 字形在 6–200 px、灰阶/单色/LCD 下的严格指令执行。实际 hinter 执行文件、版本、选项、控制文件和来源哈希参与相关缓存校验；布局、名称或版权刷新保护轮廓与 hint。静态 post 保持 format 3，竖排原点来自最终 glyf/vmtx，移除 TrueType 中的 VORG。VF 直接合并 CJK 与 Inter，合并 GDEF 变化存储、可变定位和 mark filtering sets。Italic CJK 先物化 IUP 隐含增量再剪切，metric phantom points 不剪切；用 13 个轴点检查复合字形。最终保留 HVAR，横向原点补偿转为轮廓与组件变化，移除 VVAR/VORG，竖排统一使用 gvar，并保持既有运行时轮廓边界和度量。37 个数字、空格、标点与运算符默认比例宽，tnum 恢复 tabular，pnum 不改变默认宽度；zero 及可达替代数字共享严格等宽变化曲线。ss03/cv10 保留替代字形自己的定位；完整恢复固定 Inter 的上下文大小写规则与抑制规则，冒号规则在数字宽度替换前执行，兼容字符串边界、长串冒号和烘焙后的字母身份。西文文字系统按 Source Han 的语言路由；hani/kana/hang/bopo 默认采用地区标点，双省略号严格 2em。CL 中文破折号使用 Shanggu，西文使用 Source Han K。竖排长破折号拆为连续的 1em 片段，轮廓在 hint 前生成，最终重算全部字形的 head 包围盒。保留 Source Han/Shanggu 的 ccmp→locl→vert/vrt2 及 KOR 单破折号特例。最后追加 Noto CJK 交付后处理的 chws/vchw。命名、STAT、版权、版本和下划线度量按项目统一。发布审计使用明确的 23 节注册表，包含全码位、两端真实 HarfBuzz、跨引擎、布局、地区边界、指令和独立栅格参照。栅格参照从固定上游与独立默认 ttfautohint 分类构造，仅应用声明的 fallback 策略；原始上游像素差异另行记录。最终还需 OTS、独立环境下的分地区 FontBakery、逐图视觉验收与 21 包校验，任何覆盖缺失不得声明完整通过。",
+  "method": "固定 Sarasa Gothic 1.0.43、Source Han Sans 2.005R、Inter 4.1、Shanggu Sans 1.028 与 Node.js 26.12.1；归档和已解包来源均按固定 SHA-256 核验。公开字重为 200/300/400/600/700/900，350 仅为隐藏 avar 锚点。CJK public 200/600 分别使用内部 250/500，Inter 使用公开数字坐标；先应用 Source Han public axis，再重映射 Inter 轮廓和 GPOS 变化。SC/TC/HC/J/K 各用对应地区 Source Han；CL 使用 K 基底与 Shanggu TC 覆盖，公开 cmap/layout 按 Sarasa Ui CL 边界裁剪。静态字体走原生 pass1/kanji/hangul/pass2，绝不由 VF 实例化。每字重建立同序的 96 个 pass1 与 12 个 CJK 输入，统一 instruct 后由 pass2 合成。Ui pass1 使用 --fallback-script=none --fallback-scaling；原生控制文件将 U+0360、U+22EF 和竖排连接片段 归入相同 fallback，正常拉丁字母和数字保留原有 hint。生成后检查全部 Ui pass1 字形在 6–200 px、灰阶/单色/LCD 下的严格指令执行。实际 hinter 执行文件、版本、选项、控制文件和来源哈希参与相关缓存校验；布局、名称或版权刷新保护轮廓与 hint。静态 post 保持 format 3，竖排原点来自最终 glyf/vmtx，移除 TrueType 中的 VORG。VF 直接合并 CJK 与 Inter，合并 GDEF 变化存储、可变定位和 mark filtering sets；语言系统按上游规则逐一精确合并，再给远东文字与远东语言追加 DFLT/dflt 的特性，最终路由结构须与原生静态字体一致。Italic CJK 先物化 IUP 隐含增量再剪切，metric phantom points 不剪切；用 13 个轴点检查复合字形。最终保留 HVAR，横向原点补偿转为轮廓与组件变化，gvar 幽灵点步进在 13 个轴点与 HVAR 一致，移除 VVAR/VORG，竖排统一使用 gvar，并保持既有运行时轮廓边界和度量。37 个数字、空格、标点与运算符默认比例宽，tnum 恢复 tabular，pnum 不改变默认宽度；zero 及可达替代数字共享严格等宽变化曲线。ss03/cv10 保留替代字形自己的定位；完整恢复固定 Inter 的上下文大小写规则与抑制规则，冒号规则在数字宽度替换前执行，兼容字符串边界、长串冒号和烘焙后的字母身份。西文文字系统按 Source Han 的语言路由；hani/kana/hang/bopo 默认采用地区标点，双省略号严格 2em。西里尔、希腊文字的默认语言系统共用 DFLT/dflt 的特性，竖排替换保留各自路由。CL 中文破折号使用 Shanggu，西文使用 Source Han K。竖排长破折号拆为连续的 1em 片段，轮廓在 hint 前生成，最终重算全部字形的 head 包围盒。保留 Source Han/Shanggu 的 ccmp→locl→vert/vrt2 及 KOR 单破折号特例。最后追加 Noto CJK 交付后处理的 chws/vchw。命名、STAT、版权、版本和下划线度量按项目统一。发布审计使用明确的 23 节注册表，包含全码位、两端真实 HarfBuzz、跨引擎、布局、地区边界、指令和独立栅格参照。栅格参照从固定上游与独立默认 ttfautohint 分类构造，仅应用声明的 fallback 策略；原始上游像素差异另行记录。最终还需 OTS、独立环境下的分地区 FontBakery、逐图视觉验收与 21 包校验，任何覆盖缺失不得声明完整通过。",
   "intentional_differences_from_upstream_sarasa_ui": [
     "37 个数字、空格、标点和运算符默认比例宽，tnum 恢复 tabular，pnum 不改变默认宽度；tnum+zero 数字在各引擎内严格等宽。",
     "公开 200/600 分别配对 CJK 250/500 与 Inter 200/600，350 仅为隐藏锚点；Heavy 900 是正式扩展样式。",
     "完整的 Inter 上下文规则与字母抑制规则在烘焙 ss03/cv10 后继续有效，并保留替代字形自己的定位。",
     "西文文字系统采用 Source Han 的语言路由；hani/kana/hang/bopo 默认采用地区 CJK 形式。CL 中文破折号使用 Shanggu，西文使用 Source Han K；CJK 双省略号严格 2em。",
+    "西里尔、希腊文字的默认语言系统共用 DFLT/dflt 的特性（tnum、zero、frac、mark、mkmk 等），竖排替换保留各自路由；上游 Sarasa Ui 与 Inter 在此只有 kern，俄文、希腊文段落无法选用等宽数字，组合附加符号也不定位。",
     "竖排连续破折号以 1em 片段接续，每段墨迹不越界，连接边严格一致；静态分段轮廓在 hint 前生成，最终 head 包围盒重新计算。",
     "CL 使用 Source Han K 和 Shanggu TC 来源，公开 cmap/layout 按 Sarasa Ui CL 边界裁剪。",
-    "Ui 原生 hint 对未分类字形及 U+0360 使用明确的 fallback 策略，修复无效指令；正常拉丁字母和数字的 hint 保持有效。",
+    "Ui 原生 hint 对未分类字形及 U+0360、U+22EF 和竖排连接片段 使用明确的 fallback 策略，修复无效指令；正常拉丁字母和数字的 hint 保持有效。",
     "VF 使用 HVAR 与 gvar 的统一度量表示，移除 VVAR/VORG；静态竖排使用最终 glyf/vmtx，post 保持 format 3。",
     "追加 Noto CJK 交付流程的 chws/vchw，是否自动启用由实际引擎和应用决定。",
     "静态与 VF 分别沿用固定静态源和可变源；记录源轮廓差异，并在公开字重以两端真实 HarfBuzz 对齐横竖度量。"
@@ -257,10 +258,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -1081,10 +1082,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -1905,10 +1906,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -2729,10 +2730,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -3553,10 +3554,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -4377,10 +4378,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -5201,10 +5202,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -6025,10 +6026,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -6736,7 +6737,7 @@
       "rebuilt": false,
       "resume_verified": true,
       "raw_gvar_integrity": {
-        "gvar_materialized_glyphs": 48566,
+        "gvar_materialized_glyphs": 48565,
         "gvar_raw_point_warning_count": 0,
         "gvar_raw_point_warning_glyphs": [],
         "gvar_coordinate_length_mismatches": 0,
@@ -6757,7 +6758,7 @@
       "head_flags": 15,
       "default_lsb_xmin_mismatches": 0,
       "raw_simple_glyph_flags": {
-        "glyphs_checked": 46905,
+        "glyphs_checked": 46904,
         "overlap_point_flags": 4,
         "invalid_explicit_overlap_flags": 0,
         "malformed_glyphs": 0
@@ -6780,10 +6781,10 @@
           "vertical_three": "glyph45577"
         },
         "vertical_segments": {
-          "begin": "glyph48562",
-          "middle": "glyph48563",
-          "end2": "glyph48564",
-          "end3": "glyph48565"
+          "begin": "glyph48561",
+          "middle": "glyph48562",
+          "end2": "glyph48563",
+          "end3": "glyph48564"
         },
         "locl": {
           "JAN ": {
@@ -6849,10 +6850,11 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50,
+              51
             ],
             "vrt2": [
-              50
+              53
             ]
           },
           "fullwidth_advance": 1000,
@@ -7560,7 +7562,7 @@
       "rebuilt": false,
       "resume_verified": true,
       "raw_gvar_integrity": {
-        "gvar_materialized_glyphs": 48527,
+        "gvar_materialized_glyphs": 48526,
         "gvar_raw_point_warning_count": 0,
         "gvar_raw_point_warning_glyphs": [],
         "gvar_coordinate_length_mismatches": 0,
@@ -7581,7 +7583,7 @@
       "head_flags": 15,
       "default_lsb_xmin_mismatches": 0,
       "raw_simple_glyph_flags": {
-        "glyphs_checked": 46903,
+        "glyphs_checked": 46902,
         "overlap_point_flags": 4,
         "invalid_explicit_overlap_flags": 0,
         "malformed_glyphs": 0
@@ -7604,10 +7606,10 @@
           "vertical_three": "glyph45577"
         },
         "vertical_segments": {
-          "begin": "glyph48523",
-          "middle": "glyph48524",
-          "end2": "glyph48525",
-          "end3": "glyph48526"
+          "begin": "glyph48522",
+          "middle": "glyph48523",
+          "end2": "glyph48524",
+          "end3": "glyph48525"
         },
         "locl": {
           "JAN ": {
@@ -7673,10 +7675,11 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49,
+              50
             ],
             "vrt2": [
-              49
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -8497,10 +8500,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -9321,10 +9324,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -10028,7 +10031,7 @@
   ],
   "static_outputs": [
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
       "region": "CL",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10039,7 +10042,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
       "region": "CL",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10050,7 +10053,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
       "region": "CL",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10061,7 +10064,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
       "region": "CL",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10072,7 +10075,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
       "region": "CL",
       "weight": "Light",
       "wght": 300,
@@ -10083,7 +10086,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
       "region": "CL",
       "weight": "Light",
       "wght": 300,
@@ -10094,7 +10097,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
       "region": "CL",
       "weight": "Light",
       "wght": 300,
@@ -10105,7 +10108,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
       "region": "CL",
       "weight": "Light",
       "wght": 300,
@@ -10116,7 +10119,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
       "region": "CL",
       "weight": "Regular",
       "wght": 400,
@@ -10127,7 +10130,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
       "region": "CL",
       "weight": "Regular",
       "wght": 400,
@@ -10138,7 +10141,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
       "region": "CL",
       "weight": "Regular",
       "wght": 400,
@@ -10149,7 +10152,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
       "region": "CL",
       "weight": "Regular",
       "wght": 400,
@@ -10160,7 +10163,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
       "region": "CL",
       "weight": "SemiBold",
       "wght": 600,
@@ -10171,7 +10174,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
       "region": "CL",
       "weight": "SemiBold",
       "wght": 600,
@@ -10182,7 +10185,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
       "region": "CL",
       "weight": "SemiBold",
       "wght": 600,
@@ -10193,7 +10196,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
       "region": "CL",
       "weight": "SemiBold",
       "wght": 600,
@@ -10204,7 +10207,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
       "region": "CL",
       "weight": "Bold",
       "wght": 700,
@@ -10215,7 +10218,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
       "region": "CL",
       "weight": "Bold",
       "wght": 700,
@@ -10226,7 +10229,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
       "region": "CL",
       "weight": "Bold",
       "wght": 700,
@@ -10237,7 +10240,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
       "region": "CL",
       "weight": "Bold",
       "wght": 700,
@@ -10248,7 +10251,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
       "region": "CL",
       "weight": "Heavy",
       "wght": 900,
@@ -10259,7 +10262,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
       "region": "CL",
       "weight": "Heavy",
       "wght": 900,
@@ -10270,7 +10273,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
       "region": "CL",
       "weight": "Heavy",
       "wght": 900,
@@ -10281,7 +10284,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
       "region": "CL",
       "weight": "Heavy",
       "wght": 900,
@@ -10292,7 +10295,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
       "region": "SC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10303,7 +10306,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
       "region": "SC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10314,7 +10317,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
       "region": "SC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10325,7 +10328,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
       "region": "SC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10336,7 +10339,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
       "region": "SC",
       "weight": "Light",
       "wght": 300,
@@ -10347,7 +10350,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
       "region": "SC",
       "weight": "Light",
       "wght": 300,
@@ -10358,7 +10361,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
       "region": "SC",
       "weight": "Light",
       "wght": 300,
@@ -10369,7 +10372,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
       "region": "SC",
       "weight": "Light",
       "wght": 300,
@@ -10380,7 +10383,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
       "region": "SC",
       "weight": "Regular",
       "wght": 400,
@@ -10391,7 +10394,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
       "region": "SC",
       "weight": "Regular",
       "wght": 400,
@@ -10402,7 +10405,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
       "region": "SC",
       "weight": "Regular",
       "wght": 400,
@@ -10413,7 +10416,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
       "region": "SC",
       "weight": "Regular",
       "wght": 400,
@@ -10424,7 +10427,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
       "region": "SC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10435,7 +10438,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
       "region": "SC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10446,7 +10449,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
       "region": "SC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10457,7 +10460,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
       "region": "SC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10468,7 +10471,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
       "region": "SC",
       "weight": "Bold",
       "wght": 700,
@@ -10479,7 +10482,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
       "region": "SC",
       "weight": "Bold",
       "wght": 700,
@@ -10490,7 +10493,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
       "region": "SC",
       "weight": "Bold",
       "wght": 700,
@@ -10501,7 +10504,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
       "region": "SC",
       "weight": "Bold",
       "wght": 700,
@@ -10512,7 +10515,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
       "region": "SC",
       "weight": "Heavy",
       "wght": 900,
@@ -10523,7 +10526,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
       "region": "SC",
       "weight": "Heavy",
       "wght": 900,
@@ -10534,7 +10537,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
       "region": "SC",
       "weight": "Heavy",
       "wght": 900,
@@ -10545,7 +10548,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
       "region": "SC",
       "weight": "Heavy",
       "wght": 900,
@@ -10556,7 +10559,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
       "region": "TC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10567,7 +10570,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
       "region": "TC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10578,7 +10581,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
       "region": "TC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10589,7 +10592,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
       "region": "TC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10600,7 +10603,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
       "region": "TC",
       "weight": "Light",
       "wght": 300,
@@ -10611,7 +10614,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
       "region": "TC",
       "weight": "Light",
       "wght": 300,
@@ -10622,7 +10625,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
       "region": "TC",
       "weight": "Light",
       "wght": 300,
@@ -10633,7 +10636,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
       "region": "TC",
       "weight": "Light",
       "wght": 300,
@@ -10644,7 +10647,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
       "region": "TC",
       "weight": "Regular",
       "wght": 400,
@@ -10655,7 +10658,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
       "region": "TC",
       "weight": "Regular",
       "wght": 400,
@@ -10666,7 +10669,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
       "region": "TC",
       "weight": "Regular",
       "wght": 400,
@@ -10677,7 +10680,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
       "region": "TC",
       "weight": "Regular",
       "wght": 400,
@@ -10688,7 +10691,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
       "region": "TC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10699,7 +10702,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
       "region": "TC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10710,7 +10713,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
       "region": "TC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10721,7 +10724,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
       "region": "TC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10732,7 +10735,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
       "region": "TC",
       "weight": "Bold",
       "wght": 700,
@@ -10743,7 +10746,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
       "region": "TC",
       "weight": "Bold",
       "wght": 700,
@@ -10754,7 +10757,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
       "region": "TC",
       "weight": "Bold",
       "wght": 700,
@@ -10765,7 +10768,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
       "region": "TC",
       "weight": "Bold",
       "wght": 700,
@@ -10776,7 +10779,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
       "region": "TC",
       "weight": "Heavy",
       "wght": 900,
@@ -10787,7 +10790,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
       "region": "TC",
       "weight": "Heavy",
       "wght": 900,
@@ -10798,7 +10801,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
       "region": "TC",
       "weight": "Heavy",
       "wght": 900,
@@ -10809,7 +10812,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
       "region": "TC",
       "weight": "Heavy",
       "wght": 900,
@@ -10820,7 +10823,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
       "region": "HC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10831,7 +10834,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
       "region": "HC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10842,7 +10845,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
       "region": "HC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10853,7 +10856,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
       "region": "HC",
       "weight": "ExtraLight",
       "wght": 200,
@@ -10864,7 +10867,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
       "region": "HC",
       "weight": "Light",
       "wght": 300,
@@ -10875,7 +10878,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
       "region": "HC",
       "weight": "Light",
       "wght": 300,
@@ -10886,7 +10889,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
       "region": "HC",
       "weight": "Light",
       "wght": 300,
@@ -10897,7 +10900,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
       "region": "HC",
       "weight": "Light",
       "wght": 300,
@@ -10908,7 +10911,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
       "region": "HC",
       "weight": "Regular",
       "wght": 400,
@@ -10919,7 +10922,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
       "region": "HC",
       "weight": "Regular",
       "wght": 400,
@@ -10930,7 +10933,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
       "region": "HC",
       "weight": "Regular",
       "wght": 400,
@@ -10941,7 +10944,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
       "region": "HC",
       "weight": "Regular",
       "wght": 400,
@@ -10952,7 +10955,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
       "region": "HC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10963,7 +10966,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
       "region": "HC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10974,7 +10977,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
       "region": "HC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10985,7 +10988,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
       "region": "HC",
       "weight": "SemiBold",
       "wght": 600,
@@ -10996,7 +10999,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
       "region": "HC",
       "weight": "Bold",
       "wght": 700,
@@ -11007,7 +11010,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
       "region": "HC",
       "weight": "Bold",
       "wght": 700,
@@ -11018,7 +11021,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
       "region": "HC",
       "weight": "Bold",
       "wght": 700,
@@ -11029,7 +11032,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
       "region": "HC",
       "weight": "Bold",
       "wght": 700,
@@ -11040,7 +11043,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
       "region": "HC",
       "weight": "Heavy",
       "wght": 900,
@@ -11051,7 +11054,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
       "region": "HC",
       "weight": "Heavy",
       "wght": 900,
@@ -11062,7 +11065,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
       "region": "HC",
       "weight": "Heavy",
       "wght": 900,
@@ -11073,7 +11076,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
       "region": "HC",
       "weight": "Heavy",
       "wght": 900,
@@ -11084,7 +11087,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
       "region": "J",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11095,7 +11098,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
       "region": "J",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11106,7 +11109,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
       "region": "J",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11117,7 +11120,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
       "region": "J",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11128,7 +11131,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
       "region": "J",
       "weight": "Light",
       "wght": 300,
@@ -11139,7 +11142,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
       "region": "J",
       "weight": "Light",
       "wght": 300,
@@ -11150,7 +11153,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
       "region": "J",
       "weight": "Light",
       "wght": 300,
@@ -11161,7 +11164,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
       "region": "J",
       "weight": "Light",
       "wght": 300,
@@ -11172,7 +11175,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
       "region": "J",
       "weight": "Regular",
       "wght": 400,
@@ -11183,7 +11186,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
       "region": "J",
       "weight": "Regular",
       "wght": 400,
@@ -11194,7 +11197,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
       "region": "J",
       "weight": "Regular",
       "wght": 400,
@@ -11205,7 +11208,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
       "region": "J",
       "weight": "Regular",
       "wght": 400,
@@ -11216,7 +11219,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
       "region": "J",
       "weight": "SemiBold",
       "wght": 600,
@@ -11227,7 +11230,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
       "region": "J",
       "weight": "SemiBold",
       "wght": 600,
@@ -11238,7 +11241,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
       "region": "J",
       "weight": "SemiBold",
       "wght": 600,
@@ -11249,7 +11252,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
       "region": "J",
       "weight": "SemiBold",
       "wght": 600,
@@ -11260,7 +11263,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
       "region": "J",
       "weight": "Bold",
       "wght": 700,
@@ -11271,7 +11274,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
       "region": "J",
       "weight": "Bold",
       "wght": 700,
@@ -11282,7 +11285,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
       "region": "J",
       "weight": "Bold",
       "wght": 700,
@@ -11293,7 +11296,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
       "region": "J",
       "weight": "Bold",
       "wght": 700,
@@ -11304,7 +11307,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
       "region": "J",
       "weight": "Heavy",
       "wght": 900,
@@ -11315,7 +11318,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
       "region": "J",
       "weight": "Heavy",
       "wght": 900,
@@ -11326,7 +11329,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
       "region": "J",
       "weight": "Heavy",
       "wght": 900,
@@ -11337,7 +11340,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
       "region": "J",
       "weight": "Heavy",
       "wght": 900,
@@ -11348,7 +11351,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
       "region": "K",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11359,7 +11362,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
       "region": "K",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11370,7 +11373,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
       "region": "K",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11381,7 +11384,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
       "region": "K",
       "weight": "ExtraLight",
       "wght": 200,
@@ -11392,7 +11395,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
       "region": "K",
       "weight": "Light",
       "wght": 300,
@@ -11403,7 +11406,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Light.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
       "region": "K",
       "weight": "Light",
       "wght": 300,
@@ -11414,7 +11417,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
       "region": "K",
       "weight": "Light",
       "wght": 300,
@@ -11425,7 +11428,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-LightItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
       "region": "K",
       "weight": "Light",
       "wght": 300,
@@ -11436,7 +11439,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
       "region": "K",
       "weight": "Regular",
       "wght": 400,
@@ -11447,7 +11450,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Regular.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
       "region": "K",
       "weight": "Regular",
       "wght": 400,
@@ -11458,7 +11461,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
       "region": "K",
       "weight": "Regular",
       "wght": 400,
@@ -11469,7 +11472,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Italic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
       "region": "K",
       "weight": "Regular",
       "wght": 400,
@@ -11480,7 +11483,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
       "region": "K",
       "weight": "SemiBold",
       "wght": 600,
@@ -11491,7 +11494,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-SemiBold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
       "region": "K",
       "weight": "SemiBold",
       "wght": 600,
@@ -11502,7 +11505,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
       "region": "K",
       "weight": "SemiBold",
       "wght": 600,
@@ -11513,7 +11516,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
       "region": "K",
       "weight": "SemiBold",
       "wght": 600,
@@ -11524,7 +11527,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
       "region": "K",
       "weight": "Bold",
       "wght": 700,
@@ -11535,7 +11538,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Bold.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
       "region": "K",
       "weight": "Bold",
       "wght": 700,
@@ -11546,7 +11549,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
       "region": "K",
       "weight": "Bold",
       "wght": 700,
@@ -11557,7 +11560,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
       "region": "K",
       "weight": "Bold",
       "wght": 700,
@@ -11568,7 +11571,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
       "region": "K",
       "weight": "Heavy",
       "wght": 900,
@@ -11579,7 +11582,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Heavy.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
       "region": "K",
       "weight": "Heavy",
       "wght": 900,
@@ -11590,7 +11593,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
       "region": "K",
       "weight": "Heavy",
       "wght": 900,
@@ -11601,7 +11604,7 @@
       "resume_static_verified": true
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
       "region": "K",
       "weight": "Heavy",
       "wght": 900,

@@ -13,7 +13,7 @@ from fontTools.ttLib import TTFont
 from . import contract as c
 from . import geometry, metadata, metrics, native, products, provenance, raster
 from .comparison import Sources
-from .differential import compare_pair, default_contexts, source_sequences
+from .differential import compare_pair, context_texts, default_contexts, paired_contexts, source_sequences
 from .outlines import compare_outlines
 from .oracles import IDEOGRAPH_RANGES, in_ranges, cjk_weight
 from .gate import SECTIONS, digest, summarize
@@ -70,10 +70,10 @@ def plan(regions=c.REGIONS):
         result[name] = dict(variable)
     result['hint_execution'] = {case.key: 1 for case in cases if case.hinted}
     for case in cases:
-        result['metadata'][case.key] = 21 if case.weight is None else 18 + (case.weight == 'Regular')
-        result['digit_features'][case.key] = 114 * len(case.weights)
+        result['metadata'][case.key] = 25 if case.weight is None else 20 + (case.weight == 'Regular')
+        result['digit_features'][case.key] = products.WIDTH_CASES * len(case.weights)
         result['colon_context'][case.key] = len(products.COLON_TEXTS) * 2 * len(products.WIDTH_FEATURES) * len(case.weights)
-        result['inter_positioning'][case.key] = (5 * len(products.KERN_TEXTS) + len(products.MARK_TEXTS)) * len(case.weights)
+        result['inter_positioning'][case.key] = products.POSITIONING_CASES * len(case.weights)
         result['vertical_joining'][case.key] = 7 * 8 * 3 * len(products.VERTICAL_DASH_RUN_TEXTS) * len(case.weights)
         if case.path.is_file():
             with TTFont(case.path, lazy=True) as font:
@@ -87,7 +87,7 @@ def plan(regions=c.REGIONS):
                     regressions = len({font.getGlyphID(font.getBestCmap()[ord(char)]) for char in raster.REGRESSION_TEXT
                                        if ord(char) in font.getBestCmap()})
                     result['hint_execution'][case.key] = (count * 2 + regressions * 193) * len(raster.MODES)
-    contexts = default_contexts()
+    contexts, paired = default_contexts(), paired_contexts()
     for region in regions:
         for italic in (False, True):
             path = c.reference_path(region, 'Regular', italic)
@@ -96,8 +96,15 @@ def plan(regions=c.REGIONS):
             with TTFont(path, lazy=True) as font:
                 repertoire = set(font.getBestCmap())
             probes = (path, c.cjk_path(region), c.inter_path(italic))
-            sequences = sum(all(ord(char) in repertoire for char in text) for text in source_sequences(probes)) if all(path.is_file() for path in probes) else 1
-            total = len(repertoire) + sequences
+            runs = ([text for text in source_sequences(probes) if all(ord(char) in repertoire for char in text)]
+                    if all(path.is_file() for path in probes) else ['?'])
+            # Each context measures its own probes (Cyrillic and Greek ones only
+            # the western repertoire), so cases are counted context by context.
+            texts = {context: context_texts(context, sorted(repertoire), runs) for context in paired}
+
+            def counted(selection, keep=lambda context: True, sequences=False):
+                return sum(sum(not sequences or len(text) > 1 for text in texts[context])
+                           for context in selection if keep(context))
             with TTFont(c.inter_path(italic), lazy=True) as inter:
                 inter_repertoire = set(inter.getBestCmap())
             result['inter_axis_curve'][c.display_path(c.vf_path(region, italic))] = 141 * sum(
@@ -107,15 +114,15 @@ def plan(regions=c.REGIONS):
                 key = paired_key(region, italic, weight)
                 result['horizontal_metrics'][key] = len(repertoire)
                 result['vertical_metrics'][key] = len(repertoire)
-                result['shaping_default'][key] = total * sum(ctx.feature == 'default' and ctx.language == 'und' for ctx in contexts)
-                result['shaping_languages'][key] = total * sum(ctx.feature == 'default' and ctx.language != 'und' for ctx in contexts)
-                result['shaping_features'][key] = total * sum(ctx.feature != 'default' for ctx in contexts) + products.SPACING_CASES
-                result['gsub_sequences'][key] = sequences * len(contexts)
-                result['gpos_values'][key] = total * len(contexts)
+                result['shaping_default'][key] = counted(paired, lambda ctx: ctx.feature == 'default' and ctx.language == 'und')
+                result['shaping_languages'][key] = counted(paired, lambda ctx: ctx.feature == 'default' and ctx.language != 'und')
+                result['shaping_features'][key] = counted(paired, lambda ctx: ctx.feature != 'default') + products.SPACING_CASES
+                result['gsub_sequences'][key] = counted(paired, sequences=True)
+                result['gpos_values'][key] = counted(paired)
             for weight_name in c.WEIGHTS:
                 for hinted in (False, True):
                     path = c.static_path(region, weight_name, italic, hinted)
-                    result['static_outlines'][c.display_path(path)] = total * len(contexts) + (
+                    result['static_outlines'][c.display_path(path)] = counted(contexts) + (
                         len(repertoire) if weight_name == 'Heavy' else 0)
                     result['raster'][c.display_path(path)] = len(repertoire) * len(raster.RASTER_PPEMS)
             if region == 'CL':
@@ -221,6 +228,11 @@ class Unit:
         if self.kind in ('shaping', 'metrics'):
             return [c.vf_path(self.region, self.italic), c.static_path(self.region, self.weight, self.italic, False)]
         paths = [self.case.path]
+        if self.kind == 'metadata' and self.weight is None:
+            # A VF's routes are checked against the native static Regular.
+            paths.append(c.static_path(self.region, 'Regular', self.italic, False))
+        if self.kind == 'metadata' and self.weight == 'Heavy' and self.hinted:
+            paths.append(c.static_path(self.region, 'Bold', self.italic, True))
         if self.kind == 'hint_execution' and self.weight != 'Heavy':
             paths.append(c.reference_path(self.region, self.weight, self.italic, True))
         if self.kind == 'raster':
@@ -261,7 +273,7 @@ def shaping_unit(region, italic, weight_name):
     weight = c.WEIGHTS[weight_name]
     source = Sources(region, italic, weight)
     try:
-        measured = compare_pair(variable, static, weight=weight, outlines=True,
+        measured = compare_pair(variable, static, weight=weight, outlines=True, contexts=paired_contexts(),
                                 explanation=source.explains, sample_limit=12,
                                 probe_sources=(c.reference_path(region, 'Regular', italic), c.cjk_path(region), c.inter_path(italic)))
     finally:
@@ -310,8 +322,8 @@ def static_outline_unit(case):
     source = Sources(case.region, case.italic, c.WEIGHTS[case.weight], variable=False)
     try:
         # Probe sequences come from the release itself; positions from the
-        # release after the OpenType-mandated PairSet ordering.
-        report = compare_pair(case.path, native.sorted_pair_reference(reference), outlines=True, explanation=source.explains,
+        # release as the project routes it (native.project_reference).
+        report = compare_pair(case.path, native.project_reference(reference), outlines=True, explanation=source.explains,
                               probe_sources=(reference, c.cjk_path(case.region), c.inter_path(case.italic)), sample_limit=12)
     finally:
         source.close()

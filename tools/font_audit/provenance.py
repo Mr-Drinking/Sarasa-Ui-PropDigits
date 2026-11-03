@@ -102,9 +102,9 @@ def source_groups() -> dict[str, list[Path]]:
     }
     for hinted in (False, True):
         variant = "TTF" if hinted else "TTF-Unhinted"
-        aggregate = f"SarasaUi-{variant}-{c.VERSION}.7z"
+        aggregate = f"SarasaUi-{variant}-{c.SARASA_VERSION}.7z"
         for region in c.REGIONS:
-            archive = aggregate if (c.WORK / "source-archives" / aggregate).is_file() else f"SarasaUi{region}-{variant}-{c.VERSION}.7z"
+            archive = aggregate if (c.WORK / "source-archives" / aggregate).is_file() else f"SarasaUi{region}-{variant}-{c.SARASA_VERSION}.7z"
             groups.setdefault(archive, []).extend(c.reference_path(region, weight, italic, hinted)
                 for weight in c.WEIGHTS if weight != "Heavy" for italic in (False, True))
     return groups

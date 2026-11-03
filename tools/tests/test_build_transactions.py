@@ -68,9 +68,12 @@ class BuildTransactionTests(unittest.TestCase):
             root=Path(directory);cache=root/'.cache';cache.mkdir()
             receipts=cache/'validation';receipts.mkdir()
             other=receipts/'unrelated.json';other.write_text('old')
+            # A completed transaction goes to the Recycle Bin; a test must not
+            # reach the real one.
             with patch.multiple(b,ROOT=root,BUILD_CACHE_DIR=cache,STATIC_ROOT=root/'fonts/static',
                                 VARIABLE_DIR=root/'fonts/variable',REPORT_DIR=root/'reports',OUTPUT_VALIDATION_DIR=receipts), \
-                 patch.object(b,'verified_output_record_status',return_value=(True,'')):
+                 patch.object(b,'verified_output_record_status',return_value=(True,'')), \
+                 patch.object(b,'recycle_completed_transaction') as recycle:
                 with b.staged_build_outputs(['SC'],static_only=True,variable_only=False,unhinted_only=True,
                                            resume_static=False,resume_variable=False):
                     other.write_text('updated by another build')
@@ -82,6 +85,8 @@ class BuildTransactionTests(unittest.TestCase):
                             b.write_json_atomic(b.output_validation_record_path(path),{
                                 'region':'SC','weight':str(stop['name']),'italic':italic,'hinted':False})
                 self.assertEqual(other.read_text(),'updated by another build')
+                recycle.assert_called_once()
+                self.assertEqual(recycle.call_args.args[0].parent.resolve(), (root/'.build-cache'/'transactions').resolve())
 
     def test_failed_promotion_restores_every_previous_file(self):
         with tempfile.TemporaryDirectory() as directory, patch.object(b, 'ROOT', Path(directory)):

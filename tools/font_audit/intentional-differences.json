@@ -59,7 +59,7 @@
     },
     {
       "id": "integer-source-scaling",
-      "oracle": "Inter 由 2048 em 换算为 1000 em 的步进允许至多 1 单位差异；附加符号的相对墨迹坐标允许两端各一次整数取整。数字等宽、原生公开字重指标和正体竖排连接不适用此容差。"
+      "oracle": "Inter 由 2048 em 换算为 1000 em 的步进，成品与各自的 Inter 来源允许至多 1 单位差异；VF 与静态字体之间的步进差，与两份 Inter 来源按 1/64 单位读取的差相比不得超过 1 单位（两端各自只取整一次）。附加符号的相对墨迹坐标允许两端各一次整数取整。数字等宽、原生公开字重指标和正体竖排连接不适用此容差。"
     },
     {
       "id": "engine-integer-bearings",
@@ -71,6 +71,11 @@
       "regions": ["CL"],
       "codepoints": [14985, 15000, 15011, 15024],
       "oracle": "㪉㪘㪣㪰 是有间距的汉字，保持来源轮廓与 1000 单位步进，修正上游将其误标记为 GDEF mark 的错误。"
+    },
+    {
+      "id": "cyrillic-greek-default-routing",
+      "scripts": ["cyrl", "grek"],
+      "oracle": "西里尔、希腊文字的默认语言系统共用 DFLT/dflt 的特性（tnum、zero、frac、ccmp、mark、mkmk 等），同名特性取 lookup 并集，vert/vrt2 保留各自路由；上游 Sarasa Ui 在此只有 kern 等少数特性，Inter 自身的 cyrl/grek GPOS 也只有 kern。静态字体对照按此规则改写路由后的固定 Sarasa Ui 成品排版；VF 与静态字体在每个语言系统的特性及其分组必须一致；Inter 来源在西里尔、希腊上下文按 DFLT 路由排版作为期望值；这两种文字默认语言下的竖排西文标点（省略号、破折号）与 DFLT 相同，按固定 Source Han 的 DFLT 运行时对照（v1.0.43 已是如此）。"
     }
   ]
 }

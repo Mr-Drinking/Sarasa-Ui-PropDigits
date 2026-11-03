@@ -2,7 +2,7 @@
 
 <p align="center">
   <img
-    src="assets/Sarasa_Ui_VF_Specimen.svg"
+    src="https://raw.githubusercontent.com/Mr-Drinking/Sarasa-Ui-PropDigits/main/assets/Sarasa_Ui_VF_Specimen.svg"
     alt="Sarasa Ui VF"
     title="Sarasa Ui VF"
   >
@@ -16,7 +16,9 @@
 
 ## 简介
 
-Sarasa Ui PropDigits 是面向中西文混排的更纱 Ui 衍生字体。当前版本为 **v1.0.43**，上游同步到 Sarasa Gothic 1.0.43。
+Sarasa Ui PropDigits 是面向中西文混排的更纱 Ui 衍生字体。当前版本为 **v1.0.43.1**，是 v1.0.43 的修订版，上游仍为 Sarasa Gothic 1.0.43。
+
+v1.0.43.1 修正了 VF 在“西里尔/希腊文字 + 中日韩语言”下组合附加符号不定位的问题（例如 Android 系统语言为中文时的俄文重音），让西里尔、希腊文字的默认语言系统也能使用 `tnum` 等特性，并修正 VF 的 gvar 步进与 Heavy 的部分度量；详见下文与 [v1.0.43.1 发布说明](https://github.com/Mr-Drinking/Sarasa-Ui-PropDigits/releases/tag/v1.0.43.1)。
 
 字体菜单中的家族名缩写为 **Sarasa Ui PD <地区>**，可变系列为 **Sarasa Ui VF PD <地区>**，本地化名称同样使用 PD。字重名称不缩写；文件名和 ZIP 名仍保留 PropDigits。
 
@@ -31,7 +33,7 @@ Sarasa Ui PropDigits 是面向中西文混排的更纱 Ui 衍生字体。当前�
 | J | Source Han Sans J | `0x8002019F` |
 | K | Source Han Sans K | `0x8028019F` |
 
-CL 的公开 cmap 和 layout 按 Sarasa Ui CL 的地区边界裁剪；西文标点仍使用 Source Han K。Sarasa 只覆盖其自带的尚古 1.025 子集（约 7,000 字），本项目使用完整的尚古 1.028，因此每个字重约有 720 个汉字的轮廓与 Sarasa Ui CL 不同（如 㓱 㙦 䌙，上游此处仍为 Source Han K 字形）。这些字保持尚古的原始位置，与 Sarasa 处理其子集内尚古字形的方式相同；官方成品的边距与竖排原点只用于与其字形相同的字。静态字体的 `post` 使用 format 3，不人为生成持久化字形名称。家族名、样式、实例名和 PostScript 名一起更新，并检查 Windows 的 31 字符限制。
+CL 的公开 cmap 和 layout 按 Sarasa Ui CL 的地区边界裁剪；西文标点仍使用 Source Han K。Sarasa 只覆盖其自带的尚古 1.025 子集（约 7,000 字），本项目使用完整的尚古 1.028，因此每个字重约有 720 个汉字的轮廓与 Sarasa Ui CL 不同（如 㓱 㙦 䌙，上游此处仍为 Source Han K 字形）。这些字保持尚古的原始位置，与 Sarasa 处理其子集内尚古字形的方式相同；官方成品的边距与竖排原点只用于与其字形相同的字。完整的尚古还带有自己的 `aalt`、`dlig`（部首与异体替代，大正、昭和、平成、令和与“株式会社”的合字），Sarasa 自带的子集没有，Sarasa Ui CL 与 VF 也都没有；v1.0.43 的 CL 静态字体曾带着它们，v1.0.43.1 起，静态字体的这两个特性只保留上游同名特性所作用的 lookup。静态字体的 `post` 使用 format 3，不人为生成持久化字形名称。家族名、样式、实例名和 PostScript 名一起更新，并检查 Windows 的 31 字符限制。
 
 ## 下载与使用
 
@@ -39,9 +41,9 @@ CL 的公开 cmap 和 layout 按 Sarasa Ui CL 的地区边界裁剪；西文标�
 
 | 包名 | 内容 |
 | --- | --- |
-| `Sarasa-Ui-VF-PropDigits-SC-TTF-1.0.43.zip` | 正体、斜体两个可变 TTF |
-| `SarasaUiPropDigitsSC-TTF-1.0.43.zip` | 六字重正斜体，共 12 个 hinted 静态 TTF |
-| `SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.zip` | 六字重正斜体，共 12 个 unhinted 静态 TTF |
+| `Sarasa-Ui-VF-PropDigits-SC-TTF-1.0.43.1.zip` | 正体、斜体两个可变 TTF |
+| `SarasaUiPropDigitsSC-TTF-1.0.43.1.zip` | 六字重正斜体，共 12 个 hinted 静态 TTF |
+| `SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1.zip` | 六字重正斜体，共 12 个 unhinted 静态 TTF |
 
 只接受单个字体文件且支持可变 TTF 的工具，可选对应地区的正体 VF；斜体另有文件。实际字重、语言、文字系统和 OpenType 特性由应用选择。字体本身不包含 Android 或 Windows 的系统字体替换工具。
 
@@ -73,11 +75,13 @@ CL 的公开 cmap 和 layout 按 Sarasa Ui CL 的地区边界裁剪；西文标�
 
 `tnum` 恢复这些字符的 Inter tabular 形态；数字本身严格等宽。`tnum + zero` 的斜线零与其他数字共享同一 advance 变化曲线。
 
+西里尔、希腊文字的默认语言系统（未标语言，或 ru、el 等没有单独记录的语言）与 DFLT/dflt 共用同一组特性，同名特性合并 lookup，竖排替换 `vert/vrt2` 保留各自的路由。上游 Sarasa Ui 在这里只有 `kern` 等少数特性，Inter 自身的 cyrl/grek GPOS 也只有 `kern`：俄文、希腊文段落开不了 `tnum`、`zero`、`frac`，`и́` 这类组合重音也不定位，会落在字母右侧。本项目把 Sarasa 给中日韩语言追加 DFLT/dflt 特性的同一规则延伸到这两个默认语言系统，这是与上游的有意差异。
+
 冒号沿用 Inter colon-run `calt`：`1:2`、`1:`、`:2` 上浮；`1:a`、`a:2`、`a:b` 和 `ķļņŗșț` 旁的冒号保持原位；`a::::::::::2` 只有后五个冒号上浮。相同规则覆盖 `tnum`、`pnum`、`zero` 及其组合。非冒号上下文规则和共享 lookup 保留，包括 `->`、`<->` 等 Inter 箭头连字；地区模板必须保留这些规则在默认西文中的引用。CJK 来源的破折号继续使用自己的排版规则。
 
 Inter 先烘焙 `tnum`，再依次烘焙 `ss03`、`cv10`，最后对上表 37 个码位恢复 `pnum`。这一顺序与 Sarasa 原生 pass1 衔接，逗号、分号保留默认外形及 `numr/dnom` 替换。烘焙改变 cmap 字形身份，同时保留替代字形的字偶距、附加符号锚点和组件关系。
 
-VF 按文字系统、语言和特性标签合并 Source Han 与 Inter 的布局引用，同名 `kern/ccmp` 保留双方适用的 lookup，`locl` 不按特性记录序号配对。Source Han 的地区 VF 按语言拆分部分竖排替换（如韩文 VF 的 JAN/ZHH/ZHT 不替换 `！：；？`，日文冒号改用旋转形）；原生静态字体对各语言使用同一组 `vert/vrt2` 时，VF 的这些语言也共用同一路由。路由可取自其他文字系统（TC 的 DFLT 本无 `！：；？` 的竖排替换），也可合并两条来源路由（Sarasa J 旋转冒号，同时替换 `！；？`）；结果按编码或绘制外框逐码位与原生静态字体核对。GDEF 沿用实际来源字形的类别及变化存储，不把静态字体的位置性字形名当作 VF 的身份。静态 GPOS SinglePos 格式 2 保留逐字形取值。GPOS PairSet 按第二字形编号排序：固定上游中部分 PairSet 未排序，HarfBuzz 会漏掉其中已存储的字偶距（如 ExtraLight、Light 的 `とっ`），本项目统一按 OpenType 规范排序。拆分 cmap 别名时同步继承布局输入，CL 的统一码与兼容码先按尚古来源字形分离，再覆盖轮廓。CL 的 `㪉㪘㪣㪰` 明确归为间距汉字，修正上游 GDEF 误标记造成的零步进。
+VF 按上游 Sarasa 的规则合并 Source Han 与 Inter 的语言系统：同一文字系统下的同一语言精确合并，不回退到默认语言（ot-builder 的合并方式）；再给远东文字（hani/kana/bopo/hang）的默认语言，以及任何文字下的远东语言（JAN/KOR/ZHS/ZHT/ZHH），追加 DFLT/dflt 的特性（Sarasa 的 `shareFeatures`）。同名 `kern/ccmp` 保留双方适用的 lookup，`locl` 不按特性记录序号配对。构建末尾要求 VF 与原生静态字体在每个语言系统的特性集合、以及各特性按 lookup 组合划分的语言分组完全一致；竖排替换另按效果核对。v1.0.43 的 VF 按运行时回退合并，cyrl/grek 下的 JAN/KOR/ZHH/ZHS/ZHT 因此缺少 `mark/mkmk/cpsp`，latn/CAT·MOL·ROM 则多出 Source Han 的 `kern` 和 `ccmp`。Source Han 的地区 VF 按语言拆分部分竖排替换（如韩文 VF 的 JAN/ZHH/ZHT 不替换 `！：；？`，日文冒号改用旋转形）；原生静态字体对各语言使用同一组 `vert/vrt2` 时，VF 的这些语言也共用同一路由。路由可取自其他文字系统（TC 的 DFLT 本无 `！：；？` 的竖排替换），也可合并两条来源路由（Sarasa J 旋转冒号，同时替换 `！；？`）；结果按编码或绘制外框逐码位与原生静态字体核对。GDEF 沿用实际来源字形的类别及变化存储，不把静态字体的位置性字形名当作 VF 的身份。静态 GPOS SinglePos 格式 2 保留逐字形取值。GPOS PairSet 按第二字形编号排序：固定上游中部分 PairSet 未排序，HarfBuzz 会漏掉其中已存储的字偶距（如 ExtraLight、Light 的 `とっ`），本项目统一按 OpenType 规范排序。拆分 cmap 别名时同步继承布局输入，CL 的统一码与兼容码先按尚古来源字形分离，再覆盖轮廓。CL 的 `㪉㪘㪣㪰` 明确归为间距汉字，修正上游 GDEF 误标记造成的零步进。
 
 拉丁、西里尔、希腊文字系统中的西文标点，以固定 Source Han 的实际排版为准，六地区规则一致：
 
@@ -103,17 +107,17 @@ hint 缓存绑定实际执行文件的 SHA-256、版本、选项、控制文件�
 
 VF 直接合并 CJK VF 与 Inter VF。Italic CJK 先物化 IUP 隐含增量，再以 em/3 为剪切中心倾斜 9.4°；此规则覆盖非 cmap 的竖排替代字形，最后四个 metric phantom points 不剪切。剪切后的增量按变化区间的先后逐级取整：每个变化区间在峰值处吸收默认轮廓与先前区间留下的取整误差，因此各峰值处的轮廓都只比实例化后正体轮廓的精确剪切值差 0.5 unit 以内；各自取整时误差会在区间重叠处叠加（`夜` 在 200 差约 2 unit）。静态破折号也使用同一中心；修正这一轮廓时需要重建对应 hint。韩文字形宽度归一化覆盖 GSUB 可达的非编码字形，原本零步进的组合字母仍保留零步进。
 
-构建时重建 HVAR/VVAR，最终保留 HVAR，将竖向变化统一到 `gvar` 并移除 VVAR/VORG，避免引擎采用不一致的原点路径。横向原点补偿写入轮廓和组件坐标。Inter 的轮廓、GPOS 变化和步进曲线保留双方轴映射及来源变化区间的全部折点；控制值直接取自原始 2048 单位的 Inter 曲线，增量在分层模型内逐级取整；轮廓再在 13 个控制字重逐点校正，每次校正只作用到相邻控制字重为止，每个控制点的轮廓误差不超过 0.5 unit。HVAR 步进同样取自原始 Inter，并保留六个原生静态字重的控制值，不用实例化、缩放后已取整的副本重新推算。删除线粗细通过 MVAR `strs` 随字重变化，Heavy 使用自己的删除线粗细与 PANOSE 字重。
+构建时重建 HVAR/VVAR，最终保留 HVAR，将竖向变化统一到 `gvar` 并移除 VVAR/VORG，避免引擎采用不一致的原点路径。横向原点补偿写入轮廓和组件坐标。Inter 的轮廓、GPOS 变化和步进曲线保留双方轴映射及来源变化区间的全部折点；控制值直接取自原始 2048 单位的 Inter 曲线，增量在分层模型内逐级取整；轮廓再在 13 个控制字重逐点校正，每次校正只作用到相邻控制字重为止：命名字重下，简单字形的每个点整体平移后与原始曲线相差不超过 0.5 unit；复合字形按组件分别对齐（见下文），各组件偏移各自取整，整字最多相差约 1.5 unit。已知例外：只能经 `salt` 到达的无编码替代字形（如 Ἱ、ṫ、ů 的替代形）在 VF 中没有校正到 Inter 的曲线，命名字重下与静态字体最多相差约 6 unit（Ἱ 在 900 斜体），v1.0.43 起如此，留待修复；审计因此暂不在 `salt` 下比较 VF 与静态字体。审计按整体平移后 2 unit 以内核对。HVAR 步进同样取自原始 Inter，并保留六个原生静态字重的控制值，不用实例化、缩放后已取整的副本重新推算；gvar 的幽灵点步进在 13 个轴控制点与 HVAR 一致，按 gvar 实例化的工具得到相同步进（v1.0.43 中 U+2014 在 700 为 907，HVAR 与静态 Bold 为 908）。删除线粗细通过 MVAR `strs` 随字重变化。Heavy 使用自己的删除线粗细、PANOSE 字重和竖排 vhea 极值；xAvgCharWidth 按上游规则由 Inter Black 换算（Inter 的值乘 1000/2048 后向下取整），不沿用 Bold 的值。
 
 VF 与 unhinted 静态字体使用 `gasp {0xFFFF: 0x000F}` 和开启 smart dropout 的最小 `prep`，同步更新 `maxp`。这段准备程序只控制栅格补点，不含逐字形 hint、`fpgm` 或 `cvt`，不对轮廓进行网格拟合。VF 还删除未被 fvar、STAT 或 FeatureParams 引用的自定义 name 记录。
 
-静态与 VF 分别遵循固定静态源和可变源，来源差异完整记录。发布字重的横竖度量让 HarfBuzz 同时读取两端成品；竖排边界及连接不一致属于失败项。横向位置与竖排原点都以实际墨迹为准：VF 与静态字体常以不同的离线控制点画出同一墨迹，例如斜体字形、Inter 的斜体来源与 `Ƴ`、`Ƙ` 的钩，以及 Source Han 可变与静态来源各自转换出的 `〱〲〳`。控制点 xMin（LSB）相等，或控制点 yMax 加 TSB（TrueType 的竖排原点）相等，都会移动墨迹，因此 LSB 与 TSB 取使墨迹与原生静态字体重合的值；步进仍逐字形严格相等。原生静态字体的墨迹按实际绘制的位置计算：上游 Sarasa 每个斜体约两万个字形的 LSB 与字形头比实际轮廓小 1 unit。Inter 组合字形在每个控制字重按原始 Inter 曲线的未取整位置校正组件偏移：各子字形的墨迹中心放到 Inter 中对应子字形的位置，子字形各自对齐时的取整不再累积到整字（此前 `½` 在 700 比静态字体窄约 3 unit），整字保持度量对齐后的墨迹边界。Inter 的可变附加符号锚点与字偶距在每个取样字重只取整一次：缩放到 1000 单位时舍去的默认值小数与原始曲线的变化量合并后取整，再以相邻控制点为界的变化行逐点重现。按 Inter 原有变化区间分别取整时，发布字重处会叠加相邻区间的小数（此前 700 的 `ToWa` 中 o–W 的字偶距为 −49.5，排版取整后比静态字体宽 1 unit）。字形墨迹因对齐原生静态字体而移动时，只有 1 unit 以上的平移才带动所附锚点，并由对应的原始锚点只取整一次；1 unit 以内的移动是原生静态字体自身的取整，其锚点并不随之移动，跟随它会让 600 的 `ê̌`、`Ê̌` 与 SemiBold 静态字体相差 2 unit 以上。比例标点在 13 个轴控制点对照固定 Source Han 的实际宽度，最终校准只更新 HVAR 的 advance 及对应右边距，保留公开字重与轮廓。
+静态与 VF 分别遵循固定静态源和可变源，来源差异完整记录。发布字重的横竖度量让 HarfBuzz 同时读取两端成品；竖排边界及连接不一致属于失败项。横向位置与竖排原点都以实际墨迹为准：VF 与静态字体常以不同的离线控制点画出同一墨迹，例如斜体字形、Inter 的斜体来源与 `Ƴ`、`Ƙ` 的钩，以及 Source Han 可变与静态来源各自转换出的 `〱〲〳`。控制点 xMin（LSB）相等，或控制点 yMax 加 TSB（TrueType 的竖排原点）相等，都会移动墨迹，因此 LSB 与 TSB 取使墨迹与原生静态字体重合的值；步进仍逐字形严格相等。原生静态字体的墨迹按实际绘制的位置计算：上游 Sarasa 每个斜体约两万个字形的 LSB 与字形头比实际轮廓小 1 unit。Inter 组合字形在每个控制字重按原始 Inter 曲线的未取整位置校正组件偏移：各子字形的墨迹中心放到 Inter 中对应子字形的位置，子字形各自对齐时的取整不再累积到整字（此前 `½` 在 700 比静态字体窄约 3 unit），整字保持度量对齐后的墨迹边界。Inter 的可变附加符号锚点与字偶距在每个取样字重只取整一次：缩放到 1000 单位时舍去的默认值小数与原始曲线的变化量合并后取整，再以相邻控制点为界的变化行逐点重现。按 Inter 原有变化区间分别取整时，发布字重处会叠加相邻区间的小数（此前 700 的 `ToWa` 中 o–W 的字偶距为 −49.5，排版取整后比静态字体宽 1 unit）。静态字体则沿用同字重 Inter 静态实例的整数字偶距，所以两份 Inter 来源跨过取整边界时，VF 与静态字体在命名字重会差 1 unit：拉丁、希腊、西里尔字母两两组合中，600 约有 1.9%，700 约 1.3%，300 约 0.5%，例如 600 的 `AT`，Inter VF 为 −87.60、取 −88，Inter SemiBold 为 −87.40、取 −87。少数字偶距两份 Inter 来源本身就不同，例如 `Ұ` 后接 ō、α 等小写字母，700 下 Inter VF 为 −109.6、Inter Bold 为 −56.6，VF 与静态字体也就相应不同。字形墨迹因对齐原生静态字体而移动时，只有 1 unit 以上的平移才带动所附锚点，并由对应的原始锚点只取整一次；1 unit 以内的移动是原生静态字体自身的取整，其锚点并不随之移动，跟随它会让 600 的 `ê̌`、`Ê̌` 与 SemiBold 静态字体相差 2 unit 以上。比例标点在 13 个轴控制点对照固定 Source Han 的实际宽度，最终校准只更新 HVAR 的 advance 及对应右边距，保留公开字重与轮廓。
 
-Windows 的 win 度量仍沿用上游的 968/241。部分字形墨迹超出该范围；例如固定上游 SC Regular 中有 183 个字形超界，其中 144 个可由 cmap 直接访问，GDI 按这组度量裁切时可能缺笔。本版不扩大这组度量；各应用对行高、裁切和字体边距的处理不同，实际效果以目标应用实测为准。
+Windows 的 win 度量仍沿用上游的 968/241。部分字形墨迹超出该范围；例如固定上游 SC Regular 中有 183 个字形超界，其中 144 个可由 cmap 直接访问，GDI 按这组度量裁切时可能缺笔。本版不扩大这组度量；各应用对行高、裁切和字体边距的处理不同，实际效果以目标应用实测为准。`head` 包围盒的上下界 1323/−549 由竖排用的 〱〲 决定，与上游相同；Android 的 TextView 默认开启 includeFontPadding 时按这组值留白，首末行会多出约 0.66 em（Inter 约 0.22 em），Android 实机验收应先看这一项。
 
 ## 固定来源
 
-2026-10-26 已重新联网检查四个上游，Sarasa Gothic 更新到 1.0.43，其余固定版本未变化：
+2026-11-02 再次联网检查四个上游，均无新版；v1.0.43.1 沿用 v1.0.43 的全部固定来源与工具链：
 
 | 上游 | 本轮查到的最新发布 | 本项目固定来源 |
 | --- | --- | --- |
@@ -136,6 +140,14 @@ npm 使用已核验的 Node 运行时执行 `npm ci --ignore-scripts`。本次�
 python tools\build_sarasa_ui_propdigits_sc.py
 ```
 
+字体成品不进 git，只随 GitHub Release 发布；构建在 `fonts/` 生成成品。要取得某个已发布版本的字体（例如在对应 tag 上复核发布包），用：
+
+```powershell
+python tools\fetch_release_fonts.py --root <检出该 tag 的目录>
+```
+
+它按目标检出中的 `reports/release-packages.json`，从该版本的 Release 下载三个全地区包，逐包、逐字体核对大小和 SHA-256 后解压到 `fonts/`；已有文件内容不同时拒绝覆盖。不加 `--root` 时作用于本检出。
+
 默认来源工作目录为仓库内的 `.build-cache/work`。构建、主审计和视觉入口使用 `.build-cache/build-audit-venv`，包括 `freetype-py==2.5.1`；FontBakery 使用独立的 `.build-cache/fontbakery-venv`，固定 FontBakery 1.1.0 与 freetype-py 2.3.0。两个环境分别执行 `pip check`，不能将不兼容的依赖合并安装。
 
 四份 `requirements-*.lock` 钉住直接及传递依赖的版本和 SHA-256，安装使用 `--require-hashes`；对应 `.txt` 是维护锁文件的输入。已有环境同时核对版本与安装 RECORD 中的文件 SHA-256，损坏时按锁文件重新安装。环境身份按 venv 目录判断，两个共享基础解释器的环境不会被混淆；目标环境重复启动后仍不匹配时明确失败。模块导入不创建环境、不安装依赖、不重启进程，环境准备仅在显式入口进行。`otc2otf` 等工具优先使用明确配置和私有环境中的执行文件。
@@ -147,7 +159,7 @@ python tools\build_sarasa_ui_propdigits_sc.py --variable-only --regions SC
 python tools\build_sarasa_ui_propdigits_sc.py --unhinted-only --regions SC,TC
 ```
 
-VF 入口先检查原生 unhinted 度量参考的版本、哈希、样式与布局；缺失或无效时重建所选地区参考，全程跳过 hint。其他入口包括 `--static-only`、`--resume-static`、`--resume-variable` 和 `--force-static-weights`。增量文件必须具有与当前代码和实际工具相符的校验记录，不能仅凭文件存在跳过构建。静态中间字体和最终化缓存同时绑定输入、配方、实际工具及输出 SHA-256；缓存内容损坏、缺少记录或来源改变时重新生成，不能把已有未知字节补写成新校验记录。`--unhinted-only` 和 VF 参考准备也会写入 README 与固定许可证副本。
+VF 入口先检查原生 unhinted 度量参考的版本、哈希、样式与布局；缺失或无效时重建所选地区参考，全程跳过 hint。其他入口包括 `--static-only`、`--resume-static`、`--resume-variable` 和 `--force-static-weights`。增量文件必须具有与当前代码和实际工具相符的校验记录，不能仅凭文件存在跳过构建。静态中间字体和最终化缓存同时绑定输入、配方、构建脚本与组件模块、依赖锁、实际工具及输出 SHA-256；缓存内容损坏、缺少记录或来源改变时重新生成，不能把已有未知字节补写成新校验记录。hinted 构建不能跳过 ttfautohint 或 Chlorophytum，Node 和 npm 也只能使用核验过的固定版本（可用 `SARASA_NODE_DIR` 改变其存放目录）；无 hint 成品请使用 `--unhinted-only`。`--unhinted-only` 和 VF 参考准备也会写入 README 与固定许可证副本。
 
 仅刷新项目版本时可用 `--refresh-version-from <原项目版本>`。入口要求原有整组 156 个字体与完整 OTS 输入记录匹配，在暂存目录更新 nameID 3、5 和 head 版本，逐表证明其他数据未改变；原版本记录与保护表哈希一并保留。
 
@@ -162,20 +174,21 @@ $env:HTTP_PROXY = 'http://127.0.0.1:7897'
 $env:HTTPS_PROXY = 'http://127.0.0.1:7897'
 ```
 
-下载有连接/读取超时、重试、长度与哈希检查，验证成功后才提交缓存文件。不要强行终止仍在工作的长任务。常用路径覆盖项为 `SARASA_WORK_ROOT`、`SARASA_SOURCE_DIR`、`VF_SOURCE_DIR`、`REFERENCE_SARASA_ROOT`、`SARASA_NODE_DIR`、`SARASA_BUILD_CACHE`、`SARASA_PYTHON_VENV` 和 `SARASA_FONTBAKERY_VENV`。
+下载有连接/读取超时、重试、长度与哈希检查，下载内容先在临时文件中核对固定 SHA-256，通过后才移到缓存路径。不要强行终止仍在工作的长任务。常用路径覆盖项为 `SARASA_WORK_ROOT`、`SARASA_SOURCE_DIR`、`VF_SOURCE_DIR`、`REFERENCE_SARASA_ROOT`、`SARASA_NODE_DIR`、`SARASA_BUILD_CACHE`、`SARASA_PYTHON_VENV` 和 `SARASA_FONTBAKERY_VENV`。
 
 ## 发布验收
 
 ```powershell
 python -m unittest discover -s tools/tests
 python tools\audit_sarasa_ui_propdigits.py --jobs 10
+python tools\check_quick_audit.py --jobs 10
 python tools\check_external_release.py
 python tools\render_visual_checks.py
 ```
 
-主审计是独立的差分审计，代码位于 `tools/font_audit`，不导入构建模块，也不调用构建脚本自己的判定函数。主干是两条覆盖全面的不变量：发布字重下 VF 与同字重静态字体一致；每个静态字体与固定 Sarasa Ui 同地区成品一致。比较在全 cmap、来源 GSUB 可达的合字与替代序列、多种文字系统与语言、横排竖排，以及 `palt/halt/kern/vpal/vhal/vert/vrt2` 下进行，用 HarfBuzz 实际排版分别比对 cluster、advance、offset、墨迹包围盒和轮廓。横竖名义度量、CJK 字形位置、Inter 对照与附加符号定位按绘制轮廓的实际墨迹测量：HarfBuzz 包围盒包含离线控制点，TrueType 竖排原点随控制点 yMax 变化，且 HarfBuzz 对 2048 单位的缩放字体与 1000 单位成品取整方式不同。步进仍严格相等；名义度量的墨迹位置允许 1 unit 的取整差，排版运行与附加符号的墨迹位置允许 2 unit。附加符号的定位以 1/64 unit 精度读取：HarfBuzz 在 1000 单位下会对 2048 单位来源的锚点默认值与变化量分别取整。VF 的 Inter 轮廓直接对照原始曲线，不对照缩放取整后的副本；CL 汉字在尚古 TC 的可变与静态来源本身不同时（如 㒶），分别对照两份来源；CL 静态字体中与官方成品不同的汉字改为对照固定尚古 1.028 静态来源，必须是相同坐标上的同一轮廓，步进与偏移也完全相同。TrueType 来源与构建一样先剪切存储点，再由其得出隐含的曲线点。差异只有在固定 Inter、Source Han 或尚古来源独立复现时才算有依据；[有意差异清单](tools/font_audit/intentional-differences.json)逐项写明对应的来源核验，清单本身不能跳过比较。Heavy 没有上游成品，因此逐码位对照 Inter Black 与 Source Han Heavy（CL 为尚古 Heavy）的轮廓，并分别比较有、无 GPOS 时的定位效果，不能借用 Bold 作为判定基准。
+主审计是独立的差分审计，代码位于 `tools/font_audit`，不导入构建模块，也不调用构建脚本自己的判定函数。主干是两条覆盖全面的不变量：发布字重下 VF 与同字重静态字体一致；每个静态字体与固定 Sarasa Ui 同地区成品一致。比较在全 cmap、来源 GSUB 可达的合字与替代序列、多种文字系统与语言、横排竖排，以及 `palt/halt/kern/vpal/vhal/vert/vrt2` 下进行，用 HarfBuzz 实际排版分别比对 cluster、advance、offset、墨迹包围盒和轮廓。语言覆盖未标语言、en/ro/mo/lt/ca 与五个中日韩语言；西里尔、希腊文字另测各自的默认语言、ru/el 与五个中日韩语言及竖排，这两种文字只测拉丁、希腊、西里尔字符及其附加符号与标点。VF 与静态字体另在 `case/frac/numr/dnom/sups/subs/sinf/ordn/zero/tnum/dlig` 下逐一对照（Sarasa Ui 保留了 Inter 的 `ss01–ss08`、`cv01–cv14` 特性记录，但其替代字形已被裁掉，这些特性不改变排版）。语料另含 Inter 的上下文箭头（`->`、`<=>` 等）和西里尔、希腊字母加组合附加符号。横竖名义度量、CJK 字形位置、Inter 对照与附加符号定位按绘制轮廓的实际墨迹测量：HarfBuzz 包围盒包含离线控制点，TrueType 竖排原点随控制点 yMax 变化，且 HarfBuzz 对 2048 单位的缩放字体与 1000 单位成品取整方式不同。步进仍严格相等；名义度量的墨迹位置允许 1 unit 的取整差，排版运行与附加符号的墨迹位置允许 2 unit。成品与各自的 Inter 来源允许 1 unit 的步进差，但 VF 与静态字体之间的步进差，与两份 Inter 来源按 1/64 unit 读取的差相比不得超过 1 unit，两边各自只取整一次，不能叠加到 2 unit。附加符号的定位以 1/64 unit 精度读取：HarfBuzz 在 1000 单位下会对 2048 单位来源的锚点默认值与变化量分别取整。VF 的 Inter 轮廓直接对照原始曲线，不对照缩放取整后的副本；CL 汉字在尚古 TC 的可变与静态来源本身不同时（如 㒶），分别对照两份来源；CL 静态字体中与官方成品不同的汉字改为对照固定尚古 1.028 静态来源，必须是相同坐标上的同一轮廓，步进与偏移也完全相同。TrueType 来源与构建一样先剪切存储点，再由其得出隐含的曲线点。差异只有在固定 Inter、Source Han 或尚古来源独立复现时才算有依据；[有意差异清单](https://github.com/Mr-Drinking/Sarasa-Ui-PropDigits/blob/v1.0.43.1/tools/font_audit/intentional-differences.json)逐项写明对应的来源核验，审计直接从清单读取豁免码位，清单本身不能跳过比较。静态字体对照的上游成品先按本项目唯一的路由改动（西里尔、希腊默认语言系统共用 DFLT/dflt）改写，再比较排版；Inter 来源在西里尔、希腊上下文按 DFLT 路由排版。CJK 来源在它没有的 latn/ROM、MOL、CAT 下不应用自身特性（产品在那里只用 Inter 的特性，运行时回退会把韩文字母组合起来），西文标点仍按 Source Han 的运行时；西里尔、希腊默认语言的竖排标点按 DFLT 路径对照。VF 与静态字体选字相同、只有轮廓不同时，逐字形对照两份 Inter 来源。Heavy 没有上游成品，因此逐码位对照 Inter Black 与 Source Han Heavy（CL 为尚古 Heavy）的轮廓，并分别比较有、无 GPOS 时的定位效果；轮廓与定位数值不借用 Bold，只有与字重无关的语言路由，在结构上不同于来源时，按改写后的固定 Bold 成品核对。
 
-无法用差分验证的产品规则单独检查：37 个比例码位与 `tnum`、`zero` 的严格等宽（各字重下 FreeType 与 HarfBuzz 各自检查，不设取整容差），冒号上下文对照原始 Inter（VF 对照可变来源，静态字体对照同字重的 Inter 静态来源，含字符串边界和 1–16 个连续冒号），Inter 字偶距与附加符号定位（独立对照来源，不以引擎的回退定位为基准），350 附近的 Inter 步进曲线（200–900 每 5 个单位），竖排连续破折号，`chws/vchw` 在 VF 与静态字体间完全一致且确实生效，13 个轴点的 FreeType/HarfBuzz 跨引擎度量（保留两者各自整数取整的原始差异），复合字形插值，hint 执行与栅格，元数据，地区字符集，尚古覆盖，固定来源与许可证。
+无法用差分验证的产品规则单独检查：37 个比例码位与 `tnum`、`zero` 的严格等宽（拉丁、西里尔、希腊数字串，各字重下 FreeType 与 HarfBuzz 各自检查，不设取整容差），冒号上下文对照原始 Inter（VF 对照可变来源，静态字体对照同字重的 Inter 静态来源，含字符串边界和 1–16 个连续冒号），Inter 字偶距与附加符号定位（含西里尔、希腊字母在默认语言与中日韩语言下的组合重音；独立对照来源，不以引擎的回退定位为基准），VF 与同地区静态 Regular 的路由结构（每个语言系统的特性集合，以及各特性按 lookup 组合的语言分组），13 个轴点上 gvar 幽灵点与 HVAR 的步进一致，命名记录逐条核对（含本地化名），hinted 字体确实带 hint（Heavy 带指令的字形不少于同地区 Bold）、VF 与 unhinted 字体不带逐字形指令，每个字形的 lsb 等于存储的 xMin（只重算斜体偏保守的边界而不改 lsb，字形会横移），350 附近的 Inter 步进曲线（200–900 每 5 个单位），竖排连续破折号，`chws/vchw` 在 VF 与静态字体间完全一致且确实生效，13 个轴点的 FreeType/HarfBuzz 跨引擎度量（保留两者各自整数取整的原始差异），复合字形插值，hint 执行与栅格，元数据，地区字符集，尚古覆盖，固定来源与许可证。
 
 主审计共 **23 节**。各节的用例计划从实际字体与来源清单推导，不采信报告自带的计数或完成标志；空章节、缺项、重复、身份错误或用例不足都不能 PASSED，完整发布要求 `total_failures=0`。打包器用当前字体重新推导计划并重算门槛。局部运行（`--regions`、`--sections`）只写入 `.build-cache/release-audit-partial`，不能覆盖 `reports/release-audit.json`。审计按互相独立的单元并行执行；检查点绑定输入字体、审计程序、依赖锁、固定来源与实际工具，任一变化都会重新计算，已保存的失败仍然是失败。
 
@@ -183,19 +196,19 @@ python tools\render_visual_checks.py
 
 版权检查直接读取固定 Source Han 来源中的声明，同时核验根 LICENSE、NOTICE 和 12 份静态目录中的许可证副本。打包前重新比对这 14 份文档的哈希，审计后的修改会使报告失效。
 
-持续集成先从固定归档准备 Inter 静态/VF、Source Han SC 和六地区 Sarasa 原生参考，再运行单元测试；出现跳过测试即失败。`tools/check_quick_audit.py` 快速检查字体清单、名称、包围盒、数字特性、冒号和竖排分段。快速报告明确标记为非完整发布审计，不能用于放行 Release。
+持续集成先从固定归档准备 Inter 静态/VF、Source Han SC 和六地区 Sarasa 原生参考，再用 `tools/fetch_release_fonts.py` 取回本检出版本已发布的字体，然后运行单元测试；取回字体后出现跳过测试即失败。发布提交推送时该版本尚未发布，此时只允许依赖成品的测试跳过；Release（含预发布）发布后，`release-assets.yml` 在全新环境中下载实际资产，核验后跑完整单元测试（不允许跳过）与快速审计，通过后才标为正式版。`tools/check_quick_audit.py` 快速检查字体清单、名称、包围盒、数字特性、冒号和竖排分段。快速报告明确标记为非完整发布审计，不能用于放行 Release。
 
 OTS 9.3.0 必须 **156/156** 成功，无意外输出或丢表。FontBakery 1.1.0 必须按六地区、每批 **26 字体、`-J 4`** 运行，禁止一次载入 156 字体。发布门要求总状态通过，且逐项计数共 **630 PASS**：逐字体版本、Mac 名称、家族名长度和 smart dropout 各 156 项，正斜体 STAT 配对 6 项。
 
-上游已知 FAIL 的批准清单在发布工具中显式维护，当前为空。任何新增豁免必须记录检查标识、适用字体、固定来源的同项复现、原因和证据，不能将本项目已发现的缺陷改成观察项或隐藏 FAIL。
+此外，每个地区的 VF 正体与 hinted Regular、Italic、Heavy 跑完整的 `check-universal` 配置（VF 与静态字体是两个家族，分两批运行，否则同族检查会把两者混为一族而 FAIL），并与各自对应的固定 Sarasa Ui 成品（Heavy 对应 Bold）分开运行同一配置。成品的 FAIL 只有同时满足两条才放行：列在发布工具显式维护的批准清单里，且上游对应字体的同一检查也是 FAIL。ERROR 一律不放行，WARN 照实记录。当前清单有 `base_has_width`（U+0488、U+0489 在上游即为零步进）、`case_mapping`（上游缺少部分大小写对应字形）、`file_size`（全字集 CJK 字体远超网页字体的 9 MB 上限）和 `opentype/family/underline_thickness`（下划线粗细随字重变化，上游 Regular、Italic 为 68、Bold 为 92，本项目 Heavy 为 113）四项。斜体 VF 不跑完整配置：单是 `interpolation_issues` 一项，每个 VF 就要约 16 分钟，斜体 VF 由上面的逐字体检查与 STAT 正斜体配对覆盖。任何新增豁免都必须记录检查标识、适用字体、固定来源的同项复现和原因，不能把本项目已发现的缺陷改成观察项或隐藏 FAIL。
 
 视觉生成器为六地区各生成静态、可变、放大细节三张样张，共 **18 张**。静态样张覆盖全部 72 个 hinted 字体的 9、12、16 px。候选报告始终标记为未审阅；生成图片不等于完成验收。中文标签默认使用本项目 SC Regular unhinted，也可指定 `--label-font` 或 `SARASA_VISUAL_LABEL_FONT`，不依赖写死的系统路径。
 
-每张细节图另含七种文字系统／语言组合、37 个字符的默认／pnum／tnum 对照，以及正斜体、静态／VF 的 2em、3em、4 段、16 段与混合编码竖排对照。
+每张细节图另含七种文字系统／语言组合、37 个字符的默认／pnum／tnum 对照（关闭 `calt`，否则 `<=>` 会被 Inter 的箭头规则连成 ⇔，三个码位看不到），以及正斜体、静态／VF 的 2em、3em、4 段、16 段与混合编码竖排对照。
 
-逐图实际查看后，记录字重递进、正斜体、字偶距、附加符号、数字与冒号组合、语言路由、横竖标点和裁切情况。发布门核验图片与生成器哈希、每张图的审阅状态及非空的具体记录、上述用例，以及六地区和 156 个字体的清单；只有总记录标为通过不能放行。
+逐图实际查看后，记录字重递进、正斜体、字偶距、附加符号、数字与冒号组合、语言路由、横竖标点和裁切情况。发布门核验图片与生成器哈希、审阅者、每张图的审阅状态及非空的具体记录、上述用例，以及六地区和 156 个字体的清单；只有总记录标为通过不能放行。同类图片的记录在去掉地区名后不得逐字相同：v1.0.43 的 66 条记录去掉地区名后只剩 12 种文本，模板不能代替逐图审阅。
 
-本轮 Android 与 Unigram 实测均按用户决定暂缓，当前状态均为“未实测”。Android 可按[仓库中的验收清单](https://github.com/Mr-Drinking/Sarasa-Ui-PropDigits/blob/v1.0.43/docs/Android验收.md)后续补测；实机验收另记设备/应用版本、字体哈希、轴点、实际结果和截图，未实测的平台不写成已通过。字体审计和样张检查不代替目标应用的实测结论。
+本轮 Android 与 Unigram 实测均按用户决定暂缓，当前状态均为“未实测”。Android 可按[仓库中的验收清单](https://github.com/Mr-Drinking/Sarasa-Ui-PropDigits/blob/v1.0.43.1/docs/Android验收.md)后续补测；实机验收另记设备/应用版本、字体哈希、轴点、实际结果和截图，未实测的平台不写成已通过。字体审计和样张检查不代替目标应用的实测结论。
 
 发布验收报告绑定同一组字体哈希和对应工具代码，使用可移植路径。Git 原样保存 JSON 报告的字节，避免换行转换改变发布清单中记录的 SHA-256。通过后才打包：
 
@@ -204,4 +217,4 @@ python tools\package_release.py
 python tools\package_release.py --verify-only
 ```
 
-打包器要求字体完整、发布审计完整且哈希匹配，并重新核对审计绑定的来源和工具身份。每个静态目录仅允许 12 个确定名称的 TTF、README.txt 和 LICENSE-Sarasa-Gothic.txt；额外文件、临时文件、嵌套文件或链接均拒绝入包。默认输出到 `dist/v1.0.43`；新 ZIP 先核验内容再替换旧文件，生成模式写入 `SHA256SUMS.txt` 和 `reports/release-packages.json`。`--verify-only` 只读，不改写这两份文件。
+打包器要求字体完整、发布审计完整且哈希匹配，并重新核对审计绑定的来源和工具身份。每个静态目录仅允许 12 个确定名称的 TTF、README.txt 和 LICENSE-Sarasa-Gothic.txt；额外文件、临时文件、嵌套文件或链接均拒绝入包。默认输出到 `dist/v<版本>`；新 ZIP 先核验内容再替换旧文件，生成模式写入 `SHA256SUMS.txt` 和 `reports/release-packages.json`。`--verify-only` 只读，不改写这两份文件。复核已发布的版本要在对应 tag 上进行：先用 `tools/fetch_release_fonts.py` 取回该版本的字体，再运行 `--verify-only`；它同时核对审计报告绑定的工具出处，venv 重装或依赖变化后会如实报告不一致。

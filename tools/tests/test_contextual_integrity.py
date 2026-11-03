@@ -125,8 +125,9 @@ class ContextualIntegrity(unittest.TestCase):
         self.assertEqual(products.static_inter_style(400, True), "Italic")
         self.assertEqual(products.static_inter_style(900, True), "BlackItalic")
         semibold = contract.static_path("SC", "SemiBold", False, False)
-        if not semibold.exists():
-            self.skipTest("需要已构建的 SC SemiBold")
+        inter_semibold = contract.SARASA_SOURCE / "sources/Inter/Inter-SemiBold.ttf"
+        if not semibold.exists() or not inter_semibold.exists():
+            self.skipTest("需要已构建的 SC SemiBold 与固定 Inter SemiBold 静态来源")
         styles, original = [], products.source_inter
         def recording(italic, static_style=None, **options):
             styles.append(static_style)

@@ -5,7 +5,11 @@
 *.tmp
 build-*.ps1
 .build-cache/
+# 字体成品只随 GitHub Release 发布，用 tools/fetch_release_fonts.py 取回。
+/fonts/
 reports/visual-candidates.json
+# 只构建部分地区或只刷新时写的部分报告；完整构建另写正式报告。
+reports/*.partial-*.json
 artifacts/
 dist/
 __pycache__/

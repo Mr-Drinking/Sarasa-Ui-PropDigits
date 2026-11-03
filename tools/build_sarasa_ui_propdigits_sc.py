@@ -174,9 +174,10 @@ def log_step(message: str) -> None:
 
 
 SARASA_VERSION = "1.0.43"
-VERSION = "1.0.43"
-FONT_REVISION = 1.043
-OPENTYPE_VERSION = "1.043"
+VERSION = "1.0.43.1"
+# head.fontRevision and the nameID 5 prefix: 1.0.43 is written 1.043, 1.0.43.1 1.0431.
+OPENTYPE_VERSION = "1." + "".join(VERSION.split(".")[1:])
+FONT_REVISION = float(OPENTYPE_VERSION)
 VISUAL_VERTICAL_RUN_TEXTS = ("甲……乙——丙⸺丁", "甲……乙———丙⸻丁",
                            "甲————乙⸺⸻丁", "甲————————————————乙")
 SARASA_TAG = f"v{SARASA_VERSION}"
@@ -597,21 +598,10 @@ SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT = {
     700: 700,
     900: 900,
 }
-EM_DASH_PROBE_WEIGHTS = (
-    200,
-    250,
-    300,
-    325,
-    350,
-    375,
-    400,
-    500,
-    600,
-    650,
-    700,
-    800,
-    900,
-)
+# The 13 public-axis controls: the named weights, the hidden 350 anchor and
+# the points between them where the Inter and Source Han curves are checked.
+AXIS_CONTROL_WEIGHTS = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
+EM_DASH_PROBE_WEIGHTS = AXIS_CONTROL_WEIGHTS
 INTER_OUTLINE_TRANSLATION_TOLERANCE = 2.0
 INTER_OUTLINE_AUDIT_WEIGHTS = list(EM_DASH_PROBE_WEIGHTS)
 INTER_COMPOSITE_CONTROL_WEIGHTS = list(INTER_OUTLINE_AUDIT_WEIGHTS)
@@ -740,10 +730,6 @@ def static_uses_official_glyph_baseline(weight_name: str) -> bool:
 
 def reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
     return region_reference_dir(region, False) / f"{sarasa_region_prefix(region)}-{reference_style_name(weight_name, italic)}.ttf"
-
-
-def hinted_reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
-    return region_reference_dir(region, True) / f"{sarasa_region_prefix(region)}-{reference_style_name(weight_name, italic)}.ttf"
 
 
 def static_reference_font_path(region: str, weight_name: str, italic: bool) -> Path:
@@ -905,15 +891,28 @@ def set_windows_name_record(font: TTFont, name_id: int, value: str, lang_id: int
     font["name"].setName(value, name_id, 3, 1, lang_id)
 
 
-def set_zh_hans_name_records(font: TTFont, replacements: dict[int, str]) -> None:
-    for name_id, value in replacements.items():
-        set_windows_name_record(font, name_id, value, 0x0804)
-
-
 def set_localized_name_records(font: TTFont, region: str, replacements: dict[int, str]) -> None:
     lang_id = int(region_config(region)["local_lang_id"])
     for name_id, value in replacements.items():
         set_windows_name_record(font, name_id, value, lang_id)
+
+
+LOCALIZED_FAMILY_NAME_IDS = frozenset({1, 2, 4, 16, 17})
+
+
+def drop_foreign_family_names(font: TTFont, region: str) -> dict[str, int]:
+    """Family and style records only in English and the regional language.
+
+    The CL VF starts from Source Han Sans K: set_name_record turned its Korean
+    records into copies of the English names, which neither the static CL nor
+    Sarasa Ui CL carries.
+    """
+    keep = {0x409, int(region_config(region)["local_lang_id"])}
+    before = len(font["name"].names)
+    font["name"].names = [record for record in font["name"].names
+                          if record.nameID not in LOCALIZED_FAMILY_NAME_IDS
+                          or record.platformID != 3 or record.langID in keep]
+    return {"foreign_family_name_records_removed": before - len(font["name"].names)}
 
 
 def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
@@ -954,6 +953,7 @@ def update_vf_names(font: TTFont, region: str, italic: bool) -> None:
             17: subfamily,
         },
     )
+    drop_foreign_family_names(font, region)
     if "fvar" in font:
         update_fvar_instances(font, region, italic)
 
@@ -1459,6 +1459,42 @@ def sync_sarasa_metadata_from_reference(font: TTFont, reference: TTFont) -> dict
     return {"sarasa_metadata_fields_synced": 1}
 
 
+def derive_static_weight_metadata(font: TTFont, weight_name: str, italic: bool) -> dict[str, Any]:
+    """xAvgCharWidth for a weight Sarasa does not publish.
+
+    Heavy borrows the Bold release's OS/2 fields, but Sarasa's xAvgCharWidth
+    is its Inter source's value scaled to 1000 units and floored (618 to 661
+    from ExtraLight to Bold, verified here on every published weight), so
+    Bold's 661 stood for Heavy's 684.
+    """
+    with TTFont(inter_static_source_path(weight_name, italic), lazy=True) as inter:
+        average = inter["OS/2"].xAvgCharWidth * 1000 // inter["head"].unitsPerEm
+    if static_uses_official_glyph_baseline(weight_name):
+        if font["OS/2"].xAvgCharWidth != average:
+            raise ValueError(f"上游 xAvgCharWidth {font['OS/2'].xAvgCharWidth} 不符合 Inter 缩放取整规则 {average}")
+        return {"xavgcharwidth_rule_verified": average}
+    font["OS/2"].xAvgCharWidth = average
+    return {"derived_xavgcharwidth": average}
+
+
+def recalculate_derived_vertical_extremes(font: TTFont, weight_name: str) -> dict[str, Any]:
+    """vhea extremes of a weight Sarasa does not publish, from its glyph bounds.
+
+    Heavy borrowed Bold's (2000, -232, -706, 1931); its own glyphs give
+    (2000, -246, -722, 1932). The stored bounds are read as they are: italic
+    glyphs keep Sarasa's conservative bounds, and recalculating them moved
+    xMin off the left side bearing in 20,378 HeavyItalic glyphs, which
+    FreeType and HarfBuzz render 1 unit to the side. Published weights keep
+    the release's values.
+    """
+    if static_uses_official_glyph_baseline(weight_name):
+        return {}
+    vhea = font["vhea"]
+    vhea.recalc(font)
+    return {"derived_vhea_extremes": [vhea.advanceHeightMax, vhea.minTopSideBearing,
+                                      vhea.minBottomSideBearing, vhea.yMaxExtent]}
+
+
 def update_head_project_revision(font: TTFont) -> dict[str, float]:
     font["head"].fontRevision = FONT_REVISION
     return {"head_font_revision": FONT_REVISION}
@@ -1570,66 +1606,6 @@ def add_noto_contextual_spacing(path: Path) -> dict[str, Any]:
         "chws_present": has_chws,
         "vchw_present": has_vchw,
         "head_modified_preserved": modified_preserved,
-    }
-
-
-def glyph_coordinates_match(font: TTFont, glyph_name: str, reference: TTFont, ref_glyph_name: str) -> bool:
-    try:
-        coordinates, end_pts, flags = font["glyf"][glyph_name].getCoordinates(font["glyf"])
-        ref_coordinates, ref_end_pts, ref_flags = reference["glyf"][ref_glyph_name].getCoordinates(reference["glyf"])
-    except Exception:
-        return False
-    return (
-        len(coordinates) == len(ref_coordinates)
-        and list(end_pts) == list(ref_end_pts)
-        and list(flags) == list(ref_flags)
-        and all(tuple(coordinates[i]) == tuple(ref_coordinates[i]) for i in range(len(coordinates)))
-    )
-
-
-def sync_hinting_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
-    if "glyf" not in font or "glyf" not in reference:
-        return {"hint_tables_synced": 0, "hint_glyph_programs_synced": 0, "hint_glyph_programs_skipped": 0}
-
-    tables_synced = 0
-    for tag in ("fpgm", "prep", "cvt ", "gasp"):
-        if tag in reference:
-            font[tag] = copy.deepcopy(reference[tag])
-            tables_synced += 1
-        elif tag in font:
-            del font[tag]
-
-    if "maxp" in font and "maxp" in reference:
-        for field in (
-            "maxZones",
-            "maxTwilightPoints",
-            "maxStorage",
-            "maxFunctionDefs",
-            "maxInstructionDefs",
-            "maxStackElements",
-            "maxSizeOfInstructions",
-        ):
-            if hasattr(font["maxp"], field) and hasattr(reference["maxp"], field):
-                setattr(font["maxp"], field, copy.deepcopy(getattr(reference["maxp"], field)))
-
-    synced = 0
-    skipped = 0
-    empty_program = Program()
-    empty_program.fromBytecode([])
-    for glyph_name in font.getGlyphOrder():
-        if glyph_name not in reference["glyf"].glyphs:
-            skipped += 1
-            continue
-        if not glyph_coordinates_match(font, glyph_name, reference, glyph_name):
-            skipped += 1
-            continue
-        ref_program = getattr(reference["glyf"][glyph_name], "program", empty_program)
-        font["glyf"][glyph_name].program = copy.deepcopy(ref_program)
-        synced += 1
-    return {
-        "hint_tables_synced": tables_synced,
-        "hint_glyph_programs_synced": synced,
-        "hint_glyph_programs_skipped": skipped,
     }
 
 
@@ -2453,9 +2429,47 @@ def ensure_gvar_keys(font: TTFont) -> None:
             variations[glyph_name] = []
 
 
+def language_system_tags(font: TTFont) -> dict[str, dict[str, list[str]]]:
+    result = {}
+    for tag in ("GSUB", "GPOS"):
+        if tag in font and font[tag].table.ScriptList:
+            result[tag] = {record.ScriptTag: [entry.LangSysTag for entry in record.Script.LangSysRecord]
+                           for record in font[tag].table.ScriptList.ScriptRecord}
+    return result
+
+
+def restore_language_systems(font: TTFont, before: dict[str, dict[str, list[str]]]) -> int:
+    """Re-add the language systems the subsetter dropped as equal to their default.
+
+    fontTools removes such records unconditionally. A runtime falls back to the
+    default anyway, but the merge joins languages exactly, as Sarasa does: once
+    Source Han's cyrl/JAN had collapsed into cyrl/dflt, it never received the
+    DFLT/dflt marks that Sarasa's shareFeatures gives every Far East language.
+    """
+    restored = 0
+    for tag, scripts in before.items():
+        if tag not in font or not font[tag].table.ScriptList:
+            continue
+        for record in font[tag].table.ScriptList.ScriptRecord:
+            script = record.Script
+            present = {entry.LangSysTag for entry in script.LangSysRecord}
+            missing = [language for language in scripts.get(record.ScriptTag, []) if language not in present]
+            if not missing or script.DefaultLangSys is None:
+                continue
+            for language in missing:
+                entry = ot.LangSysRecord(); entry.LangSysTag = language
+                entry.LangSys = copy.deepcopy(script.DefaultLangSys)
+                script.LangSysRecord.append(entry)
+                restored += 1
+            script.LangSysRecord.sort(key=lambda entry: entry.LangSysTag)
+            script.LangSysCount = len(script.LangSysRecord)
+    return restored
+
+
 def subset_font(font: TTFont, unicodes: set[int]) -> None:
     flush_layout_aliases(font)
     ensure_gvar_keys(font)
+    languages = language_system_tags(font)
     options = subset.Options()
     options.layout_features = "*"
     options.name_IDs = "*"
@@ -2467,6 +2481,7 @@ def subset_font(font: TTFont, unicodes: set[int]) -> None:
     subsetter = subset.Subsetter(options=options)
     subsetter.populate(unicodes=unicodes)
     subsetter.subset(font)
+    restore_language_systems(font, languages)
     ensure_gvar_keys(font)
 
 
@@ -2865,8 +2880,10 @@ def prune_locl_like_reference(font: TTFont, region: str) -> dict[str, int]:
                     after += len(subtable.mapping)
                     if subtable.mapping:
                         lookup_has_mappings = True
-            elif lookup.LookupType != 7:
-                lookup_has_mappings = True
+            else:
+                # A contextual lookup, or an Extension wrapping one, has no
+                # single mappings to prune and stays routed.
+                lookup_has_mappings = bool(lookup.SubTable)
             if lookup_has_mappings:
                 kept_indices.append(lookup_index)
             else:
@@ -2882,16 +2899,64 @@ def prune_locl_like_reference(font: TTFont, region: str) -> dict[str, int]:
     }
 
 
-def copy_glyph_data(font: TTFont, source_name: str, target_name: str) -> None:
-    if source_name == target_name or source_name not in font["glyf"].glyphs or target_name not in font["glyf"].glyphs:
-        return
-    font["glyf"].glyphs[target_name] = copy.deepcopy(font["glyf"][source_name])
-    if source_name in font["hmtx"].metrics:
-        font["hmtx"].metrics[target_name] = copy.deepcopy(font["hmtx"].metrics[source_name])
-    if "vmtx" in font and source_name in font["vmtx"].metrics:
-        font["vmtx"].metrics[target_name] = copy.deepcopy(font["vmtx"].metrics[source_name])
-    if "gvar" in font:
-        font["gvar"].variations[target_name] = copy.deepcopy(font["gvar"].variations.get(source_name, []))
+# GSUB features a static takes from Inter alone, as the release and the VF do.
+RELEASE_ALIGNED_GSUB_FEATURES = ("aalt", "dlig")
+
+
+def lookup_input_glyphs(lookup: Any) -> set[str]:
+    """Glyphs at which a lookup can start to match."""
+    glyphs: set[str] = set()
+    for part in lookup.SubTable:
+        part = getattr(part, "ExtSubTable", part)
+        for field in ("mapping", "alternates", "ligatures"):
+            value = getattr(part, field, None)
+            if value is not None:
+                glyphs.update(value)
+        coverage = getattr(part, "Coverage", None)
+        if isinstance(coverage, list):
+            coverage = coverage[0] if coverage else None
+        if coverage is not None:
+            glyphs.update(coverage.glyphs)
+        if getattr(part, "InputCoverage", None):
+            glyphs.update(part.InputCoverage[0].glyphs)
+    return glyphs
+
+
+def prune_features_like_reference(font: TTFont, reference: TTFont,
+                                  tags: tuple[str, ...] = RELEASE_ALIGNED_GSUB_FEATURES) -> dict[str, Any]:
+    """Keep a lookup of these features only where the release's same feature acts.
+
+    Sarasa's kanji pass keeps an override's layout. Its own Shanggu subset has
+    none, but the full 1.028 fonts bring aalt and dlig for ideographs (radical
+    and variant alternates, era ligatures) that only the CL statics carried;
+    the Sarasa Ui CL release and the VF route Inter's alone. A lookup stays
+    when one of its input codepoints is an input of the release's lookups for
+    the same tag. The cmap subset that follows drops the orphaned alternates.
+    """
+    def input_codepoints(target: TTFont) -> dict[int, set[int]]:
+        reverse = glyph_to_unicodes(target)
+        lookups = target["GSUB"].table.LookupList.Lookup
+        return {index: set().union(*(reverse.get(glyph, set()) for glyph in lookup_input_glyphs(lookups[index])))
+                for index in range(len(lookups))}
+
+    if "GSUB" not in font or "GSUB" not in reference or not font["GSUB"].table.FeatureList:
+        return {"release_aligned_lookup_references_removed": 0}
+    released: dict[str, set[int]] = {}
+    reference_inputs = input_codepoints(reference)
+    for record in reference["GSUB"].table.FeatureList.FeatureRecord:
+        if record.FeatureTag in tags:
+            for index in record.Feature.LookupListIndex:
+                released.setdefault(record.FeatureTag, set()).update(reference_inputs[index])
+    inputs = input_codepoints(font)
+    removed = 0
+    for record in font["GSUB"].table.FeatureList.FeatureRecord:
+        if record.FeatureTag in tags:
+            kept = [index for index in record.Feature.LookupListIndex
+                    if inputs[index] & released.get(record.FeatureTag, set())]
+            removed += len(record.Feature.LookupListIndex) - len(kept)
+            record.Feature.LookupListIndex = kept
+            record.Feature.LookupCount = len(kept)
+    return {"release_aligned_lookup_references_removed": removed}
 
 
 def clone_glyph(font: TTFont, source_name: str, preferred_name: str, *, inherit_layout: bool = False) -> str | None:
@@ -3442,18 +3507,6 @@ def raw_gvar_integrity_status(path: Path) -> dict[str, Any]:
         or report["gvar_coordinate_length_mismatches"]
     )
     return report
-
-
-def simple_glyph_coordinates(font: TTFont, glyph_name: str) -> list[tuple[int, int]] | None:
-    if "glyf" not in font or glyph_name not in font["glyf"].glyphs:
-        return None
-    glyph = font["glyf"][glyph_name]
-    if glyph.isComposite():
-        return None
-    coordinates = glyph.getCoordinates(font["glyf"])[0]
-    if not coordinates:
-        return None
-    return [(x, y) for x, y in coordinates]
 
 
 def glyph_variation_control_coordinates(
@@ -4597,6 +4650,60 @@ def advance_supports(font: TTFont, weights: list[int]) -> dict[int, tuple[float,
     return supports
 
 
+def gvar_hvar_advance_mismatches(font: TTFont) -> list[tuple[str, int, int, float]]:
+    """(glyph, weight, HVAR advance, gvar phantom advance) at each axis control.
+
+    HarfBuzz and FreeType add the rounded HVAR delta to the default advance;
+    a tool that instances from gvar takes the phantom points instead.
+    """
+    if "gvar" not in font or "HVAR" not in font:
+        return []
+    hvar = font["HVAR"].table
+    locations = {weight: {"wght": normalized_wght(font, weight)} for weight in AXIS_CONTROL_WEIGHTS}
+    instancers = {weight: VarStoreInstancer(hvar.VarStore, font["fvar"].axes, location)
+                  for weight, location in locations.items() if location["wght"]}
+    mapping = hvar.AdvWidthMap.mapping if hvar.AdvWidthMap else None
+    mismatches = []
+    for gid, name in enumerate(font.getGlyphOrder()):
+        default = font["hmtx"].metrics[name][0]
+        index = mapping[name] if mapping else gid
+        count = gvar_coordinate_count(font, name)
+        variations = font["gvar"].variations.get(name, [])
+        for weight, instancer in instancers.items():
+            phantom = float(default)
+            for variation in variations:
+                scalar = supportScalar(locations[weight], variation.axes)
+                if scalar and len(variation.coordinates) == count:
+                    left, right = variation.coordinates[count - 4], variation.coordinates[count - 3]
+                    phantom += scalar * ((right[0] if right else 0) - (left[0] if left else 0))
+            target = default + otRound(instancer[index])
+            if otRound(phantom) != target:
+                mismatches.append((name, weight, target, phantom))
+    return mismatches
+
+
+def sync_gvar_advances_to_hvar(font: TTFont) -> dict[str, Any]:
+    """Make each gvar phantom advance agree with HVAR at every axis control.
+
+    The final calibrations write HVAR, which HarfBuzz, FreeType and the
+    native statics agree with; the phantom points kept Source Han's own
+    rounding (U+2014 at 700: 907 against 908 in HVAR and the Bold static).
+    A correction tent ends at the neighboring controls, so it changes no
+    other control weight.
+    """
+    mismatches = gvar_hvar_advance_mismatches(font)
+    supports = advance_supports(font, [weight for weight in AXIS_CONTROL_WEIGHTS if normalized_wght(font, weight)])
+    for name, weight, target, phantom in mismatches:
+        # An integer shift moves the rounded advance by exactly that much;
+        # otRound(target - phantom) overshoots when phantom ends in .5.
+        add_advance_tuple_variation(font, name, supports[weight], target - otRound(phantom))
+    remaining = gvar_hvar_advance_mismatches(font)
+    if remaining:
+        raise RuntimeError(f"gvar 幽灵点步进仍与 HVAR 不一致：{remaining[:6]!r}")
+    return {"gvar_phantom_advances_synced_to_hvar": len(mismatches),
+            "gvar_phantom_advance_sync_samples": [(name, weight, target) for name, weight, target, _ in mismatches[:12]]}
+
+
 def cmap_widths_at_weight(font: TTFont, weight_value: int) -> dict[int, int]:
     instance = instantiateVariableFont(font, {"wght": weight_value}, inplace=False, optimize=True)
     try:
@@ -5109,8 +5216,6 @@ def bake_single_substitution_feature(
     return count
 
 
-
-
 def shift_glyph_x(font: TTFont, glyph_name: str, dx: float) -> None:
     dx = otRound(dx)
     if not dx or glyph_name not in font["glyf"].glyphs:
@@ -5129,22 +5234,6 @@ def shift_glyph_x(font: TTFont, glyph_name: str, dx: float) -> None:
     glyph.recalcBounds(glyf)
 
 
-def shift_glyph_y(font: TTFont, glyph_name: str, dy: float) -> None:
-    dy = otRound(dy)
-    if not dy or glyph_name not in font["glyf"].glyphs:
-        return
-    glyf = font["glyf"]
-    glyph = glyf[glyph_name]
-    glyph.expand(glyf)
-    if glyph.isComposite():
-        for component in glyph.components:
-            component.y = otRound(component.y + dy)
-    elif glyph.numberOfContours > 0 and hasattr(glyph, "coordinates"):
-        for index, (x, y) in enumerate(glyph.coordinates):
-            glyph.coordinates[index] = x, y + dy
-    glyph.recalcBounds(glyf)
-
-
 def glyph_x_min(font: TTFont, glyph_name: str, fallback: int = 0) -> int:
     if glyph_name not in font["glyf"].glyphs:
         return fallback
@@ -5153,20 +5242,6 @@ def glyph_x_min(font: TTFont, glyph_name: str, fallback: int = 0) -> int:
         glyph.recalcBounds(font["glyf"])
         return getattr(glyph, "xMin", fallback)
     return fallback
-
-
-def sync_hmtx_lsb_to_glyph_bounds(font: TTFont) -> dict[str, int]:
-    if "hmtx" not in font or "glyf" not in font:
-        return {"hmtx_lsb_synced": 0}
-    touched = 0
-    for glyph_name, (advance_width, lsb) in list(font["hmtx"].metrics.items()):
-        if glyph_name not in font["glyf"].glyphs:
-            continue
-        new_lsb = glyph_x_min(font, glyph_name, lsb)
-        if new_lsb != lsb:
-            font["hmtx"].metrics[glyph_name] = (advance_width, new_lsb)
-            touched += 1
-    return {"hmtx_lsb_synced": touched}
 
 
 def set_advance_width(font: TTFont, glyph_name: str, width: int) -> None:
@@ -5183,23 +5258,6 @@ def freeze_advance_variation(font: TTFont, glyph_name: str) -> None:
         for index in range(len(variation.coordinates) - 4, len(variation.coordinates)):
             if variation.coordinates[index] is not None:
                 variation.coordinates[index] = (0, 0)
-
-
-def freeze_horizontal_advance_preserve_bearings(
-    font: TTFont,
-    glyph_name: str,
-) -> None:
-    if "gvar" not in font:
-        return
-    for variation in font["gvar"].variations.get(glyph_name, []):
-        if len(variation.coordinates) < 4:
-            continue
-        left_phantom = variation.coordinates[-4]
-        variation.coordinates[-3] = (
-            copy.deepcopy(left_phantom)
-            if left_phantom is not None
-            else (0, 0)
-        )
 
 
 def center_to_width(font: TTFont, glyph_name: str, width: int) -> None:
@@ -5424,20 +5482,6 @@ def shear_variation_deltas(variations: list[TupleVariation], default_errors: lis
         for index, value in enumerate(row):
             if value is not None:
                 variation.coordinates[index] = value, variation.coordinates[index][1]
-
-
-def piecewise_map(value: float, segment: dict[float, float]) -> float:
-    items = sorted(segment.items())
-    if value <= items[0][0]:
-        return items[0][1]
-    if value >= items[-1][0]:
-        return items[-1][1]
-    for (x0, y0), (x1, y1) in zip(items, items[1:]):
-        if x0 <= value <= x1:
-            if x1 == x0:
-                return y0
-            return y0 + (value - x0) * (y1 - y0) / (x1 - x0)
-    return value
 
 
 def inverse_piecewise_map(value: float, segment: dict[float, float]) -> float:
@@ -5760,70 +5804,6 @@ def rename_ot_glyph_references(obj: Any, rename: dict[str, str], seen: set[int] 
                 rename_ot_glyph_references(value, rename, seen)
 
 
-def apply_glyph_rename_map(font: TTFont, rename: dict[str, str]) -> None:
-    rename = {old: new for old, new in rename.items() if old != new}
-    if not rename:
-        return
-
-    font.setGlyphOrder([rename.get(glyph_name, glyph_name) for glyph_name in font.getGlyphOrder()])
-    if "glyf" in font:
-        glyf = font["glyf"]
-        glyf.glyphs = {rename.get(glyph_name, glyph_name): glyph for glyph_name, glyph in glyf.glyphs.items()}
-        for glyph in glyf.glyphs.values():
-            if glyph.isComposite():
-                for component in getattr(glyph, "components", []):
-                    component.glyphName = rename.get(component.glyphName, component.glyphName)
-    for table_tag in ("hmtx", "vmtx"):
-        if table_tag in font:
-            metrics = font[table_tag].metrics
-            font[table_tag].metrics = {
-                rename.get(glyph_name, glyph_name): value for glyph_name, value in metrics.items()
-            }
-    if "cmap" in font:
-        for cmap_table in font["cmap"].tables:
-            cmap_table.cmap = {
-                codepoint: rename.get(glyph_name, glyph_name) for codepoint, glyph_name in cmap_table.cmap.items()
-            }
-    if "gvar" in font:
-        font["gvar"].variations = {
-            rename.get(glyph_name, glyph_name): value for glyph_name, value in font["gvar"].variations.items()
-        }
-    if "VORG" in font:
-        records = font["VORG"].VOriginRecords
-        font["VORG"].VOriginRecords = {
-            rename.get(glyph_name, glyph_name): value for glyph_name, value in records.items()
-        }
-    for table_tag in ("GDEF", "GSUB", "GPOS", "BASE", "JSTF", "MATH", "COLR"):
-        if table_tag in font:
-            rename_ot_glyph_references(font[table_tag].table, rename)
-    if "maxp" in font:
-        font["maxp"].numGlyphs = len(font.getGlyphOrder())
-
-
-def rename_glyphs(font: TTFont, rename: dict[str, str]) -> int:
-    glyph_set = set(font.getGlyphOrder())
-    rename = {old: new for old, new in rename.items() if old != new and old in glyph_set}
-    if not rename:
-        return 0
-    targets = set(rename.values())
-    collisions = targets & (glyph_set - set(rename))
-    if collisions:
-        raise ValueError(f"Cannot rename glyphs onto existing glyphs: {sorted(collisions)[:8]}")
-
-    glyph_set = set(font.getGlyphOrder())
-    temporary: dict[str, str] = {}
-    for index, old in enumerate(rename):
-        candidate = f"zzTmpRename{index:05d}"
-        while candidate in glyph_set or candidate in targets:
-            index += 1
-            candidate = f"zzTmpRename{index:05d}"
-        temporary[old] = candidate
-        glyph_set.add(candidate)
-    apply_glyph_rename_map(font, temporary)
-    apply_glyph_rename_map(font, {temporary[old]: new for old, new in rename.items()})
-    return len(rename)
-
-
 def collect_ot_glyph_references(obj: Any, glyphs: set[str], out: set[str], seen: set[int] | None = None) -> None:
     if seen is None:
         seen = set()
@@ -5895,8 +5875,6 @@ def remove_glyphs(font: TTFont, glyph_names: set[str]) -> int:
     if "maxp" in font:
         font["maxp"].numGlyphs = len(font.getGlyphOrder())
     return len(removable)
-
-
 
 
 def import_name_id(
@@ -7467,17 +7445,19 @@ def align_layout_feature_template(
     reference: TTFont,
     table_tag: str,
     use_reference_lookup_indices: bool = False,
-) -> dict[str, int]:
+    strict: bool = False,
+) -> dict[str, Any]:
     key = table_tag.lower()
     if table_tag not in font or table_tag not in reference:
         return {f"{key}_feature_records_before_template": 0,
                 f"{key}_feature_records_after_template": 0,
                 f"{key}_empty_feature_records_added_from_template": 0,
-                f"{key}_langsys_after_template": 0}
+                f"{key}_langsys_after_template": 0,
+                f"{key}_template_features_unavailable": []}
     table, template = font[table_tag].table, reference[table_tag].table
     before = len(table.FeatureList.FeatureRecord) if table.FeatureList else 0
     actual, required = font_layout.routes(table), font_layout.routes(template)
-    selected = {}; empty = 0
+    selected = {}; empty = 0; unavailable = []
     for (script, language), features in required.items():
         current = font_layout.selected(actual, script, language)
         selected[(script, language)] = {}
@@ -7488,21 +7468,21 @@ def align_layout_feature_template(
             elif tag in current:
                 chosen = current[tag]
             else:
+                unavailable.append(f"{script}/{language.strip()}/{tag}")
                 continue
             selected[(script, language)][tag] = font_layout.Feature(
                 chosen.lookups, chosen.params, expected.required,
             )
+    # Dropping a template feature silently removed mark/mkmk/cpsp from the
+    # VF's cyrl/grek Far East languages; the VF has to route every one.
+    if strict and unavailable:
+        raise ValueError(f"{table_tag} 缺少模板要求的特性路由：" + "、".join(unavailable[:12]))
     font_layout.install(table, selected)
     return {f"{key}_feature_records_before_template": before,
             f"{key}_feature_records_after_template": len(table.FeatureList.FeatureRecord),
             f"{key}_empty_feature_records_added_from_template": empty,
-            f"{key}_langsys_after_template": len(selected)}
-
-
-def empty_coverage() -> ot.Coverage:
-    coverage = ot.Coverage()
-    coverage.glyphs = []
-    return coverage
+            f"{key}_langsys_after_template": len(selected),
+            f"{key}_template_features_unavailable": unavailable}
 
 
 VALUE_RECORD_FIELDS = [
@@ -7525,72 +7505,6 @@ def value_record_for_format(source: Any | None, value_format: int) -> ot.ValueRe
         if value_format & bit:
             setattr(record, attr, copy.deepcopy(getattr(source, attr, default)))
     return record
-
-
-def empty_gpos_subtable(lookup_type: int) -> Any:
-    if lookup_type == 1:
-        subtable = ot.SinglePos()
-        subtable.Format = 1
-        subtable.Coverage = empty_coverage()
-        subtable.ValueFormat = 0
-        subtable.Value = None
-        return subtable
-    if lookup_type == 2:
-        subtable = ot.PairPos()
-        subtable.Format = 1
-        subtable.Coverage = empty_coverage()
-        subtable.ValueFormat1 = 0
-        subtable.ValueFormat2 = 0
-        subtable.PairSet = []
-        subtable.PairSetCount = 0
-        return subtable
-    if lookup_type == 3:
-        subtable = ot.CursivePos()
-        subtable.Format = 1
-        subtable.Coverage = empty_coverage()
-        subtable.EntryExitRecord = []
-        subtable.EntryExitCount = 0
-        return subtable
-    if lookup_type == 4:
-        subtable = ot.MarkBasePos()
-        subtable.Format = 1
-        subtable.MarkCoverage = empty_coverage()
-        subtable.BaseCoverage = empty_coverage()
-        subtable.ClassCount = 0
-        subtable.MarkArray = ot.MarkArray()
-        subtable.MarkArray.MarkCount = 0
-        subtable.MarkArray.MarkRecord = []
-        subtable.BaseArray = ot.BaseArray()
-        subtable.BaseArray.BaseCount = 0
-        subtable.BaseArray.BaseRecord = []
-        return subtable
-    if lookup_type == 5:
-        subtable = ot.MarkLigPos()
-        subtable.Format = 1
-        subtable.MarkCoverage = empty_coverage()
-        subtable.LigatureCoverage = empty_coverage()
-        subtable.ClassCount = 0
-        subtable.MarkArray = ot.MarkArray()
-        subtable.MarkArray.MarkCount = 0
-        subtable.MarkArray.MarkRecord = []
-        subtable.LigatureArray = ot.LigatureArray()
-        subtable.LigatureArray.LigatureCount = 0
-        subtable.LigatureArray.LigatureAttach = []
-        return subtable
-    if lookup_type == 6:
-        subtable = ot.MarkMarkPos()
-        subtable.Format = 1
-        subtable.Mark1Coverage = empty_coverage()
-        subtable.Mark2Coverage = empty_coverage()
-        subtable.ClassCount = 0
-        subtable.Mark1Array = ot.MarkArray()
-        subtable.Mark1Array.MarkCount = 0
-        subtable.Mark1Array.MarkRecord = []
-        subtable.Mark2Array = ot.Mark2Array()
-        subtable.Mark2Array.Mark2Count = 0
-        subtable.Mark2Array.Mark2Record = []
-        return subtable
-    raise ValueError(f"Unsupported empty GPOS lookup type: {lookup_type}")
 
 
 def align_single_pos_format(subtable: Any, reference: Any) -> Any:
@@ -7714,85 +7628,6 @@ def align_pair_pos_format(subtable: Any, reference: Any) -> Any:
         subtable.PairSet = []
     subtable.PairSetCount = len(subtable.PairSet)
     return subtable
-
-
-def align_gpos_subtable_to_reference(subtable: Any, reference_subtable: Any, lookup_type: int) -> Any:
-    if lookup_type == 9 and hasattr(reference_subtable, "ExtensionLookupType"):
-        subtable.Format = getattr(reference_subtable, "Format", 1)
-        subtable.ExtensionLookupType = reference_subtable.ExtensionLookupType
-        if not hasattr(subtable, "ExtSubTable") or subtable.ExtSubTable is None:
-            subtable.ExtSubTable = empty_gpos_subtable(reference_subtable.ExtensionLookupType)
-        subtable.ExtSubTable = align_gpos_subtable_to_reference(
-            subtable.ExtSubTable,
-            reference_subtable.ExtSubTable,
-            reference_subtable.ExtensionLookupType,
-        )
-        return subtable
-    if lookup_type == 1:
-        return align_single_pos_format(subtable, reference_subtable)
-    if lookup_type == 2:
-        return align_pair_pos_format(subtable, reference_subtable)
-    if hasattr(reference_subtable, "Format"):
-        subtable.Format = reference_subtable.Format
-    return subtable
-
-
-def empty_layout_subtable_like(reference_subtable: Any, lookup_type: int) -> Any:
-    if lookup_type == 9 and hasattr(reference_subtable, "ExtensionLookupType"):
-        extension = ot.ExtensionPos()
-        extension.Format = 1
-        extension.ExtensionLookupType = reference_subtable.ExtensionLookupType
-        extension.ExtSubTable = empty_gpos_subtable(reference_subtable.ExtensionLookupType)
-        return align_gpos_subtable_to_reference(extension, reference_subtable, lookup_type)
-    return align_gpos_subtable_to_reference(empty_gpos_subtable(lookup_type), reference_subtable, lookup_type)
-
-
-def align_layout_lookup_structure(font: TTFont, reference: TTFont, table_tag: str) -> dict[str, int]:
-    key = table_tag.lower()
-    if table_tag not in font or table_tag not in reference:
-        return {f"{key}_lookups_before_structure_template": 0, f"{key}_lookups_after_structure_template": 0}
-    table = font[table_tag].table
-    ref_table = reference[table_tag].table
-    if not table.LookupList or not ref_table.LookupList:
-        return {f"{key}_lookups_before_structure_template": 0, f"{key}_lookups_after_structure_template": 0}
-    before = len(table.LookupList.Lookup)
-    ref_lookups = ref_table.LookupList.Lookup
-    while len(table.LookupList.Lookup) < len(ref_lookups):
-        ref_lookup = ref_lookups[len(table.LookupList.Lookup)]
-        lookup = ot.Lookup()
-        lookup.LookupType = ref_lookup.LookupType
-        lookup.LookupFlag = ref_lookup.LookupFlag
-        if hasattr(ref_lookup, "MarkFilteringSet"):
-            lookup.MarkFilteringSet = copy.deepcopy(ref_lookup.MarkFilteringSet)
-        lookup.SubTable = [
-            empty_layout_subtable_like(ref_subtable, ref_lookup.LookupType) for ref_subtable in ref_lookup.SubTable
-        ]
-        lookup.SubTableCount = len(lookup.SubTable)
-        table.LookupList.Lookup.append(lookup)
-    if len(table.LookupList.Lookup) > len(ref_lookups):
-        table.LookupList.Lookup = table.LookupList.Lookup[: len(ref_lookups)]
-    for lookup, ref_lookup in zip(table.LookupList.Lookup, ref_lookups):
-        lookup.LookupType = ref_lookup.LookupType
-        lookup.LookupFlag = ref_lookup.LookupFlag
-        if hasattr(ref_lookup, "MarkFilteringSet"):
-            lookup.MarkFilteringSet = copy.deepcopy(ref_lookup.MarkFilteringSet)
-        elif hasattr(lookup, "MarkFilteringSet"):
-            delattr(lookup, "MarkFilteringSet")
-        if len(lookup.SubTable) > len(ref_lookup.SubTable):
-            lookup.SubTable = lookup.SubTable[: len(ref_lookup.SubTable)]
-        while len(lookup.SubTable) < len(ref_lookup.SubTable):
-            ref_subtable = ref_lookup.SubTable[len(lookup.SubTable)]
-            lookup.SubTable.append(empty_layout_subtable_like(ref_subtable, ref_lookup.LookupType))
-        lookup.SubTable = [
-            align_gpos_subtable_to_reference(subtable, ref_subtable, ref_lookup.LookupType)
-            for subtable, ref_subtable in zip(lookup.SubTable, ref_lookup.SubTable)
-        ]
-        lookup.SubTableCount = len(lookup.SubTable)
-    table.LookupList.LookupCount = len(table.LookupList.Lookup)
-    return {
-        f"{key}_lookups_before_structure_template": before,
-        f"{key}_lookups_after_structure_template": len(table.LookupList.Lookup),
-    }
 
 
 def feature_lookup_indices(font: TTFont, table_tag: str, feature_tags: set[str]) -> list[int]:
@@ -7968,63 +7803,6 @@ def sync_gpos_single_pos_feature_values_from_reference(
         "gpos_single_pos_glyphs_missing_in_reference": missing,
         "gpos_single_pos_feature_lookup_count_mismatch": abs(len(target_indices) - len(ref_indices)),
     }
-
-
-def pad_lookup_list_to_reference_count(font: TTFont, reference: TTFont, table_tag: str) -> dict[str, int]:
-    key = table_tag.lower()
-    if table_tag not in font or table_tag not in reference:
-        return {f"{key}_lookups_before_padding": 0, f"{key}_lookups_after_padding": 0}
-    table = font[table_tag].table
-    ref_table = reference[table_tag].table
-    if not table.LookupList or not ref_table.LookupList or not table.LookupList.Lookup:
-        return {f"{key}_lookups_before_padding": 0, f"{key}_lookups_after_padding": 0}
-    before = len(table.LookupList.Lookup)
-    target = len(ref_table.LookupList.Lookup)
-    while len(table.LookupList.Lookup) < target:
-        table.LookupList.Lookup.append(copy.deepcopy(table.LookupList.Lookup[-1]))
-    table.LookupList.LookupCount = len(table.LookupList.Lookup)
-    return {f"{key}_lookups_before_padding": before, f"{key}_lookups_after_padding": len(table.LookupList.Lookup)}
-
-
-def append_single_sub_feature(font: TTFont, tag: str, mapping: dict[str, str]) -> bool:
-    mapping = {src: dst for src, dst in mapping.items() if src in font.getGlyphSet() and dst in font.getGlyphSet()}
-    if not mapping or "GSUB" not in font:
-        return False
-
-    gsub = font["GSUB"].table
-    if gsub.LookupList is None:
-        gsub.LookupList = ot.LookupList()
-        gsub.LookupList.Lookup = []
-        gsub.LookupList.LookupCount = 0
-    if gsub.FeatureList is None:
-        gsub.FeatureList = ot.FeatureList()
-        gsub.FeatureList.FeatureRecord = []
-        gsub.FeatureList.FeatureCount = 0
-
-    subtable = ot.SingleSubst()
-    subtable.mapping = mapping
-
-    lookup = ot.Lookup()
-    lookup.LookupType = 1
-    lookup.LookupFlag = 0
-    lookup.SubTable = [subtable]
-    lookup.SubTableCount = 1
-
-    lookup_index = len(gsub.LookupList.Lookup)
-    gsub.LookupList.Lookup.append(lookup)
-    gsub.LookupList.LookupCount = len(gsub.LookupList.Lookup)
-
-    feature = ot.Feature()
-    feature.FeatureParams = None
-    feature.LookupListIndex = [lookup_index]
-    feature.LookupCount = 1
-
-    record = ot.FeatureRecord()
-    record.FeatureTag = tag
-    record.Feature = feature
-    gsub.FeatureList.FeatureRecord.append(record)
-    gsub.FeatureList.FeatureCount = len(gsub.FeatureList.FeatureRecord)
-    return True
 
 
 def glyph_order_sorted(font: TTFont, glyphs: list[str]) -> list[str]:
@@ -8546,6 +8324,30 @@ def install_continuous_vertical_dash_layout(font: TTFont) -> dict[str, Any]:
             "existing_positioning_lookups_preserved": len(original_gpos), "existing_layout_variations_preserved": True}
 
 
+def finalize_layout_routes(font: TTFont) -> dict[str, Any]:
+    """The last routing step of every static and variable output path.
+
+    Continuous vertical dashes get their joins, the Cyrillic and Greek default
+    languages take the DFLT/dflt features, and lookups that can never match
+    lose their feature references.
+    """
+    report = install_continuous_vertical_dash_layout(font)
+    report.update(font_layout.share_default_language_features(font))
+    report["empty_layout_lookup_references_removed"] = font_layout.remove_empty_lookups(font)
+    return report
+
+
+def verify_variable_routes_match_static(font: TTFont, region: str, italic: bool) -> dict[str, Any]:
+    """Every VF language system routes its features as the native static does."""
+    path = static_dir(region, False) / static_output_name(region, "Regular", italic)
+    with TTFont(path, lazy=True, recalcTimestamp=False) as static:
+        problems = [f"{tag} {problem}" for tag in ("GSUB", "GPOS")
+                    for problem in font_layout.structure_differences(font[tag].table, static[tag].table)]
+    if problems:
+        raise RuntimeError("VF 与原生静态字体的特性路由不一致：" + "；".join(problems[:8]))
+    return {"variable_routes_match_static": path.name}
+
+
 def recalculate_head_bounds(font: TTFont) -> dict[str, Any]:
     boxes = []
     for name in font.getGlyphOrder():
@@ -8579,7 +8381,7 @@ def continuous_vertical_dash_structure_status(font: TTFont) -> dict[str, Any]:
         for tag in ("cmap", "glyf", "hmtx", "vmtx", "head", "fvar", "gvar"):
             if tag in font:
                 probe[tag] = font[tag]
-        install_continuous_vertical_dash_layout(probe)
+        finalize_layout_routes(probe)
         after = {tag: probe.getTableData(tag) for tag in tags if tag in probe}
         return {"ok": before == after, "reason": "" if before == after else "连续竖排连接规则、变化锚点或必要特性引用不完整"}
     except (KeyError, ValueError, AttributeError) as error:
@@ -8685,7 +8487,7 @@ def finalize_variable_vertical_segments(font: TTFont, reference_fonts: dict[int,
 
 def align_source_punctuation_advances(font: TTFont, region: str) -> dict[str, Any]:
     """Retain Source Han advances at intermediate public-axis control points."""
-    weights = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
+    weights = AXIS_CONTROL_WEIGHTS
     runtime = hb.Font(hb.Face(serialized_font_bytes(font)))
     source_path = source_han_vf_path(region)
     source = hb.Font(hb.Face(source_path.read_bytes()))
@@ -8789,311 +8591,6 @@ def align_source_punctuation_advances(font: TTFont, region: str) -> dict[str, An
     return report
 
 
-def horizontal_em_dash_continuation_points(
-    box: tuple[int, int, int, int],
-    advance_width: int,
-) -> list[tuple[float, float]]:
-    _x_min, y_min, x_max, y_max = box
-    half_height = (y_max - y_min) / 2
-    return [
-        (x_max - advance_width, y_max),
-        (x_max - advance_width - half_height, (y_min + y_max) / 2),
-        (x_max - advance_width, y_min),
-        (x_max, y_min),
-        (x_max, y_max),
-    ]
-
-
-def glyph_set_bbox(
-    font: TTFont,
-    glyph_name: str,
-    location: dict[str, float] | None = None,
-) -> tuple[int, int, int, int] | None:
-    glyph_set = font.getGlyphSet(location=location)
-    if glyph_name not in glyph_set:
-        return None
-    pen = BoundsPen(glyph_set)
-    glyph_set[glyph_name].draw(pen)
-    if pen.bounds is None:
-        return None
-    return tuple(otRound(value) for value in pen.bounds)
-
-
-def vertical_origin_y(font: TTFont, glyph_name: str) -> int:
-    if "VORG" in font:
-        return int(font["VORG"].VOriginRecords.get(glyph_name, font["VORG"].defaultVertOriginY))
-    box = glyph_bbox(font, glyph_name)
-    if box and "vmtx" in font and glyph_name in font["vmtx"].metrics:
-        return int(box[3] + font["vmtx"].metrics[glyph_name][1])
-    return int(font["head"].unitsPerEm)
-
-
-def add_simple_glyph(font: TTFont, glyph_name: str, source_name: str, points: list[tuple[float, float]]) -> None:
-    font["glyf"].glyphs[glyph_name] = make_polygon_glyph(points)
-    font["glyf"].glyphs[glyph_name].recalcBounds(font["glyf"])
-    font["hmtx"].metrics[glyph_name] = copy.deepcopy(font["hmtx"].metrics[source_name])
-    if "vmtx" in font and source_name in font["vmtx"].metrics:
-        font["vmtx"].metrics[glyph_name] = copy.deepcopy(font["vmtx"].metrics[source_name])
-    if "gvar" in font:
-        font["gvar"].variations[glyph_name] = []
-    order = font.getGlyphOrder()
-    if glyph_name not in order:
-        order.append(glyph_name)
-        font.setGlyphOrder(order)
-    if "maxp" in font:
-        font["maxp"].numGlyphs = len(font.getGlyphOrder())
-
-
-def add_fixed_advance_glyph_alias(
-    font: TTFont,
-    glyph_name: str,
-    source_name: str,
-    advance_width: int,
-) -> None:
-    font["glyf"].glyphs[glyph_name] = copy.deepcopy(font["glyf"][source_name])
-    source_lsb = int(font["hmtx"].metrics[source_name][1])
-    font["hmtx"].metrics[glyph_name] = (int(advance_width), source_lsb)
-    if "vmtx" in font and source_name in font["vmtx"].metrics:
-        font["vmtx"].metrics[glyph_name] = copy.deepcopy(
-            font["vmtx"].metrics[source_name]
-        )
-    if "gvar" in font:
-        font["gvar"].variations[glyph_name] = copy.deepcopy(
-            font["gvar"].variations.get(source_name, [])
-        )
-        freeze_horizontal_advance_preserve_bearings(font, glyph_name)
-    order = font.getGlyphOrder()
-    if glyph_name not in order:
-        order.append(glyph_name)
-        font.setGlyphOrder(order)
-    if "maxp" in font:
-        font["maxp"].numGlyphs = len(font.getGlyphOrder())
-
-
-def layout_glyph_references(font: TTFont, glyph_names: set[str]) -> set[str]:
-    found: set[str] = set()
-
-    def visit(value: Any, seen: set[int]) -> None:
-        if isinstance(value, str):
-            if value in glyph_names:
-                found.add(value)
-            return
-        if value is None or isinstance(value, (bytes, int, float, bool)):
-            return
-        value_id = id(value)
-        if value_id in seen:
-            return
-        seen.add(value_id)
-        if isinstance(value, dict):
-            for key, item in value.items():
-                visit(key, seen)
-                visit(item, seen)
-        elif isinstance(value, (list, tuple, set)):
-            for item in value:
-                visit(item, seen)
-        elif hasattr(value, "__dict__"):
-            for attribute, item in vars(value).items():
-                if not attribute.startswith("_"):
-                    visit(item, seen)
-
-    for tag in ("GSUB", "GPOS", "GDEF", "MATH", "COLR"):
-        if tag in font:
-            visit(getattr(font[tag], "table", font[tag]), set())
-    return found
-
-
-def remove_generated_glyphs(font: TTFont, glyph_names: set[str]) -> int:
-    removable = set(glyph_names) & set(font.getGlyphOrder())
-    if not removable:
-        return 0
-    cmap_glyphs = set((font.getBestCmap() or {}).values())
-    if removable & cmap_glyphs:
-        raise ValueError(f"refusing to remove encoded glyphs: {sorted(removable & cmap_glyphs)}")
-    layout_references = layout_glyph_references(font, removable)
-    if layout_references:
-        raise ValueError(
-            f"refusing to remove layout-referenced glyphs: {sorted(layout_references)}"
-        )
-    component_references = (
-        {
-            component.glyphName
-            for glyph_name in font.getGlyphOrder()
-            if glyph_name not in removable
-            for glyph in [font["glyf"][glyph_name]]
-            if glyph.isComposite()
-            for component in glyph.components
-            if component.glyphName in removable
-        }
-        if "glyf" in font
-        else set()
-    )
-    if component_references:
-        raise ValueError(
-            f"refusing to remove component-referenced glyphs: {sorted(component_references)}"
-        )
-    if "gvar" in font:
-        font["gvar"].ensureDecompiled()
-    for glyph_name in removable:
-        if "gvar" in font:
-            font["gvar"].variations.pop(glyph_name, None)
-        if "glyf" in font:
-            font["glyf"].glyphs.pop(glyph_name, None)
-        for tag in ("hmtx", "vmtx"):
-            if tag in font:
-                font[tag].metrics.pop(glyph_name, None)
-        if "VORG" in font:
-            font["VORG"].VOriginRecords.pop(glyph_name, None)
-        for tag, attributes in {
-            "HVAR": ("AdvWidthMap", "LsbMap", "RsbMap"),
-            "VVAR": ("AdvHeightMap", "TsbMap", "BsbMap", "VOrgMap"),
-        }.items():
-            if tag not in font:
-                continue
-            table = font[tag].table
-            for attribute in attributes:
-                var_index_map = getattr(table, attribute, None)
-                mapping = getattr(var_index_map, "mapping", None)
-                if isinstance(mapping, dict):
-                    mapping.pop(glyph_name, None)
-    font.setGlyphOrder([name for name in font.getGlyphOrder() if name not in removable])
-    if "maxp" in font:
-        font["maxp"].numGlyphs = len(font.getGlyphOrder())
-    return len(removable)
-
-
-def set_continuation_metrics(
-    font: TTFont,
-    glyph_name: str,
-    source_name: str,
-    points: list[tuple[float, float]],
-    *,
-    horizontal: bool,
-) -> None:
-    x_min = min(otRound(point[0]) for point in points)
-    y_max = max(otRound(point[1]) for point in points)
-    source_h_advance = int(font["hmtx"].metrics[source_name][0])
-    h_advance = int(font["head"].unitsPerEm) if horizontal else source_h_advance
-    font["hmtx"].metrics[glyph_name] = (h_advance, x_min)
-    if "vmtx" in font and source_name in font["vmtx"].metrics:
-        v_advance = int(font["vmtx"].metrics[source_name][0])
-        font["vmtx"].metrics[glyph_name] = (
-            v_advance,
-            vertical_origin_y(font, source_name) - y_max,
-        )
-
-
-def add_em_dash_continuation_variations(
-    font: TTFont,
-    em_dash: str,
-    em_dash_cont: str,
-) -> int:
-    if "gvar" not in font or "fvar" not in font:
-        return 0
-    correction_weights = sorted(
-        int(weight)
-        for weight in SOURCE_HAN_PUBLIC_TO_INTERNAL_WGHT
-        if int(weight) != int(weight_axis(font).defaultValue)
-    )
-    supports = advance_supports(font, correction_weights)
-    additions = 0
-    for weight in correction_weights:
-        instance = instantiateVariableFont(font, {"wght": weight}, inplace=False, optimize=True)
-        try:
-            cases = [
-                (
-                    em_dash,
-                    em_dash_cont,
-                    True,
-                    horizontal_em_dash_continuation_points,
-                )
-            ]
-            pending: list[tuple[str, list[Any]]] = []
-            for source_name, target_name, horizontal, point_builder in cases:
-                source_box = glyph_set_bbox(instance, source_name)
-                current_points = simple_glyph_coordinates(instance, target_name)
-                if not source_box or current_points is None:
-                    continue
-                source_h_advance = int(instance["hmtx"].metrics[source_name][0])
-                source_v_advance = int(instance["vmtx"].metrics[source_name][0])
-                pair_cell_advance = int(instance["head"].unitsPerEm)
-                target_points = [
-                    (otRound(x), otRound(y))
-                    for x, y in point_builder(
-                        source_box,
-                        pair_cell_advance if horizontal else source_v_advance,
-                    )
-                ]
-                if len(current_points) != len(target_points):
-                    raise ValueError(f"incompatible em dash continuation topology: {target_name}")
-                outline_deltas = [
-                    (target_x - current_x, target_y - current_y)
-                    for (current_x, current_y), (target_x, target_y) in zip(current_points, target_points)
-                ]
-
-                current_h_advance, current_lsb = instance["hmtx"].metrics[target_name]
-                target_h_advance = (
-                    pair_cell_advance
-                    if horizontal
-                    else source_h_advance
-                )
-                current_x_min = min(x for x, _y in current_points)
-                target_x_min = min(x for x, _y in target_points)
-                target_lsb = target_x_min
-                left_phantom_delta = otRound(
-                    current_lsb + (target_x_min - current_x_min) - target_lsb
-                )
-                right_phantom_delta = otRound(
-                    left_phantom_delta + target_h_advance - current_h_advance
-                )
-
-                current_v_advance, current_tsb = instance["vmtx"].metrics[target_name]
-                target_v_advance = source_v_advance
-                current_y_max = max(y for _x, y in current_points)
-                target_y_max = max(y for _x, y in target_points)
-                target_tsb = vertical_origin_y(instance, source_name) - target_y_max
-                top_phantom_delta = otRound(
-                    target_tsb - current_tsb + target_y_max - current_y_max
-                )
-                bottom_phantom_delta = otRound(
-                    top_phantom_delta - (target_v_advance - current_v_advance)
-                )
-                coordinates: list[Any] = list(outline_deltas)
-                coordinates.extend(
-                    [
-                        (left_phantom_delta, 0),
-                        (right_phantom_delta, 0),
-                        (0, top_phantom_delta),
-                        (0, bottom_phantom_delta),
-                    ]
-                )
-                if any(delta != (0, 0) for delta in coordinates):
-                    pending.append((target_name, coordinates))
-        finally:
-            instance.close()
-        for target_name, coordinates in pending:
-            font["gvar"].variations.setdefault(target_name, []).append(
-                TupleVariation({"wght": supports[weight]}, coordinates)
-            )
-            additions += 1
-    return additions
-
-
-def align_em_dash_continuation_variations(font: TTFont) -> dict[str, int]:
-    cmap = font.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    continuations = em_dash_continuation_glyphs(font) if em_dash else []
-    if not em_dash or not continuations:
-        return {"continuous_em_dash_variation_corrections": 0}
-    em_dash_cont = continuations[0]
-    return {
-        "continuous_em_dash_variation_corrections": add_em_dash_continuation_variations(
-            font,
-            em_dash,
-            em_dash_cont,
-        )
-    }
-
-
 def glyph_bbox(font: TTFont, glyph_name: str) -> tuple[int, int, int, int] | None:
     if glyph_name not in font["glyf"].glyphs:
         return None
@@ -9102,191 +8599,6 @@ def glyph_bbox(font: TTFont, glyph_name: str) -> tuple[int, int, int, int] | Non
     if not hasattr(glyph, "xMin"):
         return None
     return glyph.xMin, glyph.yMin, glyph.xMax, glyph.yMax
-
-
-def add_vert_alias(font: TTFont, source_codepoint: int, target_codepoint: int) -> int:
-    if "GSUB" not in font:
-        return 0
-    cmap = font.getBestCmap()
-    source_glyph = cmap.get(source_codepoint)
-    target_glyph = cmap.get(target_codepoint)
-    if not source_glyph or not target_glyph:
-        return 0
-
-    added = 0
-    gsub = font["GSUB"].table
-    if not gsub.FeatureList or not gsub.LookupList:
-        return 0
-    for record in gsub.FeatureList.FeatureRecord:
-        if record.FeatureTag not in {"vert", "vrt2"}:
-            continue
-        for lookup_index in record.Feature.LookupListIndex:
-            lookup = gsub.LookupList.Lookup[lookup_index]
-            if lookup.LookupType != 1:
-                continue
-            for subtable in lookup.SubTable:
-                if not hasattr(subtable, "mapping"):
-                    continue
-                target_substitution = subtable.mapping.get(target_glyph)
-                if target_substitution and subtable.mapping.get(source_glyph) != target_substitution:
-                    subtable.mapping[source_glyph] = target_substitution
-                    added += 1
-    return added
-
-
-def add_continuous_em_dash_feature(font: TTFont) -> dict[str, Any]:
-    cmap = font.getBestCmap()
-    em_dash = cmap.get(0x2014)
-    if not em_dash or em_dash not in font["glyf"].glyphs:
-        return {"continuous_em_dash_feature_added": False, "continuous_em_dash_vert_mappings": 0}
-    vert_aliases = add_vert_alias(font, 0x2014, 0x2015)
-
-    default_location = (
-        {"wght": float(weight_axis(font).defaultValue)}
-        if "fvar" in font
-        else None
-    )
-    em_dash_box = glyph_set_bbox(font, em_dash, default_location)
-    if not em_dash_box:
-        return {
-            "continuous_em_dash_feature_added": False,
-            "continuous_em_dash_vert_mappings": 0,
-            "continuous_em_dash_vert_aliases": vert_aliases,
-        }
-    x_min, _y_min, _x_max, _y_max = em_dash_box
-    if x_min <= 0:
-        return {
-            "continuous_em_dash_feature_added": False,
-            "continuous_em_dash_vert_mappings": 0,
-            "continuous_em_dash_vert_aliases": vert_aliases,
-        }
-
-    pair_cell_advance = int(font["head"].unitsPerEm)
-
-    em_dash_cont = em_dash + ".cont"
-    horizontal_points = horizontal_em_dash_continuation_points(
-        em_dash_box,
-        pair_cell_advance,
-    )
-    add_simple_glyph(
-        font,
-        em_dash_cont,
-        em_dash,
-        horizontal_points,
-    )
-    set_continuation_metrics(
-        font,
-        em_dash_cont,
-        em_dash,
-        horizontal_points,
-        horizontal=True,
-    )
-    variation_additions = add_em_dash_continuation_variations(
-        font,
-        em_dash,
-        em_dash_cont,
-    )
-
-    em_dash_start = em_dash + ".pair-start"
-    add_fixed_advance_glyph_alias(
-        font,
-        em_dash_start,
-        em_dash,
-        pair_cell_advance,
-    )
-
-    single_sub = ot.SingleSubst()
-    single_sub.mapping = {em_dash: em_dash_cont}
-    single_lookup = ot.Lookup()
-    single_lookup.LookupType = 1
-    single_lookup.LookupFlag = 0
-    single_lookup.SubTable = [single_sub]
-    single_lookup.SubTableCount = 1
-    single_index = append_gsub_lookup(font, single_lookup)
-
-    chain = ot.ChainContextSubst()
-    chain.Format = 3
-    chain.BacktrackGlyphCount = 1
-    chain.BacktrackCoverage = [coverage(font, [em_dash, em_dash_cont, em_dash_start])]
-    chain.InputGlyphCount = 1
-    chain.InputCoverage = [coverage(font, [em_dash])]
-    chain.LookAheadGlyphCount = 0
-    chain.LookAheadCoverage = []
-    subst_record = ot.SubstLookupRecord()
-    subst_record.SequenceIndex = 0
-    subst_record.LookupListIndex = single_index
-    chain.SubstCount = 1
-    chain.SubstLookupRecord = [subst_record]
-
-    chain_lookup = ot.Lookup()
-    chain_lookup.LookupType = 6
-    chain_lookup.LookupFlag = 0
-    chain_lookup.SubTable = [chain]
-    chain_lookup.SubTableCount = 1
-    chain_index = append_gsub_lookup(font, chain_lookup)
-
-    start_single_sub = ot.SingleSubst()
-    start_single_sub.mapping = {em_dash: em_dash_start}
-    start_single_lookup = ot.Lookup()
-    start_single_lookup.LookupType = 1
-    start_single_lookup.LookupFlag = 0
-    start_single_lookup.SubTable = [start_single_sub]
-    start_single_lookup.SubTableCount = 1
-    start_single_index = append_gsub_lookup(font, start_single_lookup)
-
-    start_chain = ot.ChainContextSubst()
-    start_chain.Format = 3
-    start_chain.BacktrackGlyphCount = 0
-    start_chain.BacktrackCoverage = []
-    start_chain.InputGlyphCount = 1
-    start_chain.InputCoverage = [coverage(font, [em_dash])]
-    start_chain.LookAheadGlyphCount = 1
-    start_chain.LookAheadCoverage = [coverage(font, [em_dash_cont])]
-    start_subst_record = ot.SubstLookupRecord()
-    start_subst_record.SequenceIndex = 0
-    start_subst_record.LookupListIndex = start_single_index
-    start_chain.SubstCount = 1
-    start_chain.SubstLookupRecord = [start_subst_record]
-    start_chain_lookup = ot.Lookup()
-    start_chain_lookup.LookupType = 6
-    start_chain_lookup.LookupFlag = 0
-    start_chain_lookup.SubTable = [start_chain]
-    start_chain_lookup.SubTableCount = 1
-    start_chain_index = append_gsub_lookup(font, start_chain_lookup)
-    append_gsub_feature(font, "calt", [chain_index, start_chain_index])
-
-    vert_mappings = 0
-    for tag in ("vert", "vrt2"):
-        if "GSUB" not in font:
-            continue
-        gsub = font["GSUB"].table
-        if not gsub.FeatureList or not gsub.LookupList:
-            continue
-        for record in gsub.FeatureList.FeatureRecord:
-            if record.FeatureTag != tag:
-                continue
-            for lookup_index in record.Feature.LookupListIndex:
-                lookup = gsub.LookupList.Lookup[lookup_index]
-                if lookup.LookupType != 1:
-                    continue
-                for subtable in lookup.SubTable:
-                    if hasattr(subtable, "mapping") and em_dash in subtable.mapping:
-                        for alias in (em_dash_cont, em_dash_start):
-                            if subtable.mapping.get(alias) != subtable.mapping[em_dash]:
-                                subtable.mapping[alias] = subtable.mapping[em_dash]
-                                vert_mappings += 1
-
-    enable_features_for_all_scripts(font, {"calt", "vert", "vrt2"})
-    return {
-        "continuous_em_dash_feature_added": True,
-        "continuous_em_dash_two_em": True,
-        "continuous_em_dash_variations_added": variation_additions,
-        "continuous_em_dash_pair_start": em_dash_start,
-        "continuous_em_dash_pair_cell_advance": pair_cell_advance,
-        "continuous_em_dash_start_chain_lookup": start_chain_index,
-        "continuous_em_dash_vert_mappings": vert_mappings,
-        "continuous_em_dash_vert_aliases": vert_aliases,
-    }
 
 
 def coverage_has_glyph(coverage_table: Any, glyph_name: str) -> bool:
@@ -9446,118 +8758,6 @@ def em_dash_calt_chain_lookup_indices(font: TTFont) -> list[int]:
         em_dash_chain_lookup_indices(font)
         | em_dash_pair_start_chain_lookup_indices(font)
     )
-
-
-def ensure_variable_em_dash_pair_start_feature(font: TTFont) -> dict[str, Any]:
-    if "fvar" not in font or "gvar" not in font or "GSUB" not in font:
-        return {"variable_em_dash_pair_start_feature_added": False}
-    cmap = font.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    continuations = em_dash_continuation_glyphs(font) if em_dash else []
-    starts = em_dash_pair_start_glyphs(font) if em_dash else []
-    if not em_dash or len(continuations) != 1 or len(starts) > 1:
-        raise ValueError(
-            "variable em dash pair start requires one continuation and at most one start alias"
-        )
-
-    feature_added = False
-    linked_records = 0
-    start_chain_index: int | None = None
-    if starts:
-        em_dash_start = starts[0]
-    else:
-        em_dash_cont = continuations[0]
-        glyph_names = set(font.getGlyphOrder())
-        em_dash_start = f"{em_dash}.pair-start"
-        suffix = 1
-        while em_dash_start in glyph_names:
-            em_dash_start = f"{em_dash}.pair-start.{suffix}"
-            suffix += 1
-        add_fixed_advance_glyph_alias(
-            font,
-            em_dash_start,
-            em_dash,
-            int(font["head"].unitsPerEm),
-        )
-
-        start_single_sub = ot.SingleSubst()
-        start_single_sub.mapping = {em_dash: em_dash_start}
-        start_single_lookup = ot.Lookup()
-        start_single_lookup.LookupType = 1
-        start_single_lookup.LookupFlag = 0
-        start_single_lookup.SubTable = [start_single_sub]
-        start_single_lookup.SubTableCount = 1
-        start_single_index = append_gsub_lookup(font, start_single_lookup)
-
-        start_chain = ot.ChainContextSubst()
-        start_chain.Format = 3
-        start_chain.BacktrackGlyphCount = 0
-        start_chain.BacktrackCoverage = []
-        start_chain.InputGlyphCount = 1
-        start_chain.InputCoverage = [coverage(font, [em_dash])]
-        start_chain.LookAheadGlyphCount = 1
-        start_chain.LookAheadCoverage = [coverage(font, [em_dash_cont])]
-        start_subst_record = ot.SubstLookupRecord()
-        start_subst_record.SequenceIndex = 0
-        start_subst_record.LookupListIndex = start_single_index
-        start_chain.SubstCount = 1
-        start_chain.SubstLookupRecord = [start_subst_record]
-        start_chain_lookup = ot.Lookup()
-        start_chain_lookup.LookupType = 6
-        start_chain_lookup.LookupFlag = 0
-        start_chain_lookup.SubTable = [start_chain]
-        start_chain_lookup.SubTableCount = 1
-        start_chain_index = append_gsub_lookup(font, start_chain_lookup)
-
-        continuation_indices = em_dash_chain_lookup_indices(font)
-        feature_list = font["GSUB"].table.FeatureList
-        if feature_list:
-            for record in feature_list.FeatureRecord:
-                if record.FeatureTag != "calt":
-                    continue
-                indices = list(record.Feature.LookupListIndex or [])
-                if not any(index in continuation_indices for index in indices):
-                    continue
-                if start_chain_index not in indices:
-                    indices.append(start_chain_index)
-                    record.Feature.LookupListIndex = indices
-                    record.Feature.LookupCount = len(indices)
-                    linked_records += 1
-        if not linked_records:
-            append_gsub_feature(font, "calt", [start_chain_index])
-            enable_features_for_all_scripts(font, {"calt"})
-            linked_records = 1
-        feature_added = True
-
-    vert_mappings = 0
-    for tag in ("vert", "vrt2"):
-        mapping = get_single_substitution_mapping(font, tag)
-        vertical_em_dash = mapping.get(em_dash)
-        if not vertical_em_dash:
-            continue
-        for record in font["GSUB"].table.FeatureList.FeatureRecord:
-            if record.FeatureTag != tag:
-                continue
-            for lookup_index in record.Feature.LookupListIndex:
-                lookup = font["GSUB"].table.LookupList.Lookup[lookup_index]
-                if lookup.LookupType != 1:
-                    continue
-                for subtable in lookup.SubTable:
-                    if (
-                        hasattr(subtable, "mapping")
-                        and subtable.mapping.get(em_dash) == vertical_em_dash
-                        and subtable.mapping.get(em_dash_start) != vertical_em_dash
-                    ):
-                        subtable.mapping[em_dash_start] = vertical_em_dash
-                        vert_mappings += 1
-
-    return {
-        "variable_em_dash_pair_start_feature_added": feature_added,
-        "variable_em_dash_pair_start_feature_links": linked_records,
-        "variable_em_dash_pair_start_chain_lookup": start_chain_index,
-        "variable_em_dash_pair_start_vert_mappings": vert_mappings,
-        "variable_em_dash_pair_start": em_dash_start,
-    }
 
 
 def ligature_substitution_subtables(lookup: Any) -> list[Any]:
@@ -10472,31 +9672,6 @@ def apply_upstream_dash_behavior(
     return report
 
 
-def sync_em_dash_continuation_metrics_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
-    target_glyphs = em_dash_continuation_glyphs(font)
-    reference_glyphs = em_dash_continuation_glyphs(reference)
-    hmtx_synced = 0
-    vmtx_synced = 0
-    for target_glyph, reference_glyph in zip(target_glyphs, reference_glyphs):
-        if target_glyph in font["hmtx"].metrics and reference_glyph in reference["hmtx"].metrics:
-            if font["hmtx"].metrics[target_glyph] != reference["hmtx"].metrics[reference_glyph]:
-                hmtx_synced += 1
-            font["hmtx"].metrics[target_glyph] = copy.deepcopy(reference["hmtx"].metrics[reference_glyph])
-        if (
-            "vmtx" in font
-            and "vmtx" in reference
-            and target_glyph in font["vmtx"].metrics
-            and reference_glyph in reference["vmtx"].metrics
-        ):
-            if font["vmtx"].metrics[target_glyph] != reference["vmtx"].metrics[reference_glyph]:
-                vmtx_synced += 1
-            font["vmtx"].metrics[target_glyph] = copy.deepcopy(reference["vmtx"].metrics[reference_glyph])
-    return {
-        "em_dash_continuation_hmtx_synced": hmtx_synced,
-        "em_dash_continuation_vmtx_synced": vmtx_synced,
-    }
-
-
 def pair_position_record(
     font: TTFont,
     lookup_index: int,
@@ -10576,108 +9751,6 @@ def pair_position_placement(
                 else:
                     y_placement = base_value + delta
     return x_placement, y_placement
-
-
-def set_pair_position_placement(
-    font: TTFont,
-    lookup_index: int,
-    first: str,
-    second: str,
-    x_placement: int,
-    y_placement: int,
-    x_device: Any | None = None,
-    y_device: Any | None = None,
-) -> bool:
-    found = pair_position_record(font, lookup_index, first, second)
-    if not found:
-        return False
-    subtable, record = found
-    device_format = (0x0010 if x_device is not None else 0) | (0x0020 if y_device is not None else 0)
-    subtable.ValueFormat2 = (
-        int(getattr(subtable, "ValueFormat2", 0) or 0) & ~0x0030
-    ) | 0x0003 | device_format
-    if getattr(record, "Value2", None) is None:
-        record.Value2 = ot.ValueRecord()
-    record.Value2.XPlacement = int(x_placement)
-    record.Value2.YPlacement = int(y_placement)
-    record.Value2.XPlaDevice = x_device
-    record.Value2.YPlaDevice = y_device
-    return True
-
-
-def glyph_set_points_and_vertical_advance(
-    font: TTFont,
-    glyph_name: str,
-    location: dict[str, float] | None = None,
-) -> tuple[list[tuple[float, float]], int]:
-    glyph_set = font.getGlyphSet(location=location)
-    if glyph_name not in glyph_set:
-        return [], 0
-    glyph = glyph_set[glyph_name]
-    pen = RecordingPen()
-    glyph.draw(pen)
-    points: list[tuple[float, float]] = []
-    for operation, arguments in pen.value:
-        if operation not in {"moveTo", "lineTo", "curveTo", "qCurveTo"}:
-            continue
-        points.extend(
-            (float(point[0]), float(point[1]))
-            for point in arguments
-            if point is not None and len(point) == 2
-        )
-    return points, int(getattr(glyph, "height", 0) or 0)
-
-
-def vertical_em_dash_pair_placement_from_points(
-    font: TTFont,
-    points: list[tuple[float, float]],
-    advance_height: int,
-) -> tuple[int, int]:
-    if not points or not advance_height:
-        raise ValueError("missing vertical em dash geometry")
-    x_min = min(x for x, _y in points)
-    y_min = min(y for _x, y in points)
-    x_max = max(x for x, _y in points)
-    y_max = max(y for _x, y in points)
-    top_x = [x for x, y in points if y == y_max]
-    bottom_x = [x for x, y in points if y == y_min]
-    if top_x and bottom_x and y_max != y_min:
-        top_center = (min(top_x) + max(top_x)) / 2
-        bottom_center = (min(bottom_x) + max(bottom_x)) / 2
-        slope = (top_center - bottom_center) / (y_max - y_min)
-        cap_width = (
-            (max(top_x) - min(top_x)) + (max(bottom_x) - min(bottom_x))
-        ) / 2
-    else:
-        italic_angle = float(font["post"].italicAngle) if "post" in font else 0.0
-        slope = math.tan(math.radians(-italic_angle))
-        cap_width = max(1.0, (x_max - x_min) - abs(slope * (y_max - y_min)))
-    y_placement = max(
-        1,
-        otRound(y_min + advance_height + cap_width / 2 - y_max),
-    )
-    vertical_step = -advance_height + y_placement
-    x_placement = otRound(slope * vertical_step)
-    return x_placement, y_placement
-
-
-def vertical_em_dash_pair_placement(
-    font: TTFont,
-    glyph_name: str,
-    location: dict[str, float] | None = None,
-) -> tuple[int, int]:
-    points, advance_height = glyph_set_points_and_vertical_advance(
-        font,
-        glyph_name,
-        location,
-    )
-    if not points or not advance_height:
-        raise ValueError(f"missing vertical em dash geometry: {glyph_name}")
-    return vertical_em_dash_pair_placement_from_points(
-        font,
-        points,
-        advance_height,
-    )
 
 
 def collect_ot_variation_devices(obj: Any, seen: set[int] | None = None) -> list[Any]:
@@ -10789,136 +9862,6 @@ def append_item_variation_store(
     return merged, remapped
 
 
-def vertical_em_dash_variation_data(
-    font: TTFont,
-    glyph_name: str,
-    existing_lookup_indices: set[int],
-) -> dict[str, Any]:
-    x_placement, y_placement = vertical_em_dash_pair_placement(font, glyph_name)
-    if "fvar" not in font:
-        return {
-            "x_placement": x_placement,
-            "y_placement": y_placement,
-            "x_device": None,
-            "y_device": None,
-            "controls": {},
-        }
-
-    weights = list(EM_DASH_PROBE_WEIGHTS)
-    normalized_locations = [
-        {} if vf_mapped_normalized_weight(font, weight) == 0 else {
-            "wght": vf_mapped_normalized_weight(font, weight)
-        }
-        for weight in weights
-    ]
-    expected_controls = {
-        weight: vertical_em_dash_pair_placement(font, glyph_name, {"wght": weight})
-        for weight in weights
-    }
-    controls = {weight: list(expected_controls[weight]) for weight in weights}
-
-    def build_store() -> tuple[Any, int, int, int, int]:
-        model = VariationModel(normalized_locations, axisOrder=["wght"])
-        store_builder = OnlineVarStoreBuilder(["wght"])
-        store_builder.setModel(model)
-        base_x, x_var_idx = store_builder.storeMasters(
-            [controls[weight][0] for weight in weights]
-        )
-        base_y, y_var_idx = store_builder.storeMasters(
-            [controls[weight][1] for weight in weights]
-        )
-        store = store_builder.finish()
-        for region in store.VarRegionList.Region:
-            for axis in region.VarRegionAxis:
-                for attribute in ("StartCoord", "PeakCoord", "EndCoord"):
-                    setattr(axis, attribute, floatToFixedToFloat(getattr(axis, attribute), 14))
-        variation_index_mapping = store.optimize()
-        return (
-            store,
-            int(base_x),
-            variation_index_mapping[x_var_idx],
-            int(base_y),
-            variation_index_mapping[y_var_idx],
-        )
-
-    calibration_rounds = 0
-    while True:
-        store, base_x, x_var_idx, base_y, y_var_idx = build_store()
-        errors: dict[int, tuple[int, int]] = {}
-        for weight, normalized_location in zip(weights, normalized_locations):
-            instancer = VarStoreInstancer(
-                store,
-                font["fvar"].axes,
-                normalized_location,
-            )
-            actual = (
-                base_x + (0 if x_var_idx == 0xFFFFFFFF else otRound(instancer[x_var_idx])),
-                base_y + (0 if y_var_idx == 0xFFFFFFFF else otRound(instancer[y_var_idx])),
-            )
-            expected = expected_controls[weight]
-            if actual != expected:
-                errors[weight] = (expected[0] - actual[0], expected[1] - actual[1])
-        if not errors:
-            break
-        calibration_rounds += 1
-        if calibration_rounds > 8:
-            raise RuntimeError(
-                f"vertical em dash PairPos calibration did not converge: {errors}"
-            )
-        for weight, correction in errors.items():
-            controls[weight][0] += correction[0]
-            controls[weight][1] += correction[1]
-
-    dash_device_ids: set[int] = set()
-    for lookup_index in existing_lookup_indices:
-        found = pair_position_record(font, lookup_index, glyph_name, glyph_name)
-        if not found:
-            continue
-        value = getattr(found[1], "Value2", None)
-        for attribute in ("XPlaDevice", "YPlaDevice"):
-            device = getattr(value, attribute, None)
-            if device and getattr(device, "DeltaFormat", None) == 0x8000:
-                dash_device_ids.add(id(device))
-    all_devices = []
-    for tag in ("GPOS", "GDEF"):
-        if tag in font:
-            all_devices.extend(collect_ot_variation_devices(font[tag].table))
-    external_devices = [device for device in all_devices if id(device) not in dash_device_ids]
-    existing_store = getattr(font["GDEF"].table, "VarStore", None) if "GDEF" in font else None
-    if not existing_store and external_devices:
-        raise ValueError(
-            "GPOS/GDEF VariationIndex records exist without a GDEF VarStore; rebuild required"
-        )
-    if "GDEF" not in font:
-        raise ValueError("variable em dash PairPos requires GDEF")
-    if existing_store is not None:
-        store, remapped_indices = append_item_variation_store(
-            existing_store,
-            store,
-            [x_var_idx, y_var_idx],
-        )
-        x_var_idx, y_var_idx = remapped_indices
-    gdef = font["GDEF"].table
-    gdef.Version = max(int(gdef.Version), 0x00010003)
-    gdef.VarStore = store
-    return {
-        "x_placement": int(base_x),
-        "y_placement": int(base_y),
-        "x_device": None if x_var_idx == 0xFFFFFFFF else buildVarDevTable(x_var_idx),
-        "y_device": None if y_var_idx == 0xFFFFFFFF else buildVarDevTable(y_var_idx),
-        "controls": {str(weight): list(expected_controls[weight]) for weight in weights},
-        "calibration_rounds": calibration_rounds,
-        "control_corrections": {
-            str(weight): [
-                controls[weight][index] - expected_controls[weight][index]
-                for index in range(2)
-            ]
-            for weight in weights
-            if tuple(controls[weight]) != expected_controls[weight]
-        },
-    }
-
-
 def vertical_em_dash_positioning_records(
     font: TTFont,
     location: dict[str, float] | None = None,
@@ -10956,576 +9899,6 @@ def vertical_em_dash_positioning_records(
                     }
                 )
     return result
-
-
-def add_vertical_em_dash_positioning(font: TTFont) -> dict[str, Any]:
-    cmap = font.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    continuations = em_dash_continuation_glyphs(font) if em_dash else []
-    if not em_dash or not continuations or "GSUB" not in font or "GPOS" not in font:
-        return {"vertical_em_dash_positioning_added": False}
-    em_dash_cont = continuations[0]
-    em_dash_starts = em_dash_pair_start_glyphs(font)
-    vert_mapping = get_single_substitution_mapping(font, "vert")
-    vrt2_mapping = get_single_substitution_mapping(font, "vrt2")
-    em_dash_v = vert_mapping.get(em_dash) or vrt2_mapping.get(em_dash)
-    if not em_dash_v:
-        return {"vertical_em_dash_positioning_added": False}
-
-    gsub = font["GSUB"].table
-    collapsed_mappings = 0
-    for record in gsub.FeatureList.FeatureRecord if gsub.FeatureList else []:
-        if record.FeatureTag not in {"vert", "vrt2"}:
-            continue
-        for lookup_index in record.Feature.LookupListIndex:
-            lookup = gsub.LookupList.Lookup[lookup_index]
-            for subtable in single_substitution_subtables(lookup):
-                if subtable.mapping.get(em_dash) == em_dash_v:
-                    for alias in (em_dash_cont, *em_dash_starts):
-                        if subtable.mapping.get(alias) != em_dash_v:
-                            subtable.mapping[alias] = em_dash_v
-                            collapsed_mappings += 1
-
-    removed_vertical_calt_mappings = 0
-    obsolete_vertical_continuations: set[str] = set()
-    for lookup_index in em_dash_chain_lookup_indices(font):
-        lookup = gsub.LookupList.Lookup[lookup_index]
-        for subtable in lookup.SubTable:
-            for subst_record in chain_substitution_records(subtable):
-                referenced_lookup = gsub.LookupList.Lookup[subst_record.LookupListIndex]
-                for single_subtable in single_substitution_subtables(referenced_lookup):
-                    if single_subtable.mapping.get(em_dash) == em_dash_cont:
-                        old_vertical_continuation = single_subtable.mapping.get(em_dash_v)
-                        if old_vertical_continuation and old_vertical_continuation != em_dash_v:
-                            obsolete_vertical_continuations.add(old_vertical_continuation)
-                            del single_subtable.mapping[em_dash_v]
-                            removed_vertical_calt_mappings += 1
-    removed_vertical_coverage_glyphs = 0
-    if obsolete_vertical_continuations:
-        for lookup_index in em_dash_chain_lookup_indices(font):
-            lookup = gsub.LookupList.Lookup[lookup_index]
-            for subtable in lookup.SubTable:
-                for coverage_table in [
-                    *list(getattr(subtable, "BacktrackCoverage", []) or []),
-                    *list(getattr(subtable, "InputCoverage", []) or []),
-                    *list(getattr(subtable, "LookAheadCoverage", []) or []),
-                ]:
-                    before = list(getattr(coverage_table, "glyphs", []) or [])
-                    after = [
-                        glyph
-                        for glyph in before
-                        if glyph not in obsolete_vertical_continuations
-                    ]
-                    if after != before:
-                        coverage_table.glyphs = after
-                        removed_vertical_coverage_glyphs += len(before) - len(after)
-
-    if not glyph_bbox(font, em_dash_v) or "vmtx" not in font:
-        return {"vertical_em_dash_positioning_added": False}
-    existing = vertical_em_dash_positioning_records(font)
-    existing_lookup_indices = {
-        item["lookup_index"]
-        for records in existing.values()
-        for item in records
-    }
-    variation_data = vertical_em_dash_variation_data(
-        font,
-        em_dash_v,
-        existing_lookup_indices,
-    )
-    x_placement = int(variation_data["x_placement"])
-    y_placement = int(variation_data["y_placement"])
-    x_device = variation_data["x_device"]
-    y_device = variation_data["y_device"]
-
-    updated_existing_lookups = 0
-    for lookup_index in sorted(existing_lookup_indices):
-        if set_pair_position_placement(
-            font,
-            lookup_index,
-            em_dash_v,
-            em_dash_v,
-            x_placement,
-            y_placement,
-            copy.deepcopy(x_device),
-            copy.deepcopy(y_device),
-        ):
-            updated_existing_lookups += 1
-    if updated_existing_lookups:
-        existing = vertical_em_dash_positioning_records(font)
-    gpos = font["GPOS"].table
-    existing_feature_indices = {
-        tag: [
-            index
-            for index, record in enumerate(gpos.FeatureList.FeatureRecord)
-            if record.FeatureTag == tag
-        ]
-        for tag in ("vert", "vrt2")
-    }
-    missing_feature_indices = {
-        tag: [
-            index
-            for index in existing_feature_indices[tag]
-            if not any(
-                item["feature_index"] == index
-                and item["x_placement"] == x_placement
-                and item["y_placement"] == y_placement
-                for item in existing[tag]
-            )
-        ]
-        for tag in ("vert", "vrt2")
-    }
-    missing_tags = {
-        tag for tag in ("vert", "vrt2") if not existing_feature_indices[tag]
-    }
-    needs_lookup = bool(missing_tags) or any(missing_feature_indices.values())
-    lookup_index: int | None = next(
-        (
-            item["lookup_index"]
-            for records in existing.values()
-            for item in records
-            if item["x_placement"] == x_placement
-            and item["y_placement"] == y_placement
-        ),
-        None,
-    )
-    feature_indices: dict[str, list[int]] = {"vert": [], "vrt2": []}
-    if needs_lookup and lookup_index is None:
-        subtable = ot.PairPos()
-        subtable.Format = 1
-        subtable.Coverage = coverage(font, [em_dash_v])
-        subtable.ValueFormat1 = 0
-        subtable.ValueFormat2 = (
-            0x0003
-            | (0x0010 if x_device is not None else 0)
-            | (0x0020 if y_device is not None else 0)
-        )
-        pair_value = ot.PairValueRecord()
-        pair_value.SecondGlyph = em_dash_v
-        pair_value.Value1 = None
-        pair_value.Value2 = ot.ValueRecord()
-        pair_value.Value2.XPlacement = x_placement
-        pair_value.Value2.YPlacement = y_placement
-        pair_value.Value2.XPlaDevice = copy.deepcopy(x_device)
-        pair_value.Value2.YPlaDevice = copy.deepcopy(y_device)
-        pair_set = ot.PairSet()
-        pair_set.PairValueRecord = [pair_value]
-        pair_set.PairValueCount = 1
-        subtable.PairSet = [pair_set]
-        subtable.PairSetCount = 1
-        lookup = ot.Lookup()
-        lookup.LookupType = 2
-        lookup.LookupFlag = 0
-        lookup.SubTable = [subtable]
-        lookup.SubTableCount = 1
-        lookup.MarkFilteringSet = None
-        lookup_index = append_gpos_lookup(font, lookup)
-    if lookup_index is not None:
-        for tag in ("vert", "vrt2"):
-            for feature_index in missing_feature_indices[tag]:
-                feature = gpos.FeatureList.FeatureRecord[feature_index].Feature
-                indices = list(feature.LookupListIndex or [])
-                if lookup_index not in indices:
-                    indices.append(lookup_index)
-                    feature.LookupListIndex = indices
-                    feature.LookupCount = len(indices)
-                    feature_indices[tag].append(feature_index)
-            if tag in missing_tags:
-                feature_indices[tag].append(insert_gpos_feature(font, tag, [lookup_index]))
-
-    removed_obsolete_glyphs = remove_generated_glyphs(font, obsolete_vertical_continuations)
-    return {
-        "vertical_em_dash_positioning_added": needs_lookup,
-        "vertical_em_dash_positioning_x": x_placement,
-        "vertical_em_dash_positioning_y": y_placement,
-        "vertical_em_dash_positioning_variations": variation_data["controls"],
-        "vertical_em_dash_positioning_calibration_rounds": variation_data.get(
-            "calibration_rounds",
-            0,
-        ),
-        "vertical_em_dash_positioning_control_corrections": variation_data.get(
-            "control_corrections",
-            {},
-        ),
-        "vertical_em_dash_positioning_updated_lookups": updated_existing_lookups,
-        "vertical_em_dash_positioning_lookup": lookup_index,
-        "vertical_em_dash_positioning_features": feature_indices,
-        "vertical_em_dash_collapsed_mappings": collapsed_mappings,
-        "vertical_em_dash_calt_mappings_removed": removed_vertical_calt_mappings,
-        "vertical_em_dash_obsolete_coverage_glyphs_removed": removed_vertical_coverage_glyphs,
-        "vertical_em_dash_obsolete_glyphs": sorted(obsolete_vertical_continuations),
-        "vertical_em_dash_obsolete_glyphs_removed": removed_obsolete_glyphs,
-    }
-
-
-def apply_static_two_em_dash_behavior(font: TTFont) -> dict[str, Any]:
-    cmap = font.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    if not em_dash or "GSUB" not in font or "glyf" not in font:
-        return {"static_two_em_dash_applied": False}
-    continuations = em_dash_continuation_glyphs(font)
-    if not continuations:
-        return {"static_two_em_dash_applied": False}
-    em_dash_cont = continuations[0]
-
-    upem = int(font["head"].unitsPerEm)
-    base_advance = int(font["hmtx"].metrics[em_dash][0])
-    old_cont_advance, old_cont_lsb = font["hmtx"].metrics[em_dash_cont]
-    font["hmtx"].metrics[em_dash_cont] = (2 * upem - base_advance, old_cont_lsb)
-
-    return {
-        "static_two_em_dash_applied": True,
-        "static_two_em_dash_base_advance": base_advance,
-        "static_two_em_dash_old_continuation_advance": int(old_cont_advance),
-        "static_two_em_dash_continuation_advance": int(font["hmtx"].metrics[em_dash_cont][0]),
-    }
-
-
-def legacy_vertical_em_dash_continuation_glyphs(font: TTFont, em_dash_v: str) -> list[str]:
-    if "glyf" not in font or "vmtx" not in font:
-        return []
-    box = glyph_bbox(font, em_dash_v)
-    if not box:
-        return []
-    x_min, y_min, x_max, _y_max = box
-    advance_height = int(font["vmtx"].metrics[em_dash_v][0])
-    half_width = (x_max - x_min) / 2
-    expected_points = [
-        (otRound(x_min), otRound(y_min)),
-        (otRound(x_max), otRound(y_min)),
-        (otRound(x_max), otRound(y_min + advance_height)),
-        (otRound((x_min + x_max) / 2), otRound(y_min + advance_height + half_width)),
-        (otRound(x_min), otRound(y_min + advance_height)),
-    ]
-    expected_box = (
-        min(x for x, _y in expected_points),
-        min(y for _x, y in expected_points),
-        max(x for x, _y in expected_points),
-        max(y for _x, y in expected_points),
-    )
-    encoded = set((font.getBestCmap() or {}).values())
-    excluded = encoded | {em_dash_v} | set(em_dash_continuation_glyphs(font))
-    matches: list[str] = []
-    for glyph_name in font.getGlyphOrder():
-        if glyph_name in excluded:
-            continue
-        glyph = font["glyf"][glyph_name]
-        if glyph.isComposite() or getattr(glyph, "numberOfContours", 0) != 1:
-            continue
-        glyph_box = tuple(
-            int(getattr(glyph, attribute, 0))
-            for attribute in ("xMin", "yMin", "xMax", "yMax")
-        )
-        if glyph_box != expected_box:
-            continue
-        if simple_glyph_coordinates(font, glyph_name) == expected_points:
-            matches.append(glyph_name)
-    return matches
-
-
-def variable_em_dash_ligature_structure_status(font: TTFont) -> dict[str, Any]:
-    reasons: list[str] = []
-    cmap = font.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    if not em_dash or "GSUB" not in font:
-        return {"ok": False, "reasons": ["missing U+2014 or GSUB"]}
-    gsub = font["GSUB"].table
-    ccmp_indices = {
-        int(index)
-        for record in (gsub.FeatureList.FeatureRecord if gsub.FeatureList else [])
-        if record.FeatureTag == "ccmp"
-        for index in record.Feature.LookupListIndex or []
-    }
-    pair_rules: set[tuple[int, str]] = set()
-    triple_rules: set[tuple[int, str]] = set()
-    for lookup_index in ccmp_indices:
-        lookup = gsub.LookupList.Lookup[lookup_index]
-        for subtable in ligature_substitution_subtables(lookup):
-            for ligature in subtable.ligatures.get(em_dash, []) or []:
-                components = list(ligature.Component or [])
-                if components == [em_dash]:
-                    pair_rules.add((lookup_index, ligature.LigGlyph))
-                elif components == [em_dash, em_dash]:
-                    triple_rules.add((lookup_index, ligature.LigGlyph))
-    pair_targets = {target for _index, target in pair_rules}
-    if len(pair_targets) != 1:
-        reasons.append(f"expected one ccmp em dash pair target, found {sorted(pair_targets)}")
-        horizontal_ligature = None
-    else:
-        horizontal_ligature = next(iter(pair_targets))
-
-    expected_triple = cmap.get(0x2E3B)
-    triple_targets = {target for _index, target in triple_rules}
-    if expected_triple and triple_targets != {expected_triple}:
-        reasons.append(
-            f"ccmp em dash triple target {sorted(triple_targets)} != {expected_triple}"
-        )
-
-    expected_two_em = cmap.get(0x2E3A)
-    ccmp_mapping = get_single_substitution_mapping(font, "ccmp")
-    if expected_two_em and ccmp_mapping.get(expected_two_em) != horizontal_ligature:
-        reasons.append("ccmp does not send U+2E3A through the two-em ligature")
-
-    vert_mapping = get_single_substitution_mapping(font, "vert")
-    vrt2_mapping = get_single_substitution_mapping(font, "vrt2")
-    vertical_ligature = (
-        vert_mapping.get(horizontal_ligature) if horizontal_ligature else None
-    )
-    if not vertical_ligature:
-        reasons.append("vert does not map the horizontal two-em ligature")
-    elif vrt2_mapping.get(horizontal_ligature) != vertical_ligature:
-        reasons.append("vrt2 does not share the Source Han long-dash mapping")
-    vertical_three_em_ligature = (
-        vert_mapping.get(expected_triple) if expected_triple else None
-    )
-    if not vertical_three_em_ligature:
-        reasons.append("vert does not map the horizontal three-em ligature")
-    elif vrt2_mapping.get(expected_triple) != vertical_three_em_ligature:
-        reasons.append("vrt2 does not share the Source Han three-em mapping")
-
-    upem = int(font["head"].unitsPerEm)
-    if horizontal_ligature and int(font["hmtx"].metrics[horizontal_ligature][0]) != 2 * upem:
-        reasons.append("horizontal em dash ligature advance is not 2em")
-    if (
-        vertical_ligature
-        and int(font["vmtx"].metrics[vertical_ligature][0]) != 2 * upem
-    ):
-        reasons.append("vertical em dash ligature advance is not 2em")
-    if expected_triple and int(font["hmtx"].metrics[expected_triple][0]) != 3 * upem:
-        reasons.append("horizontal three-em dash advance is not 3em")
-    if (
-        vertical_three_em_ligature
-        and int(font["vmtx"].metrics[vertical_three_em_ligature][0]) != 3 * upem
-    ):
-        reasons.append("vertical three-em dash ligature advance is not 3em")
-
-    continuations = em_dash_continuation_glyphs(font)
-    pair_starts = em_dash_pair_start_glyphs(font)
-    if continuations or pair_starts:
-        reasons.append(
-            "obsolete variable calt pair states remain: "
-            + repr({"continuations": continuations, "pair_starts": pair_starts})
-        )
-    pair_positioning = vertical_em_dash_positioning_records(font)
-    if any(pair_positioning.values()):
-        reasons.append("obsolete variable vertical em dash PairPos remains")
-
-    gdef_classes = (
-        font["GDEF"].table.GlyphClassDef.classDefs
-        if "GDEF" in font and getattr(font["GDEF"].table, "GlyphClassDef", None)
-        else {}
-    )
-    for glyph_name in (
-        horizontal_ligature,
-        vertical_ligature,
-        vertical_three_em_ligature,
-    ):
-        if glyph_name and gdef_classes.get(glyph_name) != 2:
-            reasons.append(f"{glyph_name} is not classified as a GDEF ligature")
-
-    topology = {
-        horizontal_ligature: (2, 9),
-        vertical_ligature: (2, 8),
-        vertical_three_em_ligature: (3, 12),
-    }
-    for glyph_name, (expected_contours, expected_points) in topology.items():
-        if not glyph_name or "glyf" not in font:
-            continue
-        glyph = font["glyf"][glyph_name]
-        if glyph.isComposite():
-            reasons.append(f"{glyph_name} is unexpectedly composite")
-            continue
-        coordinates, _end_points, flags = glyph.getCoordinates(font["glyf"])
-        if int(glyph.numberOfContours) != expected_contours or len(coordinates) != expected_points:
-            reasons.append(
-                f"{glyph_name} topology is {glyph.numberOfContours}/{len(coordinates)}, "
-                f"expected {expected_contours}/{expected_points}"
-            )
-        if not len(flags) or not (int(flags[0]) & 0x40):
-            reasons.append(f"{glyph_name} lacks OVERLAP_SIMPLE on its first contour")
-        if len(font["gvar"].variations.get(glyph_name, [])) != len(EM_DASH_PROBE_WEIGHTS) - 1:
-            reasons.append(f"{glyph_name} does not have every em-dash gvar control")
-
-    if pair_rules and min(index for index, _target in pair_rules) != 0:
-        reasons.append("em dash ccmp ligature lookup is not first in GSUB")
-    return {
-        "ok": not reasons,
-        "reasons": reasons,
-        "mechanism": "Source Han ccmp plus vert",
-        "pair_rules": sorted([index, target] for index, target in pair_rules),
-        "triple_rules": sorted([index, target] for index, target in triple_rules),
-        "horizontal_ligature": horizontal_ligature,
-        "vertical_ligature": vertical_ligature,
-        "vertical_three_em_ligature": vertical_three_em_ligature,
-        "encoded_two_em": expected_two_em,
-        "encoded_three_em": expected_triple,
-        "obsolete_continuations": continuations,
-        "obsolete_pair_starts": pair_starts,
-        "obsolete_pair_positioning": pair_positioning,
-    }
-
-
-def two_em_dash_structure_status(font: TTFont, variable: bool) -> dict[str, Any]:
-    if variable:
-        return variable_em_dash_ligature_structure_status(font)
-    reasons: list[str] = []
-    cmap = font.getBestCmap() or {}
-    em_dash = cmap.get(0x2014)
-    continuations = em_dash_continuation_glyphs(font) if em_dash else []
-    if not em_dash or not continuations:
-        return {"ok": False, "reasons": ["missing horizontal em dash continuation"]}
-    em_dash_cont = continuations[0]
-    em_dash_starts = em_dash_pair_start_glyphs(font)
-    if variable and len(em_dash_starts) != 1:
-        reasons.append(
-            "variable em dash pair requires exactly one fixed-advance start alias: "
-            + repr(em_dash_starts)
-        )
-    em_dash_start = em_dash_starts[0] if len(em_dash_starts) == 1 else em_dash
-    vert_mapping = get_single_substitution_mapping(font, "vert")
-    vrt2_mapping = get_single_substitution_mapping(font, "vrt2")
-    em_dash_v = vert_mapping.get(em_dash) or vrt2_mapping.get(em_dash)
-    if not em_dash_v:
-        reasons.append("missing vertical em dash mapping")
-    legacy_vertical_continuations = (
-        legacy_vertical_em_dash_continuation_glyphs(font, em_dash_v)
-        if em_dash_v
-        else []
-    )
-    if legacy_vertical_continuations:
-        reasons.append(
-            "obsolete unencoded vertical em dash continuation glyphs remain: "
-            + ", ".join(legacy_vertical_continuations)
-        )
-    for tag, mapping in (("vert", vert_mapping), ("vrt2", vrt2_mapping)):
-        mapped_base = mapping.get(em_dash)
-        aliases = [em_dash_cont, *em_dash_starts]
-        if mapped_base and any(mapping.get(alias) != mapped_base for alias in aliases):
-            reasons.append(f"{tag} does not collapse all em dash states to one vertical glyph")
-
-    positioning = vertical_em_dash_positioning_records(font)
-    expected_pair_placement = (
-        vertical_em_dash_pair_placement(font, em_dash_v)
-        if em_dash_v
-        else None
-    )
-    pair_placements: dict[str, tuple[int, int] | None] = {
-        tag: (
-            (records[0]["x_placement"], records[0]["y_placement"])
-            if records
-            else None
-        )
-        for tag, records in positioning.items()
-    }
-    for tag, placement in pair_placements.items():
-        if not placement or placement[1] <= 0:
-            reasons.append(f"missing positive {tag} em dash pair positioning")
-        elif placement != expected_pair_placement or any(
-            (record["x_placement"], record["y_placement"]) != expected_pair_placement
-            for record in positioning[tag]
-        ):
-            reasons.append(
-                f"incorrect {tag} em dash pair positioning: {positioning[tag]}, "
-                f"expected {expected_pair_placement}"
-            )
-
-    weights = (
-        [int(stop["value"]) for stop in SOURCE_HAN_WEIGHT_STOPS]
-        if variable
-        else [None]
-    )
-    width_samples = {}
-    for weight in weights:
-        instance = (
-            instantiateVariableFont(font, {"wght": weight}, inplace=False, optimize=True)
-            if weight is not None
-            else font
-        )
-        try:
-            horizontal = (
-                int(instance["hmtx"].metrics[em_dash_start][0])
-                + int(instance["hmtx"].metrics[em_dash_cont][0])
-            )
-            pair_start_outline_matches = (
-                simple_glyph_coordinates(instance, em_dash_start)
-                == simple_glyph_coordinates(instance, em_dash)
-                and glyph_bbox(instance, em_dash_start)
-                == glyph_bbox(instance, em_dash)
-            )
-            if variable and not pair_start_outline_matches:
-                reasons.append(
-                    f"em dash pair start outline differs from U+2014 at {weight}"
-                )
-            vertical = (
-                2 * int(instance["vmtx"].metrics[em_dash_v][0])
-                if em_dash_v and "vmtx" in instance
-                else None
-            )
-            key = "static" if weight is None else str(weight)
-            location = {"wght": weight} if weight is not None else None
-            positioning_at_location = vertical_em_dash_positioning_records(font, location)
-            pair_placements_at_location: dict[str, tuple[int, int] | None] = {
-                tag: (
-                    (records[0]["x_placement"], records[0]["y_placement"])
-                    if records
-                    else None
-                )
-                for tag, records in positioning_at_location.items()
-            }
-            expected_at_location = (
-                vertical_em_dash_pair_placement(font, em_dash_v, location)
-                if em_dash_v
-                else None
-            )
-            for tag, placement in pair_placements_at_location.items():
-                if placement != expected_at_location or any(
-                    (record["x_placement"], record["y_placement"])
-                    != expected_at_location
-                    for record in positioning_at_location[tag]
-                ):
-                    reasons.append(
-                        f"incorrect {tag} em dash pair positioning at {key}: "
-                        f"{positioning_at_location[tag]}, expected {expected_at_location}"
-                    )
-            seam_gaps = {}
-            if em_dash_v:
-                box = glyph_bbox(instance, em_dash_v)
-                if box:
-                    _x_min, y_min, _x_max, y_max = box
-                    advance_height = int(instance["vmtx"].metrics[em_dash_v][0])
-                    for tag, placement in pair_placements_at_location.items():
-                        seam_gaps[tag] = (
-                            y_min - (y_max - advance_height + int(placement[1]))
-                            if placement is not None
-                            else None
-                        )
-                        if seam_gaps[tag] is None or seam_gaps[tag] > 0:
-                            reasons.append(
-                                f"vertical em dash pair at {key}/{tag} has seam gap "
-                                f"{seam_gaps[tag]!r}"
-                            )
-            width_samples[key] = {
-                "horizontal": horizontal,
-                "vertical": vertical,
-                "pair_start_outline_matches": pair_start_outline_matches,
-                "vertical_seam_gaps": seam_gaps,
-                "pair_placements": pair_placements_at_location,
-            }
-            expected = 2 * int(instance["head"].unitsPerEm)
-            if horizontal != expected:
-                reasons.append(f"horizontal em dash pair at {key} is {horizontal}, expected {expected}")
-            if vertical != expected:
-                reasons.append(f"vertical em dash pair at {key} is {vertical}, expected {expected}")
-        finally:
-            if weight is not None:
-                instance.close()
-    return {
-        "ok": not reasons,
-        "reasons": reasons,
-        "widths": width_samples,
-        "pair_start_glyphs": em_dash_starts,
-        "legacy_vertical_continuations": legacy_vertical_continuations,
-    }
 
 
 def upstream_dash_structure_status(font: TTFont, region: str) -> dict[str, Any]:
@@ -11671,30 +10044,6 @@ def upstream_dash_structure_status(font: TTFont, region: str) -> dict[str, Any]:
     }
 
 
-def tnum_digit_glyphs(font: TTFont, digit_names: list[str]) -> list[str]:
-    if "GSUB" not in font or not font["GSUB"].table.FeatureList:
-        return []
-    result: list[str] = []
-    lookup_list = font["GSUB"].table.LookupList.Lookup if font["GSUB"].table.LookupList else []
-    for feature_record in font["GSUB"].table.FeatureList.FeatureRecord:
-        if feature_record.FeatureTag != "tnum":
-            continue
-        for lookup_index in feature_record.Feature.LookupListIndex:
-            if lookup_index >= len(lookup_list):
-                continue
-            lookup = lookup_list[lookup_index]
-            if lookup.LookupType != 1:
-                continue
-            for subtable in lookup.SubTable:
-                if not hasattr(subtable, "mapping"):
-                    continue
-                for digit_name in digit_names:
-                    target = subtable.mapping.get(digit_name)
-                    if target:
-                        result.append(target)
-    return result
-
-
 def calt_referenced_substitution_lookups(font: TTFont) -> set[int]:
     if "GSUB" not in font or not font["GSUB"].table.FeatureList or not font["GSUB"].table.LookupList:
         return set()
@@ -11722,27 +10071,6 @@ def calt_referenced_substitution_lookups(font: TTFont) -> set[int]:
                             for record in getattr(rule, "SubstLookupRecord", []) or []:
                                 stack.append(record.LookupListIndex)
     return seen
-
-
-def remove_existing_calt_colon_substitutions(font: TTFont, colon: str) -> tuple[str | None, int]:
-    if "GSUB" not in font or not font["GSUB"].table.LookupList:
-        return None, 0
-    lookup_list = font["GSUB"].table.LookupList.Lookup
-    raised = None
-    removed = 0
-    for lookup_index in sorted(calt_referenced_substitution_lookups(font)):
-        if lookup_index >= len(lookup_list):
-            continue
-        lookup = lookup_list[lookup_index]
-        if lookup.LookupType != 1:
-            continue
-        for subtable in lookup.SubTable:
-            if not hasattr(subtable, "mapping") or colon not in subtable.mapping:
-                continue
-            raised = raised or subtable.mapping[colon]
-            del subtable.mapping[colon]
-            removed += 1
-    return raised, removed
 
 
 def coverage_contains_glyph(cov: Any, glyph_name: str) -> bool:
@@ -11836,78 +10164,11 @@ def remove_gsub_lookups(font: TTFont, remove_indices: set[int]) -> dict[str, int
 
     for lookup in new_lookups:
         for subtable in lookup.SubTable:
-            remap_records(subtable)
+            remap_records(getattr(subtable, "ExtSubTable", subtable))
 
     gsub.LookupList.Lookup = new_lookups
     gsub.LookupList.LookupCount = len(new_lookups)
     return {"gsub_lookups_removed": len(remove_indices)}
-
-
-def drop_empty_feature_records(font: TTFont, table_tag: str, tag: str) -> dict[str, int]:
-    if table_tag not in font or not font[table_tag].table.FeatureList:
-        return {f"{tag}_empty_feature_records_removed": 0}
-    table = font[table_tag].table
-    old_records = table.FeatureList.FeatureRecord
-    index_map: dict[int, int] = {}
-    new_records = []
-    removed = 0
-    for old_index, record in enumerate(old_records):
-        if record.FeatureTag == tag and not list(record.Feature.LookupListIndex or []):
-            removed += 1
-            continue
-        index_map[old_index] = len(new_records)
-        new_records.append(record)
-    if not removed:
-        return {f"{tag}_empty_feature_records_removed": 0}
-    table.FeatureList.FeatureRecord = new_records
-    table.FeatureList.FeatureCount = len(new_records)
-    if table.ScriptList:
-        for script_record in table.ScriptList.ScriptRecord:
-            langsys_list = []
-            if script_record.Script.DefaultLangSys:
-                langsys_list.append(script_record.Script.DefaultLangSys)
-            langsys_list.extend(record.LangSys for record in script_record.Script.LangSysRecord)
-            for langsys in langsys_list:
-                indices = [
-                    index_map[index]
-                    for index in list(langsys.FeatureIndex or [])
-                    if index in index_map
-                ]
-                langsys.FeatureIndex = indices
-                langsys.FeatureCount = len(indices)
-                if getattr(langsys, "ReqFeatureIndex", 0xFFFF) != 0xFFFF:
-                    langsys.ReqFeatureIndex = index_map.get(langsys.ReqFeatureIndex, 0xFFFF)
-    return {f"{tag}_empty_feature_records_removed": removed}
-
-
-def ensure_raised_colon_glyph(font: TTFont, colon: str, raised: str | None) -> tuple[str, int]:
-    glyphs = font.getGlyphSet()
-    if raised and raised in glyphs:
-        return raised, 0
-    raised = f"{colon}.digitsep"
-    order = font.getGlyphOrder()
-    if raised in order:
-        return raised, 0
-    font["glyf"].glyphs[raised] = copy.deepcopy(font["glyf"][colon])
-    font["hmtx"].metrics[raised] = copy.deepcopy(font["hmtx"].metrics[colon])
-    if "vmtx" in font and colon in font["vmtx"].metrics:
-        font["vmtx"].metrics[raised] = copy.deepcopy(font["vmtx"].metrics[colon])
-    if "gvar" in font:
-        font["gvar"].variations[raised] = copy.deepcopy(font["gvar"].variations.get(colon, []))
-    digit_names = [font.getBestCmap()[cp] for cp in range(0x30, 0x3A) if cp in font.getBestCmap()]
-    digit_boxes = [glyph_bbox(font, name) for name in digit_names if glyph_bbox(font, name)]
-    colon_box = glyph_bbox(font, colon)
-    if digit_boxes and colon_box:
-        digit_y_min = min(box[1] for box in digit_boxes if box)
-        digit_y_max = max(box[3] for box in digit_boxes if box)
-        digit_center = (digit_y_min + digit_y_max) / 2
-        colon_center = (colon_box[1] + colon_box[3]) / 2
-        shift_glyph_y(font, raised, otRound(digit_center - colon_center))
-    else:
-        shift_glyph_y(font, raised, 105)
-    order.append(raised)
-    font.setGlyphOrder(order)
-    return raised, 1
 
 
 @functools.lru_cache(maxsize=2)
@@ -12360,9 +10621,11 @@ def align_variable_layout_to_reference(font: TTFont, reference: TTFont) -> dict[
     except ValueError:
         roles = None
     before = source_dash_locl_by_language(font, roles) if roles else {}
+    # Later dash passes rebuild some GSUB routes, so GSUB is checked against
+    # the native static once the VF is final (verify_variable_routes_match_static).
     report = {
         **align_layout_feature_template(font, reference, "GSUB"),
-        **align_layout_feature_template(font, reference, "GPOS"),
+        **align_layout_feature_template(font, reference, "GPOS", strict=True),
     }
     report.update(unify_reference_vertical_routes(font, reference))
     after = source_dash_locl_by_language(font, roles) if roles else {}
@@ -12631,6 +10894,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     vorgless_report.update(align_source_punctuation_advances(base, region))
     vorgless_report.update(align_inter_attachment_origins(base, italic))
     vorgless_report.update(align_tabular_alternate_advances(base))
+    vorgless_report.update(sync_gvar_advances_to_hvar(base))
     log_step(f"variable {style_label}: materialize and validate final gvar")
     gvar_finalization_report = materialize_gvar_variations(base)
     if gvar_finalization_report["gvar_coordinate_length_mismatches"]:
@@ -12645,7 +10909,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     vorgless_report.update(normalize_variable_raster_metadata(base))
     vorgless_report.update(prune_unreferenced_variable_names(base))
     vorgless_report.update(recalculate_head_bounds(base))
-    vorgless_report.update(install_continuous_vertical_dash_layout(base))
+    vorgless_report.update(finalize_layout_routes(base))
     vorgless_report.update(normalize_ideograph_gdef_classes(base))
     vorgless_report["gpos_pair_sets_sorted"] = font_layout.sort_pair_sets(base)
     vorgless_report["unreferenced_layout_lookups_removed"] = font_layout.prune_unreferenced_lookups(base)
@@ -12654,6 +10918,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     base.close()
     base = TTFont(out_path)
 
+    vorgless_report.update(verify_variable_routes_match_static(base, region, italic))
     cmap = base.getBestCmap()
     widths = {f"U+{cp:04X}": base["hmtx"].metrics[cmap[cp]][0] for cp in range(0x30, 0x3A)}
     key_widths = {
@@ -12802,7 +11067,11 @@ def run_checked(
         raise RuntimeError(stderr or stdout or f"{cmd[0]} failed with exit code {result.returncode}")
 
 
-def download_file(url: str, path: Path) -> Path:
+class ChecksumMismatch(ValueError):
+    pass
+
+
+def download_file(url: str, path: Path, sha256: str | None = None) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists() and path.stat().st_size:
         return path
@@ -12821,6 +11090,10 @@ def download_file(url: str, path: Path) -> Path:
                     size += len(chunk)
                 if expected_length is not None and size != int(expected_length):
                     raise http.client.IncompleteRead(b"", int(expected_length) - size)
+            # Only bytes with the pinned digest reach the cache path, so an
+            # interrupted or tampered download never looks like a cached one.
+            if sha256 is not None and (actual := file_sha256(tmp)).lower() != sha256.lower():
+                raise ChecksumMismatch(f"sha256 mismatch for {path.name}: expected {sha256}, got {actual}")
             tmp.replace(path)
             return path
         except (urllib.error.URLError, TimeoutError, OSError, http.client.IncompleteRead) as error:
@@ -12846,15 +11119,14 @@ def download_file_checked(url: str, path: Path, sha256: str) -> Path:
     if path.exists() and path.stat().st_size and file_sha256(path).lower() != sha256.lower():
         path.unlink()
     for attempt in range(3):
-        result = download_file(url, path)
-        actual = file_sha256(result)
-        if actual.lower() == sha256.lower():
-            return result
-        result.unlink(missing_ok=True)
-        if attempt < 2:
+        try:
+            return download_file(url, path, sha256)
+        except ChecksumMismatch:
+            if attempt == 2:
+                raise
             log_step(f"retry checksum-mismatched download: {path.name}")
             time.sleep(2 ** attempt)
-    raise RuntimeError(f"sha256 mismatch for {path.name}: expected {sha256}, got {actual}")
+    raise RuntimeError("download retry loop exhausted")
 
 
 def validate_archive_member_paths(names: list[str], destination: Path) -> None:
@@ -12932,22 +11204,6 @@ def extract_zip_basename(archive: Path, basename: str, out_path: Path) -> Path:
         payload = zf.read(member)
         verify_or_write_source(out_path, payload)
     return out_path
-
-
-def extract_zip_first_basename(archive: Path, basenames: list[str], out_dir: Path) -> Path:
-    with zipfile.ZipFile(archive) as zf:
-        validate_zip_archive(zf, out_dir)
-        names = zf.namelist()
-        for basename in basenames:
-            members = [name for name in names if Path(name).name == basename]
-            if not members:
-                continue
-            out_path = out_dir / basename
-            out_path.parent.mkdir(parents=True, exist_ok=True)
-            member = sorted(members, key=len)[0]
-            verify_or_write_source(out_path, zf.read(member))
-            return out_path
-    raise FileNotFoundError(f"None of {basenames} found in {archive}")
 
 
 def extract_7z_ttf_prefix(archive: Path, out_dir: Path, prefix: str) -> None:
@@ -13086,9 +11342,7 @@ def local_runtime_env() -> dict[str, str]:
 
 
 def npm_executable() -> str:
-    env_value = os.environ.get("NPM")
-    if env_value:
-        return env_value
+    reject_unpinned_node_override()
     ensure_node_runtime()
     return str(bundled_npm_executable())
 
@@ -13669,9 +11923,10 @@ def ui_hint_control(in_path: Path) -> str:
 
 
 def hint_static_font(in_path: Path, out_path: Path, weight_name: str | None = None) -> dict[str, Any]:
-    if os.environ.get("SARASA_SKIP_TTFAUTOHINT") == "1":
-        shutil.copy2(in_path, out_path)
-        return {"hinted": False, "hint_tool": "skipped"}
+    # Skipping wrote unhinted fonts under ttfautohint cache keys and a report
+    # naming ttfautohint; an unhinted product has its own entry instead.
+    if "SARASA_SKIP_TTFAUTOHINT" in os.environ:
+        raise RuntimeError("hinted 构建不能跳过 ttfautohint；无 hint 成品请使用 --unhinted-only")
     options = list(UI_AUTOHINT_OPTIONS) if weight_name is not None else []
     control = ui_hint_control(in_path) if weight_name is not None else ""
     control_args = []
@@ -13725,11 +11980,17 @@ def native_hint_execution_status(path: Path, *, full_ppems: tuple[int, ...] = (1
             "loads_expected": expected, "loads_checked": checked, "failures": len(errors), "samples": errors}
 
 
+def reject_unpinned_node_override() -> None:
+    """An executable named by the environment bypassed the pinned archive
+    check, yet fragments built with it were cached under the pinned Node."""
+    named = [name for name in ("SARASA_NODE", "NODE", "NPM") if os.environ.get(name)]
+    if named:
+        raise RuntimeError(f"不再接受 {'、'.join(named)} 指定的 Node/npm；"
+                           "改用 SARASA_NODE_DIR，构建会在其中核验固定版本的归档")
+
+
 def node_executable() -> str:
-    for env_name in ("SARASA_NODE", "NODE"):
-        env_value = os.environ.get(env_name)
-        if env_value:
-            return env_value
+    reject_unpinned_node_override()
     ensure_node_runtime()
     return str(bundled_node_executable())
 
@@ -15058,7 +13319,7 @@ def refresh_static_finalization_font(
         ellipsis_report.update(apply_default_regional_punctuation(font, region))
         vertical_report = normalize_static_vertical_origin(font)
         colon_report = add_digit_colon_feature(font)
-        colon_report.update(install_continuous_vertical_dash_layout(font))
+        colon_report.update(finalize_layout_routes(font))
         colon_report.update(normalize_ideograph_gdef_classes(font))
         colon_report["gpos_pair_sets_sorted"] = font_layout.sort_pair_sets(font)
         colon_report["unreferenced_layout_lookups_removed"] = font_layout.prune_unreferenced_lookups(font)
@@ -15132,7 +13393,7 @@ def normalize_static_vertical_origin(font: TTFont) -> dict[str, Any]:
 def normalize_variable_vertical_origin(font: TTFont) -> dict[str, Any]:
     if "VORG" not in font:
         return {"variable_vorg_removed": False}
-    weights = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
+    weights = AXIS_CONTROL_WEIGHTS
     source_hb = hb.Font(hb.Face(serialized_font_bytes(font)))
     order = font.getGlyphOrder()
     expected = {}
@@ -15195,7 +13456,7 @@ def normalize_cross_engine_metrics(font: TTFont) -> dict[str, Any]:
         return {"cross_engine_metric_normalization": False}
     if "VVAR" not in font and "VORG" not in font and not any(item.coordinates[-4] and item.coordinates[-4][0] for items in font["gvar"].variations.values() for item in items):
         return {"cross_engine_metric_normalization": True, "cross_engine_metrics_already_canonical": True, "vertical_metrics_source": "gvar"}
-    weights = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
+    weights = AXIS_CONTROL_WEIGHTS
     def snapshot(data: bytes) -> dict[int, list[tuple]]:
         runtime = hb.Font(hb.Face(data))
         result = {}
@@ -15333,7 +13594,6 @@ def normalize_cross_engine_metrics(font: TTFont) -> dict[str, Any]:
     return {"cross_engine_metric_normalization": True, "horizontal_origin_tuples_translated": translated, "component_origin_tuples_compensated": compensated, "vertical_metrics_source": "gvar", "vvar_removed_for_shared_vertical_origin": removed, "runtime_metric_preservation_weights": list(weights), "runtime_metric_preservation_glyphs": len(font.getGlyphOrder()), "runtime_metric_preservation_mismatches": 0, "runtime_extent_rounding_observations": rounding_observations}
 
 
-
 def _refresh_variable_finalization_outputs(regions: list[str], italic_styles: tuple[bool, ...] = (False, True)) -> list[dict[str, Any]]:
     outputs = []
     for region in regions:
@@ -15361,13 +13621,15 @@ def _refresh_variable_finalization_outputs(regions: list[str], italic_styles: tu
                     for reference in references.values():
                         reference.close()
                 report.update(align_source_punctuation_advances(font, region))
+                report.update(sync_gvar_advances_to_hvar(font))
                 update_vf_names(font, region, italic)
                 update_os2_sarasa_metadata(font, region)
                 remove_mac_name_records(font)
                 update_head_project_revision(font)
                 report.update(normalize_variable_raster_metadata(font))
                 report.update(prune_unreferenced_variable_names(font))
-                report.update(install_continuous_vertical_dash_layout(font))
+                report.update(finalize_layout_routes(font))
+                report.update(verify_variable_routes_match_static(font, region, italic))
                 report.update(normalize_ideograph_gdef_classes(font))
                 report["unreferenced_layout_lookups_removed"] = font_layout.prune_unreferenced_lookups(font)
                 font["OS/2"].usMaxContext = maxCtxFont(font)
@@ -15482,7 +13744,7 @@ def refresh_layout_outputs(regions: list[str]) -> dict[str, Any]:
             try:
                 with TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False) as font:
                     original_head = font.reader["head"]
-                    details = install_continuous_vertical_dash_layout(font)
+                    details = finalize_layout_routes(font)
                     font.save(pending, reorderTables=True)
                 with TTFont(pending, lazy=True) as candidate:
                     candidate_head = candidate.reader["head"]
@@ -15595,6 +13857,7 @@ def postprocess_static_font(
                 else:
                     report["extension_source_vorg_preserved"] = True
                 report.update(sync_sarasa_metadata_from_reference(font, reference))
+                report.update(derive_static_weight_metadata(font, weight_name, italic))
             except Exception:
                 reference.close()
                 reference = None
@@ -15620,6 +13883,7 @@ def postprocess_static_font(
             report.update(align_layout_feature_template(font, reference, "GSUB"))
             report.update(apply_upstream_dash_behavior(font, region, italic=italic, prepared_layout=prepared_layout))
             report.update(align_layout_feature_template(font, reference, "GPOS"))
+            report.update(prune_features_like_reference(font, reference))
             subset_to_current_cmap(font)
             report.update(align_layout_feature_template(font, reference, "GSUB"))
             report.update(apply_upstream_dash_behavior(font, region, italic=italic, prepared_layout=prepared_layout))
@@ -15708,7 +13972,8 @@ def postprocess_static_font(
         report.update(apply_default_regional_punctuation(font, region))
         report.update(add_digit_colon_feature(font))
         report.update(recalculate_head_bounds(font))
-        report.update(install_continuous_vertical_dash_layout(font))
+        report.update(recalculate_derived_vertical_extremes(font, weight_name))
+        report.update(finalize_layout_routes(font))
         report.update(normalize_ideograph_gdef_classes(font))
         report["gpos_pair_sets_sorted"] = font_layout.sort_pair_sets(font)
         report["unreferenced_layout_lookups_removed"] = font_layout.prune_unreferenced_lookups(font)
@@ -15764,12 +14029,14 @@ def prepare_static_style(
             unhinted_report = None
         cache_inputs = {name: file_sha256(Path(fragments[name])) for name in
                         ("pass1", "kanji", "hangul", "dash_source_path", "western_dash_source_path")}
+        # The postprocess runs the layout components and locked dependencies
+        # too, so reuse needs the whole output contract, not only this script.
+        cache_binding = {"schema": 2, "contract": output_validation_contract(False), "inputs": cache_inputs}
         if (
             isinstance(unhinted_report, dict)
             and unhinted_tmp.is_file()
             and unhinted_report.get("cache_binding") == {
-                "schema": 1, "builder_sha256": BUILDER_CODE_SHA256,
-                "inputs": cache_inputs, "output_sha256": file_sha256(unhinted_tmp),
+                **cache_binding, "output_sha256": file_sha256(unhinted_tmp),
                 "output_size": unhinted_tmp.stat().st_size,
             }
             and unhinted_report.get("static_postprocess_cache_key")
@@ -15807,7 +14074,7 @@ def prepare_static_style(
                 Path(fragments["dash_source_path"]),
             )
             unhinted_report["cache_binding"] = {
-                "schema": 1, "builder_sha256": BUILDER_CODE_SHA256, "inputs": cache_inputs,
+                **cache_binding,
                 "output_sha256": file_sha256(unhinted_tmp), "output_size": unhinted_tmp.stat().st_size,
             }
             write_json_atomic(unhinted_report_path, unhinted_report)
@@ -16341,18 +14608,6 @@ def contextual_spacing_shape_samples(path: Path, font: TTFont) -> dict[str, Any]
     }
 
 
-def lsb_mismatch_count(font: TTFont) -> int | None:
-    if "hmtx" not in font or "glyf" not in font:
-        return None
-    mismatches = 0
-    for glyph_name, (_advance_width, lsb) in font["hmtx"].metrics.items():
-        if glyph_name not in font["glyf"].glyphs:
-            continue
-        if glyph_x_min(font, glyph_name, lsb) != lsb:
-            mismatches += 1
-    return mismatches
-
-
 def inspect_font(path: Path) -> dict[str, Any]:
     font = TTFont(path)
     try:
@@ -16455,7 +14710,8 @@ CL 的公开 cmap/layout 限于 Sarasa Ui CL 边界。
 
 37 个数字、空格、标点和运算符默认使用 Inter 比例形态；tnum 恢复 tabular，pnum 不改变默认宽度。
 冒号复用 Inter 的上下文规则，在 tnum 之前执行；1:2、1:、:2 上浮，
-1:a、a:2、a:b 保持原位。tnum 与 zero 可同时启用。{default}
+1:a、a:2、a:b 保持原位。tnum 与 zero 可同时启用。
+西里尔、希腊文字的默认语言系统也带这些特性和附加符号定位（上游 Sarasa Ui 在此只有 kern）。{default}
 破折号、省略号和竖排沿用对应 Source Han/Shanggu 字形，保持
 ccmp → locl → vert/vrt2 顺序。中文双省略号为两个居中 glyph，共 2em；
 中文双连、三连破折号分别为 2em、3em；竖排拆为连续的 1em 片段，墨迹不越出各自 advance。
@@ -16471,7 +14727,6 @@ unhinted 仅保留启用 smart dropout 的最小 prep，不含逐字形 hint、f
 完整版本的主审计、OTS、分地区 FontBakery、视觉检查与 21 包校验报告见仓库 reports。
 这些字体按 SIL Open Font License 1.1 分发，是修改版字体，不是任何上游的官方发布。
 """
-
 
 
 def write_static_readme(regions: list[str], variants: tuple[bool, ...] = (True, False)) -> None:
@@ -16531,10 +14786,16 @@ def assert_portable_report_text(text: str) -> None:
         raise ValueError(f"report contains local absolute paths: {leaks[:8]}")
 
 
+def ui_hint_fallback_description() -> str:
+    """The Ui pass1 fallback set, written from the constants that build it."""
+    targets = "、".join(f"U+{codepoint:04X}" for codepoint in UI_AUTOHINT_UNSCALED_CODEPOINTS)
+    return targets + (" 和竖排连接片段" if UI_AUTOHINT_UNSCALED_VERTICAL_SEGMENTS else "")
+
+
 def production_method_description() -> str:
     return (
         f"固定 Sarasa Gothic {SARASA_VERSION}、Source Han Sans 2.005R、Inter 4.1、Shanggu Sans 1.028 "
-        "与 Node.js 26.7.0；归档和已解包来源均按固定 SHA-256 核验。"
+        f"与 Node.js {NODE_VERSION.removeprefix('v')}；归档和已解包来源均按固定 SHA-256 核验。"
         "公开字重为 200/300/400/600/700/900，350 仅为隐藏 avar 锚点。"
         "CJK public 200/600 分别使用内部 250/500，Inter 使用公开数字坐标；"
         "先应用 Source Han public axis，再重映射 Inter 轮廓和 GPOS 变化。"
@@ -16542,19 +14803,23 @@ def production_method_description() -> str:
         "公开 cmap/layout 按 Sarasa Ui CL 边界裁剪。"
         "静态字体走原生 pass1/kanji/hangul/pass2，绝不由 VF 实例化。"
         "每字重建立同序的 96 个 pass1 与 12 个 CJK 输入，统一 instruct 后由 pass2 合成。"
-        "Ui pass1 使用 --fallback-script=none --fallback-scaling；原生控制文件将 U+0360 "
+        f"Ui pass1 使用 --fallback-script=none --fallback-scaling；原生控制文件将 {ui_hint_fallback_description()} "
         "归入相同 fallback，正常拉丁字母和数字保留原有 hint。生成后检查全部 Ui pass1 字形在 "
         "6–200 px、灰阶/单色/LCD 下的严格指令执行。实际 hinter 执行文件、版本、选项、"
         "控制文件和来源哈希参与相关缓存校验；布局、名称或版权刷新保护轮廓与 hint。"
         "静态 post 保持 format 3，竖排原点来自最终 glyf/vmtx，移除 TrueType 中的 VORG。"
-        "VF 直接合并 CJK 与 Inter，合并 GDEF 变化存储、可变定位和 mark filtering sets。"
+        "VF 直接合并 CJK 与 Inter，合并 GDEF 变化存储、可变定位和 mark filtering sets；"
+        "语言系统按上游规则逐一精确合并，再给远东文字与远东语言追加 DFLT/dflt 的特性，"
+        "最终路由结构须与原生静态字体一致。"
         "Italic CJK 先物化 IUP 隐含增量再剪切，metric phantom points 不剪切；"
         "用 13 个轴点检查复合字形。最终保留 HVAR，横向原点补偿转为轮廓与组件变化，"
+        "gvar 幽灵点步进在 13 个轴点与 HVAR 一致，"
         "移除 VVAR/VORG，竖排统一使用 gvar，并保持既有运行时轮廓边界和度量。"
         "37 个数字、空格、标点与运算符默认比例宽，tnum 恢复 tabular，pnum 不改变默认宽度；zero 及可达替代数字共享严格等宽变化曲线。"
         "ss03/cv10 保留替代字形自己的定位；完整恢复固定 Inter 的上下文大小写规则与抑制规则，"
         "冒号规则在数字宽度替换前执行，兼容字符串边界、长串冒号和烘焙后的字母身份。"
         "西文文字系统按 Source Han 的语言路由；hani/kana/hang/bopo 默认采用地区标点，双省略号严格 2em。"
+        "西里尔、希腊文字的默认语言系统共用 DFLT/dflt 的特性，竖排替换保留各自路由。"
         "CL 中文破折号使用 Shanggu，西文使用 Source Han K。竖排长破折号拆为连续的 1em 片段，"
         "轮廓在 hint 前生成，最终重算全部字形的 head 包围盒。保留 Source Han/Shanggu 的 "
         "ccmp→locl→vert/vrt2 及 KOR 单破折号特例。最后追加 Noto CJK 交付后处理的 chws/vchw。"
@@ -16572,9 +14837,10 @@ def production_intentional_differences() -> list[str]:
         "公开 200/600 分别配对 CJK 250/500 与 Inter 200/600，350 仅为隐藏锚点；Heavy 900 是正式扩展样式。",
         "完整的 Inter 上下文规则与字母抑制规则在烘焙 ss03/cv10 后继续有效，并保留替代字形自己的定位。",
         "西文文字系统采用 Source Han 的语言路由；hani/kana/hang/bopo 默认采用地区 CJK 形式。CL 中文破折号使用 Shanggu，西文使用 Source Han K；CJK 双省略号严格 2em。",
+        "西里尔、希腊文字的默认语言系统共用 DFLT/dflt 的特性（tnum、zero、frac、mark、mkmk 等），竖排替换保留各自路由；上游 Sarasa Ui 与 Inter 在此只有 kern，俄文、希腊文段落无法选用等宽数字，组合附加符号也不定位。",
         "竖排连续破折号以 1em 片段接续，每段墨迹不越界，连接边严格一致；静态分段轮廓在 hint 前生成，最终 head 包围盒重新计算。",
         "CL 使用 Source Han K 和 Shanggu TC 来源，公开 cmap/layout 按 Sarasa Ui CL 边界裁剪。",
-        "Ui 原生 hint 对未分类字形及 U+0360 使用明确的 fallback 策略，修复无效指令；正常拉丁字母和数字的 hint 保持有效。",
+        f"Ui 原生 hint 对未分类字形及 {ui_hint_fallback_description()} 使用明确的 fallback 策略，修复无效指令；正常拉丁字母和数字的 hint 保持有效。",
         "VF 使用 HVAR 与 gvar 的统一度量表示，移除 VVAR/VORG；静态竖排使用最终 glyf/vmtx，post 保持 format 3。",
         "追加 Noto CJK 交付流程的 chws/vchw，是否自动启用由实际引擎和应用决定。",
         "静态与 VF 分别沿用固定静态源和可变源；记录源轮廓差异，并在公开字重以两端真实 HarfBuzz 对齐横竖度量。",
@@ -16600,11 +14866,16 @@ def write_reports(build_report: dict[str, Any]) -> None:
     font_paths = (sorted(VARIABLE_DIR.glob("*.ttf"))
                   + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-{VERSION}/*.ttf"))
                   + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-Unhinted-{VERSION}/*.ttf")))
-    inspection = {"title": "Sarasa Ui PropDigits 字体检查", "complete_font_matrix": complete,
-                  "fonts": [inspect_font(path) for path in font_paths if portable_report_path(path) in declared]}
+    inspected = [path for path in font_paths if portable_report_path(path) in declared]
+    # A layout refresh of some regions declares all 156 fonts but stages only
+    # its own; the inspection is complete only for the fonts it really read.
+    inspection_complete = complete and {portable_report_path(path) for path in inspected} == expected
+    inspection_suffix = "" if inspection_complete else ".partial-" + ("-".join(scope) or "selection")
+    inspection = {"title": "Sarasa Ui PropDigits 字体检查", "complete_font_matrix": inspection_complete,
+                  "fonts": [inspect_font(path) for path in inspected]}
     inspection = sanitize_report_data(inspection)
     assert_portable_report_text(json.dumps(inspection, ensure_ascii=False))
-    write_json_atomic(REPORT_DIR / f"font-inspection{suffix}.json", inspection)
+    write_json_atomic(REPORT_DIR / f"font-inspection{inspection_suffix}.json", inspection)
 
 
 def existing_variable_outputs() -> list[dict[str, Any]]:
@@ -17336,11 +15607,40 @@ def recycle_completed_transaction(transaction: Path) -> None:
     if state.get("status") != "promoted":
         raise ValueError("只能清理已经完成提交的事务")
     if os.name == "nt":
-        script = ("Add-Type -AssemblyName Microsoft.VisualBasic; "
-                  "[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory("
-                  "$env:SARASA_COMPLETED_TRANSACTION, "
-                  "[Microsoft.VisualBasic.FileIO.UIOption]::OnlyErrorDialogs, "
-                  "[Microsoft.VisualBasic.FileIO.RecycleOption]::SendToRecycleBin)")
+        # Windows deletes outright what does not fit the volume's Recycle Bin,
+        # or everything when NukeOnDelete is set, without asking, and a full
+        # bin makes room by purging its oldest items; keep the transaction in
+        # place instead.
+        script = r"""
+Add-Type -AssemblyName Microsoft.VisualBasic
+Add-Type -TypeDefinition @'
+using System.Runtime.InteropServices;
+public static class SarasaRecycleBin {
+    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    struct Info { public int cbSize; public long Size; public long Items; }
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    static extern int SHQueryRecycleBinW(string root, ref Info info);
+    public static long Used(string root) {
+        var info = new Info(); info.cbSize = Marshal.SizeOf(typeof(Info));
+        Marshal.ThrowExceptionForHR(SHQueryRecycleBinW(root, ref info));
+        return info.Size;
+    }
+}
+'@
+$path = $env:SARASA_COMPLETED_TRANSACTION
+$size = [long](Get-ChildItem -LiteralPath $path -Force -Recurse -File | Measure-Object Length -Sum).Sum
+$drive = [IO.Path]::GetPathRoot($path).TrimEnd('\')
+$volume = Get-CimInstance Win32_Volume -Filter "DriveLetter='$drive'"
+if (-not $volume) { throw "cannot find the volume of $drive" }
+$guid = ($volume.DeviceID -replace '^\\\\\?\\Volume', '').TrimEnd('\')
+$settings = Get-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\BitBucket\Volume\$guid" -ErrorAction Stop
+if ($settings.NukeOnDelete -eq 1) { throw "$drive deletes without the Recycle Bin (NukeOnDelete)" }
+$used = [SarasaRecycleBin]::Used($drive + '\')
+if ($used + $size -gt [long]$settings.MaxCapacity * 1MB * 0.8) { throw "the transaction does not fit the Recycle Bin of $drive" }
+[Microsoft.VisualBasic.FileIO.FileSystem]::DeleteDirectory($path,
+    [Microsoft.VisualBasic.FileIO.UIOption]::OnlyErrorDialogs,
+    [Microsoft.VisualBasic.FileIO.RecycleOption]::SendToRecycleBin)
+"""
         subprocess.run(["powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script],
                        env={**os.environ, "SARASA_COMPLETED_TRANSACTION": str(source)}, check=True)
     else:

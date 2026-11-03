@@ -32,15 +32,31 @@ jobs:
           .ci-venv/bin/python -m pip check
       - name: 校验并准备完整测试来源
         run: .ci-venv/bin/python tools/tests/prepare_sources.py
+      # 字体不进 git：取回本检出发布清单对应的 Release 资产，逐包逐字体核验。
+      # 发布提交推送时 Release 尚未发布，由 release-assets.yml 在发布后核验实际资产。
+      - name: 取回本版本已发布的字体
+        id: fonts
+        run: |
+          set +e
+          .ci-venv/bin/python tools/fetch_release_fonts.py
+          status=$?
+          set -e
+          if [ "$status" -eq 0 ]; then echo "available=true" >> "$GITHUB_OUTPUT"
+          elif [ "$status" -eq 3 ]; then echo "available=false" >> "$GITHUB_OUTPUT"
+          else exit "$status"; fi
       - name: 单元测试
+        env:
+          RELEASE_FONTS: ${{ steps.fonts.outputs.available }}
         run: |
           .ci-venv/bin/python - <<'PY'
+          import os
           import unittest
           suite = unittest.defaultTestLoader.discover('tools/tests')
           result = unittest.TextTestRunner(verbosity=2).run(suite)
-          if result.skipped:
+          if result.skipped and os.environ['RELEASE_FONTS'] == 'true':
               raise SystemExit('CI 不允许缺失夹具而跳过测试：' + repr(result.skipped))
           raise SystemExit(0 if result.wasSuccessful() else 1)
           PY
       - name: 快速字体审计
+        if: steps.fonts.outputs.available == 'true'
         run: .ci-venv/bin/python tools/check_quick_audit.py

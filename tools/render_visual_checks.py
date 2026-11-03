@@ -189,9 +189,11 @@ def detail_sheet(region: str) -> dict:
     width_text = "".join(chr(cp) for cp in sorted(audit.INTENTIONAL_CPS))
     widths = FontRenderer(audit.vf_path(region, False), 25); widths.weight(400)
     width_cases = []
-    for index, features in enumerate(({}, {"pnum": True}, {"tnum": True})):
+    # calt off: Inter's contextual arrows would join <=> into one ⇔ and hide
+    # three of the 37 codepoints.
+    for index, features in enumerate(({"calt": False}, {"calt": False, "pnum": True}, {"calt": False, "tnum": True})):
         baseline = 1518 + index * 82
-        draw.text((990, baseline - 43), next(iter(features), "默认"), font=label_font, fill=(65, 80, 100))
+        draw.text((990, baseline - 43), next((tag for tag in features if tag != "calt"), "默认"), font=label_font, fill=(65, 80, 100))
         end, _ = widths.draw(image, width_text, (990, baseline), script="Latn", features=features)
         if end > 1850: raise RuntimeError("37 个比例码位的样张超出画布")
         width_cases.append({"font": audit.display_path(audit.vf_path(region, False)), "weight": 400,

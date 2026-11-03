@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 from pathlib import Path
 
@@ -9,22 +10,34 @@ ROOT = Path(__file__).resolve().parents[2]
 WORK = Path(os.environ.get("SARASA_WORK_ROOT", ROOT / ".build-cache/work"))
 FONT_ROOT = Path(os.environ.get("SARASA_AUDIT_FONT_ROOT", ROOT / "fonts"))
 SOURCE_ROOT = Path(os.environ.get("VF_SOURCE_DIR", WORK / "vf-sources"))
-VERSION = "1.0.43"
-# head.fontRevision and the nameID 5 prefix: 1.0.43 is written 1.043.
-OPENTYPE_VERSION = "1.{}{}".format(*VERSION.split(".")[1:])
-REFERENCE_ROOT = Path(os.environ.get("REFERENCE_SARASA_ROOT", WORK / f"official-sarasa-ui-{VERSION}"))
-SARASA_SOURCE = Path(os.environ.get("SARASA_SOURCE_DIR", WORK / f"Sarasa-Gothic-{VERSION}"))
+VERSION = "1.0.43.1"
+# A project revision keeps the pinned upstream release.
+SARASA_VERSION = "1.0.43"
+# head.fontRevision and the nameID 5 prefix: 1.0.43 is written 1.043, 1.0.43.1 1.0431.
+OPENTYPE_VERSION = "1." + "".join(VERSION.split(".")[1:])
+REFERENCE_ROOT = Path(os.environ.get("REFERENCE_SARASA_ROOT", WORK / f"official-sarasa-ui-{SARASA_VERSION}"))
+SARASA_SOURCE = Path(os.environ.get("SARASA_SOURCE_DIR", WORK / f"Sarasa-Gothic-{SARASA_VERSION}"))
 REGIONS = ("CL", "SC", "TC", "HC", "J", "K")
 WEIGHTS = {"ExtraLight": 200, "Light": 300, "Regular": 400,
            "SemiBold": 600, "Bold": 700, "Heavy": 900}
 AXIS_POINTS = (200, 250, 300, 325, 350, 375, 400, 500, 600, 650, 700, 800, 900)
 CJK_WEIGHTS = {200: 250, 300: 300, 350: 350, 400: 400, 600: 500, 700: 700, 900: 900}
-INTENTIONAL_CPS = frozenset(range(0x30, 0x3A)) | {
-    0x20, 0xA0, 0x2008, 0x2C, 0x2E, 0x3A, 0x3B,
-    0x28, 0x29, 0x5B, 0x5D, 0x7B, 0x7D,
-    0x2A, 0x2B, 0x3C, 0x3D, 0x3E, 0x7E,
-    0xB1, 0xD7, 0xF7, 0x2212, 0x2248, 0x2260, 0x2264, 0x2265,
-}
+# The declared differences are read from the published list itself, so the
+# list and the codepoints the audit treats specially cannot drift apart.
+INTENTIONAL_DIFFERENCES = json.loads(Path(__file__).with_name("intentional-differences.json")
+                                     .read_text("utf-8"))["differences"]
+
+
+def declared_codepoints(identifier: str) -> frozenset[int]:
+    return frozenset(next(item for item in INTENTIONAL_DIFFERENCES if item["id"] == identifier)["codepoints"])
+
+
+# The 37 proportional defaults (digits, spaces, punctuation and operators).
+INTENTIONAL_CPS = declared_codepoints("proportional-defaults")
+# Dashes and ellipses that follow Source Han's (CL: Shanggu's) language routing.
+REGIONAL_PUNCTUATION = declared_codepoints("regional-punctuation")
+# CL ideographs whose GDEF marking the project corrects to spacing bases.
+CLASSICAL_SPACING_BASES = declared_codepoints("classical-spacing-bases")
 
 
 def sha256(path: Path) -> str:

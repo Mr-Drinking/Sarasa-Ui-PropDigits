@@ -95,6 +95,12 @@ class FeatureRoutingTests(unittest.TestCase):
 
     def test_common_and_script_specific_kerning_both_survive(self):
         target = fixture_font(); incoming = fixture_font()
+        # Source Han routes every script itself. ot-builder joins each language
+        # exactly, so common kerning reaches Latin through the base's own latn.
+        addOpenTypeFeaturesFromString(target, '''
+            languagesystem DFLT dflt; languagesystem latn dflt;
+            feature kern { pos G T -30; } kern;
+        ''')
         addOpenTypeFeaturesFromString(incoming, '''
             languagesystem DFLT dflt; languagesystem latn dflt;
             feature kern { pos Galt o -15; } kern;

@@ -238,13 +238,21 @@ class VisualControls(unittest.TestCase):
                                                                 ("Latn","zh-Hans"),("Latn","ko"),("Hani",None))]
                 item["width_cases"]=[{"font":vf,"weight":400,"features":features,
                                       "text":"".join(chr(cp) for cp in sorted(audit.INTENTIONAL_CPS)),"pixels":25}
-                                     for features in ({},{"pnum":True},{"tnum":True})]
+                                     for features in ({"calt":False},{"calt":False,"pnum":True},{"calt":False,"tnum":True})]
                 item["vertical_cases"]=[{"font":audit.display_path(audit.vf_path(region,italic) if variable else audit.static_path(region,"Regular",italic,False)),
                                          "weight":400,"italic":italic,"variable":variable,"script":"Hani","direction":"ttb","text":text,"pixels":34}
                                         for variable in (True,False) for italic in (False,True)
                                         for text in build.VISUAL_VERTICAL_RUN_TEXTS]
+        # v1.0.43's records repeat one template per image kind across regions;
+        # number each image's records so the fixture describes its own image.
+        for index, item in enumerate(report["images"], 1):
+            item["observations"] = [f"第 {index} 张：{value}" for value in item["observations"]]
         package.validate_visual_report(report, manifest)
+        templated = lambda value: [item.update(observations=["字重递进与标点均正常。"])
+                                   for item in value["images"] if item["file"].endswith("-detail.png")]
         mutations = (
+            templated,
+            lambda value: value.update(reviewer=""),
             lambda value: value.update(images=[]),
             lambda value: value.update(reviewed_fonts=[]),
             lambda value: value.update(generator_sha256="incorrect"),

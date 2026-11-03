@@ -60,6 +60,13 @@ class IndependentMetadataTests(unittest.TestCase):
         self.assertEqual({tag: font.getTableData(tag) for tag in before}, before)
         self.assertEqual((glyph.xMin, glyph.xMax), (-1, 401))
 
+    def test_left_side_bearings_must_equal_stored_xmin(self):
+        font = fixture_font()
+        self.assertEqual(audit_metadata.left_bearing_mismatches(font), [])
+        # Recalculated bounds without the bearing move the rendered outline.
+        font["glyf"]["G"].xMin = 1
+        self.assertEqual(audit_metadata.left_bearing_mismatches(font), ["G"])
+
     def test_license_documents_follow_upstream_and_reject_stale_copies(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)

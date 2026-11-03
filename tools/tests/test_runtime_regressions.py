@@ -268,6 +268,9 @@ class PositioningRegressionTests(unittest.TestCase):
         b.apply_public_weight_axis(base)
         b.append_inter_glyphs(base, inter, set(inter.getBestCmap()))
         b.import_inter_layout_features(base, inter)
+        # Every output ends with this routing step (finalize_layout_routes): the
+        # Cyrillic and Greek defaults take the DFLT/dflt marks Inter routes only there.
+        b.font_layout.share_default_language_features(base)
         b.subset_to_current_cmap(base)
         b.rebuild_gdef_from_reference(base, fixture_font())
         b.subset_to_current_cmap(base)

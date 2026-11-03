@@ -1,7 +1,7 @@
 {
   "title": "持续集成快速审计",
-  "version": "1.0.43",
-  "generated_at": "2026-10-27T16:27:38.350697+00:00",
+  "version": "1.0.43.1",
+  "generated_at": "2026-11-03T06:13:44.113026+00:00",
   "release_audit_complete": false,
   "regions": [
     "CL",
@@ -16,7 +16,7 @@
   "results": [
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
-      "sha256": "ef7a35fb9adac69c01261c81f985cc105542e6e71158df93224a86eb6e0d4c5e",
+      "sha256": "9ff45623ed182848b887c5b0c34eff8c9193fce6f77d076d6b42c60bdb1ce2ea",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -117,10 +117,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -153,7 +153,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
-      "sha256": "0cad67e02b6bd88756fde7f58a3ece618a352923cacb41d69bb85b258b769688",
+      "sha256": "21df72e4b676c3240afaff381eb0b3fe65396a60d61b176a9d092f46c5898106",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -254,10 +254,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -289,8 +289,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "sha256": "22a235182cc94b13d99fc6244d1296f5a3406ccf1551101b709e26d2b28a3d7a",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "sha256": "549a785fa7c168d12083c6d57a0e6c0abda6a8c2fa359348c335a64ffede6d38",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -391,6 +391,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -399,19 +401,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -441,8 +441,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "sha256": "662d0dd46cd5323e520465f027fb380b89ffddc6fbd7bf4677fb753a79910b46",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "sha256": "8149b0f50687f9ef795b1db6855d134a5c1f5b486e4cf5c53d0265e221f17a40",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -543,6 +543,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -551,19 +553,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -589,8 +589,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "sha256": "3a9fa2230e2f14c7c9f7ca515a914ee89f0897dda20ad17bb5af40a7ba398115",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "sha256": "7d41d9af85a34d484e329502e3bf50044c6842c67c5ac398273704b9f237fff6",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -691,6 +691,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -699,19 +701,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -741,8 +741,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "sha256": "40b8b65a9cd46138b50963f0ae57ea75f159b5c4b712b1c8ac4dbdcedfd4e654",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "sha256": "e2f7b8b4ed7651dd82f03b626af80160771ffab549a56d550a0413f566c65489",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -843,6 +843,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -851,19 +853,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -889,8 +889,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Light.ttf",
-      "sha256": "05d1a4955fcb6460c550e2a998ca47c36da82edd9bda4d5f477dd0317988f038",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
+      "sha256": "fcf4daf79695e4ff87610cb29c0ad2a21bb51594b7219be083f2e63e88942dff",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -991,6 +991,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -999,19 +1001,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -1041,8 +1041,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Light.ttf",
-      "sha256": "6bc1141cdf5392d16fc444cfb3dad817d703c3367771a0d95b56972bc99a1ae5",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
+      "sha256": "cd1ee0109e7fc87fcf5636ddf8b695872bc6a53f3261efb08e33d4a1f49f8319",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -1143,6 +1143,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -1151,19 +1153,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -1189,8 +1189,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "sha256": "17373c7c2947f1e24a894e2ea74a9d456a9228624c1fa5aae965c2c292f1d226",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "sha256": "c38b404b9496b042a1b698302d05baa0ca29c63d7ffaee5e6e71324ce3178c94",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -1291,6 +1291,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -1299,19 +1301,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -1341,8 +1341,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "sha256": "2bd47edb50f45b8f65b6f9e1d9402cd3eb1af080a8f359393310df9007b9d1c0",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "sha256": "566fb879472802608a91b3f3488d49dc2661dd974be84434b09f6baba25ee999",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -1443,6 +1443,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -1451,19 +1453,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -1489,8 +1489,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Regular.ttf",
-      "sha256": "a8e4ebcc4354284ffa2428bc6027e66896a68f89024e9af49241431a7ca73491",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
+      "sha256": "100db7eb78f17d1c8a7cbe033b332c7a82198a6c1b1acbbaa867c33f114ba870",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -1591,6 +1591,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -1599,19 +1601,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -1641,8 +1641,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Regular.ttf",
-      "sha256": "fe66ef7dd75041b83e159dc45b72d33f08febb7c98e3df3bf799563e63348747",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
+      "sha256": "013a97265cd0eea406ad77ad39a72182b1671099fd64096af53a0a27514778c7",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -1743,6 +1743,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -1751,19 +1753,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -1789,8 +1789,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Italic.ttf",
-      "sha256": "7e4e156deeb9e72b3d909cec9f5b07a816896e14d53664eadf7c0a595d3c972b",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
+      "sha256": "acc658d946a2b6c06e69cd4f4486495a47d8c471893c4595dd448701e21d9f86",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -1891,6 +1891,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -1899,19 +1901,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -1941,8 +1941,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Italic.ttf",
-      "sha256": "45e77114f86acb6a73d2f0cbc40680ccfc7089cbbd28a82567f434392c391cba",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
+      "sha256": "6fae109a7d1e9cbc458e21e8797cb5109e98f5a53f102be2d35757042b822130",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -2043,6 +2043,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -2051,19 +2053,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -2089,8 +2089,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "sha256": "8db475c76b5fe6a4683105563b208bc3d346ebb3036c59134927b88abc39407f",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "sha256": "0f02edef4490c850f154900092d7198796f135a432f6dbfdf841930583b409bb",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -2191,6 +2191,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -2199,19 +2201,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -2241,8 +2241,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "sha256": "f7c6e4660a0361074d16748cf150d5354d9cff3faac485943bf3baff365ca9f1",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "sha256": "e61ea0fc6f7d37d0bd7a05e87263b50a965d8c34cbbca9fdf1a1b42bab02acb0",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -2343,6 +2343,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -2351,19 +2353,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -2389,8 +2389,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "sha256": "0582fcdd5fd3a46c0e69dd461dafc8b64296c1928c190f1f1d78403c1d0895aa",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "sha256": "b1f3fa764dfec67fc08a15aaed14dc70d5a83a326673d588a81831d228a9bf58",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -2491,6 +2491,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -2499,19 +2501,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -2541,8 +2541,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "sha256": "9fd0a4fe11634cc51df7ef0a8ecf32290310f940cc2905d7062348e2ca153506",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "sha256": "97cb2ff132a9a3a5108782fb8e6317a3da15f9eaf26cdd3982f69ac73b13b2c8",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -2643,6 +2643,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -2651,19 +2653,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -2689,8 +2689,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Bold.ttf",
-      "sha256": "7e571d99480e777516730902b60d42a7fe4dde7435e8137d7e5162e3c3a6fa78",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
+      "sha256": "fd3a749c7c3bb3f0d29e82c1c1b8c3a949fc41e4db0937831723acec5f1a77fd",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -2791,6 +2791,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -2799,19 +2801,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -2841,8 +2841,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Bold.ttf",
-      "sha256": "8738ed4908f716122f959463cd9bace262dc00475c975edf8daeaaae97b5a42a",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
+      "sha256": "5f50932fcd50dd470144bb7cdcf196a48cf1062d2c707445d204d21b7d846cf7",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -2943,6 +2943,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -2951,19 +2953,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -2989,8 +2989,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "sha256": "4e8e90a036580bc5fa0114c7b647da9551fe58a1579f9b59db53e86601968f7c",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "sha256": "dec513d01f4efde7d6b8c1cef53ef746fb6429db3765236b881ed2d3d79ee6b3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -3091,6 +3091,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -3099,19 +3101,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -3141,8 +3141,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "sha256": "b35b2163a5131976f45d52e51839d05f7b32269e0e6715f31de387277acb0af6",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "sha256": "b683bcdea4aca8ce5684297cd90a4fdec5e3ca5e5d8cb6ad61b8cb4c6808136d",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -3243,6 +3243,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -3251,19 +3253,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -3289,8 +3289,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-Heavy.ttf",
-      "sha256": "833413c49b2fecce7ffe4f8729f0ed8d56b4c1be45dfc66b2d3e19da35dc481f",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
+      "sha256": "ca5fb56388c5353808bfa7e485dc89e280a161ee15c4831e6425aca168559694",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -3391,6 +3391,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -3399,19 +3401,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -3441,8 +3441,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-Heavy.ttf",
-      "sha256": "147429c7e5baba6367bff78a2618e16d8eabd183d51e16c14ba918f1136fd2e1",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
+      "sha256": "84c79fe1369b6ead9b1c78ac0239948c6a0a2de8cc0d23ff88fc23d533b24ef3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -3543,6 +3543,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              50,
+              51,
               52,
               53,
               54,
@@ -3551,19 +3553,17 @@
               57,
               58,
               59,
-              60,
-              61,
-              62
+              60
             ],
             "vrt2": [
+              62,
+              63,
               64,
               65,
               66,
               67,
               68,
-              69,
-              70,
-              71
+              69
             ]
           },
           "fullwidth_advance": 1000,
@@ -3589,8 +3589,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "sha256": "ed009538668ea436a0e0a7c06aa26f63488f60302108f5654fef7b5f340ba8ec",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "sha256": "5d7f23d1850f0ddd065f4a2839f0f73e5c51a5bf014f3a23df51ea472b55a179",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -3691,6 +3691,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -3699,19 +3701,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -3741,8 +3741,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "sha256": "c7e85ca2ea25fbbced52912e30c4bc2dc73d2fe44ed1b10952f5539150060fc4",
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "sha256": "f71a2558afa50880454b31b8390cc9babbd6927286cb3159282df805d52ad3cf",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -3843,6 +3843,8 @@
           },
           "vertical_feature_records": {
             "vert": [
+              49,
+              50,
               51,
               52,
               53,
@@ -3851,19 +3853,17 @@
               56,
               57,
               58,
-              59,
-              60,
-              61
+              59
             ],
             "vrt2": [
+              61,
+              62,
               63,
               64,
               65,
               66,
               67,
-              68,
-              69,
-              70
+              68
             ]
           },
           "fullwidth_advance": 1000,
@@ -3890,7 +3890,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "sha256": "8dc64b75f7a3b46d843655549a6e1f43f54bace1c352bff8ef94d174c41d49d3",
+      "sha256": "b4b82e711505189a08bb72b48fb6a74f9a902ff825291134fc0b86bdc6e7fe3a",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -3991,10 +3991,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -4027,7 +4027,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "sha256": "0fdab6ee97210747c1bb5d496428ab6dece692ed0cadfcb17a1e08e3dbf0bc90",
+      "sha256": "a480e74f9f62fcec66f1f9fa7b61b6ec00d99f1ed9f6532566838027dbe328c3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -4128,10 +4128,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -4163,8 +4163,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "sha256": "2848858d2bbbd3cc0550e47468f501330af019acc8421fc346d6268333d58841",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "sha256": "2ee5d6ade3a0d16ead4d273be9d1e1cb8855c74ec4a79ad704fe43108a6952d0",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -4303,8 +4303,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "sha256": "7b2f68f88a7e3816de4a8fd05b6132b7714d0798e606c7c68e5b209fc5eb689b",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "sha256": "33d20c283d72b9dd7ec54aefd22adb53353c244df9fccf89b1f7f45f94ac13ac",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -4439,8 +4439,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "sha256": "9e6da1d5c44b0c96e7739a1fae49025f06e2e24d72b40b2d04fde80e52bafdd0",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "sha256": "f969036c0373bb4b20d4b4a000cc89e089ddd85dbda7cdeb81dbafa56afaea39",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -4579,8 +4579,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "sha256": "897328166ec84020e4b8ee72a33be9970b8aa9c3fc7e84f8940b0a41d0580805",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "sha256": "63dbcca503c03fbb4f9888a51d4ad705051102f772486859af8f5f45d04e8dbe",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -4715,8 +4715,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Light.ttf",
-      "sha256": "ea8649b6d86990e442ec231778423b57e330ea3450e514364c7ddf7846b5aa13",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
+      "sha256": "98a7291984a2142d8aab823a04d4cd2eb73e964de5e8116a9d71db46b7162628",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -4855,8 +4855,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Light.ttf",
-      "sha256": "8c7db1ee8a41db769ae067ce39ea387991276592258b5dac5ff355d22687e7c0",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
+      "sha256": "94fdc640d84d11a6e11e9a84473bf06e02ce59ce3d8b39aa81122c661e66652c",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -4991,8 +4991,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "sha256": "06111dfbf66463547cfaf209836c3bb613ed08bc2efefd4d29c3a47caba2e6db",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "sha256": "641d991de464ee7cce385ab98a6fbe2fae48cababf7ffee085b594e59d1060de",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -5131,8 +5131,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "sha256": "86a3f7d72519ffd37f64ae578304966b9d8b2b0dc8cc1172d34133680e88d704",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "sha256": "69de312d86836ec4c151b87f530ab7b04774c2580cebd5a95e1bbb58bb6943b2",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -5267,8 +5267,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Regular.ttf",
-      "sha256": "d41f23f6625536ca5b75eca9c56757dd336ebb8fcabfd510a1c463f0e4c85a11",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
+      "sha256": "5f25e910aa6523d6f5b09eaefcbfbcb12512f2246cb9d1e1fa6f4d0e48d6d26a",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -5407,8 +5407,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Regular.ttf",
-      "sha256": "04f01fc94b9a7fa2be94ec4e084d3c633e5d51cd958c1e2a3eefd78922ecee48",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
+      "sha256": "88f78523ba3c0e564dd2a14a39ebb49b2e0f526b39f08af15ae1978df494c18a",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -5543,8 +5543,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Italic.ttf",
-      "sha256": "e4463430a4a47518c4a64df5b1ccb6ad73b320eb73d1a67642e171a76151c7f2",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
+      "sha256": "e821e9815e8e121e82c419515b45b780877c6076fdfab95604c4b45f8529c9bf",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -5683,8 +5683,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Italic.ttf",
-      "sha256": "200c4301adb7f293d9d42c7b4e590685db818b8fbb1dec79e8d37d79c300178b",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
+      "sha256": "5461160ab32ae4b92daf2259d19c9d358eaaa4dd7b467c70f4e4f5122d5c7424",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -5819,8 +5819,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "sha256": "4438605b01c77d44c1047fc2c2dd6945154834e515f5f6584d4ef713e00a969f",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "sha256": "2d7acdb8e7dd8e289849a8b6045aed47a90c2517ef8ce9bfcec9224552218e18",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -5959,8 +5959,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "sha256": "02d902fcf0af823590069a6ee46af29127ee8127c52abf8bde41702f119d92bb",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "sha256": "bfb81959bcc4183d290c17663589fb2a2d8b93fae38436ab3f677f31ec87bc8d",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -6095,8 +6095,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "sha256": "797188cf624186a2482c4ae0843aa6e339e6af379a54a794a4bdbdafdf26e1f8",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "sha256": "0e8f0f8c7b7296f95804e07c352c7c16e8cd81f332f2a7701d7e8bcf4914f52d",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -6235,8 +6235,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "sha256": "977b717c6b2e289e1ad7b51c0607e409d11c5ac11110a04d9f73f5823bd2d7f9",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "sha256": "c5df4be3147f7ad6ccd1eb4e5f686d97bc176e35438ee1cc605b0a6f2f9d4165",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -6371,8 +6371,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Bold.ttf",
-      "sha256": "4346a7b9a73bb560a39d3828880558a8e160c7084f5714318087a4dabc6ed966",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
+      "sha256": "77fe7b3c609a4862ba07f2beb70da51b4bc8a4736bb2267acd214a5cf60dd9e0",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -6511,8 +6511,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Bold.ttf",
-      "sha256": "dbaff9ca70f13fcbe305a3c04375a1d6ff4e83cc4c8a743519a8a0732dfd733e",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
+      "sha256": "37ae5ed506c67b69a4b67b54847abc28c5b448433d2f30af67b1e227144e07ef",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -6647,8 +6647,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "sha256": "d62b405783a4e158675542aba25cc208021158f73b159b6a97ed995deaed2172",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "sha256": "76448b1c98a08b573cf79bfaf2d51e697d9e9693b10e496660e4a98c40b12c6b",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -6787,8 +6787,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "sha256": "f81bfe53cea0cbbed222cff2574632fc81c0665f30438c5495eeebd6a59351e1",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "sha256": "a8f63da14c83196b43455ee6605833103cf2d0f7f4a0dc76a3cc8b2644029d0e",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -6923,8 +6923,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-Heavy.ttf",
-      "sha256": "e5dc25b0631bd3dc7af73008633fedf025e114fc125863784da3db66d2024f37",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
+      "sha256": "4fae3f1842883458456d8d48acf33940fc0de515cf4170cc2cbac217835c9716",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -7063,8 +7063,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-Heavy.ttf",
-      "sha256": "46712247b5e6d4702ab68dcb3bd36eea32b09e0a7fc48b47f517e321d0196763",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
+      "sha256": "c9752588c794fb72b5717288497fe9fcb29ed06c03318be866f040325fc7081f",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -7199,8 +7199,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "sha256": "aaba8625f5f6ab80f256e208bb0f3d6550b424e000ff0583142cfa0cd29c90bd",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "sha256": "08173a3b4ee8edfc4954761dab23ef74450753df3251292d65ac97c459c35037",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -7339,8 +7339,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "sha256": "e42fe8ddf8d236ff662dca394a034f7c22b6511b85977719fa3bd4bf77c8bb30",
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "sha256": "6fd95d70c60932d43dd2aa7460ab1a460491a6b029dcbf8c5cbe018d08e3551f",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -7476,7 +7476,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
-      "sha256": "d2b34925f8d290ccedbaf591e1a4fa7f903710ff03d3aff7298b25dac776c056",
+      "sha256": "9d734efba2eb6af6f1864ae96c5a332a3583fa870dbc93f57db77bd5435c46e7",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -7577,10 +7577,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -7613,7 +7613,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
-      "sha256": "f513a32a74cde0341a9464d0a94a3ebee5aaf7a53cb898edd2980a801636ffd0",
+      "sha256": "1b136cae6c933a7d794ff25540ef8d8f52deaffbcfa34d0880923bc39828ed08",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -7714,10 +7714,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -7749,8 +7749,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "sha256": "6c0309f1b6edd3093632789fba0b6bb8bbab53f2754950ee9830d7e00b72e7b4",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "sha256": "c74823ea82241e677a510a89404da09edeefd3291e1c6f05dd7cf7c59137944c",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -7889,8 +7889,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "sha256": "a80bd87eb5501bccf87e5a964fac20dc3f14f9908e10c0cd6b3c265206b934ec",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "sha256": "432e4a26fbee6e7aef581021257aade19fd0a54461f3f98b66f110103fc9a315",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8025,8 +8025,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "sha256": "1bfcc3adf470ce96658a39108ee105e0d0c91bdd9f5c5e12752c61c39e1a5ec4",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "sha256": "3f33a800893d34f89177ae152b4162c36103c191325cdc897cc3e5414e3a6144",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8165,8 +8165,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "sha256": "dd2815fe7e956de94f597ab09717301a94395f882e099c2b76fbaecf491042ba",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "sha256": "cfe512ac5f2d297d4be62b8f822e80a1fe339826b85d05b65bf00a8c37e1eb24",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8301,8 +8301,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Light.ttf",
-      "sha256": "7a21d036089e83e5dd266c433105b805f45b1a61a73cf529cbdcb099d4a51a43",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
+      "sha256": "ff84686761c5a66c424ee86af645f4ad4aa355776b658e961716a934a6159a94",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8441,8 +8441,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Light.ttf",
-      "sha256": "685022b53a334d8d5c1ab2f31df57c44bc35be38ddd0c7c3ecf5f0b815e79917",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
+      "sha256": "85d10271093e2c5fd694b692ce3686e57ca68d958248496a0051dfa17e70db3e",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8577,8 +8577,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "sha256": "530b09611fbba2d6118919f4be7d179b079063cb28e7563c96d865e840b17cdb",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "sha256": "3bde8df5b95fa12858763af34fec939dcc35e31676f67fc53cb64512cb23d77e",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8717,8 +8717,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "sha256": "fcf2865e6dff140c82493ff4088d3b84a4fc07abf3c8d918a986d2db20dcd78e",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "sha256": "d81ad1c31add75d6178e44f38affe1f56248165ec4f19e78c3c36c63b296a285",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8853,8 +8853,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Regular.ttf",
-      "sha256": "52b72161479245cac90faf43d835c1fba3a1f734bef6be9da83563e82b8fb7de",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
+      "sha256": "600b1b5188a0c37085605d2da5f3e66fc927522e98246c1f89d12d6d9f2039ac",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -8993,8 +8993,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Regular.ttf",
-      "sha256": "0674aa4c4b8d0f4630c1dc9276ba3b11599c6f1d21b1667adf1228fceb882d29",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
+      "sha256": "0c23d413928877aefbc190e49a30226828cd1646f948cb37659ca49c34b44708",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -9129,8 +9129,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Italic.ttf",
-      "sha256": "1cfa8d43312fe0619edde593cd99e156a80fe9de79018fa0e9efb1eb8afa5217",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
+      "sha256": "7f8ad02a9b699c315afc3986e6e2346ecbd807fd66e8bc7181cbd0e677cd32cf",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -9269,8 +9269,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Italic.ttf",
-      "sha256": "ea924b7527e8f978420af4b8e05643321b292b85a2658960f3fe2cb87d43ad94",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
+      "sha256": "fe962164247a96dfd46ebf27afdf99ee8ace17e71a4c18e82de8e3e5c384f4e0",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -9405,8 +9405,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "sha256": "670ecf338206ba64a4081759007e56ea8cb8f6935040c5f2f062a0b6fdc64294",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "sha256": "b32543df35fbf46bbd3be192dac3c8c4441f167663b2c59286f5e53ace92b2c6",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -9545,8 +9545,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "sha256": "d99a652612b5719536872fb855990f8fee32d5e98fed08e588517a752496ea9e",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "sha256": "013d9d2fd7d34667dee3b809c7dcf3248ca4482858a114838adf6efcd34bd58f",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -9681,8 +9681,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "sha256": "327923e4969f5f28511a6831d864c8404d2532c3625c47d3b1ce79fd7c6709d8",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "sha256": "5197094858a503a3689d74a1f05cf02ddf7c3aaa972285f9a5388e59956f580a",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -9821,8 +9821,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "sha256": "7b9f1f2763acfb76482144845f379d7f1aae2249161049f596a66e042466e10a",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "sha256": "ad8e429087229cb7fa34427b0af170ee267d6f484578e54be96d49e6e838e212",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -9957,8 +9957,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Bold.ttf",
-      "sha256": "2169bd17a34561fdece7a6c9416bc3b05cb2d4e85c60aae60e4a2712d9bd7297",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
+      "sha256": "b0ec47dec2bb51a56f07e36a446566732e38017827a72bbb7d43a8c0618cd3d0",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -10097,8 +10097,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Bold.ttf",
-      "sha256": "ae010955a3fcfbec38d1a4f1216dace151b5e924af7ae2c4fce9ad9444a57d93",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
+      "sha256": "059e8c5d238ce50567de09d2f7abe9ca9f5b132ea2f07bc53046b013befd080a",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -10233,8 +10233,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "sha256": "84c0ed664826a7b7812d5abdd2144e314f5acf74792d7f12fc4d29239996e99d",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "sha256": "1b1b749e83e414919d81c6eea94baf64d387ae701319f4d5e6ef3d2698fb8fbb",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -10373,8 +10373,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "sha256": "789b672b800c1245719975ea4b8930c6fdf28c171b495e0552be606990892015",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "sha256": "1960c22dfa3e5957903e4320c2aedf8ea39c4dc0f8f058390dcd390120dc03e9",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -10509,8 +10509,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-Heavy.ttf",
-      "sha256": "8056a4af015f2e07bc4043412c4508469427bd8a90b6fcfef6ac708711195a5d",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
+      "sha256": "246192f10fc5c4a119814dcb019b7eb8e09e91d8c40a9acf835249bd6c20c970",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -10649,8 +10649,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-Heavy.ttf",
-      "sha256": "1905e23e3bd6e0c237042ce58ffb5a7c69bfb9840cd3118dd63a6e23d849306c",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
+      "sha256": "825ad889915d8f4d72a5eebff0cda7336cdf12b6078bb9965eede0773468cb9c",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -10785,8 +10785,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "sha256": "48002e715581b62b7d91dcc9161750bd4c9e7bfe5f13857ad22fdd2083f2fad6",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "sha256": "91713fa02b7d3b1afdebd63a24a24a2dcf53019cca2bea21f3f1ff4a6a8a3b5c",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -10925,8 +10925,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "sha256": "49aec432fc4108dbabee99dedb36c1f746fd1459468d04de97dda309ab03d563",
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "sha256": "6994173bbb4592e5bd845dda87b7db889dd4b66630fdc86145fed241130fefc1",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -11062,7 +11062,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
-      "sha256": "37882dde4fa8d90d558e878e7bc80b7420956cf8f5a059893182d3250b250ac6",
+      "sha256": "521faf29a4ab2fbe7cd57e5845a7fdba71dbcdfe38ad14a5ec384a88a03e3a29",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -11163,10 +11163,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -11199,7 +11199,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
-      "sha256": "098432643a2eabc0a3647485059c96e9bdd742b15cca77298efba36a2862f5d6",
+      "sha256": "ed7e5efe587b51a6e26f366f5ce7e15da68d8ae5a37ffe63636f9f497d4c0212",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -11300,10 +11300,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -11335,8 +11335,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "sha256": "a2dca5e39802bf28ec769578e79db5723718c485d305a3e4829d6474bb4a637f",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "sha256": "b6924c49b37ce31749ddcac104430821ed4a2453054b82119c366485974a49f3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -11475,8 +11475,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "sha256": "82750df5d217d9089b91d1f3d0e132bcdc00287f6440d7a11b081c07e060b12d",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "sha256": "b69825b793d554d7635e0177d2ee1df856a8f2072f6d4d98e3b31352b5aababb",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -11611,8 +11611,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "sha256": "079f5cd32d75841a93a4d547f339a98d85f4f677cca5b34a47a667f6abf3a432",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "sha256": "a00a794a6a340e15ebb92d25c36aae5f80ed894b013de72d1a008b00ea6b3003",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -11751,8 +11751,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "sha256": "9b17485f33d2cdd5d69fc93a8bb9b61e8d8d4a594c232b2ab0fc7e46aecfc284",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "sha256": "63640ec42f2009b56d7a697b1b28a33428e53f984f0af3c21d4d718edd838e02",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -11887,8 +11887,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Light.ttf",
-      "sha256": "071e4ad4ea4e6b50d832a8a3a5f911624487e87d36c9e7804dd6e0c90acf454c",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
+      "sha256": "6b118589840e6d07d6344c35cc9ecb89ac78e34440f518ee0e743410389b39bd",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12027,8 +12027,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Light.ttf",
-      "sha256": "485995152db4ab16067a1279f0a80c69f95239d6b4d3e51e7f7ae51535aad604",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
+      "sha256": "57c1895d34f50509db1efde1b6ef3298ff257516d2a50473f7c09938685e14a0",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12163,8 +12163,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "sha256": "342eddd3ff781e8ffa70ad7091fe084015423a5576830a9df3d84bd161ed662b",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "sha256": "e3a9c4ce4e0de9b6dabf3b43b68dbdaf075d5ceb21300116034a79b2e322b018",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12303,8 +12303,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "sha256": "d18bb62a4a601c36265f86486fb84cc80c448e73c5ce24d474d793ca3bd93449",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "sha256": "0f63c4d61b3b1997e050d153733a6f506ba4239ebfd59dea2b58bde42de569a9",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12439,8 +12439,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Regular.ttf",
-      "sha256": "298eb96d9d7d9df565724bda235ae873c92282020ff5df756157acdfb13b0e43",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
+      "sha256": "a3d1c9eb1c4c21ba6f6eeca6bc1e35a939368c9c15bcd2af5d999ac049a9dcee",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12579,8 +12579,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Regular.ttf",
-      "sha256": "b93526c9ec65a715e1d43c8c2cb324b7d76ac60736d95707e985d8d240eeac17",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
+      "sha256": "f07162e52a99baf9c157eea2746f9423ec7f2cc9ce0571832d2392c3b7e3c032",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12715,8 +12715,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Italic.ttf",
-      "sha256": "e37b912195b96abd59e2732e7b16c45650b3cd80181f2b28dcb49b3be9dd2649",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
+      "sha256": "eef99b37f429344a927ceec2ed2e74d29972480a7f2b619faf966797b0a92383",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12855,8 +12855,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Italic.ttf",
-      "sha256": "ca5a64893d571c427ef24fa205563ea4b168420f2102693bbe2f134160270daa",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
+      "sha256": "48a2f7e3c42c2c27a318d4e5237ba78898d2de83e45e8e8169e72c0f8488d9eb",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -12991,8 +12991,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "sha256": "5cc545ede910fa9e30651e72b9b620e58bb0e9838444cb7e3a6c33b9adeed8ed",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "sha256": "b72910c385d7c55684bf98bc3a4d8fd4366a1cda70ba76bb7bd04badea5941a7",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -13131,8 +13131,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "sha256": "1eb9fc607724ca50d7e6b0d7b443ebea8c7e4ab944b7667519c8d0c719c77156",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "sha256": "f2d99f6e90e206821fad1d64c48a1ffb9efd90324651f542bbdd8aa9a8e8f3bb",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -13267,8 +13267,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "sha256": "8afaefad85029837a339ab9836354cee3887e886f0f34861446031b66fcf191d",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "sha256": "2ede9af8a9392a55930d6430084f7e6f4b2ca2a9e83c311fc03f14d87f374343",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -13407,8 +13407,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "sha256": "6b9bf5b9c69e61131ddb77d2d28cd95ee6e0cb7e0fbaa70c8b1231ce18a1f26c",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "sha256": "57032397d174b19e6ced069f7f90d484df9e7ace26b980f5149c14ebdc6ac15d",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -13543,8 +13543,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Bold.ttf",
-      "sha256": "9868c8d467093de8cd90673b17685d9b08d2d2a522cbb2551bb59d616b6172ea",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
+      "sha256": "54d0e367eb6ecaec96a3f7c82e37457427e772c3c9b9b5c26fc6dca96ca4afb9",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -13683,8 +13683,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Bold.ttf",
-      "sha256": "d2001ef18da56197b7807513ced26bebc055e92e3928e018654babd4665af64c",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
+      "sha256": "68a922ce7e4c9e7c465710494db50f4f31293fc4ab5592758c45c446fafb7813",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -13819,8 +13819,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "sha256": "4a27117f7ba36708b8e1530d05f08dc3f368b9912e9cf835979832461995ae81",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "sha256": "09cb0d862f60569ea3cf5f371dc7d1eb6662d5ce33161ff0bac273dee24f4271",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -13959,8 +13959,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "sha256": "5e974df0e01f9c566054e5a33515b83ef346b9ec20495ab027a0079725d01a9c",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "sha256": "9a5aad0c998602794d1e91f110cc1ed105a8df3ef2c8d6b89738a1f0ddbde0e8",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -14095,8 +14095,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-Heavy.ttf",
-      "sha256": "8397c7eec392db010c01d233a1d46aab4ae516d73d5010d6207c678ebbb44986",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
+      "sha256": "bab7b674f63679cea3d228e6e4a4e222b824ffccaabedf045ef23be614813850",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -14235,8 +14235,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-Heavy.ttf",
-      "sha256": "ea449b46b7712af4075b4df27655e8db3c95e794d2319d67d08769592014ead4",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
+      "sha256": "f636eb09daeb13f55cb71df06ddfc7823f03db339c94681ee606576de903fbf5",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -14371,8 +14371,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "sha256": "0d0b53b7cc4078905cc3890c610a080b03320f0e5587d80dba2775655d35ddb1",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "sha256": "c373c9f3f32281f38c7f093c70443e12182674bdf36399d9cbea6901e4c99540",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -14511,8 +14511,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "sha256": "9cbb1a9973cd6a0fa264172c62c7c768e3cb65033bd62ee7b0f2a96fd93d40a8",
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "sha256": "4e3691f37dac2f3a5402ba8042683419dae8ff0aa97d0ac58adf25c75cdd9c21",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -14648,7 +14648,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
-      "sha256": "1aec261e538b613326c49e55d2cc8fba9e4ae2f49f14a1e47002044a45fd5cc5",
+      "sha256": "bc6bfbe42470dc602f433874ba33948b799d5eb609dd4386d12a6b7e4576b856",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -14680,10 +14680,10 @@
           "vertical_three": "glyph45577"
         },
         "vertical_segments": {
-          "begin": "glyph48562",
-          "middle": "glyph48563",
-          "end2": "glyph48564",
-          "end3": "glyph48565"
+          "begin": "glyph48561",
+          "middle": "glyph48562",
+          "end2": "glyph48563",
+          "end3": "glyph48564"
         },
         "locl": {
           "JAN ": {
@@ -14749,10 +14749,11 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50,
+              51
             ],
             "vrt2": [
-              50
+              53
             ]
           },
           "fullwidth_advance": 1000,
@@ -14785,7 +14786,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
-      "sha256": "4f78cf3aaef6cd02b73471fa8545c4588c19bd2bca4c4eb0f045910b23e9ddd4",
+      "sha256": "b1fec556119565c371e0fbd9509b0b231a8df65b136d705d58c960aab6123cf6",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -14817,10 +14818,10 @@
           "vertical_three": "glyph45577"
         },
         "vertical_segments": {
-          "begin": "glyph48523",
-          "middle": "glyph48524",
-          "end2": "glyph48525",
-          "end3": "glyph48526"
+          "begin": "glyph48522",
+          "middle": "glyph48523",
+          "end2": "glyph48524",
+          "end3": "glyph48525"
         },
         "locl": {
           "JAN ": {
@@ -14886,10 +14887,11 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49,
+              50
             ],
             "vrt2": [
-              49
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -14921,8 +14923,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "sha256": "349e0eb5058680fbb79cac1f3acb3feee7607d6f1bd1d15efca1415b547cf35b",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "sha256": "9b5cd4cce124a3b3743cf97232e17473cefd5102b04f3a8b8eefee4d3665c713",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -15061,8 +15063,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "sha256": "16d93b8960131d4fb13cacc2b245a38273966abe909aa56794fc94bc233acabc",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "sha256": "c41fd42d98f96833bc7d1ec5e1e96a9d70aa0da2755f1dabc766701f48b72b75",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -15197,8 +15199,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "sha256": "4d33ffdd835ebcd33967d670cb65b284317323f546836f5c934052f904726c74",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "sha256": "a1fbc0e17e3c5e2582ac09d57ebe491a451c6e1e7adba3b7cb67559b72de88c7",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -15337,8 +15339,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "sha256": "09454e1e38b77d217aa3c12f083cfd0aefab01b9add4c49886e6c80af9213349",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "sha256": "d95518c0ca94ce2db629d7134f65fb50800ee7b377e9aceb33d091ee0033094f",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -15473,8 +15475,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Light.ttf",
-      "sha256": "f941e4d749541e44831e75bd07099e8c3e3ab3ad8170735439ed4b149aabb710",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
+      "sha256": "7f8b81cc7627e8ff1eb010f0aac39cce8c94716ba01427f182460df89a45c00c",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -15613,8 +15615,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Light.ttf",
-      "sha256": "c0f39dfa0fefced6947b0a8d5f6e58cf413c360c7ad6c113e063511f30f2391a",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
+      "sha256": "0a352378b2c25eb63cf3e7b84f511b3145452b8e01e953e3175e89dddb9e14f2",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -15749,8 +15751,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "sha256": "f11ab474da6d0c3182f04d946c345b1b96e9fe21a664f7fea45ed2ff44a343c9",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "sha256": "4f0112e9189e0c4c9a4c602f35120aa1528e8bae7a3eb83a462e575101752195",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -15889,8 +15891,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "sha256": "53320b39e389eca557438667bd449d62404edaa1b9644f3a109261e0d520d479",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "sha256": "4f8b8f8e85d9ef34e7a5ab6371a88288f828fa3c9ecc927892231fbd29f83f7a",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16025,8 +16027,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Regular.ttf",
-      "sha256": "75c9cd96b9109d327fd9f5dfa582070cdcb3b8e8a0d5e667bc7e74c874d6cbae",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
+      "sha256": "f5d41ef53b22f56040bdd3dd4380b71d949ea41198bc5158e1f905a0fdf1308e",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16165,8 +16167,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Regular.ttf",
-      "sha256": "686d617ce63740c7192eb3c1027ff1ac308caa207f2f80eb52e9192cf77d51de",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
+      "sha256": "7dc8de12d359b3d6ff592dcef559a9cf4d6295abb3c0c2f80ec91f7450bfe4ab",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16301,8 +16303,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Italic.ttf",
-      "sha256": "07f0c440a9ab794259b867fd50268e0118c899d5f8f33bbeb869ee8130d2e420",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
+      "sha256": "9ed423e5e56f59e308195fc0391c75133f437634b1314d524ea2eb751e528ab6",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16441,8 +16443,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Italic.ttf",
-      "sha256": "a8a07da6b54970743c3a055924cdbbb672db8cabe3c874458a8b7dc1fd07e11b",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
+      "sha256": "268708ec029c3d6a177abe9fdf805bb041073bce2d1c5619f8180a86f1a5dca8",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16577,8 +16579,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "sha256": "53a93829685684ac6cb6f9d5d4ddb07a212bbac279afe2db688daa748e45c309",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "sha256": "f8b0b1fe412401302eb201e8ff01033c0d8027494a6cc067df4e95f99c2753de",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16717,8 +16719,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "sha256": "d4caae92a0ce95d65e55ed75c79058314394c0e893d8fd2633b343162f008f99",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "sha256": "428bd0ee9420b1c033e4ca8d48f430b5f2ce6917170b7c4d160c08324613fb56",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16853,8 +16855,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "sha256": "372244be533a3d770cd856a6d6c35b11a52387c295c65de7dc93eebfff7d124e",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "sha256": "63e824d7348e22132ab0cfdaa5b2b754ab250b97724cf2ecce744da593d750bb",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -16993,8 +16995,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "sha256": "bf4c10987bc9f8e60e4f7f1cfca023ce7548dde0720fb507b415a1f63cedc2cd",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "sha256": "6550ca0fac589f71bef67170d4bb915650832082609b00c1c3a8640c2989ea1f",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -17129,8 +17131,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Bold.ttf",
-      "sha256": "f114f95ef4897c7b8adfc11586af3a1a272b07b629d760df88230286d3535208",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
+      "sha256": "0a3786b3c313fe3f9fdb804a294a462265fb61f438fa85650a3faab91695cbd9",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -17269,8 +17271,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Bold.ttf",
-      "sha256": "ee14c4eb5cc8dbf48ad7ae75731ebbdcda1e1875e676e14e7a31c9d24c9b30d2",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
+      "sha256": "020e240addadc7d26640abb99a1e8537a009d0bb71a013a1a7f64f4728eb59a7",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -17405,8 +17407,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "sha256": "cf21f9168281994eb8416318ecaff8bc9c6f32c3e519c596620b32ad2fd05c64",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "sha256": "86509f30a7346a5bbaf7944c5a057d057e583478b57944ec980992641006d90d",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -17545,8 +17547,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "sha256": "6f07d4493848e994da7ea71c7eeae751084a2951955f6aa07a4716568453e746",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "sha256": "3fd0034ca42d58ea550327487e3723cefbb83f38d03fa37bf0e77050234da6ff",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -17681,8 +17683,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-Heavy.ttf",
-      "sha256": "3257e40fe9c298dcb342d9b5d0eca66e24b22d03b02a8c684d17fa157b30ad5d",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
+      "sha256": "2dc8fcd4e6584d45af784bc90b806a3790b7c57a8b844a14413aef4c826e0adf",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -17821,8 +17823,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-Heavy.ttf",
-      "sha256": "03353b11f8093dba55744b46028619ae9f07cde7af7c117746d972bf14f8fc14",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
+      "sha256": "8fdfb8f26544b9b809be5b8bbf5e7d98beaeb215709bca08069756379f66ca45",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -17957,8 +17959,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "sha256": "595c1f0474c67cd2e1ab9fe7f86c550fb660be0c472390ba47c71e2cc517a0ce",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "sha256": "4467048a596879ab07b136995c0098d9d838573a828b648d3ac44c02e52ebcf6",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -18097,8 +18099,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "sha256": "12c57aea9d15e8021a6935781db113c911ae5c8de5d45ea8d87c48aaac777db4",
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "sha256": "6e873f299b586655381cf2ab8155a48809c99ba271dc43a1b0de3e28af9e2fc1",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -18234,7 +18236,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
-      "sha256": "c8c05aa8628a0681f5de7c777ceffce35574f6e847ffc2001a8e5a96a8f503eb",
+      "sha256": "60280b395ed70183d42d17e5550fd29b38b0e7f156ec2754127814112d45cca3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -18335,10 +18337,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              48
+              50
             ],
             "vrt2": [
-              50
+              52
             ]
           },
           "fullwidth_advance": 1000,
@@ -18371,7 +18373,7 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
-      "sha256": "c01d65d3d435be278724eb8550a9a3a714e501637075c1dd8dbdf8964f06d24b",
+      "sha256": "8e4207af15f0b7866f6b7a24cf52acf08cb015103b289cb182ee336541fa4b55",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -18472,10 +18474,10 @@
           },
           "vertical_feature_records": {
             "vert": [
-              47
+              49
             ],
             "vrt2": [
-              49
+              51
             ]
           },
           "fullwidth_advance": 1000,
@@ -18507,8 +18509,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "sha256": "ff25d72ee63c43e7150ac2894f0e8f4260bc198e07c77b1de5dd882355c362e7",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "sha256": "e214f8989d9e2e36b371c89a0d3b6e68a603896184e6919955abe8da761895ff",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -18647,8 +18649,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "sha256": "fda75543d4113a26f82c3f8b818f45fce46174b90336b2771521c2a79e6a46f0",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "sha256": "0a4b9a0260a30552eda47c5a832bc0bf49cc04e5c2c363384ae40e23496d06cd",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -18783,8 +18785,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "sha256": "cc080ded96a07f80011683f21444562ca16a1deda574f5123eda5ad612f4c2d0",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "sha256": "65c343100c1e452ec27c44c7bd61ec523a5f598784c398256766e1b9e5e2c3d3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -18923,8 +18925,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "sha256": "b3fe377c8c88f4188ef54d2780c1dd28fd352d7822c309c4c7d9c752d16790b1",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "sha256": "d3b292ef1d0d8f9decc0d5b832b12889942b4180769e7fb30c0cb3626de0ec8e",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -19059,8 +19061,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Light.ttf",
-      "sha256": "fe3b94615f75770abb80365a5a44d81156427ac43eab9c4236bf7d8e0edcf086",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
+      "sha256": "a42cd806fbd5d4a3f732d96c3bbf3398387e482abbf324f8d175f797acb91cae",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -19199,8 +19201,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Light.ttf",
-      "sha256": "244e2c8259f91e7d82a87eec7eef0bd8e9ae9ff63f71e470d020d6728e6a2ab6",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
+      "sha256": "a56e45191adc0295204411b947566f983c78a87a09df1a3c907d26e793f7db7c",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -19335,8 +19337,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-LightItalic.ttf",
-      "sha256": "7a509e08e402689639aee0a9b119eccce98ce8b3df83e482ec96256ab48cf3ae",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
+      "sha256": "9125d4ae90df72dfebf41e83ad3ae7be5834e5a86e71e7f2c37212b77151930b",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -19475,8 +19477,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-LightItalic.ttf",
-      "sha256": "0013521e98e3d8aa5ff6766ce9a5e7fbe99728e67b98be8c414f445fe181561d",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
+      "sha256": "f7aafa30ba74cc704603275f95137210b64dafffebeba2e11d889a924b880287",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -19611,8 +19613,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Regular.ttf",
-      "sha256": "9721c05364ab595d1cbcbb29fa071b4f2fea2f0beb7fe5c84f455c9c47467c98",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
+      "sha256": "caf719a83e695e808986a03dd196f957c827a46635edef030e779cafe2515743",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -19751,8 +19753,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Regular.ttf",
-      "sha256": "1d939c10e9468e5618f6b9d2c66a6c626b2b64bb588548e0d9792884e0b69a2f",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
+      "sha256": "2cfbd86047fedd41e264f87ffda9891c241094d0131801df839f85f2d1dc9ded",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -19887,8 +19889,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Italic.ttf",
-      "sha256": "91e14455af8d53af625f1f7c484b4ec26839bb6ff9593fb1f20ed1e10201f452",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
+      "sha256": "df0c682ab5509a5f83304c8e9b60c3608f5fefe96810c48add4d35e187124cf3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20027,8 +20029,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Italic.ttf",
-      "sha256": "47bb50b67763f4d5558d90b2873333aeda4d2cc7c4b4947f5f4ab92b6a6d3c60",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
+      "sha256": "5edb6d4f9a955b5b2d838354ef168be0c49ada40afe0c487cdafacf1e27f1963",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20163,8 +20165,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-SemiBold.ttf",
-      "sha256": "0e6418b21dda2af771528dee23b1b2d8f6a0f1fd22759f6ed1856bd0cea5b9bd",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
+      "sha256": "40cad196b75e907cad7ddb98a02d5ddc0dea0ef3a0981569df4f56df881c914b",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20303,8 +20305,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-SemiBold.ttf",
-      "sha256": "24ad596f00f57bfb153d0efd4b3de55ce1d6f32b9e3d9b62b04f9aa667f9bff9",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
+      "sha256": "fe5b7209197a3ed80b6274692348fbff41d13604016cc8f32244ec5ae8493ac6",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20439,8 +20441,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "sha256": "1b24003f3493e18a78b0bd3bdd92e2110e245d0efad1d2c7541e1a4879c347b2",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "sha256": "2dc8af42173d56aaaf545b9e7404513bed679b646ca1fd0f58d133b43c27234e",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20579,8 +20581,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "sha256": "99653883eeb9481e788ea9ac72e4f54f8a3b05d114fcb707bc5630cad8f76a3a",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "sha256": "91d65e7596abd7374ee2e394f2fde749cf51d5ef7d1904b10a6bbac420cf6b1e",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20715,8 +20717,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Bold.ttf",
-      "sha256": "1f3c9d81eeeefe22811d141b3b7ac856fb9cd3b9ef5c9b2f6847a78c8a262b6e",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
+      "sha256": "61d0ddcd40a6655560b05b715d49c014be70be4ff18140a91882051d35094447",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20855,8 +20857,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Bold.ttf",
-      "sha256": "23b6a1f156e42a7fa5dbaa968241de93164a3b5b22f54d0833b60d92aa2f8d83",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
+      "sha256": "7b8abf84cea377b0a9bdcc0fccf5f8bc8573a49158dfdfde1cbe8e6ee5523249",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -20991,8 +20993,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "sha256": "1b74d0fc8025fbb238a697506b69cb7d3ecd79fa15fc507d3e90db53e3ce477d",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "sha256": "6b4417a896e17396963b8f6a7b16ec1128d4f4412043565863496484732f4469",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -21131,8 +21133,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "sha256": "757f53eddbe44445e77076a889ab25df67fde33edcbd4f551a4d495814d9ba57",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "sha256": "caca557e9e0a56f3955929af07b242221c6775e7a84f0bc07ef2f8dd19a97871",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -21267,8 +21269,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-Heavy.ttf",
-      "sha256": "037a35c2e763f0468c16897c8b369aac6390c4ded46eb4fa071df1802381428e",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
+      "sha256": "1c8b60d4dd16059612757fd3d14a0b4f57f6e38f414adb781f141a62e1190c6d",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -21407,8 +21409,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-Heavy.ttf",
-      "sha256": "f8f266dbd7a3c53ace6e38877c60f6dacc40d6dbddb869b4d133951cb5c929dc",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
+      "sha256": "26cd521b3d70cfc9d346bf1ee5051fa1dc085e1f8dbf16d9c93cf23626898a99",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -21543,8 +21545,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "sha256": "98824f0898a827432f1abc091532e2736774ac26d1d0ab710a24a163b23faa49",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "sha256": "76250d671ddff7aca3587f136ed291b54df813597b6ee3f22230c780d21fa9b3",
       "head_bounds": {
         "ok": true,
         "actual": [
@@ -21683,8 +21685,8 @@
       }
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "sha256": "b017b560c8afb7c953f5cbcc23fbe2500d520d84f8c37c6789597b254f3b063f",
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "sha256": "adbe15cbae1966a704f69c35497f936719f2aecce6f112168b49cc9bb3f843a8",
       "head_bounds": {
         "ok": true,
         "actual": [

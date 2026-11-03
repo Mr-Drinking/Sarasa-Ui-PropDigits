@@ -29,7 +29,9 @@ UI_AUTOHINT_OPTIONS = ("--fallback-script=none", "--fallback-scaling")
 UI_AUTOHINT_UNSCALED_CODEPOINTS = (0x0360, 0x22EF)
 # Product glyphs that intentionally differ from the regional Sarasa release;
 # their shapes and positions are verified against their own source oracles.
-DASH_CODEPOINTS = frozenset({0x2014, 0x2015, 0x2E3A, 0x2E3B, 0xFE31})
+# Of the declared regional punctuation, the ellipses keep the release's own
+# outlines; only their language routing differs.
+DASH_CODEPOINTS = c.REGIONAL_PUNCTUATION - {0x2026, 0x22EF}
 SAMPLE_LIMIT = 24
 
 

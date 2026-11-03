@@ -12,29 +12,72 @@ from fontTools.ttLib import TTFont
 
 from . import contract as c
 from .comparison import Sources
-from .differential import Context, default_contexts, source_sequences
+from .differential import Context, context_texts, default_contexts, source_sequences
 from .outlines import quadratic_source_outline, residual, segment_recording
 from .oracles import IDEOGRAPH_RANGES, in_ranges
 from .results import Result
 from .shaping import Face
 
 
-_SORTED_REFERENCES: dict[tuple[str, str], Path] = {}
-_SORTED_DIRECTORY: tempfile.TemporaryDirectory | None = None
+_PROJECT_REFERENCES: dict[tuple[str, str], Path] = {}
+_PROJECT_DIRECTORY: tempfile.TemporaryDirectory | None = None
+# The project's one declared routing change from the release: the Cyrillic
+# and Greek default languages take the DFLT/dflt features, as Sarasa's
+# shareFeatures gives the Far East languages, except vertical substitutions.
+SHARED_DEFAULT_SCRIPTS = ("cyrl", "grek")
+OWN_VERTICAL_FEATURES = ("vert", "vrt2")
 
 
-def sorted_pair_reference(path: Path) -> Path:
-    """The pinned release with GPOS PairSets in the order OpenType requires.
+def share_default_language_features(font: TTFont) -> int:
+    """Apply the declared rule to a release, one combined record per tag."""
+    changed = 0
+    for tag in ("GSUB", "GPOS"):
+        if tag not in font:
+            continue
+        table = font[tag].table
+        records = table.FeatureList.FeatureRecord
+        scripts = {record.ScriptTag: record.Script for record in table.ScriptList.ScriptRecord}
+        default = scripts["DFLT"].DefaultLangSys if "DFLT" in scripts else None
+        for name in SHARED_DEFAULT_SCRIPTS:
+            system = scripts[name].DefaultLangSys if name in scripts else None
+            if default is None or system is None:
+                continue
+            for index in list(default.FeatureIndex):
+                feature_tag = records[index].FeatureTag
+                own = [i for i in system.FeatureIndex if records[i].FeatureTag == feature_tag]
+                if own and feature_tag in OWN_VERTICAL_FEATURES:
+                    continue
+                lookups = sorted(set(records[index].Feature.LookupListIndex).union(
+                    *(records[i].Feature.LookupListIndex for i in own)))
+                if len(own) == 1 and lookups == sorted(set(records[own[0]].Feature.LookupListIndex)):
+                    continue
+                # HarfBuzz applies only the first record of a tag in a
+                # language system, so a shared tag becomes one record.
+                record = copy.deepcopy(records[index])
+                record.Feature.LookupListIndex = lookups
+                record.Feature.LookupCount = len(lookups)
+                records.append(record)
+                system.FeatureIndex = sorted([i for i in system.FeatureIndex if i not in own] + [len(records) - 1])
+                system.FeatureCount = len(system.FeatureIndex)
+                changed += 1
+        table.FeatureList.FeatureCount = len(records)
+    return changed
+
+
+def project_reference(path: Path) -> Path:
+    """The pinned release as this project routes it.
 
     Upstream stores some PairValueRecords out of SecondGlyph order, so binary
     search engines such as HarfBuzz miss values the font contains (e.g. the
-    kana pair とっ at ExtraLight). Sorting by glyph ID changes no stored value.
+    kana pair とっ at ExtraLight); sorting by glyph ID changes no stored
+    value. The declared Cyrillic and Greek routing (share_default_language_features)
+    is applied as stated, independently of the builder.
     """
-    global _SORTED_DIRECTORY
+    global _PROJECT_DIRECTORY
     key = (str(path), c.sha256(path))
-    if key not in _SORTED_REFERENCES:
-        if _SORTED_DIRECTORY is None:
-            _SORTED_DIRECTORY = tempfile.TemporaryDirectory(prefix="sarasa-audit-reference-")
+    if key not in _PROJECT_REFERENCES:
+        if _PROJECT_DIRECTORY is None:
+            _PROJECT_DIRECTORY = tempfile.TemporaryDirectory(prefix="sarasa-audit-reference-")
         with TTFont(path, recalcBBoxes=False, recalcTimestamp=False) as font:
             changed = 0
             for lookup in font["GPOS"].table.LookupList.Lookup if "GPOS" in font else ():
@@ -46,13 +89,14 @@ def sorted_pair_reference(path: Path) -> Path:
                         ordered = sorted(pair_set.PairValueRecord, key=lambda record: font.getGlyphID(record.SecondGlyph))
                         changed += ordered != pair_set.PairValueRecord
                         pair_set.PairValueRecord = ordered
-            target = Path(_SORTED_DIRECTORY.name) / f"{len(_SORTED_REFERENCES)}-{path.name}"
+            changed += share_default_language_features(font)
+            target = Path(_PROJECT_DIRECTORY.name) / f"{len(_PROJECT_REFERENCES)}-{path.name}"
             if changed:
                 font.save(target)
             else:
                 target = path
-        _SORTED_REFERENCES[key] = target
-    return _SORTED_REFERENCES[key]
+        _PROJECT_REFERENCES[key] = target
+    return _PROJECT_REFERENCES[key]
 
 
 def without_positioning(original):
@@ -145,9 +189,11 @@ def heavy_sources(path, region, italic, *, contexts=None, codepoints=None):
     # Sarasa Ui narrows Source Han's language-system routing (for example, no
     # Hangul or kana composition under latn/ROM). That routing is the same for
     # every weight, so a structural difference from Source Han is accepted only
-    # when it equals the pinned Bold release exactly; its positioning effect is
-    # then compared with that release instead.
-    routing = Face(c.reference_path(region, 'Bold', italic)); routing_unpositioned = without_positioning(routing)
+    # when it equals the pinned Bold release, as the project routes it,
+    # exactly; its positioning effect is then compared with that release.
+    # Only the routing comes from Bold: outlines and values still come from
+    # Inter Black and Source Han Heavy.
+    routing = Face(project_reference(c.reference_path(region, 'Bold', italic))); routing_unpositioned = without_positioning(routing)
     with TTFont(path, lazy=True) as font:
         repertoire = sorted(font.getBestCmap() if codepoints is None else codepoints)
     repertoire_set = set(repertoire)
@@ -177,7 +223,7 @@ def heavy_sources(path, region, italic, *, contexts=None, codepoints=None):
         context_rows = []
         for context in contexts or default_contexts():
             count, failures = positioning.cases, positioning.failures
-            for text in [*(chr(cp) for cp in repertoire), *sequences]:
+            for text in context_texts(context, repertoire, sequences):
                 args = context.arguments()
                 run = actual.shape(text, **args)
                 a = positioning_effect(run, unpositioned.shape(text, **args))

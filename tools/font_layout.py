@@ -8,6 +8,19 @@ from fontTools import subset  # Registers the OpenType lookup closure methods.
 from fontTools.ttLib.tables import otTables as ot
 
 
+# Sarasa pass2 (make/pass2/index.mjs, shareFeatures) appends the DFLT/dflt
+# features to the default language of these scripts and, under any script,
+# to these languages.
+FAR_EAST_SCRIPTS = frozenset({"hani", "kana", "bopo", "hang"})
+FAR_EAST_LANGUAGES = frozenset({"JAN", "KOR", "ZHS", "ZHT", "ZHH"})
+# The project extends that rule to the Cyrillic and Greek default languages:
+# upstream leaves them without tnum, zero or mark, so Russian and Greek runs
+# cannot select tabular digits and misplace combining accents. Their own
+# vertical substitutions stay (CL routes them per script).
+SHARED_DEFAULT_SCRIPTS = frozenset({"cyrl", "grek"})
+OWN_VERTICAL_FEATURES = frozenset({"vert", "vrt2"})
+
+
 @dataclass
 class Feature:
     lookups: tuple[int, ...]
@@ -134,19 +147,176 @@ def single_substitution_effect(table, lookups) -> dict[str, str]:
     return effect
 
 
+def far_east_receives_default(script: str, language: str) -> bool:
+    if language == "dflt":
+        return script in FAR_EAST_SCRIPTS
+    return script in FAR_EAST_SCRIPTS or language.strip() in FAR_EAST_LANGUAGES
+
+
+def shared_default_receives(script: str, language: str) -> bool:
+    return script in SHARED_DEFAULT_SCRIPTS and language == "dflt"
+
+
+def share_default(mapping, receives, keep=frozenset()) -> int:
+    """Append the DFLT/dflt features to the selected language systems in place.
+
+    A shared feature joins the receiver's lookups of the same tag, as Sarasa's
+    shareFeatures followed by ot-builder's consolidation; a tag in keep stays
+    as the receiver routes it. Required features are not shared.
+    """
+    default = mapping.get(("DFLT", "dflt"))
+    changed = 0
+    if not default:
+        return changed
+    for key, features in mapping.items():
+        if key == ("DFLT", "dflt") or not receives(*key):
+            continue
+        for tag, feature in default.items():
+            own = features.get(tag)
+            if own is not None and tag in keep:
+                continue
+            shared = Feature(feature.lookups, feature.params) if own is None else combine(
+                own, Feature(feature.lookups, feature.params))
+            if own is None or shared.lookups != own.lookups or shared.params is not own.params:
+                features[tag] = copy.deepcopy(shared)
+                changed += 1
+    return changed
+
+
 def merge_routes(table, incoming) -> None:
+    """Merge layout routes as Sarasa does.
+
+    ot-builder joins each (script, language) exactly, without falling back to
+    a default language; shareFeatures then appends DFLT/dflt to the Far East
+    scripts and languages. Falling back while merging, as a runtime does,
+    gave cyrl/ZHS only Inter's cyrl/dflt kerning (no mark) and latn/ROM
+    Source Han's latn/dflt kerning, unlike the native static.
+    """
     current = routes(table)
     merged = {}
-    scripts = {script for script, _ in current} | {script for script, _ in incoming}
-    for script in scripts:
-        languages = {language for source in (current, incoming) for source_script, language in source
-                     if source_script in {script, "DFLT"}}
-        for language in languages:
-            features = copy.deepcopy(selected(current, script, language))
-            for tag, feature in selected(incoming, script, language).items():
-                features[tag] = combine(features[tag], feature) if tag in features else copy.deepcopy(feature)
-            merged[(script, language)] = features
+    for key in set(current) | set(incoming):
+        features = copy.deepcopy(current.get(key, {}))
+        for tag, feature in incoming.get(key, {}).items():
+            features[tag] = combine(features[tag], feature) if tag in features else copy.deepcopy(feature)
+        merged[key] = features
+    share_default(merged, far_east_receives_default)
     install(table, merged)
+
+
+def share_default_language_features(font) -> dict[str, int]:
+    """Give the Cyrillic and Greek default languages the DFLT/dflt features."""
+    report = {}
+    for tag in ("GSUB", "GPOS"):
+        if tag not in font:
+            continue
+        table = font[tag].table
+        mapping = routes(table)
+        changed = share_default(mapping, shared_default_receives, OWN_VERTICAL_FEATURES)
+        if changed:
+            install(table, mapping)
+        report[f"{tag.lower()}_default_features_shared_with_cyrl_grek"] = changed
+    return report
+
+
+def structure_differences(table, template, grouped_except=OWN_VERTICAL_FEATURES) -> list[str]:
+    """Where two layouts route features differently, whatever their lookup numbers.
+
+    Each (script, language) must carry the same feature tags. For each tag
+    outside grouped_except, language systems that share lookups in the
+    template share them here and those it separates stay separate (latn/ROM
+    kerning without Source Han's lookups, cyrl/dflt without Inter's mark).
+    """
+    actual, expected = routes(table), routes(template)
+    problems = []
+    for key in sorted(set(actual) | set(expected)):
+        label = "/".join(part.strip() for part in key)
+        if key not in actual or key not in expected:
+            problems.append(f"{label}: {'缺少' if key not in actual else '多出'}语言系统")
+            continue
+        missing, extra = sorted(set(expected[key]) - set(actual[key])), sorted(set(actual[key]) - set(expected[key]))
+        if missing or extra:
+            problems.append(f"{label}: 缺少 {missing}，多出 {extra}")
+
+    def groups(mapping, tag):
+        shared = {}
+        for key, features in mapping.items():
+            if tag in features:
+                shared.setdefault(tuple(sorted(set(features[tag].lookups))), set()).add(
+                    "/".join(part.strip() for part in key))
+        return {frozenset(keys) for keys in shared.values()}
+
+    for tag in sorted({tag for features in expected.values() for tag in features} - set(grouped_except)):
+        own, native = groups(actual, tag), groups(expected, tag)
+        if own != native:
+            problems.append(f"{tag}: 语言分组 {sorted(map(sorted, own - native))[:3]} 应为 {sorted(map(sorted, native - own))[:3]}")
+    return problems
+
+
+def subtable_is_empty(part) -> bool:
+    """A subtable that can never match: no rules and no coverage."""
+    for field in ("mapping", "alternates", "ligatures"):
+        value = getattr(part, field, None)
+        if value is not None:
+            return not value
+    for field in ("SubRuleSet", "SubClassSet", "ChainSubRuleSet", "ChainSubClassSet",
+                  "PosRuleSet", "PosClassSet", "ChainPosRuleSet", "ChainPosClassSet"):
+        value = getattr(part, field, None)
+        if value is not None:
+            return not any(value)
+    for field in ("Coverage", "MarkCoverage", "Mark1Coverage", "InputCoverage"):
+        value = getattr(part, field, None)
+        if isinstance(value, list):
+            return not value or any(not coverage.glyphs for coverage in value)
+        if value is not None:
+            return not value.glyphs
+    return False
+
+
+def subtable_is_unreachable(part, reachable: set[str]) -> bool:
+    """A subtable needing a glyph position that no text can fill.
+
+    Every listed coverage must match for a rule to apply, so one without a
+    glyph reachable from the cmap (substitution_closure) rules it out.
+    """
+    needed = []
+    for field in ("BacktrackCoverage", "InputCoverage", "LookAheadCoverage"):
+        needed.extend(coverage.glyphs for coverage in getattr(part, field, None) or [])
+    for field in ("Coverage", "MarkCoverage", "Mark1Coverage"):
+        value = getattr(part, field, None)
+        if value is not None:
+            needed.extend(coverage.glyphs for coverage in (value if isinstance(value, list) else [value]))
+    for field in ("mapping", "alternates", "ligatures"):
+        value = getattr(part, field, None)
+        if value is not None:
+            needed.append(list(value))
+    return any(not reachable.intersection(glyphs) for glyphs in needed)
+
+
+def remove_empty_lookups(font) -> int:
+    """Drop feature references to lookups whose subtables can never match.
+
+    Repeated dash passes leave empty lookups behind, and the VF kept a Source
+    Han calt rule whose input is the unencoded GID 1 (the native static has
+    neither; upstream has none). The unreferenced-lookup pruning that follows
+    removes them unless a contextual rule still names them.
+    """
+    removed = 0
+    cmap = font.getBestCmap() if "cmap" in font else None
+    # The shaper itself only adds the notdef glyph for unmapped text.
+    reachable = substitution_closure(font, set(cmap.values()) | {font.getGlyphOrder()[0]}) if cmap else None
+    for tag in ("GSUB", "GPOS"):
+        if tag not in font or not font[tag].table.FeatureList:
+            continue
+        table = font[tag].table
+        empty = {index for index, lookup in enumerate(table.LookupList.Lookup)
+                 if all(subtable_is_empty(part) or (reachable is not None and subtable_is_unreachable(part, reachable))
+                        for part in (getattr(part, "ExtSubTable", part) for part in lookup.SubTable))}
+        for record in table.FeatureList.FeatureRecord:
+            kept = [index for index in record.Feature.LookupListIndex if index not in empty]
+            removed += len(record.Feature.LookupListIndex) - len(kept)
+            record.Feature.LookupListIndex = kept
+            record.Feature.LookupCount = len(kept)
+    return removed
 
 
 def substitution_closure(font, initial: set[str]) -> set[str]:

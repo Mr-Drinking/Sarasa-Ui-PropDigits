@@ -27,6 +27,16 @@ COLON_TEXTS = tuple(dict.fromkeys((
 WIDTH_FEATURES = ({}, {"pnum": True}, {"tnum": True}, {"zero": True}, {"tnum": True, "zero": True})
 KERN_TEXTS = ("7.", "09:41", "12.5", "T.", "LY", "GT", "Go", "AV", "To", "WA", "Ty", "F,")
 MARK_TEXTS = ("i\u0307", "j\u0301", "į\u0301", "A\u0304\u0301", "a\u0327\u0301")
+# Cyrillic and Greek accents in their default and Far East language systems,
+# which all route Inter's DFLT marks (Inter's own cyrl/grek GPOS has kern only).
+SCRIPT_MARK_TEXTS = (("Cyrl", "и́"), ("Cyrl", "і́"), ("Cyrl", "а̀́"),
+                     ("Grek", "Γ́"), ("Grek", "ῶ"))
+SCRIPT_MARK_LANGUAGES = ("und", "zh-Hans", "ja")
+POSITIONING_CASES = 5 * len(KERN_TEXTS) + len(MARK_TEXTS) + len(SCRIPT_MARK_TEXTS) * len(SCRIPT_MARK_LANGUAGES)
+# tnum and zero must keep digits tabular in Latin, Cyrillic and Greek runs.
+DIGIT_RUN_SCRIPTS = ("Latn", "Cyrl", "Grek")
+DIGIT_RUN_FEATURES = ({"tnum": True}, {"tnum": True, "zero": True}, {"tnum": True, "zero": True, "ss01": True})
+WIDTH_CASES = 3 * len(c.INTENTIONAL_CPS) + len(DIGIT_RUN_SCRIPTS) * len(DIGIT_RUN_FEATURES)
 
 
 def properties(path: Path) -> tuple[bool, tuple[int, ...]]:
@@ -168,15 +178,17 @@ def width_invariants(path: Path) -> dict:
             plain = actual.shape(chr(cp), script="Latn", features={"kern": False, "calt": False})
             proportional = actual.shape(chr(cp), script="Latn", features={"kern": False, "calt": False, "pnum": True})
             result.check(plain == proportional, {"weight": weight, "cp": f"U+{cp:04X}", "check": "default_equals_pnum"})
-        for features in ({"tnum": True}, {"tnum": True, "zero": True}, {"tnum": True, "zero": True, "ss01": True}):
-            run = actual.shape("0123456789", script="Latn", features={"kern": False, **features})
-            advances = [glyph.advance[0] for glyph in run]
-            ft_advances = []
-            for glyph in run:
-                ft.load_glyph(glyph.gid, freetype.FT_LOAD_NO_SCALE | freetype.FT_LOAD_NO_HINTING)
-                ft_advances.append(ft.glyph.metrics.horiAdvance)
-            result.check(len(run) == 10 and len(set(advances)) == 1 and advances == ft_advances,
-                         {"weight": weight, "features": features, "harfbuzz": advances, "freetype": ft_advances})
+        for script in DIGIT_RUN_SCRIPTS:
+            for features in DIGIT_RUN_FEATURES:
+                run = actual.shape("0123456789", script=script, features={"kern": False, **features})
+                advances = [glyph.advance[0] for glyph in run]
+                ft_advances = []
+                for glyph in run:
+                    ft.load_glyph(glyph.gid, freetype.FT_LOAD_NO_SCALE | freetype.FT_LOAD_NO_HINTING)
+                    ft_advances.append(ft.glyph.metrics.horiAdvance)
+                result.check(len(run) == 10 and len(set(advances)) == 1 and advances == ft_advances,
+                             {"weight": weight, "script": script, "features": features,
+                              "harfbuzz": advances, "freetype": ft_advances})
     return result.report(weights=list(weights), codepoints=len(c.INTENTIONAL_CPS))
 
 
@@ -249,7 +261,26 @@ def positioning_invariants(path: Path, *, weights=None) -> dict:
             a, b = values
             result.check(bool(a) and len(a) == len(b) and all(abs(x - y) <= 2 for av, bv in zip(a, b) for x, y in zip(av, bv)),
                          {"weight": weight, "text": text, "check": "attached_mark_ink", "actual": a, "source": b})
-    return result.report(weights=list(weights), scripts=5, kerning_texts=len(KERN_TEXTS), mark_texts=len(MARK_TEXTS))
+        for script, text in SCRIPT_MARK_TEXTS:
+            for language in SCRIPT_MARK_LANGUAGES:
+                values = []
+                for face, variations, route in ((actual, {"wght": weight}, script),
+                                                (source, {"wght": weight, "opsz": 14}, "Zyyy")):
+                    run = precise_positions(face, text, variations, script=route, language=language,
+                                            features={"kern": False, "cv10": face is source})
+                    pen, ink = 0.0, []
+                    for gid, advance, x_offset, y_offset in run:
+                        box = face.ink(gid)
+                        if box:
+                            ink.append((pen + x_offset + box[0], y_offset + box[1]))
+                        pen += advance
+                    values.append([(x - ink[0][0], y - ink[0][1]) for x, y in ink] if ink else [])
+                a, b = values
+                result.check(bool(a) and len(a) == len(b) and all(abs(x - y) <= 2 for av, bv in zip(a, b) for x, y in zip(av, bv)),
+                             {"weight": weight, "script": script, "language": language, "text": text,
+                              "check": "attached_mark_ink", "actual": a, "source": b})
+    return result.report(weights=list(weights), scripts=5, kerning_texts=len(KERN_TEXTS), mark_texts=len(MARK_TEXTS),
+                         script_mark_texts=len(SCRIPT_MARK_TEXTS) * len(SCRIPT_MARK_LANGUAGES))
 
 
 SPACING_OPENING = "「『（【〔〈《｛［〘〖〝"

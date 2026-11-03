@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import re
 import sys
 import zipfile
 from dataclasses import dataclass
@@ -252,7 +253,7 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
                                for case in item.get("language_cases", [])]
             width_text = "".join(chr(cp) for cp in sorted(audit.INTENTIONAL_CPS))
             width_expected = {(regular_vf, 400, json.dumps(features, sort_keys=True), width_text, 25)
-                              for features in ({}, {"pnum": True}, {"tnum": True})}
+                              for features in ({"calt": False}, {"calt": False, "pnum": True}, {"calt": False, "tnum": True})}
             width_actual = [(case.get("font"), case.get("weight"), json.dumps(case.get("features"), sort_keys=True), case.get("text"), case.get("pixels"))
                             for case in item.get("width_cases", [])]
             vertical_expected = {(audit.display_path(audit.vf_path(region, italic) if variable else audit.static_path(region, "Regular", italic, False)),
@@ -273,8 +274,43 @@ def validate_visual_report(visual: dict, manifest: dict) -> None:
         reviewed.update(case[0] for case in actual)
     if reviewed != set(manifest):
         raise ValueError("视觉图片没有覆盖全部成品")
+    # v1.0.43's 66 records collapsed to 12 texts once the region was removed:
+    # a template stands in for no image. Each record must describe its own.
+    if not isinstance(visual.get("reviewer"), str) or not visual["reviewer"].strip():
+        raise ValueError("视觉报告缺少审阅者")
+    seen: dict[tuple, str] = {}
+    for item in images:
+        kind = item["file"].rsplit("-", 1)[1]
+        text = tuple(re.sub(rf"(?<![A-Za-z]){item['region']}(?![A-Za-z])", "<地区>", value) for value in item["observations"])
+        if (kind, text) in seen:
+            raise ValueError(f"{item['file']} 的审阅记录与 {seen[(kind, text)]} 逐字相同，不能代替逐图审阅")
+        seen[(kind, text)] = item["file"]
     for screenshot in visual.get("runtime_screenshots", []):
         verify_image(screenshot)
+
+
+def validate_fontbakery_universal(report: dict) -> None:
+    """The full check-universal run: its samples, and a pinned reproduction for every FAIL it accepts."""
+    import check_external_release as external
+    from font_audit import contract as audit
+
+    universal = report.get("universal", {})
+    if universal.get("passed") is not True or universal.get("unapproved_failures") != []:
+        raise ValueError("FontBakery universal 仍有未经上游复现批准的 FAIL 或 ERROR")
+    regions = universal.get("regions", {})
+    if set(regions) != set(build.REGION_ORDER):
+        raise ValueError("FontBakery universal 没有覆盖全部六地区")
+    for region, row in regions.items():
+        expected = [audit.display_path(audit.vf_path(region, italic) if weight is None
+                                       else audit.static_path(region, weight, italic, True))
+                    for weight, italic, _release, _release_italic in external.UNIVERSAL_SAMPLES]
+        if row.get("product_fonts") != expected:
+            raise ValueError(f"FontBakery universal 的 {region} 抽样字体不符")
+    approvals = report.get("approved_upstream_failures")
+    if approvals != universal.get("approved_upstream_failures") or any(
+            item.get("result") != "FAIL" or item.get("counterpart_result") != "FAIL"
+            or item.get("check") not in external.APPROVED_UPSTREAM_FAILURES for item in approvals or []):
+        raise ValueError("FontBakery 批准的 FAIL 必须在显式清单中，且固定上游同项也是 FAIL")
 
 
 def validate_license_documentation(main_report: dict) -> None:
@@ -347,8 +383,7 @@ def validate_release_audits(packages: list[Package]) -> None:
         raise ValueError("FontBakery 发布门尚未取得 630 PASS")
     if fb.get("selected_checks") != expected_fb:
         raise ValueError("FontBakery 的逐字体及正斜体配对检查覆盖不完整")
-    if reports["fontbakery-audit"].get("approved_upstream_failures") != []:
-        raise ValueError("当前发布门没有批准的上游 FAIL 豁免")
+    validate_fontbakery_universal(reports["fontbakery-audit"])
     batches = fb.get("per_region_batches", {})
     if set(batches) != set(build.REGION_ORDER) or any(batch.get("fonts") != 26 or batch.get("jobs") != 4 for batch in batches.values()):
         raise ValueError("FontBakery 必须按六地区、每批 26 字体、-J 4 运行")

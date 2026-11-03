@@ -29,7 +29,7 @@ def main() -> None:
             output = io.BytesIO(); font.recalcTimestamp = False; font.save(output)
             build.verify_or_write_source(build.SARASA_SOURCE_DIR / "sources/Inter" / f"{name}.ttf", output.getvalue())
             found.add(name)
-        required = {"Inter-Regular", "Inter-ExtraLight"}
+        required = {"Inter-Regular", "Inter-ExtraLight", "Inter-SemiBold"}
         if not required <= found:
             raise ValueError("固定 Inter TTC 缺少静态测试夹具")
     finally:

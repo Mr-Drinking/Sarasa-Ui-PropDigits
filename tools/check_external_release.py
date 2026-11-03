@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import concurrent.futures
 import importlib.metadata
 import json
 import os
@@ -38,9 +39,22 @@ CHECK_EXPECTED_COUNTS = {
     "smart_dropout": 156,
 }
 CHECKS = tuple(CHECK_EXPECTED_COUNTS)
-# No identified defect is waived. Any future upstream exemption must name the
-# exact check, affected font hashes, and independently reproduced source result.
-APPROVED_UPSTREAM_FAILURES: tuple[dict, ...] = ()
+# The whole check-universal profile also runs on representative fonts of each
+# region, each paired with the pinned Sarasa Ui style it derives from (Heavy has
+# none and pairs with Bold). A product FAIL passes only when it is listed here
+# and the same check also FAILs on that release font; an ERROR, or a FAIL the
+# release does not reproduce, fails the gate. WARN results are recorded.
+# The italic VF is left to the per-font checks (STAT italic pairing): its
+# interpolation_issues check alone takes about 18 minutes per VF.
+UNIVERSAL_SAMPLES = ((None, False, "Regular", False), ("Regular", False, "Regular", False),
+                     ("Regular", True, "Regular", True), ("Heavy", False, "Bold", False))
+UNIVERSAL_PARALLEL_BATCHES = 3
+APPROVED_UPSTREAM_FAILURES = {
+    "base_has_width": "U+0488、U+0489（西里尔组合十万、百万符号）在固定 Sarasa Ui 中即为零步进。",
+    "case_mapping": "固定 Sarasa Ui 缺少部分字母的大小写对应字形。",
+    "file_size": "全字集 CJK 字体远超 FontBakery 为网页字体设定的 9 MB 上限。",
+    "opentype/family/underline_thickness": "下划线粗细随字重变化：固定 Sarasa Ui 的 Regular、Italic 为 68，Bold 为 92；本项目 Heavy 为 113，同族检查因此 FAIL。",
+}
 
 
 def save_report(name: str, report: dict) -> None:
@@ -138,15 +152,115 @@ def run_fontbakery(manifest: dict) -> bool:
                 identifier = match.group(1) if match else identifier
                 selected[identifier][check["result"]] += 1
                 records[region].append({"check": identifier, "font": check.get("filename"), "result": check["result"], "logs": check["logs"]})
+    universal = run_fontbakery_universal(python, directory)
     unchanged = audit.audit_input_manifest() == manifest
     expected_results = {name: {"PASS": count} for name, count in CHECK_EXPECTED_COUNTS.items()}
     success = (unchanged and dict(totals) == {"PASS": sum(CHECK_EXPECTED_COUNTS.values())}
                and {name: dict(value) for name, value in selected.items()} == expected_results
                and all(batch["exit_code"] == 0 for batch in batches.values()))
     report = {"title": "FontBakery 分地区发布检查", "generated_at": datetime.now(timezone.utc).isoformat(), "toolchain": environment["versions"], "environment": environment, "input_manifest": manifest, "inputs_unchanged": unchanged, "release_gate": {"fonts": 156, "selected_checks": {name: dict(value) for name, value in selected.items()}, "per_region_batches": batches, "total_result_counts": dict(totals), "all_batches_exit_zero": all(batch["exit_code"] == 0 for batch in batches.values()), "passed": success}, "results": records}
-    report["approved_upstream_failures"] = list(APPROVED_UPSTREAM_FAILURES)
+    report["universal"] = universal
+    report["approved_upstream_failures"] = universal["approved_upstream_failures"]
     save_report("fontbakery-audit.json", report)
-    return success
+    return success and universal["passed"]
+
+
+def fontbakery_results(document: dict) -> list[dict]:
+    rows = []
+    for section in document["sections"]:
+        for check in section["checks"]:
+            identifier = check["key"][1]
+            match = re.fullmatch(r"<FontBakeryCheck:(.+)>", identifier)
+            messages = []
+            for log in check["logs"]:
+                if log["status"] in ("FAIL", "ERROR", "FATAL", "WARN"):
+                    message = log["message"]
+                    text = message.get("message", str(message)) if isinstance(message, dict) else str(message)
+                    messages.append(text[:400])
+            rows.append({"check": match.group(1) if match else identifier, "font": check.get("filename"),
+                         "result": check["result"], "messages": messages})
+    return rows
+
+
+def run_fontbakery_universal(python: Path, directory: Path) -> dict:
+    """check-universal in full on samples and their pinned counterparts."""
+    regions = {}
+    approvals = []
+    unapproved = []
+    plans = {}
+    for region in build.REGION_ORDER:
+        products, counterparts = [], {}
+        for weight, italic, release_weight, release_italic in UNIVERSAL_SAMPLES:
+            path = audit.vf_path(region, italic) if weight is None else audit.static_path(region, weight, italic, True)
+            products.append(path)
+            counterparts[audit.display_path(path)] = audit.reference_path(region, release_weight, release_italic, True)
+        plans[region] = (products, counterparts)
+
+    def run_batch(region: str, kind: str, fonts: list[Path]) -> dict:
+        native = directory / f"universal-{region}-{kind}.json"
+        # Release fonts live outside the repository; pass real paths and
+        # report the portable names, in messages too (single_directory and
+        # underline_thickness list every file, some as a Python repr).
+        names = {str(font.resolve()): audit.display_path(font) for font in fonts}
+        portable = {}
+        for real, shown in names.items():
+            for old, new in ((real, shown), (str(Path(real).parent), shown.rsplit("/", 1)[0])):
+                portable[old] = new
+                portable[old.replace("\\", "\\\\")] = new
+        arguments = [str(python), "-m", "fontbakery", "check-universal", "-J", "4", "--json", str(native), *names]
+        print(f"[FontBakery universal] {region} {kind}，{len(fonts)} 个字体", flush=True)
+        with (directory / f"universal-{region}-{kind}.log").open("w", encoding="utf-8") as log:
+            process = subprocess.run(arguments, cwd=build.ROOT, stdout=log, stderr=subprocess.STDOUT)
+        rows = fontbakery_results(json.loads(native.read_text(encoding="utf-8")))
+        for row in rows:
+            if row["font"]:
+                row["font"] = names.get(str(Path(row["font"]).resolve()), row["font"])
+            for old, new in sorted(portable.items(), key=lambda item: -len(item[0])):
+                row["messages"] = [message.replace(old, new) for message in row["messages"]]
+        return {"exit_code": process.returncode, "rows": rows}
+
+    def product_batches(products: list[Path]) -> list[tuple[str, list[Path]]]:
+        # The VF and the statics are different families: run as one batch,
+        # family checks (single_directory, consistent and typographic family
+        # names, VF axis ranges) failed on the mixture, not on either.
+        variable = [path for path in products if path.parent == audit.vf_path("SC", False).parent]
+        static = [path for path in products if path not in variable]
+        return [("product-variable", variable), ("product-static", static)]
+
+    jobs = [(region, kind, fonts) for region, (products, counterparts) in plans.items()
+            for kind, fonts in (*product_batches(products), ("release", sorted(set(counterparts.values()))))]
+    with concurrent.futures.ThreadPoolExecutor(max_workers=UNIVERSAL_PARALLEL_BATCHES) as pool:
+        finished = dict(zip([(region, kind) for region, kind, _fonts in jobs],
+                            pool.map(lambda job: run_batch(*job), jobs)))
+    for region, (products, counterparts) in plans.items():
+        batches = {"product": {"rows": [row for kind in ("product-variable", "product-static")
+                                        for row in finished[(region, kind)]["rows"]]},
+                   "release": finished[(region, "release")]}
+        release_results = {(row["check"], row["font"]): row["result"] for row in batches["release"]["rows"]}
+        counts = Counter(row["result"] for row in batches["product"]["rows"])
+        for row in batches["product"]["rows"]:
+            if row["result"] not in ("FAIL", "ERROR", "FATAL"):
+                continue
+            counterpart = counterparts.get(row["font"])
+            if counterpart is not None:
+                reproduced = release_results.get((row["check"], audit.display_path(counterpart)))
+            else:
+                reproduced = next((result for (check, _font), result in release_results.items()
+                                   if check == row["check"]), None)
+            item = {"region": region, "check": row["check"], "font": row["font"], "result": row["result"],
+                    "counterpart": audit.display_path(counterpart) if counterpart is not None else None,
+                    "counterpart_result": reproduced, "messages": row["messages"]}
+            if row["result"] == "FAIL" and row["check"] in APPROVED_UPSTREAM_FAILURES and reproduced == "FAIL":
+                approvals.append({**item, "reason": APPROVED_UPSTREAM_FAILURES[row["check"]]})
+            else:
+                unapproved.append(item)
+        regions[region] = {"product_fonts": [audit.display_path(path) for path in products],
+                           "release_fonts": sorted({audit.display_path(path) for path in counterparts.values()}),
+                           "product_result_counts": dict(counts),
+                           "warnings": sorted({row["check"] for row in batches["product"]["rows"]
+                                               if row["result"] == "WARN"})}
+    return {"fonts": sum(len(region["product_fonts"]) for region in regions.values()), "regions": regions,
+            "approved_upstream_failures": approvals, "unapproved_failures": unapproved, "passed": not unapproved}
 
 
 def main() -> None:
