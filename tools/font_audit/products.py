@@ -290,7 +290,7 @@ SPACING_TEXTS = tuple(left + right for left in SPACING_OPENING + SPACING_CLOSING
                       for right in SPACING_OPENING + SPACING_CLOSING + SPACING_MIDDLE)
 SPACING_LANGUAGES = ("und", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko")
 SPACING_FEATURES = (("chws", "ltr"), ("vchw", "ttb"))
-SPACING_CASES = len(SPACING_TEXTS) * len(SPACING_LANGUAGES) * len(SPACING_FEATURES) + len(SPACING_FEATURES)
+SPACING_CASES = len(SPACING_TEXTS) * len(SPACING_LANGUAGES) * len(SPACING_FEATURES) + 2 * len(SPACING_FEATURES)
 
 
 def spacing_parity(variable_path: Path, static_path: Path, weight: int) -> dict:
@@ -303,7 +303,7 @@ def spacing_parity(variable_path: Path, static_path: Path, weight: int) -> dict:
     variable.set_weight(weight)
     result = Result()
     for feature, direction in SPACING_FEATURES:
-        tightened = 0
+        tightened = [0, 0]
         for language in SPACING_LANGUAGES:
             for text in SPACING_TEXTS:
                 effects = []
@@ -314,12 +314,15 @@ def spacing_parity(variable_path: Path, static_path: Path, weight: int) -> dict:
                     effects.append([tuple(x - y for x, y in zip((*a.advance, *a.offset), (*b.advance, *b.offset)))
                                     for a, b in zip(on, off)] if [g.gid for g in on] == [g.gid for g in off] else None)
                 a, b = effects
-                passed = (a is not None and b is not None and len(a) == len(b)
-                          and all(abs(x - y) <= 1 for left, right in zip(a, b) for x, y in zip(left, right)))
-                tightened += bool(b) and any(any(value) for value in b)
+                # The same adjustments exactly: both sides take them from
+                # the same chws/vchw logic at the published weight.
+                passed = a is not None and b is not None and a == b
+                for side, value in enumerate((a, b)):
+                    tightened[side] += bool(value) and any(any(item) for item in value)
                 result.check(passed, {"feature": feature, "language": language, "text": text,
                                       "variable": a, "static": b})
-        result.check(tightened > 0, {"feature": feature, "check": "feature_has_effect"})
+        for side, label in enumerate(("variable", "static")):
+            result.check(tightened[side] > 0, {"feature": feature, "font": label, "check": "feature_has_effect"})
     return result.report(weight=weight, texts=len(SPACING_TEXTS), languages=list(SPACING_LANGUAGES))
 
 
@@ -339,7 +342,7 @@ def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | N
             for language in (None, "en", "de", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"):
                 for features in ({}, {"vert": True, "vrt2": False}, {"vert": False, "vrt2": True}):
                     for text in VERTICAL_DASH_RUN_TEXTS:
-                        count = sum({"—": 1, "⸺": 2, "⸻": 3}[character] for character in text)
+                        count = sum(c.VERTICAL_DASH_SEGMENTS[ord(character)] for character in text)
                         buf = hb.Buffer(); buf.add_str(text); buf.script = script; buf.direction = "ttb"
                         buf.language = language or "und"
                         hb.shape(runtime, buf, features)

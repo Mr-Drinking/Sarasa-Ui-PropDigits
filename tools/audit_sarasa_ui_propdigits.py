@@ -10,6 +10,7 @@ against their own sources. No build module or build verdict is imported.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -68,12 +69,20 @@ def main() -> None:
     complete_scope = set(regions) == set(contract.REGIONS) and set(sections) == set(SECTIONS)
     if args.report is not None:
         output = args.report.resolve()
+        # A partial report stays among the partial reports; only the complete
+        # scope writes the release report.
         if output == RELEASE_REPORT.resolve() and not complete_scope:
             parser.error("局部审计不能覆盖发布审计报告")
+        if not complete_scope and not output.is_relative_to(PARTIAL_DIR.resolve()):
+            parser.error(f"局部审计报告只能写在 {PARTIAL_DIR.relative_to(ROOT).as_posix()} 下")
+        if complete_scope and output != RELEASE_REPORT.resolve() and output.is_relative_to((ROOT / "reports").resolve()):
+            parser.error("完整审计报告在 reports 下只能是 release-audit.json")
     elif complete_scope:
         output = RELEASE_REPORT
     else:
-        label = "-".join(regions) + ("" if set(sections) == set(SECTIONS) else f"-{len(sections)}sections")
+        # Named by the exact scope, so two partial runs never overwrite each other.
+        chosen = "all" if set(sections) == set(SECTIONS) else "-".join(sections)
+        label = "-".join(regions) + "--" + (chosen if len(chosen) <= 80 else hashlib.sha256(chosen.encode()).hexdigest()[:12])
         output = PARTIAL_DIR / f"release-audit-{label}.json"
 
     from font_audit import pipeline

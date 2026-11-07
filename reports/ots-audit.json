@@ -1,633 +1,633 @@
 {
   "title": "OTS 发布检查",
-  "generated_at": "2026-11-03T04:18:20.419533+00:00",
+  "generated_at": "2026-11-07T18:05:29.194349+00:00",
   "tool": "OpenType Sanitizer",
   "version": "9.3.0",
   "archive_sha256": "3e6c16678a0cb5c2401755bf13d7f7371d09e7f3348468b57da04b0ff23af01f",
   "input_manifest": {
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf": {
-      "size": 23707904,
-      "sha256": "5f50932fcd50dd470144bb7cdcf196a48cf1062d2c707445d204d21b7d846cf7"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf": {
-      "size": 24496848,
-      "sha256": "b683bcdea4aca8ce5684297cd90a4fdec5e3ca5e5d8cb6ad61b8cb4c6808136d"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf": {
-      "size": 23831788,
-      "sha256": "8149b0f50687f9ef795b1db6855d134a5c1f5b486e4cf5c53d0265e221f17a40"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
-      "size": 24623060,
-      "sha256": "e2f7b8b4ed7651dd82f03b626af80160771ffab549a56d550a0413f566c65489"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf": {
-      "size": 23413740,
-      "sha256": "84c79fe1369b6ead9b1c78ac0239948c6a0a2de8cc0d23ff88fc23d533b24ef3"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
-      "size": 24211728,
-      "sha256": "f71a2558afa50880454b31b8390cc9babbd6927286cb3159282df805d52ad3cf"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf": {
-      "size": 24634412,
-      "sha256": "6fae109a7d1e9cbc458e21e8797cb5109e98f5a53f102be2d35757042b822130"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf": {
-      "size": 23951844,
-      "sha256": "cd1ee0109e7fc87fcf5636ddf8b695872bc6a53f3261efb08e33d4a1f49f8319"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf": {
-      "size": 24741800,
-      "sha256": "566fb879472802608a91b3f3488d49dc2661dd974be84434b09f6baba25ee999"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf": {
-      "size": 23845060,
-      "sha256": "013a97265cd0eea406ad77ad39a72182b1671099fd64096af53a0a27514778c7"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf": {
-      "size": 23789284,
-      "sha256": "e61ea0fc6f7d37d0bd7a05e87263b50a965d8c34cbbca9fdf1a1b42bab02acb0"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
-      "size": 24578844,
-      "sha256": "97cb2ff132a9a3a5108782fb8e6317a3da15f9eaf26cdd3982f69ac73b13b2c8"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf": {
-      "size": 12815448,
-      "sha256": "fd3a749c7c3bb3f0d29e82c1c1b8c3a949fc41e4db0937831723acec5f1a77fd"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf": {
-      "size": 13602532,
-      "sha256": "dec513d01f4efde7d6b8c1cef53ef746fb6429db3765236b881ed2d3d79ee6b3"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf": {
-      "size": 13114104,
-      "sha256": "549a785fa7c168d12083c6d57a0e6c0abda6a8c2fa359348c335a64ffede6d38"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
-      "size": 13900008,
-      "sha256": "7d41d9af85a34d484e329502e3bf50044c6842c67c5ac398273704b9f237fff6"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf": {
-      "size": 12704832,
-      "sha256": "ca5fb56388c5353808bfa7e485dc89e280a161ee15c4831e6425aca168559694"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
-      "size": 13499116,
-      "sha256": "5d7f23d1850f0ddd065f4a2839f0f73e5c51a5bf014f3a23df51ea472b55a179"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf": {
-      "size": 13766704,
-      "sha256": "acc658d946a2b6c06e69cd4f4486495a47d8c471893c4595dd448701e21d9f86"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf": {
-      "size": 13094164,
-      "sha256": "fcf4daf79695e4ff87610cb29c0ad2a21bb51594b7219be083f2e63e88942dff"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf": {
-      "size": 13878824,
-      "sha256": "c38b404b9496b042a1b698302d05baa0ca29c63d7ffaee5e6e71324ce3178c94"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf": {
-      "size": 12981296,
-      "sha256": "100db7eb78f17d1c8a7cbe033b332c7a82198a6c1b1acbbaa867c33f114ba870"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf": {
-      "size": 12904956,
-      "sha256": "0f02edef4490c850f154900092d7198796f135a432f6dbfdf841930583b409bb"
-    },
-    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
-      "size": 13691804,
-      "sha256": "b1f3fa764dfec67fc08a15aaed14dc70d5a83a326673d588a81831d228a9bf58"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf": {
-      "size": 23834180,
-      "sha256": "68a922ce7e4c9e7c465710494db50f4f31293fc4ab5592758c45c446fafb7813"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf": {
-      "size": 24622432,
-      "sha256": "9a5aad0c998602794d1e91f110cc1ed105a8df3ef2c8d6b89738a1f0ddbde0e8"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf": {
-      "size": 24017260,
-      "sha256": "b69825b793d554d7635e0177d2ee1df856a8f2072f6d4d98e3b31352b5aababb"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
-      "size": 24808792,
-      "sha256": "63640ec42f2009b56d7a697b1b28a33428e53f984f0af3c21d4d718edd838e02"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf": {
-      "size": 23550312,
-      "sha256": "f636eb09daeb13f55cb71df06ddfc7823f03db339c94681ee606576de903fbf5"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
-      "size": 24345264,
-      "sha256": "4e3691f37dac2f3a5402ba8042683419dae8ff0aa97d0ac58adf25c75cdd9c21"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf": {
-      "size": 24764760,
-      "sha256": "48a2f7e3c42c2c27a318d4e5237ba78898d2de83e45e8e8169e72c0f8488d9eb"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf": {
-      "size": 24089808,
-      "sha256": "57c1895d34f50509db1efde1b6ef3298ff257516d2a50473f7c09938685e14a0"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf": {
-      "size": 24880284,
-      "sha256": "0f63c4d61b3b1997e050d153733a6f506ba4239ebfd59dea2b58bde42de569a9"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf": {
-      "size": 23976064,
-      "sha256": "f07162e52a99baf9c157eea2746f9423ec7f2cc9ce0571832d2392c3b7e3c032"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf": {
-      "size": 23912632,
-      "sha256": "f2d99f6e90e206821fad1d64c48a1ffb9efd90324651f542bbdd8aa9a8e8f3bb"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
-      "size": 24701600,
-      "sha256": "57032397d174b19e6ced069f7f90d484df9e7ace26b980f5149c14ebdc6ac15d"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf": {
-      "size": 12920820,
-      "sha256": "54d0e367eb6ecaec96a3f7c82e37457427e772c3c9b9b5c26fc6dca96ca4afb9"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf": {
-      "size": 13706784,
-      "sha256": "09cb0d862f60569ea3cf5f371dc7d1eb6662d5ce33161ff0bac273dee24f4271"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf": {
-      "size": 13310708,
-      "sha256": "b6924c49b37ce31749ddcac104430821ed4a2453054b82119c366485974a49f3"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
-      "size": 14096536,
-      "sha256": "a00a794a6a340e15ebb92d25c36aae5f80ed894b013de72d1a008b00ea6b3003"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf": {
-      "size": 12818224,
-      "sha256": "bab7b674f63679cea3d228e6e4a4e222b824ffccaabedf045ef23be614813850"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
-      "size": 13608864,
-      "sha256": "c373c9f3f32281f38c7f093c70443e12182674bdf36399d9cbea6901e4c99540"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf": {
-      "size": 13908300,
-      "sha256": "eef99b37f429344a927ceec2ed2e74d29972480a7f2b619faf966797b0a92383"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf": {
-      "size": 13249012,
-      "sha256": "6b118589840e6d07d6344c35cc9ecb89ac78e34440f518ee0e743410389b39bd"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf": {
-      "size": 14033988,
-      "sha256": "e3a9c4ce4e0de9b6dabf3b43b68dbdaf075d5ceb21300116034a79b2e322b018"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf": {
-      "size": 13123712,
-      "sha256": "a3d1c9eb1c4c21ba6f6eeca6bc1e35a939368c9c15bcd2af5d999ac049a9dcee"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf": {
-      "size": 13030216,
-      "sha256": "b72910c385d7c55684bf98bc3a4d8fd4366a1cda70ba76bb7bd04badea5941a7"
-    },
-    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
-      "size": 13816056,
-      "sha256": "2ede9af8a9392a55930d6430084f7e6f4b2ca2a9e83c311fc03f14d87f374343"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf": {
-      "size": 23595540,
-      "sha256": "020e240addadc7d26640abb99a1e8537a009d0bb71a013a1a7f64f4728eb59a7"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf": {
-      "size": 24385860,
-      "sha256": "3fd0034ca42d58ea550327487e3723cefbb83f38d03fa37bf0e77050234da6ff"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf": {
-      "size": 23806040,
-      "sha256": "c41fd42d98f96833bc7d1ec5e1e96a9d70aa0da2755f1dabc766701f48b72b75"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
-      "size": 24602596,
-      "sha256": "d95518c0ca94ce2db629d7134f65fb50800ee7b377e9aceb33d091ee0033094f"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf": {
-      "size": 23310132,
-      "sha256": "8fdfb8f26544b9b809be5b8bbf5e7d98beaeb215709bca08069756379f66ca45"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
-      "size": 24108036,
-      "sha256": "6e873f299b586655381cf2ab8155a48809c99ba271dc43a1b0de3e28af9e2fc1"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf": {
-      "size": 24556056,
-      "sha256": "268708ec029c3d6a177abe9fdf805bb041073bce2d1c5619f8180a86f1a5dca8"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf": {
-      "size": 23881252,
-      "sha256": "0a352378b2c25eb63cf3e7b84f511b3145452b8e01e953e3175e89dddb9e14f2"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf": {
-      "size": 24675924,
-      "sha256": "4f8b8f8e85d9ef34e7a5ab6371a88288f828fa3c9ecc927892231fbd29f83f7a"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf": {
-      "size": 23763360,
-      "sha256": "7dc8de12d359b3d6ff592dcef559a9cf4d6295abb3c0c2f80ec91f7450bfe4ab"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf": {
-      "size": 23693040,
-      "sha256": "428bd0ee9420b1c033e4ca8d48f430b5f2ce6917170b7c4d160c08324613fb56"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
-      "size": 24485036,
-      "sha256": "6550ca0fac589f71bef67170d4bb915650832082609b00c1c3a8640c2989ea1f"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf": {
-      "size": 12733988,
-      "sha256": "0a3786b3c313fe3f9fdb804a294a462265fb61f438fa85650a3faab91695cbd9"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf": {
-      "size": 13522444,
-      "sha256": "86509f30a7346a5bbaf7944c5a057d057e583478b57944ec980992641006d90d"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf": {
-      "size": 13123444,
-      "sha256": "9b5cd4cce124a3b3743cf97232e17473cefd5102b04f3a8b8eefee4d3665c713"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
-      "size": 13914636,
-      "sha256": "a1fbc0e17e3c5e2582ac09d57ebe491a451c6e1e7adba3b7cb67559b72de88c7"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf": {
-      "size": 12631024,
-      "sha256": "2dc8fcd4e6584d45af784bc90b806a3790b7c57a8b844a14413aef4c826e0adf"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
-      "size": 13425228,
-      "sha256": "4467048a596879ab07b136995c0098d9d838573a828b648d3ac44c02e52ebcf6"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf": {
-      "size": 13727120,
-      "sha256": "9ed423e5e56f59e308195fc0391c75133f437634b1314d524ea2eb751e528ab6"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf": {
-      "size": 13061044,
-      "sha256": "7f8b81cc7627e8ff1eb010f0aac39cce8c94716ba01427f182460df89a45c00c"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf": {
-      "size": 13850420,
-      "sha256": "4f0112e9189e0c4c9a4c602f35120aa1528e8bae7a3eb83a462e575101752195"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf": {
-      "size": 12938364,
-      "sha256": "f5d41ef53b22f56040bdd3dd4380b71d949ea41198bc5158e1f905a0fdf1308e"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf": {
-      "size": 12847092,
-      "sha256": "f8b0b1fe412401302eb201e8ff01033c0d8027494a6cc067df4e95f99c2753de"
-    },
-    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
-      "size": 13636376,
-      "sha256": "63e824d7348e22132ab0cfdaa5b2b754ab250b97724cf2ecce744da593d750bb"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf": {
-      "size": 23551760,
-      "sha256": "7b8abf84cea377b0a9bdcc0fccf5f8bc8573a49158dfdfde1cbe8e6ee5523249"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf": {
-      "size": 24340676,
-      "sha256": "caca557e9e0a56f3955929af07b242221c6775e7a84f0bc07ef2f8dd19a97871"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf": {
-      "size": 23760292,
-      "sha256": "0a4b9a0260a30552eda47c5a832bc0bf49cc04e5c2c363384ae40e23496d06cd"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
-      "size": 24555324,
-      "sha256": "d3b292ef1d0d8f9decc0d5b832b12889942b4180769e7fb30c0cb3626de0ec8e"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf": {
-      "size": 23266812,
-      "sha256": "26cd521b3d70cfc9d346bf1ee5051fa1dc085e1f8dbf16d9c93cf23626898a99"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf": {
-      "size": 24063336,
-      "sha256": "adbe15cbae1966a704f69c35497f936719f2aecce6f112168b49cc9bb3f843a8"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf": {
-      "size": 24509656,
-      "sha256": "5edb6d4f9a955b5b2d838354ef168be0c49ada40afe0c487cdafacf1e27f1963"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Light.ttf": {
-      "size": 23835792,
-      "sha256": "a56e45191adc0295204411b947566f983c78a87a09df1a3c907d26e793f7db7c"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf": {
-      "size": 24629024,
-      "sha256": "f7aafa30ba74cc704603275f95137210b64dafffebeba2e11d889a924b880287"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf": {
-      "size": 23718392,
-      "sha256": "2cfbd86047fedd41e264f87ffda9891c241094d0131801df839f85f2d1dc9ded"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf": {
-      "size": 23648304,
-      "sha256": "fe5b7209197a3ed80b6274692348fbff41d13604016cc8f32244ec5ae8493ac6"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
-      "size": 24438828,
-      "sha256": "91d65e7596abd7374ee2e394f2fde749cf51d5ef7d1904b10a6bbac420cf6b1e"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf": {
-      "size": 12710848,
-      "sha256": "61d0ddcd40a6655560b05b715d49c014be70be4ff18140a91882051d35094447"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf": {
-      "size": 13497904,
-      "sha256": "6b4417a896e17396963b8f6a7b16ec1128d4f4412043565863496484732f4469"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf": {
-      "size": 13099320,
-      "sha256": "e214f8989d9e2e36b371c89a0d3b6e68a603896184e6919955abe8da761895ff"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
-      "size": 13888992,
-      "sha256": "65c343100c1e452ec27c44c7bd61ec523a5f598784c398256766e1b9e5e2c3d3"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf": {
-      "size": 12608428,
-      "sha256": "1c8b60d4dd16059612757fd3d14a0b4f57f6e38f414adb781f141a62e1190c6d"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf": {
-      "size": 13401252,
-      "sha256": "76250d671ddff7aca3587f136ed291b54df813597b6ee3f22230c780d21fa9b3"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf": {
-      "size": 13702032,
-      "sha256": "df0c682ab5509a5f83304c8e9b60c3608f5fefe96810c48add4d35e187124cf3"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Light.ttf": {
-      "size": 13037064,
-      "sha256": "a42cd806fbd5d4a3f732d96c3bbf3398387e482abbf324f8d175f797acb91cae"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf": {
-      "size": 13825000,
-      "sha256": "9125d4ae90df72dfebf41e83ad3ae7be5834e5a86e71e7f2c37212b77151930b"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf": {
-      "size": 12914708,
-      "sha256": "caf719a83e695e808986a03dd196f957c827a46635edef030e779cafe2515743"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf": {
-      "size": 12823716,
-      "sha256": "40cad196b75e907cad7ddb98a02d5ddc0dea0ef3a0981569df4f56df881c914b"
-    },
-    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
-      "size": 13611528,
-      "sha256": "2dc8af42173d56aaaf545b9e7404513bed679b646ca1fd0f58d133b43c27234e"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf": {
-      "size": 23669724,
-      "sha256": "37ae5ed506c67b69a4b67b54847abc28c5b448433d2f30af67b1e227144e07ef"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf": {
-      "size": 24452148,
-      "sha256": "a8f63da14c83196b43455ee6605833103cf2d0f7f4a0dc76a3cc8b2644029d0e"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf": {
-      "size": 23861260,
-      "sha256": "33d20c283d72b9dd7ec54aefd22adb53353c244df9fccf89b1f7f45f94ac13ac"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
-      "size": 24648800,
-      "sha256": "63dbcca503c03fbb4f9888a51d4ad705051102f772486859af8f5f45d04e8dbe"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf": {
-      "size": 23390484,
-      "sha256": "c9752588c794fb72b5717288497fe9fcb29ed06c03318be866f040325fc7081f"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
-      "size": 24179252,
-      "sha256": "6fd95d70c60932d43dd2aa7460ab1a460491a6b029dcbf8c5cbe018d08e3551f"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf": {
-      "size": 24603248,
-      "sha256": "5461160ab32ae4b92daf2259d19c9d358eaaa4dd7b467c70f4e4f5122d5c7424"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf": {
-      "size": 23936088,
-      "sha256": "94fdc640d84d11a6e11e9a84473bf06e02ce59ce3d8b39aa81122c661e66652c"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf": {
-      "size": 24722060,
-      "sha256": "69de312d86836ec4c151b87f530ab7b04774c2580cebd5a95e1bbb58bb6943b2"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf": {
-      "size": 23819548,
-      "sha256": "88f78523ba3c0e564dd2a14a39ebb49b2e0f526b39f08af15ae1978df494c18a"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf": {
-      "size": 23747088,
-      "sha256": "bfb81959bcc4183d290c17663589fb2a2d8b93fae38436ab3f677f31ec87bc8d"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
-      "size": 24530984,
-      "sha256": "c5df4be3147f7ad6ccd1eb4e5f686d97bc176e35438ee1cc605b0a6f2f9d4165"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf": {
-      "size": 12833568,
-      "sha256": "77fe7b3c609a4862ba07f2beb70da51b4bc8a4736bb2267acd214a5cf60dd9e0"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf": {
-      "size": 13613768,
-      "sha256": "76448b1c98a08b573cf79bfaf2d51e697d9e9693b10e496660e4a98c40b12c6b"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf": {
-      "size": 13219876,
-      "sha256": "2ee5d6ade3a0d16ead4d273be9d1e1cb8855c74ec4a79ad704fe43108a6952d0"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
-      "size": 14001644,
-      "sha256": "f969036c0373bb4b20d4b4a000cc89e089ddd85dbda7cdeb81dbafa56afaea39"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf": {
-      "size": 12738180,
-      "sha256": "4fae3f1842883458456d8d48acf33940fc0de515cf4170cc2cbac217835c9716"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
-      "size": 13523268,
-      "sha256": "08173a3b4ee8edfc4954761dab23ef74450753df3251292d65ac97c459c35037"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf": {
-      "size": 13815016,
-      "sha256": "e821e9815e8e121e82c419515b45b780877c6076fdfab95604c4b45f8529c9bf"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf": {
-      "size": 13158444,
-      "sha256": "98a7291984a2142d8aab823a04d4cd2eb73e964de5e8116a9d71db46b7162628"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf": {
-      "size": 13938956,
-      "sha256": "641d991de464ee7cce385ab98a6fbe2fae48cababf7ffee085b594e59d1060de"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf": {
-      "size": 13035496,
-      "sha256": "5f25e910aa6523d6f5b09eaefcbfbcb12512f2246cb9d1e1fa6f4d0e48d6d26a"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf": {
-      "size": 12941600,
-      "sha256": "2d7acdb8e7dd8e289849a8b6045aed47a90c2517ef8ce9bfcec9224552218e18"
-    },
-    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
-      "size": 13722132,
-      "sha256": "0e8f0f8c7b7296f95804e07c352c7c16e8cd81f332f2a7701d7e8bcf4914f52d"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf": {
-      "size": 23871592,
-      "sha256": "059e8c5d238ce50567de09d2f7abe9ca9f5b132ea2f07bc53046b013befd080a"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf": {
-      "size": 24660020,
-      "sha256": "1960c22dfa3e5957903e4320c2aedf8ea39c4dc0f8f058390dcd390120dc03e9"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf": {
-      "size": 24043920,
-      "sha256": "432e4a26fbee6e7aef581021257aade19fd0a54461f3f98b66f110103fc9a315"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
-      "size": 24835560,
-      "sha256": "cfe512ac5f2d297d4be62b8f822e80a1fe339826b85d05b65bf00a8c37e1eb24"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf": {
-      "size": 23592536,
-      "sha256": "825ad889915d8f4d72a5eebff0cda7336cdf12b6078bb9965eede0773468cb9c"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
-      "size": 24388004,
-      "sha256": "6994173bbb4592e5bd845dda87b7db889dd4b66630fdc86145fed241130fefc1"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf": {
-      "size": 24794360,
-      "sha256": "fe962164247a96dfd46ebf27afdf99ee8ace17e71a4c18e82de8e3e5c384f4e0"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf": {
-      "size": 24118844,
-      "sha256": "85d10271093e2c5fd694b692ce3686e57ca68d958248496a0051dfa17e70db3e"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf": {
-      "size": 24909332,
-      "sha256": "d81ad1c31add75d6178e44f38affe1f56248165ec4f19e78c3c36c63b296a285"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf": {
-      "size": 24005680,
-      "sha256": "0c23d413928877aefbc190e49a30226828cd1646f948cb37659ca49c34b44708"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf": {
-      "size": 23945988,
-      "sha256": "013d9d2fd7d34667dee3b809c7dcf3248ca4482858a114838adf6efcd34bd58f"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
-      "size": 24735056,
-      "sha256": "ad8e429087229cb7fa34427b0af170ee267d6f484578e54be96d49e6e838e212"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf": {
-      "size": 12947960,
-      "sha256": "b0ec47dec2bb51a56f07e36a446566732e38017827a72bbb7d43a8c0618cd3d0"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf": {
-      "size": 13734084,
-      "sha256": "1b1b749e83e414919d81c6eea94baf64d387ae701319f4d5e6ef3d2698fb8fbb"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf": {
-      "size": 13334064,
-      "sha256": "c74823ea82241e677a510a89404da09edeefd3291e1c6f05dd7cf7c59137944c"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
-      "size": 14120088,
-      "sha256": "3f33a800893d34f89177ae152b4162c36103c191325cdc897cc3e5414e3a6144"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf": {
-      "size": 12846092,
-      "sha256": "246192f10fc5c4a119814dcb019b7eb8e09e91d8c40a9acf835249bd6c20c970"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
-      "size": 13637136,
-      "sha256": "91713fa02b7d3b1afdebd63a24a24a2dcf53019cca2bea21f3f1ff4a6a8a3b5c"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf": {
-      "size": 13934380,
-      "sha256": "7f8ad02a9b699c315afc3986e6e2346ecbd807fd66e8bc7181cbd0e677cd32cf"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf": {
-      "size": 13272896,
-      "sha256": "ff84686761c5a66c424ee86af645f4ad4aa355776b658e961716a934a6159a94"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf": {
-      "size": 14057984,
-      "sha256": "3bde8df5b95fa12858763af34fec939dcc35e31676f67fc53cb64512cb23d77e"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf": {
-      "size": 13149860,
-      "sha256": "600b1b5188a0c37085605d2da5f3e66fc927522e98246c1f89d12d6d9f2039ac"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf": {
-      "size": 13056928,
-      "sha256": "b32543df35fbf46bbd3be192dac3c8c4441f167663b2c59286f5e53ace92b2c6"
-    },
-    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
-      "size": 13842864,
-      "sha256": "5197094858a503a3689d74a1f05cf02ddf7c3aaa972285f9a5388e59956f580a"
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Bold.ttf": {
+      "size": 23710688,
+      "sha256": "6363399a43de26969438ed54463ec18101f742186a363b070c86868652f45a43"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-BoldItalic.ttf": {
+      "size": 24499628,
+      "sha256": "29bdc0d2537b542d6e17b2f8d7ebe0496ba55c85bc617889e29c4a321c4f0d6a"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-ExtraLight.ttf": {
+      "size": 23834572,
+      "sha256": "802983c13e0800f4861da535300e670a6f9508fdb5a0d681cfeb0f95f5d920d7"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
+      "size": 24625840,
+      "sha256": "6325e9780c68fd8e37071fbf1bd0ddc07eff4de87d5091ee10ed0797accb0bbc"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Heavy.ttf": {
+      "size": 23416524,
+      "sha256": "60e22b0e35ef25aac7b9b10babdc2b825145d67cf2f683d220519902aee02c90"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
+      "size": 24214508,
+      "sha256": "ce17218dcdbb2a41bf794bb6c7d1ebbe5f999d198313110b150e4342502f6d31"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Italic.ttf": {
+      "size": 24637192,
+      "sha256": "c53ce9f5da38f2f1e0e3ed8b77781ab7c04441d1605c68605bb42dbb3210e1d2"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Light.ttf": {
+      "size": 23954628,
+      "sha256": "b2edfacbda0ba60f74a7b9896969d738705200ca9cc3765fe06020f6632f8c8e"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-LightItalic.ttf": {
+      "size": 24744580,
+      "sha256": "9a99613e9aa060d58e01b4a1d9fab7ca9d1c7d0f160bfb2ed00a2a2eaf8a53d5"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Regular.ttf": {
+      "size": 23847844,
+      "sha256": "bd6393d8eaeb11bce94a283101bf60a6c30de5de9ba01169d15daa70d94b2ca2"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-SemiBold.ttf": {
+      "size": 23792068,
+      "sha256": "b2418f64014c0f1ad5af2f74792c64e39e21bddbf8f26698055a0fbc40210c50"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
+      "size": 24581624,
+      "sha256": "dea8cfd499dbfc7f9a3c4104a3d7eddd8225eda68a13fd9144dc51e9a75eccc8"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Bold.ttf": {
+      "size": 12818232,
+      "sha256": "f61a283ca3f68d5aa5fca88d1d47bb2e6e94e001df65860f1f3727de29cf9d51"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-BoldItalic.ttf": {
+      "size": 13605312,
+      "sha256": "4a0bf21234a67a91f98bd36eeb2f4a4004f44fea15b99ec70584df4de88d2b58"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-ExtraLight.ttf": {
+      "size": 13116888,
+      "sha256": "2023e378d89f8f5f5ed9b77ead92d3166c9f1d2eebd38060297c2d29d0d874a0"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-ExtraLightItalic.ttf": {
+      "size": 13902788,
+      "sha256": "df9ebbaedd9bc14a8ccf8a9550f0a298daee79550511a5df13eaad1c775f8ea1"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Heavy.ttf": {
+      "size": 12707616,
+      "sha256": "c91c9a995c27fb86386734b0d22c5ab186bcdc46f420fd3fbc8630c932370171"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-HeavyItalic.ttf": {
+      "size": 13501896,
+      "sha256": "be9a0e73a3868a5878b1c18ad202e2fd8b7b1d0e368a4685a131fd31136f751b"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Italic.ttf": {
+      "size": 13769484,
+      "sha256": "7748bc2e759efcf64e89fa49ec4e6934c069f05ab129b7355abca32bc8ce777a"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Light.ttf": {
+      "size": 13096948,
+      "sha256": "661146be46c8cb24db07062aa149b4dffc2d2d981ac55a7e477fbebb456f989b"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-LightItalic.ttf": {
+      "size": 13881604,
+      "sha256": "6e57ae16ff01b518cd7d043280caf12e8a3f7af0919bcdbdeabb509aca18295a"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Regular.ttf": {
+      "size": 12984080,
+      "sha256": "19221b3008986efb7067a0ca096a59c85899933d3a9a5dbc5b983921787912d2"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-SemiBold.ttf": {
+      "size": 12907740,
+      "sha256": "e3af2206342f335e5f60513496b1d5c215b5aa5e029bb6dd2a8e522c67749aba"
+    },
+    "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-SemiBoldItalic.ttf": {
+      "size": 13694584,
+      "sha256": "f65a52e266fe020e37ef008b04776355da31cdd1f787f872671e986a591a5d58"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Bold.ttf": {
+      "size": 23837052,
+      "sha256": "874c15d2875731e5209cc67bef85b50a1df5874f026700ef4220e481d322bb18"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-BoldItalic.ttf": {
+      "size": 24625300,
+      "sha256": "0da04f41a223db97666342d85864f094bdada878f2aaf62fd916d95ac96b5e6c"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-ExtraLight.ttf": {
+      "size": 24020132,
+      "sha256": "f005e3dfcde7bd5166cd881a896ddc23c2a5d7843fb66b755ab7ecf14803062b"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
+      "size": 24811660,
+      "sha256": "48ce494b5f8376a845025347020803b09fa34006bec9f95152bbce48088a399c"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Heavy.ttf": {
+      "size": 23553184,
+      "sha256": "eb6d9625d01dc8aae848c1a0864667f7e448f8c09a13149d28b5a6628cdf52c3"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
+      "size": 24348132,
+      "sha256": "1e2d43a77f7941de83cbefd9b63bb13bb736da0650c5af44e431f075e58054de"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Italic.ttf": {
+      "size": 24767628,
+      "sha256": "ff4f1690838eff9b13fca49c45b2399b15041ee8b70ed37af68171dd77f079f1"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Light.ttf": {
+      "size": 24092680,
+      "sha256": "860365ddeb06e6d99bfe36732949ea370b995b6e7b3fe975f9dbc217e987a15c"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-LightItalic.ttf": {
+      "size": 24883152,
+      "sha256": "04ce3077b4a4ff4123b0ee71b2827b7d2f22499e6055bad97a3b0c7de969a76b"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Regular.ttf": {
+      "size": 23978936,
+      "sha256": "2b7ba4df271c6a2d663c38a6c5fb35b3b487dc2c58616744c86eec0b7f409274"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-SemiBold.ttf": {
+      "size": 23915504,
+      "sha256": "becd3f4eaee10f902ba172952f210abc0ad59bec60f81e6156df055644af4668"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
+      "size": 24704468,
+      "sha256": "71a003e3df8f1a77c0e463db55a51bbea1dd8ee31fc7c7a67870b3d73c6091c0"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Bold.ttf": {
+      "size": 12923692,
+      "sha256": "73632df94b9d9947f20044d1fe3766c61e9de4ea1c3ea84aae3bfe76f508fb9b"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-BoldItalic.ttf": {
+      "size": 13709652,
+      "sha256": "5a40aa781ba37b10f3c11f294245212a9ca5fa38ada21a55ce8153506eea7891"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-ExtraLight.ttf": {
+      "size": 13313580,
+      "sha256": "ac48803427af7c25c1ff9cdbb51b2b0f60170f4d532a7d16b4c928a641d749c9"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-ExtraLightItalic.ttf": {
+      "size": 14099404,
+      "sha256": "98b63e7c03ccf85d948611a9c2b6bb735274ecf4b8e5b983ed5af7f0753d8f85"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Heavy.ttf": {
+      "size": 12821096,
+      "sha256": "a03589ad1b8ab448c911599f2cdbaceeb3b0709ca3dd0c2288549c1e25c091d2"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-HeavyItalic.ttf": {
+      "size": 13611732,
+      "sha256": "3c1f8d82d070771055939ee1f3c7641371279d368f8abff88667204a99b77022"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Italic.ttf": {
+      "size": 13911168,
+      "sha256": "7bfefd704ac1d76c4ea1caea5e8ffcd4d152df71c02b41edf35d511845d1a614"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Light.ttf": {
+      "size": 13251884,
+      "sha256": "389ca78bf72e9efe2296e69c4bf2a2115dec9ca2469335a7a75f400d05658e37"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-LightItalic.ttf": {
+      "size": 14036856,
+      "sha256": "d505bc974a56103a64c4d95d5ceb1b369491f07cd6717ec4436bbff68d8a432c"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Regular.ttf": {
+      "size": 13126584,
+      "sha256": "eab7b5155000aa89b90f04bd96af4bd75a77465e7c3b6fc579fa4a62417414bb"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-SemiBold.ttf": {
+      "size": 13033088,
+      "sha256": "bb790bcf33babc4e6d2310fbd3e0196cc992d495e8fc557be0597d5c411a9c9b"
+    },
+    "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-SemiBoldItalic.ttf": {
+      "size": 13818924,
+      "sha256": "c3f3c7857ab62bf26043ea4f4138fb8d57b6bfcd855c35957b042fd71acd501d"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Bold.ttf": {
+      "size": 23598412,
+      "sha256": "ed03417bff1ab6e1b433b30020c88096fcd67ec703d634a6fc662ec74982fa8b"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-BoldItalic.ttf": {
+      "size": 24388728,
+      "sha256": "0182fd3d30bca5e2a24720026f4ea70ada27f54607144245bdca0bc4c9e5c218"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-ExtraLight.ttf": {
+      "size": 23808912,
+      "sha256": "4b4f5ac8a21b0de5f279ed03a9dbc277a3800d9b8a6d192a5aa4cb5e0e787477"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
+      "size": 24605464,
+      "sha256": "e46cc505674c17b02657b8dd944ad21d7ac77fdcedfe893a3dc1835485b92495"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Heavy.ttf": {
+      "size": 23313004,
+      "sha256": "ec8c85813fa12ad2493b23153d3e85f36b4f21dbcaf094f2a565f4ab5c35c44f"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
+      "size": 24110904,
+      "sha256": "1efa1e556cca661368828f38bae0074dd332a778521b49e3c209fc0309c87951"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Italic.ttf": {
+      "size": 24558924,
+      "sha256": "329971f8d9f8f77b30f3116609235a7b0c1d70eda0d25dc4e879c91ae0ba32a7"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Light.ttf": {
+      "size": 23884124,
+      "sha256": "955c8e10be2b92d5120a407f3549d20680a500e6ad1bf9015bc18786a48a9193"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-LightItalic.ttf": {
+      "size": 24678792,
+      "sha256": "a2c34698ea4bdcee1df9bbf8c5ea5b2f2a6d3b9d52e627cec1ad2675dcd478c4"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Regular.ttf": {
+      "size": 23766232,
+      "sha256": "d2f23f7353d935d2d231d3e014411e5f3c4e07c7ec416ab91367f8e044b8e5ee"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-SemiBold.ttf": {
+      "size": 23695912,
+      "sha256": "d4a550153792a64074aa1b5ea08377acd738eae2ea9e53d57ecad924b76c5268"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
+      "size": 24487904,
+      "sha256": "4818201bc37d721f0d464646cf1acde706ec1af7c522422e9eb2a784080a71e0"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Bold.ttf": {
+      "size": 12736860,
+      "sha256": "b6f727a8ea9ecf51276b7ded768ff343d74c84fa8c61f3c96699ed246b23ff27"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-BoldItalic.ttf": {
+      "size": 13525312,
+      "sha256": "cf7997abce8afa6e681dd944d5003f949f123ae47799ab4aaf98400756d3bc12"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-ExtraLight.ttf": {
+      "size": 13126316,
+      "sha256": "6957d12e1818b072efd0e9263d0e481a4573e9660452efb56923cda3c2e7a867"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-ExtraLightItalic.ttf": {
+      "size": 13917504,
+      "sha256": "23cd6ae1860d6908d2318da6625b83f701ea4cf2b64c5b419fbe79cfb02d09ff"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Heavy.ttf": {
+      "size": 12633896,
+      "sha256": "66741fbec4f13ba10087354d7b1afc02aa4863b6b76c11ef6c1dbe0d0c14b7c4"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-HeavyItalic.ttf": {
+      "size": 13428096,
+      "sha256": "2cc2824be139d0c17e0ddc41c3f6dc856715c5cc8ea3c6f33359b37e861281c3"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Italic.ttf": {
+      "size": 13729988,
+      "sha256": "51715aebabe71f7b5f8924af2f7b2ff1476c6573a8d32e9386aa78a12d458c45"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Light.ttf": {
+      "size": 13063916,
+      "sha256": "f12151af2278c90d1dd88605969f328bcefcfbe0b90af2052ce775f4c1bf37b5"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-LightItalic.ttf": {
+      "size": 13853288,
+      "sha256": "d6e23af697b6378b0e27146ffe72569a2b217b6a23c91304a3246e346bde71b6"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Regular.ttf": {
+      "size": 12941236,
+      "sha256": "2f272a152ff5bff33add659431f41e8bf828a2bac864d5da078c6f4a5eaa0990"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-SemiBold.ttf": {
+      "size": 12849964,
+      "sha256": "eb0319ac359a287d1e65721beff49b4b6b0069208873573bdf1b820a7fc87713"
+    },
+    "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-SemiBoldItalic.ttf": {
+      "size": 13639244,
+      "sha256": "98b18308b5ae6db368b6b66e28119a46600a7fe0bac2a6d28b9ee1c49be6548f"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Bold.ttf": {
+      "size": 23554728,
+      "sha256": "0eb4af8a94ec1282bf72fbc0fe7f41d2633096de6895ae121de8f2b5ad4aa9e0"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-BoldItalic.ttf": {
+      "size": 24343640,
+      "sha256": "11581efa413598a87b0df2a7b9fdc14f5187eac4d92b70e3db7152db163519fd"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-ExtraLight.ttf": {
+      "size": 23763260,
+      "sha256": "f5816e21052d305c7ff7edb908d9143ba43737315ded6c081faeba932e1d0da3"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
+      "size": 24558288,
+      "sha256": "155bc2097d80f502ac32a5f6eb42370ea414be04a9b563c4de35a3f7bad40068"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Heavy.ttf": {
+      "size": 23269780,
+      "sha256": "7aa57b69a4bc8330d12b2ca65d226778400ad96e0a27adb82224a12216286fad"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-HeavyItalic.ttf": {
+      "size": 24066300,
+      "sha256": "a8a2515f96673ecedb2984429b4891de50364e04ca525d2d05288daaa4900302"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Italic.ttf": {
+      "size": 24512620,
+      "sha256": "2233e2bc6f14d5b1c5a0aa4cf9ecd79946ae78c593f71cd1339fff9dbaee6810"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Light.ttf": {
+      "size": 23838760,
+      "sha256": "0415e5446a74ccd10496e8046e22febe3ce538048588a62029daffe95582f068"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-LightItalic.ttf": {
+      "size": 24631988,
+      "sha256": "59a03b8f6983dd1956409300842cb61a4702bb3125261b5916ad6f0cd8a76961"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Regular.ttf": {
+      "size": 23721360,
+      "sha256": "67a4575bb0cf0da643e4b52d7b5888b2268018167d21e5a4545d660a7f57a9de"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-SemiBold.ttf": {
+      "size": 23651272,
+      "sha256": "023d80c953c8909a3343f18bed0400f180ecf4d4753b4d43413270fa6d4e2969"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
+      "size": 24441792,
+      "sha256": "17c2d0865be8cab142d86f87725cb1687d80e16a49e5ecd930b7a6849f041576"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Bold.ttf": {
+      "size": 12713816,
+      "sha256": "44d266957408951fcd844954235dda8c64f8f9755b82038298c6848d0540a5b8"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-BoldItalic.ttf": {
+      "size": 13500868,
+      "sha256": "d3cb443c15fb02ee671fc771bbc8e2e516716b5af6bf35c65ba1aa0d226d8c93"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-ExtraLight.ttf": {
+      "size": 13102288,
+      "sha256": "9be56fb8d03fbf94b0dff934baeed6e1a0a61ca3f1c87b8e32af057dbddc110e"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-ExtraLightItalic.ttf": {
+      "size": 13891956,
+      "sha256": "e8aed696bcc68c7a9b87a9b0abbd1d123a834a76776bde3feb6dfb4e410b9554"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Heavy.ttf": {
+      "size": 12611396,
+      "sha256": "a12a3771e80dd8f3204abe16102894e47d3f4aadf90ee38e189f9b7d70170704"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-HeavyItalic.ttf": {
+      "size": 13404216,
+      "sha256": "0e38baeb85fefe3f19e70900f137f4a9d2860894ed040bff7bce31613983a754"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Italic.ttf": {
+      "size": 13704996,
+      "sha256": "2a12f50ea959fb50ecfad20f37e277a9b540467dfcbdfdd82c063b664d3fdb62"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Light.ttf": {
+      "size": 13040032,
+      "sha256": "a644fff02d03a65a483c125d23c3e903243cebecb1600fe0271fae6e1e923e5b"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-LightItalic.ttf": {
+      "size": 13827964,
+      "sha256": "2a552d573eea050dbeea871bf9651cb4ee78bd0f40a6fe0cbdc479c3f62b1aff"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Regular.ttf": {
+      "size": 12917676,
+      "sha256": "d3e2863bb8d3e14d9c9551f090eac8e4fb2bd22f47b2e7797903088bcb69c51d"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-SemiBold.ttf": {
+      "size": 12826684,
+      "sha256": "e78b63c8dfee62a9f974b2aeecf66870e1eca11f87d3841c5e59bee146a1c653"
+    },
+    "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-SemiBoldItalic.ttf": {
+      "size": 13614492,
+      "sha256": "fe58a17c3673a5b68c94f8121ba399437a89fca64ed916734092d01ee26bdb5a"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Bold.ttf": {
+      "size": 23672596,
+      "sha256": "78c669e89b731909359fde8fddedde4b1b44ec53a60782bd59076664cbd37a16"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-BoldItalic.ttf": {
+      "size": 24455020,
+      "sha256": "719fcd7b9dbf01ef20a1391b4b8bd5b1a5aef58afdc05cd76c4f49e2fb444a15"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-ExtraLight.ttf": {
+      "size": 23864132,
+      "sha256": "3cdd4abed896de0ba6fdf45ad316fa9b971b1e33ec64babbb9a2e153f2741d91"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
+      "size": 24651672,
+      "sha256": "2e3d9b76b21457124a17ea6f1a3d9f28e20a90882a2f77a9177fad56025a3a97"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Heavy.ttf": {
+      "size": 23393356,
+      "sha256": "10b07846afdb256740adc4463689b3c2e7e35f4307679fac7b329d5ee184abd5"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
+      "size": 24182124,
+      "sha256": "1f5487ccedd3a4f4d80c08b0650641a49a916a68f77e50d40bcfea2a28335288"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Italic.ttf": {
+      "size": 24606120,
+      "sha256": "d8776501e02872e1a06dc44a981b64d3ae57d8168471e3137d46b30fd4e3af58"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Light.ttf": {
+      "size": 23938960,
+      "sha256": "827a4f7e59bd5bfe57509cf19291d2f57adf9ab365b3cb7a583511554d78d33e"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-LightItalic.ttf": {
+      "size": 24724932,
+      "sha256": "05c0c79c41481ed5f4db539278fcae5714eb9e296f673c8b54d81eb1539d9eaf"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Regular.ttf": {
+      "size": 23822420,
+      "sha256": "8191e547a69e9c312d3f8b7ba143463c78e8485dc56679e037313d601a5414de"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-SemiBold.ttf": {
+      "size": 23749960,
+      "sha256": "5464c131c767c66eff1049905b6b4ddce24e460ed71acfe3d36cac94b16b2f05"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
+      "size": 24533856,
+      "sha256": "6981e2efcc2088d7205edd034156b309be82c9f12cabcd0e64aa46bbb5289ddd"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Bold.ttf": {
+      "size": 12836440,
+      "sha256": "f8c8b9fe82f028ccd3e8b100710eb892357b12246f435ae9a744817b93d3ffa4"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-BoldItalic.ttf": {
+      "size": 13616640,
+      "sha256": "b5ef61afd7b89f37a3b18983f715246f726775aa2361300879dcb4c586fa2e1c"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-ExtraLight.ttf": {
+      "size": 13222748,
+      "sha256": "fd0f1c838c01c70db51e4ed6d5eac89ecdb11e3ae838acb1cc3db923222e4b24"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-ExtraLightItalic.ttf": {
+      "size": 14004516,
+      "sha256": "4b016f38c3a761d0848eebbeff773452c6ebe3a6310953a5867c304334a908d5"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Heavy.ttf": {
+      "size": 12741052,
+      "sha256": "c09b02cfd0db7be27b8c03320d2bbf99e5a0dbecb3b8e933f19d67f57ca9f331"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-HeavyItalic.ttf": {
+      "size": 13526140,
+      "sha256": "3c38b81204bcb7e9f55dacc3daa1963fe3b2c51a8c19d162670d32dfe17b1fb9"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Italic.ttf": {
+      "size": 13817888,
+      "sha256": "2df56f94e122ace341571d975f4cbc6b48671e54400c83f48269dc4171ea3bdd"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Light.ttf": {
+      "size": 13161316,
+      "sha256": "da717188c6be8547899ad8d7e65418f568407ba67b62223726cd47d28b3afb3f"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-LightItalic.ttf": {
+      "size": 13941828,
+      "sha256": "abf9d3fbdfe80ed3d5a6be354d029b02247e153cd28d0e3c82de13152cb66582"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Regular.ttf": {
+      "size": 13038368,
+      "sha256": "ef39de388189f1aff69a27cf08022f724ddc53fff670293f474a0b36684aad3f"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-SemiBold.ttf": {
+      "size": 12944472,
+      "sha256": "f3ae0b3c6190c0fcdfe1dfbd9e6c2ef782aa781cd7acac79620ff6164952f63a"
+    },
+    "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-SemiBoldItalic.ttf": {
+      "size": 13725004,
+      "sha256": "737baaedb2cddc8541e749aa874ef83244edd49b6d619535d971e2c8861d5660"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Bold.ttf": {
+      "size": 23874464,
+      "sha256": "297438bf58d3837e2a7afee8c1546928e913520df9d5c84413e0afa909d38fcc"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-BoldItalic.ttf": {
+      "size": 24662888,
+      "sha256": "43738a1a10f22311200c4931a7fb5f979a68c14dc47624bf1f06c5ae157f02cd"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-ExtraLight.ttf": {
+      "size": 24046792,
+      "sha256": "ec7df182675905ddfaef4dd43e4e142f9790e17f42b6796c2b321cc71e88d190"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
+      "size": 24838428,
+      "sha256": "9931087f13d3d9368d13485ea78b803ab6df3c748cca592e7410df7ab3d0af91"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Heavy.ttf": {
+      "size": 23595408,
+      "sha256": "4ec7f940445b7ce503ad758f7e4d4d9e1795ffb2f3e592edf521c11b5f07a3d0"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
+      "size": 24390872,
+      "sha256": "4831399ce4e70bbea0ff2d755beada97d844a234ab75f37d81fde0c7cf9a17e3"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Italic.ttf": {
+      "size": 24797228,
+      "sha256": "792c008d111467b0704534be06760a67184b8b3cbad9508436dbf5554c833a06"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Light.ttf": {
+      "size": 24121716,
+      "sha256": "9acfb5084be849a604958ba621fd76d07e42d708c91eabc0624d1962110d18af"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-LightItalic.ttf": {
+      "size": 24912200,
+      "sha256": "de7881223d3452782e8bcdb99cc43a1db72cc269878c9da701757199b28b7c1a"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Regular.ttf": {
+      "size": 24008552,
+      "sha256": "11236bdc7df75df4fe279695446c8163a0eef8a86aeb9d02efcd12ff234f50b5"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-SemiBold.ttf": {
+      "size": 23948860,
+      "sha256": "34a11e3b4ba894cf680b3911ed20f702f0836f9824b7cbc61595631d3ca11064"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
+      "size": 24737924,
+      "sha256": "5f3e03d5761f697b9a9567b1a1eb3680ad713e1ae1c260ce653e47bf1610028b"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Bold.ttf": {
+      "size": 12950832,
+      "sha256": "77e009b914cfd6d5248855cf541887f2777d292de735e4cf0fc38e42229880de"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-BoldItalic.ttf": {
+      "size": 13736952,
+      "sha256": "0ab20436c5f69671ec8afd0c0be884abf36503f54326a27340e87d5a303e14f8"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-ExtraLight.ttf": {
+      "size": 13336936,
+      "sha256": "75ccc37273585193a847f40ec1acff2300167bd1d8f066810f1cf148474a29cd"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-ExtraLightItalic.ttf": {
+      "size": 14122956,
+      "sha256": "bf713b7fda5cd466f6584b63f55b4247ab0ad136039a612400a8c8dea59d8236"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Heavy.ttf": {
+      "size": 12848964,
+      "sha256": "dae99d1374935b872f9fcd58e16263e7f56b6955486c59886193e1b16f8ed584"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-HeavyItalic.ttf": {
+      "size": 13640004,
+      "sha256": "cdc516ca0a96d688b26d4eebc7f69a1f6ed46dbf2e64f08005b0e0eadd18d273"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Italic.ttf": {
+      "size": 13937248,
+      "sha256": "b3c5bdb667379f0e5a9aef9df543446ab9ba8dcce58a51efdbd961df585e8e36"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Light.ttf": {
+      "size": 13275768,
+      "sha256": "df2942db99e667ba5b36c2fc90728efce040bdd839fd448e130d004782ad830d"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-LightItalic.ttf": {
+      "size": 14060852,
+      "sha256": "aa7da7f050e2f0b5ef5686fb980baba6db55d1398fac708ae61d76d3cccf587a"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Regular.ttf": {
+      "size": 13152732,
+      "sha256": "2c8cc4e85d95ffa25986fd0cb3f4a225a2d73967e47cbe7d381cd6ae42f94ff8"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-SemiBold.ttf": {
+      "size": 13059800,
+      "sha256": "f4aed0b1c27502b0d243ee577bc84246f34c0bc5ef8df78f764c86f122f64e5f"
+    },
+    "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-SemiBoldItalic.ttf": {
+      "size": 13845732,
+      "sha256": "b6ad67e81dd8f35b9081f876cb07ee27fb64a452011ebde1aca7e09e81321d40"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf": {
-      "size": 59418048,
-      "sha256": "21df72e4b676c3240afaff381eb0b3fe65396a60d61b176a9d092f46c5898106"
+      "size": 59465096,
+      "sha256": "a419a80d08eb60c5b3c41bab319c5f41679ada799d4c8654ac4ae8370e303e95"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf": {
-      "size": 41103656,
-      "sha256": "9ff45623ed182848b887c5b0c34eff8c9193fce6f77d076d6b42c60bdb1ce2ea"
+      "size": 41150640,
+      "sha256": "72bfaa43d2aa81d4bd6ade2c8cb189aa0e1518ecf4985731f564a9f1155cf2e0"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf": {
-      "size": 60355980,
-      "sha256": "ed7e5efe587b51a6e26f366f5ce7e15da68d8ae5a37ffe63636f9f497d4c0212"
+      "size": 60403028,
+      "sha256": "a9e3e75da156d665b91cb306330b3829e0948bf1474c8d2962d8ebd6fc973708"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf": {
-      "size": 41252260,
-      "sha256": "521faf29a4ab2fbe7cd57e5845a7fdba71dbcdfe38ad14a5ec384a88a03e3a29"
+      "size": 41299240,
+      "sha256": "c78beb4f2a35a3f2b80363fe8f7e07836e9010ef00ccc6e3ca54d4db5e11b926"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf": {
-      "size": 59274932,
-      "sha256": "b1fec556119565c371e0fbd9509b0b231a8df65b136d705d58c960aab6123cf6"
+      "size": 59321984,
+      "sha256": "6dff66328ef07cc5143b5c81f00867c993a13c29c3572c92158837b71d21f2cf"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf": {
-      "size": 40479576,
-      "sha256": "bc6bfbe42470dc602f433874ba33948b799d5eb609dd4386d12a6b7e4576b856"
+      "size": 40526564,
+      "sha256": "7b2e09d6e6cd6153179f90a370d80b85335ccc09d327969d8a9e4b0538f227d5"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf": {
-      "size": 59206964,
-      "sha256": "8e4207af15f0b7866f6b7a24cf52acf08cb015103b289cb182ee336541fa4b55"
+      "size": 59254012,
+      "sha256": "1dd76935f4c462945b99b6824b22edfea3f7c32794663f2b90c00e30bf2b2cee"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf": {
-      "size": 40446372,
-      "sha256": "60280b395ed70183d42d17e5550fd29b38b0e7f156ec2754127814112d45cca3"
+      "size": 40493356,
+      "sha256": "5935c9837d63490460547171f8cce77c2bdc6f102ce9943d4ddbb1a0b3ad97dc"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf": {
-      "size": 59983156,
-      "sha256": "a480e74f9f62fcec66f1f9fa7b61b6ec00d99f1ed9f6532566838027dbe328c3"
+      "size": 60030200,
+      "sha256": "0e81a2681047864b78bbe337b041321854341b68a7c5e2df8e6f935379ab5a95"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf": {
-      "size": 40931624,
-      "sha256": "b4b82e711505189a08bb72b48fb6a74f9a902ff825291134fc0b86bdc6e7fe3a"
+      "size": 40978612,
+      "sha256": "3471850319b65f892df8d20fce0b3117e5896e803f9480dadbde37d9beeccbac"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf": {
-      "size": 60375724,
-      "sha256": "1b136cae6c933a7d794ff25540ef8d8f52deaffbcfa34d0880923bc39828ed08"
+      "size": 60422772,
+      "sha256": "2a4a1a82799f78feb9dd6e0fe028de0448bd2b5ab684a517794b97e02b3a8baf"
     },
     "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf": {
-      "size": 41324060,
-      "sha256": "9d734efba2eb6af6f1864ae96c5a332a3583fa870dbc93f57db77bd5435c46e7"
+      "size": 41371044,
+      "sha256": "15f9065fadfb8947a375a8835270bc677da17291ad7e9e7672eac69b5f24fbaa"
     }
   },
   "inputs_unchanged": true,
@@ -637,168 +637,168 @@
   "unexpected_messages": [],
   "results": [
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
@@ -819,168 +819,168 @@
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
@@ -1001,168 +1001,168 @@
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
@@ -1183,168 +1183,168 @@
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
@@ -1365,168 +1365,168 @@
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
@@ -1547,168 +1547,168 @@
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-ExtraLight.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Light.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-LightItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Regular.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Italic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-SemiBold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Bold.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-BoldItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Heavy.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",
       "missing_tables": []
     },
     {
-      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "font": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-HeavyItalic.ttf",
       "returncode": 0,
       "stdout": "File sanitized successfully!\n",
       "stderr": "",

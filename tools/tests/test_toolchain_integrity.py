@@ -35,11 +35,21 @@ class ToolchainIntegrity(unittest.TestCase):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             jobs = [(root / "input.ttf", root / "hint.gz", "Regular")]
-            with patch.object(build, "SARASA_CHLOROPHYTUM", root / "missing"), patch.dict(os.environ, {"SARASA_SKIP_CHLOROPHYTUM": "0"}):
+            with patch.object(build, "SARASA_SOURCE_DIR", root), \
+                 patch.object(build, "SARASA_CHLOROPHYTUM", root / "node_modules" / "missing"), \
+                 patch.dict(os.environ, {"SARASA_SKIP_CHLOROPHYTUM": "0"}):
                 with self.assertRaises(FileNotFoundError):
                     build.chlorophytum_generate_static_hints(jobs, root / "work")
                 with self.assertRaises(FileNotFoundError):
                     build.chlorophytum_instruct_static_fonts([(jobs[0][0], jobs[0][1], root / "output.ttf", "Regular")])
+            # Only the copy npm ci installed from the pinned lock is verified.
+            (root / "elsewhere").mkdir()
+            (root / "elsewhere" / "_startup").write_text("", encoding="utf-8")
+            with patch.object(build, "SARASA_SOURCE_DIR", root), \
+                 patch.object(build, "SARASA_CHLOROPHYTUM", root / "elsewhere" / "_startup"), \
+                 patch.dict(os.environ, {"SARASA_SKIP_CHLOROPHYTUM": "0"}):
+                with self.assertRaisesRegex(RuntimeError, "node_modules"):
+                    build.require_chlorophytum()
             with patch.dict(os.environ, {"SARASA_SKIP_CHLOROPHYTUM": "1"}):
                 with self.assertRaises(RuntimeError):
                     build.require_chlorophytum()

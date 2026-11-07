@@ -45,7 +45,7 @@ CHECKS = tuple(CHECK_EXPECTED_COUNTS)
 # and the same check also FAILs on that release font; an ERROR, or a FAIL the
 # release does not reproduce, fails the gate. WARN results are recorded.
 # The italic VF is left to the per-font checks (STAT italic pairing): its
-# interpolation_issues check alone takes about 18 minutes per VF.
+# interpolation_issues check alone takes about 16 minutes per VF.
 UNIVERSAL_SAMPLES = ((None, False, "Regular", False), ("Regular", False, "Regular", False),
                      ("Regular", True, "Regular", True), ("Heavy", False, "Bold", False))
 UNIVERSAL_PARALLEL_BATCHES = 3
@@ -133,6 +133,9 @@ def run_fontbakery(manifest: dict) -> bool:
         if len(fonts) != 26:
             raise RuntimeError(f"{region} FontBakery 批次必须恰好包含 26 个字体，实际 {len(fonts)}")
         native = directory / f"{region}.json"
+        # A run that dies before writing its JSON must not leave the last
+        # run's results to be read in its place.
+        native.unlink(missing_ok=True)
         arguments = [str(python), "-m", "fontbakery", "check-universal", "-J", "4", "--json", str(native)]
         for check in CHECKS:
             arguments.extend(["-c", check])
@@ -140,6 +143,8 @@ def run_fontbakery(manifest: dict) -> bool:
         print(f"[FontBakery] {region}，26 个字体，-J 4", flush=True)
         with (directory / f"{region}.log").open("w", encoding="utf-8") as log:
             process = subprocess.run(arguments, cwd=build.ROOT, stdout=log, stderr=subprocess.STDOUT)
+        if not native.is_file():
+            raise RuntimeError(f"FontBakery {region} 批次没有写出 JSON（退出码 {process.returncode}）")
         document = json.loads(native.read_text(encoding="utf-8"))
         counts = {key: value for key, value in document["result"].items() if value}
         totals.update(counts)
@@ -198,10 +203,15 @@ def run_fontbakery_universal(python: Path, directory: Path) -> dict:
 
     def run_batch(region: str, kind: str, fonts: list[Path]) -> dict:
         native = directory / f"universal-{region}-{kind}.json"
+        native.unlink(missing_ok=True)
         # Release fonts live outside the repository; pass real paths and
         # report the portable names, in messages too (single_directory and
         # underline_thickness list every file, some as a Python repr).
         names = {str(font.resolve()): audit.display_path(font) for font in fonts}
+        # FontBakery's JSON names each font by its file name only.
+        by_name = {font.name: audit.display_path(font) for font in fonts}
+        if len(by_name) != len(fonts):
+            raise RuntimeError(f"FontBakery universal {region} {kind} 批次的文件名不唯一")
         portable = {}
         for real, shown in names.items():
             for old, new in ((real, shown), (str(Path(real).parent), shown.rsplit("/", 1)[0])):
@@ -211,10 +221,20 @@ def run_fontbakery_universal(python: Path, directory: Path) -> dict:
         print(f"[FontBakery universal] {region} {kind}，{len(fonts)} 个字体", flush=True)
         with (directory / f"universal-{region}-{kind}.log").open("w", encoding="utf-8") as log:
             process = subprocess.run(arguments, cwd=build.ROOT, stdout=log, stderr=subprocess.STDOUT)
+        # Exit 1 means a FAIL or worse among the results; anything else, or no
+        # fresh JSON, is a broken run.
+        if process.returncode not in (0, 1) or not native.is_file():
+            raise RuntimeError(f"FontBakery universal {region} {kind} 运行失败（退出码 {process.returncode}）")
         rows = fontbakery_results(json.loads(native.read_text(encoding="utf-8")))
         for row in rows:
             if row["font"]:
-                row["font"] = names.get(str(Path(row["font"]).resolve()), row["font"])
+                shown = by_name.get(Path(row["font"]).name)
+                if shown is None:
+                    raise RuntimeError(f"FontBakery universal 的结果含有本批次之外的字体：{row['font']}")
+                row["font"] = shown
+        reported = {row["font"] for row in rows if row["font"]}
+        if reported != set(by_name.values()):
+            raise RuntimeError(f"FontBakery universal {region} {kind} 的结果没有覆盖本批次全部字体")
             for old, new in sorted(portable.items(), key=lambda item: -len(item[0])):
                 row["messages"] = [message.replace(old, new) for message in row["messages"]]
         return {"exit_code": process.returncode, "rows": rows}
@@ -241,15 +261,19 @@ def run_fontbakery_universal(python: Path, directory: Path) -> dict:
         for row in batches["product"]["rows"]:
             if row["result"] not in ("FAIL", "ERROR", "FATAL"):
                 continue
-            counterpart = counterparts.get(row["font"])
-            if counterpart is not None:
-                reproduced = release_results.get((row["check"], audit.display_path(counterpart)))
+            if row["font"] is None:
+                # A family check runs on the whole batch: its counterpart is
+                # the same check on the pinned release batch.
+                counterpart = "family:" + ",".join(sorted({audit.display_path(path) for path in counterparts.values()}))
+                reproduced = release_results.get((row["check"], None))
             else:
-                reproduced = next((result for (check, _font), result in release_results.items()
-                                   if check == row["check"]), None)
+                upstream = counterparts.get(row["font"])
+                if upstream is None:
+                    raise RuntimeError(f"FontBakery universal 的产品字体没有上游对应字体：{row['font']}")
+                counterpart = audit.display_path(upstream)
+                reproduced = release_results.get((row["check"], counterpart))
             item = {"region": region, "check": row["check"], "font": row["font"], "result": row["result"],
-                    "counterpart": audit.display_path(counterpart) if counterpart is not None else None,
-                    "counterpart_result": reproduced, "messages": row["messages"]}
+                    "counterpart": counterpart, "counterpart_result": reproduced, "messages": row["messages"]}
             if row["result"] == "FAIL" and row["check"] in APPROVED_UPSTREAM_FAILURES and reproduced == "FAIL":
                 approvals.append({**item, "reason": APPROVED_UPSTREAM_FAILURES[row["check"]]})
             else:

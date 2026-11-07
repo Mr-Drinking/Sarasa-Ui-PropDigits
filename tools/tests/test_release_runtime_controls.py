@@ -8,6 +8,7 @@ import re
 import sys
 import tempfile
 import unittest
+from release_fonts import require_release_fonts
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -120,8 +121,9 @@ class RuntimeControls(unittest.TestCase):
 
     def test_colon_replacement_preserves_native_feature_and_language_records(self):
         path = audit.static_path("SC", "Regular", False, False)
-        if not path.exists() or not build.INTER_UPRIGHT.exists():
-            self.skipTest("需要固定 Inter 来源和静态字体夹具")
+        if not build.INTER_UPRIGHT.exists():
+            self.skipTest("需要固定 Inter 来源")
+        require_release_fonts(self, path)
         with TTFont(path) as font:
             before_tags = [record.FeatureTag for record in font["GSUB"].table.FeatureList.FeatureRecord]
             before_languages = langsys_signatures(font, "GSUB")

@@ -145,8 +145,9 @@ def ensure_project_python(
     project_root: Path,
     label: str,
 ) -> None:
-    if os.environ.get("SARASA_SKIP_PYTHON_DEPS") == "1":
-        return
+    # It once skipped the lockfile and RECORD checks; a formal entry never runs unverified.
+    if os.environ.get("SARASA_SKIP_PYTHON_DEPS", "0") not in ("", "0"):
+        raise RuntimeError("SARASA_SKIP_PYTHON_DEPS 已停用：正式入口必须在按锁文件核验的环境中运行")
     venv_dir = Path(
         os.environ.get(
             "SARASA_PYTHON_VENV",

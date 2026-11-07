@@ -1,6 +1,6 @@
 # 声明
 
-本仓库包含基于 Sarasa Gothic、Source Han Sans 和 Inter 修改得到的字体文件。
+本项目的字体是基于 Sarasa Gothic、Source Han Sans、Inter 和 Shanggu Sans 修改得到的字体文件，随 GitHub Release 发布；仓库本身不含字体文件。
 
 版权声明：
 
@@ -12,7 +12,7 @@
 
 字体按 SIL Open Font License 1.1 分发，见 [LICENSE](LICENSE)。
 
-本仓库中的修改版字体家族：
+本项目的修改版字体家族：
 
 - `Sarasa Ui VF PD SC`
 - `Sarasa Ui VF PD CL`

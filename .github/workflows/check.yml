@@ -33,9 +33,12 @@ jobs:
       - name: 校验并准备完整测试来源
         run: .ci-venv/bin/python tools/tests/prepare_sources.py
       # 字体不进 git：取回本检出发布清单对应的 Release 资产，逐包逐字体核验。
-      # 发布提交推送时 Release 尚未发布，由 release-assets.yml 在发布后核验实际资产。
+      # 先经 GitHub API 确认 Release 已发布并核对全部资产；只有 Release 不存在或仍是草稿时返回 3，
+      # 已发布却缺包或摘要不符一律失败。发布后由 release-assets.yml 逐成员核验全部 21 个包。
       - name: 取回本版本已发布的字体
         id: fonts
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           set +e
           .ci-venv/bin/python tools/fetch_release_fonts.py
@@ -53,8 +56,13 @@ jobs:
           import unittest
           suite = unittest.defaultTestLoader.discover('tools/tests')
           result = unittest.TextTestRunner(verbosity=2).run(suite)
-          if result.skipped and os.environ['RELEASE_FONTS'] == 'true':
-              raise SystemExit('CI 不允许缺失夹具而跳过测试：' + repr(result.skipped))
+          skipped = [(test.id(), reason) for test, reason in result.skipped]
+          if skipped and os.environ['RELEASE_FONTS'] == 'true':
+              raise SystemExit('CI 不允许缺失夹具而跳过测试：' + repr(skipped))
+          # 版本尚未发布时只缺成品字体；缺固定来源或工具的跳过仍是失败。
+          others = [item for item in skipped if not item[1].startswith('需要成品字体：')]
+          if others:
+              raise SystemExit('只允许缺成品字体的跳过：' + repr(others))
           raise SystemExit(0 if result.wasSuccessful() else 1)
           PY
       - name: 快速字体审计

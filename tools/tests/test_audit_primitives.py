@@ -16,6 +16,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import build_sarasa_ui_propdigits_sc as build  # noqa: E402
 import package_release  # noqa: E402
+from release_fonts import require_release_fonts  # noqa: E402
 import uharfbuzz as hb  # noqa: E402
 from fontTools.ttLib import TTFont  # noqa: E402
 from fontTools.varLib import builder as var_builder  # noqa: E402
@@ -69,8 +70,7 @@ class RawSimpleGlyphFlagTests(unittest.TestCase):
             / f"SarasaUiPropDigitsSC-TTF-{build.VERSION}"
             / "SarasaUiPropDigitsSC-Regular.ttf"
         )
-        if not path.exists():
-            self.skipTest("built SC Regular font is not available")
+        require_release_fonts(self, path)
         font = TTFont(path, lazy=False, recalcTimestamp=False)
         try:
             before = build.raw_simple_glyph_flag_stats(font)
@@ -179,9 +179,7 @@ class CjkEllipsisTests(unittest.TestCase):
             / build.static_output_name("SC", "Regular", False),
             build.VARIABLE_DIR / build.variable_output_name("SC", False),
         )
-        for source in sources:
-            if not source.exists():
-                self.skipTest("built SC static/VF fonts are not available")
+        require_release_fonts(self, *sources)
         with tempfile.TemporaryDirectory() as tmp_name:
             for source in sources:
                 with self.subTest(source=source.name):

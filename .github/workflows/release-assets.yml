@@ -1,14 +1,15 @@
 name: 发布资产核验
 
-# Release（含预发布）发布后，在全新环境中下载实际资产，按该 tag 的发布清单
-# 核验后跑完整单元测试和快速审计。预发布通过后才标为正式版。
+# Release（含预发布）发布后，在全新环境中下载全部 21 个实际资产，按该 tag 的
+# 发布清单逐包、逐成员核验后跑完整单元测试和快速审计。本工作流只读：它通过后，
+# 由维护者另行把预发布标为正式版（见 README「发布验收」）。
 on:
   release:
     types: [published]
   workflow_dispatch:
     inputs:
       tag:
-        description: '要核验的 tag，如 v1.0.43.1'
+        description: '要核验的 tag，如 v1.0.43.2'
         required: true
 
 permissions:
@@ -37,8 +38,11 @@ jobs:
           .ci-venv/bin/python -m pip check
       - name: 校验并准备完整测试来源
         run: .ci-venv/bin/python tools/tests/prepare_sources.py
+      # 全部 21 个包：资产摘要、ZIP 成员及其 SHA-256 逐项对照发布清单，再解压字体。
       - name: 取回并核验 Release 资产
-        run: .ci-venv/bin/python tools/fetch_release_fonts.py
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: .ci-venv/bin/python tools/fetch_release_fonts.py --all-packages
       - name: 单元测试
         run: |
           .ci-venv/bin/python - <<'PY'

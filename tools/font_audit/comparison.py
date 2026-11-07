@@ -137,6 +137,14 @@ class Sources:
             self.inter_outline.set_weight(weight)
         static_cjk = 'Medium' if name == 'SemiBold' else name
         self.cjk = CjkUiOracle(region, static_weight=static_cjk); self.cjk.set_weight(weight)
+        # A paired VF/static comparison reads Source Han's static source of the
+        # same weight too: a CJK difference is explained only where the static
+        # side also matches its own source (a composition the VF and Source Han
+        # make but Sarasa's static pipeline loses is not explained).
+        self.cjk_static = None
+        if variable and weight_name:
+            self.cjk_static = CjkUiOracle(region, static_weight='Medium' if weight_name == 'SemiBold' else weight_name)
+            self.cjk_static.set_weight(weight)
         self.classical = CjkUiOracle(region, classical=True, static_weight=static_cjk) if region == 'CL' else None
         if self.classical:
             self.classical.set_weight(weight)
@@ -166,6 +174,8 @@ class Sources:
 
     def close(self):
         self.cjk.close()
+        if self.cjk_static:
+            self.cjk_static.close()
         if self.classical:
             self.classical.close()
         if self.classical_static:
@@ -272,6 +282,20 @@ class Sources:
             result.append(replace(glyph, bounds=box))
         return tuple(result)
 
+    def paired_advances_follow_sources(self, text, context, actual, reference):
+        """VF minus static advance, kerning included, stays within one unit of
+        Inter VF minus Inter static read at 1/64 unit: each side rounds once,
+        so the two cannot part by two (each side +-1 of its own source did
+        allow that, for unencoded alternates and kerned pairs)."""
+        if context.direction != 'ltr' or self.inter_static is None:
+            return True
+        arguments = inter_arguments(text, context.arguments())
+        variable = precise_advances(self.inter, text, arguments)
+        static = precise_advances(self.inter_static, text, arguments)
+        return (len(variable) == len(static) == len(actual) == len(reference)
+                and all(abs((a.advance[0] - r.advance[0]) - (x - y)) <= 1
+                        for a, r, x, y in zip(actual, reference, variable, static)))
+
     def inter_source_difference(self, text, context, actual, reference, expected, actual_face=None, reference_face=None):
         """VF follows Inter VF, static follows Inter static, and their difference
         is exactly the difference between the two pinned Inter sources."""
@@ -284,6 +308,8 @@ class Sources:
                     return False
                 if (a.bounds is None) != (b.bounds is None) or (a.bounds is not None and not near(a.bounds[2:], b.bounds[2:], 2)):
                     return False
+        if not self.paired_advances_follow_sources(text, context, actual, reference):
+            return False
         if context.direction == 'ltr' and actual_face is not None and reference_face is not None:
             # Each side rounds its own source's kerning once, so VF and static
             # kerning may part by under one unit more than the two sources do,
@@ -353,8 +379,11 @@ class Sources:
         out of it). The run must be Shanggu's own: the same advances and
         offsets, and the same outlines at the same coordinates, the stored
         points sheared about em/3 for italic. Side bearings or a vertical
-        origin borrowed from the official glyph fail."""
-        expected = self.shape(text, context, face=self.classical)
+        origin borrowed from the official glyph fail. Shanggu's own dlig and
+        aalt are not the product's (it keeps only what Sarasa Ui CL's
+        features reach), so under them the source is read without them."""
+        overrides = {context.feature: False} if context.feature in ('dlig', 'aalt') else None
+        expected = self.shape(text, context, face=self.classical, feature_overrides=overrides)
         if len(actual) != len(expected) or [g.cluster for g in actual] != [g.cluster for g in expected]:
             return False
         for glyph, source in zip(actual, expected):
@@ -395,6 +424,16 @@ class Sources:
                     return False
         return True
 
+    def static_source_reproduces(self, text, context, reference, *, offset_tolerance):
+        """The static side of a VF/static CJK difference matches Source Han's
+        static source as the VF matches the variable one."""
+        if self.cjk_static is None:
+            return False
+        expected = self.shape(text, context, face=self.cjk_static)
+        return (len(reference) == len(expected) and [g.cluster for g in reference] == [g.cluster for g in expected]
+                and all(near(a.advance, s.advance, 0) and near(a.offset, s.offset, offset_tolerance)
+                        for a, s in zip(reference, expected)))
+
     def explains(self, text, context, actual, reference, actual_face, reference_face):
         """Return an explicit oracle identifier, or None for an unexplained bug.
 
@@ -412,8 +451,8 @@ class Sources:
                 allowed |= c.CLASSICAL_SPACING_BASES
             if not any(ord(char) in allowed for char in text):
                 return None
-        if context.direction == 'ttb' and all(char in '—⸺⸻' for char in text):
-            count = sum({'—': 1, '⸺': 2, '⸻': 3}[char] for char in text)
+        if context.direction == 'ttb' and all(ord(char) in c.VERTICAL_DASH_SEGMENTS for char in text):
+            count = sum(c.VERTICAL_DASH_SEGMENTS[ord(char)] for char in text)
             if count > 1 and len(actual) == count and all(g.advance == (0, -1000) for g in actual):
                 return '另行逐边核验的 1em 竖排片段'
         # Checked before the run-level source comparison, whose glyphs this
@@ -466,7 +505,8 @@ class Sources:
                                   a.bounds is not None and b.bounds is not None and near(a.bounds[2:], b.bounds[2:], 2))
                              for a, b in zip(actual, expected))
                      and all(a is None and b is None or a is not None and b is not None and near(a[:2], b[:2], 2)
-                             for a, b in zip(ink(actual), ink(position_reference))))
+                             for a, b in zip(ink(actual), ink(position_reference)))
+                     and (not self.variable or self.paired_advances_follow_sources(text, context, actual, reference)))
             return 'Inter v4.1' if valid else None
         # A nominal shape difference is only explained by the pinned CJK VF;
         # a mismatched localized or vertical form cannot borrow its metrics.
@@ -504,16 +544,17 @@ class Sources:
             # A composition the static lacks is the CJK VF's own only if the
             # VF also places every glyph as that source does. Without this,
             # Source Han's Hangul compositions leaking into latn/ROM passed.
-            if all(near(a.advance, s.advance, 0) and near(a.offset, s.offset, 1)
-                   for a, s in zip(actual, expected)):
-                return '固定 CJK 可变来源的组合规则'
+            if (all(near(a.advance, s.advance, 0) and near(a.offset, s.offset, 1) for a, s in zip(actual, expected))
+                    and self.static_source_reproduces(text, context, reference, offset_tolerance=1)):
+                return '固定 CJK 静态与可变来源的组合规则'
             return None
         # Size differences are allowed only when the independently projected
         # source explains them; positions still need to match the static run.
         if any(not near(a.advance, b.advance, 0) for a, b in zip(actual, reference)):
-            if all(near(a.advance, source.advance, 0) and near(a.offset, source.offset, 0)
-                   for a, source in zip(actual, expected)):
-                return '固定 CJK 来源的默认定位与字偶距'
+            if (all(near(a.advance, source.advance, 0) and near(a.offset, source.offset, 0)
+                    for a, source in zip(actual, expected))
+                    and self.static_source_reproduces(text, context, reference, offset_tolerance=0)):
+                return '固定 CJK 静态与可变来源的默认定位与字偶距'
             return None
         # The VF and static reach Source Han as separate quadratic conversions
         # of its VF and static sources: the same ink can have different

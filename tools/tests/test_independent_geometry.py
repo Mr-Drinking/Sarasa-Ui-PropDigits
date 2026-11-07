@@ -72,7 +72,7 @@ class IndependentGeometryTests(unittest.TestCase):
                                                        (horizontal, horizontal, shifted, False),
                                                        (vertical, vertical, own, True),
                                                        (vertical, (Glyph(1, 0, (0, -1000), (-500, -859), None),), own, False)):
-                sources = SimpleNamespace(shape=lambda _text, _context, face=None, run=expected: run,
+                sources = SimpleNamespace(shape=lambda _text, _context, face=None, feature_overrides=None, run=expected: run,
                                           classical=SimpleNamespace(metadata=shanggu), italic=False, outline_compatibility={})
                 self.assertIs(Sources.classical_static_override(sources, '一', Context(), actual, face), explained)
 

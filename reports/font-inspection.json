@@ -4,17 +4,17 @@
   "fonts": [
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL-Italic[wght].ttf",
-      "size": 59418048,
+      "size": 59465096,
       "names": {
         "family": "Sarasa Ui VF PD CL",
         "subfamily": "Italic",
         "full": "Sarasa Ui VF PD CL Italic",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansK-VF.ttf + ShangguSansTC-VF + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansK-VF.ttf + ShangguSansTC-VF + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-CL-Italic",
         "typographic_family": "Sarasa Ui VF PD CL",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48445,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -262,7 +262,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -588,17 +588,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-CL[wght].ttf",
-      "size": 41103656,
+      "size": 41150640,
       "names": {
         "family": "Sarasa Ui VF PD CL",
         "subfamily": "Regular",
         "full": "Sarasa Ui VF PD CL",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansK-VF.ttf + ShangguSansTC-VF + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansK-VF.ttf + ShangguSansTC-VF + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-CL",
         "typographic_family": "Sarasa Ui VF PD CL",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48484,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -846,7 +846,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -1173,17 +1173,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC-Italic[wght].ttf",
-      "size": 60355980,
+      "size": 60403028,
       "names": {
         "family": "Sarasa Ui VF PD HC",
         "subfamily": "Italic",
         "full": "Sarasa Ui VF PD HC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansHC-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansHC-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-HC-Italic",
         "typographic_family": "Sarasa Ui VF PD HC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -1431,7 +1431,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -1757,17 +1757,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-HC[wght].ttf",
-      "size": 41252260,
+      "size": 41299240,
       "names": {
         "family": "Sarasa Ui VF PD HC",
         "subfamily": "Regular",
         "full": "Sarasa Ui VF PD HC",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansHC-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansHC-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-HC",
         "typographic_family": "Sarasa Ui VF PD HC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -2015,7 +2015,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -2342,17 +2342,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J-Italic[wght].ttf",
-      "size": 59274932,
+      "size": 59321984,
       "names": {
         "family": "Sarasa Ui VF PD J",
         "subfamily": "Italic",
         "full": "Sarasa Ui VF PD J Italic",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSans-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSans-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-J-Italic",
         "typographic_family": "Sarasa Ui VF PD J",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48526,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -2600,7 +2600,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -2926,17 +2926,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-J[wght].ttf",
-      "size": 40479576,
+      "size": 40526564,
       "names": {
         "family": "Sarasa Ui VF PD J",
         "subfamily": "Regular",
         "full": "Sarasa Ui VF PD J",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSans-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSans-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-J",
         "typographic_family": "Sarasa Ui VF PD J",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48565,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -3184,7 +3184,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -3511,17 +3511,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K-Italic[wght].ttf",
-      "size": 59206964,
+      "size": 59254012,
       "names": {
         "family": "Sarasa Ui VF PD K",
         "subfamily": "Italic",
         "full": "Sarasa Ui VF PD K Italic",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansK-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansK-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-K-Italic",
         "typographic_family": "Sarasa Ui VF PD K",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -3769,7 +3769,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -4095,17 +4095,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-K[wght].ttf",
-      "size": 40446372,
+      "size": 40493356,
       "names": {
         "family": "Sarasa Ui VF PD K",
         "subfamily": "Regular",
         "full": "Sarasa Ui VF PD K",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansK-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansK-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-K",
         "typographic_family": "Sarasa Ui VF PD K",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -4353,7 +4353,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -4680,17 +4680,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC-Italic[wght].ttf",
-      "size": 59983156,
+      "size": 60030200,
       "names": {
         "family": "Sarasa Ui VF PD SC",
         "subfamily": "Italic",
         "full": "Sarasa Ui VF PD SC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansSC-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansSC-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-SC-Italic",
         "typographic_family": "Sarasa Ui VF PD SC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48671,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -4938,7 +4938,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -5264,17 +5264,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-SC[wght].ttf",
-      "size": 40931624,
+      "size": 40978612,
       "names": {
         "family": "Sarasa Ui VF PD SC",
         "subfamily": "Regular",
         "full": "Sarasa Ui VF PD SC",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansSC-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansSC-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-SC",
         "typographic_family": "Sarasa Ui VF PD SC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48710,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -5522,7 +5522,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -5849,17 +5849,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC-Italic[wght].ttf",
-      "size": 60375724,
+      "size": 60422772,
       "names": {
         "family": "Sarasa Ui VF PD TC",
         "subfamily": "Italic",
         "full": "Sarasa Ui VF PD TC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansTC-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansTC-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-TC-Italic",
         "typographic_family": "Sarasa Ui VF PD TC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -6107,7 +6107,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -6433,17 +6433,17 @@
     },
     {
       "file": "fonts/variable/Sarasa-Ui-VF-PropDigits-TC[wght].ttf",
-      "size": 41324060,
+      "size": 41371044,
       "names": {
         "family": "Sarasa Ui VF PD TC",
         "subfamily": "Regular",
         "full": "Sarasa Ui VF PD TC",
-        "version": "Version 1.0431; project 1.0.43.1; SourceHanSansTC-VF.ttf + Inter VF; PD",
+        "version": "Version 1.0432; project 1.0.43.2; SourceHanSansTC-VF.ttf + Inter VF; PD",
         "postscript": "Sarasa-Ui-VF-PD-TC",
         "typographic_family": "Sarasa Ui VF PD TC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -6691,7 +6691,7 @@
         ]
       },
       "has_hints": false,
-      "glyf_overlap_simple_flags": 4,
+      "glyf_overlap_simple_flags": 5,
       "glyf_ots_invalid_explicit_overlap_flags": 0,
       "mac_name_records": 0,
       "shape_1_colon_2": {
@@ -7017,18 +7017,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
-      "size": 23707904,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Bold.ttf",
+      "size": 23710688,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD CL Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Bold",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -7552,18 +7552,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "size": 24496848,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "size": 24499628,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD CL Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Bold-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -8086,18 +8086,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "size": 23831788,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "size": 23834572,
       "names": {
         "family": "Sarasa Ui PD CL ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-ExtraLight",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -8621,18 +8621,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "size": 24623060,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "size": 24625840,
       "names": {
         "family": "Sarasa Ui PD CL ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -9155,18 +9155,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
-      "size": 23413740,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Heavy.ttf",
+      "size": 23416524,
       "names": {
         "family": "Sarasa Ui PD CL Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Heavy",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -9690,18 +9690,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "size": 24211728,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "size": 24214508,
       "names": {
         "family": "Sarasa Ui PD CL Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -10224,18 +10224,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
-      "size": 24634412,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Italic.ttf",
+      "size": 24637192,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -10758,18 +10758,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
-      "size": 23951844,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Light.ttf",
+      "size": 23954628,
       "names": {
         "family": "Sarasa Ui PD CL Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Light",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -11293,18 +11293,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "size": 24741800,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "size": 24744580,
       "names": {
         "family": "Sarasa Ui PD CL Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Light-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -11827,18 +11827,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
-      "size": 23845060,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-Regular.ttf",
+      "size": 23847844,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-Regular",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -12362,18 +12362,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "size": 23789284,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "size": 23792068,
       "names": {
         "family": "Sarasa Ui PD CL SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-SemiBold",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -12897,18 +12897,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "size": 24578844,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-1.0.43.2/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "size": 24581624,
       "names": {
         "family": "Sarasa Ui PD CL SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-CL-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -13431,18 +13431,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
-      "size": 23834180,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Bold.ttf",
+      "size": 23837052,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD HC Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Bold",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -13966,18 +13966,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "size": 24622432,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "size": 24625300,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD HC Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Bold-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -14500,18 +14500,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "size": 24017260,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "size": 24020132,
       "names": {
         "family": "Sarasa Ui PD HC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-ExtraLight",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -15035,18 +15035,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "size": 24808792,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "size": 24811660,
       "names": {
         "family": "Sarasa Ui PD HC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -15569,18 +15569,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
-      "size": 23550312,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Heavy.ttf",
+      "size": 23553184,
       "names": {
         "family": "Sarasa Ui PD HC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Heavy",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -16104,18 +16104,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "size": 24345264,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "size": 24348132,
       "names": {
         "family": "Sarasa Ui PD HC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -16638,18 +16638,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
-      "size": 24764760,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Italic.ttf",
+      "size": 24767628,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -17172,18 +17172,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
-      "size": 24089808,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Light.ttf",
+      "size": 24092680,
       "names": {
         "family": "Sarasa Ui PD HC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Light",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -17707,18 +17707,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "size": 24880284,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "size": 24883152,
       "names": {
         "family": "Sarasa Ui PD HC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Light-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -18241,18 +18241,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
-      "size": 23976064,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-Regular.ttf",
+      "size": 23978936,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-Regular",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -18776,18 +18776,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "size": 23912632,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "size": 23915504,
       "names": {
         "family": "Sarasa Ui PD HC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-SemiBold",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -19311,18 +19311,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "size": 24701600,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-1.0.43.2/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "size": 24704468,
       "names": {
         "family": "Sarasa Ui PD HC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-HC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -19845,18 +19845,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
-      "size": 23595540,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Bold.ttf",
+      "size": 23598412,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD J Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Bold",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -20380,18 +20380,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "size": 24385860,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "size": 24388728,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD J Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Bold-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -20914,18 +20914,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "size": 23806040,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "size": 23808912,
       "names": {
         "family": "Sarasa Ui PD J ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-ExtraLight",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -21449,18 +21449,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "size": 24602596,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "size": 24605464,
       "names": {
         "family": "Sarasa Ui PD J ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -21983,18 +21983,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
-      "size": 23310132,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Heavy.ttf",
+      "size": 23313004,
       "names": {
         "family": "Sarasa Ui PD J Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Heavy",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -22518,18 +22518,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "size": 24108036,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "size": 24110904,
       "names": {
         "family": "Sarasa Ui PD J Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -23052,18 +23052,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
-      "size": 24556056,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Italic.ttf",
+      "size": 24558924,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -23586,18 +23586,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
-      "size": 23881252,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Light.ttf",
+      "size": 23884124,
       "names": {
         "family": "Sarasa Ui PD J Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Light",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -24121,18 +24121,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "size": 24675924,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "size": 24678792,
       "names": {
         "family": "Sarasa Ui PD J Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Light-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -24655,18 +24655,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
-      "size": 23763360,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-Regular.ttf",
+      "size": 23766232,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-Regular",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -25190,18 +25190,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "size": 23693040,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "size": 23695912,
       "names": {
         "family": "Sarasa Ui PD J SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-SemiBold",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -25725,18 +25725,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "size": 24485036,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-1.0.43.2/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "size": 24487904,
       "names": {
         "family": "Sarasa Ui PD J SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-J-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -26259,18 +26259,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
-      "size": 23551760,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Bold.ttf",
+      "size": 23554728,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD K Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Bold",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -26794,18 +26794,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "size": 24340676,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "size": 24343640,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD K Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Bold-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -27328,18 +27328,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "size": 23760292,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "size": 23763260,
       "names": {
         "family": "Sarasa Ui PD K ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-ExtraLight",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -27863,18 +27863,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "size": 24555324,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "size": 24558288,
       "names": {
         "family": "Sarasa Ui PD K ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -28397,18 +28397,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
-      "size": 23266812,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Heavy.ttf",
+      "size": 23269780,
       "names": {
         "family": "Sarasa Ui PD K Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Heavy",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -28932,18 +28932,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "size": 24063336,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "size": 24066300,
       "names": {
         "family": "Sarasa Ui PD K Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -29466,18 +29466,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
-      "size": 24509656,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Italic.ttf",
+      "size": 24512620,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -30000,18 +30000,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
-      "size": 23835792,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Light.ttf",
+      "size": 23838760,
       "names": {
         "family": "Sarasa Ui PD K Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Light",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -30535,18 +30535,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
-      "size": 24629024,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-LightItalic.ttf",
+      "size": 24631988,
       "names": {
         "family": "Sarasa Ui PD K Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Light-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -31069,18 +31069,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
-      "size": 23718392,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-Regular.ttf",
+      "size": 23721360,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-Regular",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -31604,18 +31604,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
-      "size": 23648304,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-SemiBold.ttf",
+      "size": 23651272,
       "names": {
         "family": "Sarasa Ui PD K SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-SemiBold",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -32139,18 +32139,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "size": 24438828,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-1.0.43.2/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "size": 24441792,
       "names": {
         "family": "Sarasa Ui PD K SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-K-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -32673,18 +32673,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
-      "size": 23669724,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Bold.ttf",
+      "size": 23672596,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD SC Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Bold",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -33208,18 +33208,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "size": 24452148,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "size": 24455020,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD SC Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Bold-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -33742,18 +33742,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "size": 23861260,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "size": 23864132,
       "names": {
         "family": "Sarasa Ui PD SC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-ExtraLight",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -34277,18 +34277,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "size": 24648800,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "size": 24651672,
       "names": {
         "family": "Sarasa Ui PD SC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -34811,18 +34811,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
-      "size": 23390484,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Heavy.ttf",
+      "size": 23393356,
       "names": {
         "family": "Sarasa Ui PD SC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Heavy",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -35346,18 +35346,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "size": 24179252,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "size": 24182124,
       "names": {
         "family": "Sarasa Ui PD SC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -35880,18 +35880,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
-      "size": 24603248,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Italic.ttf",
+      "size": 24606120,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -36414,18 +36414,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
-      "size": 23936088,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Light.ttf",
+      "size": 23938960,
       "names": {
         "family": "Sarasa Ui PD SC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Light",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -36949,18 +36949,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "size": 24722060,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "size": 24724932,
       "names": {
         "family": "Sarasa Ui PD SC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Light-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -37483,18 +37483,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
-      "size": 23819548,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-Regular.ttf",
+      "size": 23822420,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-Regular",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -38018,18 +38018,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "size": 23747088,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "size": 23749960,
       "names": {
         "family": "Sarasa Ui PD SC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-SemiBold",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -38553,18 +38553,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "size": 24530984,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-1.0.43.2/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "size": 24533856,
       "names": {
         "family": "Sarasa Ui PD SC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-SC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -39087,18 +39087,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
-      "size": 23871592,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Bold.ttf",
+      "size": 23874464,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD TC Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Bold",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -39622,18 +39622,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "size": 24660020,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "size": 24662888,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD TC Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Bold-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -40156,18 +40156,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "size": 24043920,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "size": 24046792,
       "names": {
         "family": "Sarasa Ui PD TC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-ExtraLight",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -40691,18 +40691,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "size": 24835560,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "size": 24838428,
       "names": {
         "family": "Sarasa Ui PD TC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -41225,18 +41225,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
-      "size": 23592536,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Heavy.ttf",
+      "size": 23595408,
       "names": {
         "family": "Sarasa Ui PD TC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Heavy",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -41760,18 +41760,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "size": 24388004,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "size": 24390872,
       "names": {
         "family": "Sarasa Ui PD TC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -42294,18 +42294,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
-      "size": 24794360,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Italic.ttf",
+      "size": 24797228,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -42828,18 +42828,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
-      "size": 24118844,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Light.ttf",
+      "size": 24121716,
       "names": {
         "family": "Sarasa Ui PD TC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Light",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -43363,18 +43363,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "size": 24909332,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "size": 24912200,
       "names": {
         "family": "Sarasa Ui PD TC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Light-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -43897,18 +43897,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
-      "size": 24005680,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-Regular.ttf",
+      "size": 24008552,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-Regular",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -44432,18 +44432,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "size": 23945988,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "size": 23948860,
       "names": {
         "family": "Sarasa Ui PD TC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-SemiBold",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -44967,18 +44967,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "size": 24735056,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-1.0.43.2/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "size": 24737924,
       "names": {
         "family": "Sarasa Ui PD TC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; hinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; hinted",
         "postscript": "Sarasa-Ui-PD-TC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -45501,18 +45501,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Bold.ttf",
-      "size": 12815448,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Bold.ttf",
+      "size": 12818232,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD CL Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Bold",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -46036,18 +46036,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-BoldItalic.ttf",
-      "size": 13602532,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-BoldItalic.ttf",
+      "size": 13605312,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD CL Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Bold-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -46570,18 +46570,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLight.ttf",
-      "size": 13114104,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-ExtraLight.ttf",
+      "size": 13116888,
       "names": {
         "family": "Sarasa Ui PD CL ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-ExtraLight",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -47105,18 +47105,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
-      "size": 13900008,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-ExtraLightItalic.ttf",
+      "size": 13902788,
       "names": {
         "family": "Sarasa Ui PD CL ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -47639,18 +47639,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Heavy.ttf",
-      "size": 12704832,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Heavy.ttf",
+      "size": 12707616,
       "names": {
         "family": "Sarasa Ui PD CL Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Heavy",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -48174,18 +48174,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-HeavyItalic.ttf",
-      "size": 13499116,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-HeavyItalic.ttf",
+      "size": 13501896,
       "names": {
         "family": "Sarasa Ui PD CL Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -48708,18 +48708,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Italic.ttf",
-      "size": 13766704,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Italic.ttf",
+      "size": 13769484,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -49242,18 +49242,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Light.ttf",
-      "size": 13094164,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Light.ttf",
+      "size": 13096948,
       "names": {
         "family": "Sarasa Ui PD CL Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Light",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -49777,18 +49777,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-LightItalic.ttf",
-      "size": 13878824,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-LightItalic.ttf",
+      "size": 13881604,
       "names": {
         "family": "Sarasa Ui PD CL Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Light-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -50311,18 +50311,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-Regular.ttf",
-      "size": 12981296,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-Regular.ttf",
+      "size": 12984080,
       "names": {
         "family": "Sarasa Ui PD CL",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-Regular",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -50846,18 +50846,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBold.ttf",
-      "size": 12904956,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-SemiBold.ttf",
+      "size": 12907740,
       "names": {
         "family": "Sarasa Ui PD CL SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD CL SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-SemiBold",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -51381,18 +51381,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
-      "size": 13691804,
+      "file": "fonts/static/SarasaUiPropDigitsCL-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsCL-SemiBoldItalic.ttf",
+      "size": 13694584,
       "names": {
         "family": "Sarasa Ui PD CL SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD CL SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-CL-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD CL",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -51915,18 +51915,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Bold.ttf",
-      "size": 12920820,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Bold.ttf",
+      "size": 12923692,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD HC Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Bold",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -52450,18 +52450,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-BoldItalic.ttf",
-      "size": 13706784,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-BoldItalic.ttf",
+      "size": 13709652,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD HC Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Bold-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -52984,18 +52984,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLight.ttf",
-      "size": 13310708,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-ExtraLight.ttf",
+      "size": 13313580,
       "names": {
         "family": "Sarasa Ui PD HC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-ExtraLight",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -53519,18 +53519,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
-      "size": 14096536,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-ExtraLightItalic.ttf",
+      "size": 14099404,
       "names": {
         "family": "Sarasa Ui PD HC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -54053,18 +54053,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Heavy.ttf",
-      "size": 12818224,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Heavy.ttf",
+      "size": 12821096,
       "names": {
         "family": "Sarasa Ui PD HC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Heavy",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -54588,18 +54588,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-HeavyItalic.ttf",
-      "size": 13608864,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-HeavyItalic.ttf",
+      "size": 13611732,
       "names": {
         "family": "Sarasa Ui PD HC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -55122,18 +55122,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Italic.ttf",
-      "size": 13908300,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Italic.ttf",
+      "size": 13911168,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -55656,18 +55656,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Light.ttf",
-      "size": 13249012,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Light.ttf",
+      "size": 13251884,
       "names": {
         "family": "Sarasa Ui PD HC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Light",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -56191,18 +56191,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-LightItalic.ttf",
-      "size": 14033988,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-LightItalic.ttf",
+      "size": 14036856,
       "names": {
         "family": "Sarasa Ui PD HC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Light-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -56725,18 +56725,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-Regular.ttf",
-      "size": 13123712,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-Regular.ttf",
+      "size": 13126584,
       "names": {
         "family": "Sarasa Ui PD HC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-Regular",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -57260,18 +57260,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBold.ttf",
-      "size": 13030216,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-SemiBold.ttf",
+      "size": 13033088,
       "names": {
         "family": "Sarasa Ui PD HC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD HC SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-SemiBold",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48742,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -57795,18 +57795,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
-      "size": 13816056,
+      "file": "fonts/static/SarasaUiPropDigitsHC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsHC-SemiBoldItalic.ttf",
+      "size": 13818924,
       "names": {
         "family": "Sarasa Ui PD HC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD HC SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansHC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansHC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-HC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD HC",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48703,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -58329,18 +58329,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Bold.ttf",
-      "size": 12733988,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Bold.ttf",
+      "size": 12736860,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD J Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Bold",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -58864,18 +58864,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-BoldItalic.ttf",
-      "size": 13522444,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-BoldItalic.ttf",
+      "size": 13525312,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD J Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Bold-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -59398,18 +59398,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLight.ttf",
-      "size": 13123444,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-ExtraLight.ttf",
+      "size": 13126316,
       "names": {
         "family": "Sarasa Ui PD J ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-ExtraLight",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -59933,18 +59933,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
-      "size": 13914636,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-ExtraLightItalic.ttf",
+      "size": 13917504,
       "names": {
         "family": "Sarasa Ui PD J ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -60467,18 +60467,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Heavy.ttf",
-      "size": 12631024,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Heavy.ttf",
+      "size": 12633896,
       "names": {
         "family": "Sarasa Ui PD J Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Heavy",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -61002,18 +61002,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-HeavyItalic.ttf",
-      "size": 13425228,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-HeavyItalic.ttf",
+      "size": 13428096,
       "names": {
         "family": "Sarasa Ui PD J Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -61536,18 +61536,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Italic.ttf",
-      "size": 13727120,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Italic.ttf",
+      "size": 13729988,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -62070,18 +62070,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Light.ttf",
-      "size": 13061044,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Light.ttf",
+      "size": 13063916,
       "names": {
         "family": "Sarasa Ui PD J Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Light",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -62605,18 +62605,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-LightItalic.ttf",
-      "size": 13850420,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-LightItalic.ttf",
+      "size": 13853288,
       "names": {
         "family": "Sarasa Ui PD J Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Light-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -63139,18 +63139,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-Regular.ttf",
-      "size": 12938364,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-Regular.ttf",
+      "size": 12941236,
       "names": {
         "family": "Sarasa Ui PD J",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-Regular",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -63674,18 +63674,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBold.ttf",
-      "size": 12847092,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-SemiBold.ttf",
+      "size": 12849964,
       "names": {
         "family": "Sarasa Ui PD J SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD J SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-SemiBold",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48566,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -64209,18 +64209,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
-      "size": 13636376,
+      "file": "fonts/static/SarasaUiPropDigitsJ-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsJ-SemiBoldItalic.ttf",
+      "size": 13639244,
       "names": {
         "family": "Sarasa Ui PD J SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD J SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSans + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSans + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-J-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD J",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48527,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -64743,18 +64743,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Bold.ttf",
-      "size": 12710848,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Bold.ttf",
+      "size": 12713816,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD K Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Bold",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -65278,18 +65278,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-BoldItalic.ttf",
-      "size": 13497904,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-BoldItalic.ttf",
+      "size": 13500868,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD K Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Bold-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -65812,18 +65812,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLight.ttf",
-      "size": 13099320,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-ExtraLight.ttf",
+      "size": 13102288,
       "names": {
         "family": "Sarasa Ui PD K ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-ExtraLight",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -66347,18 +66347,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
-      "size": 13888992,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-ExtraLightItalic.ttf",
+      "size": 13891956,
       "names": {
         "family": "Sarasa Ui PD K ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -66881,18 +66881,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Heavy.ttf",
-      "size": 12608428,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Heavy.ttf",
+      "size": 12611396,
       "names": {
         "family": "Sarasa Ui PD K Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Heavy",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -67416,18 +67416,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-HeavyItalic.ttf",
-      "size": 13401252,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-HeavyItalic.ttf",
+      "size": 13404216,
       "names": {
         "family": "Sarasa Ui PD K Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -67950,18 +67950,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Italic.ttf",
-      "size": 13702032,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Italic.ttf",
+      "size": 13704996,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -68484,18 +68484,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Light.ttf",
-      "size": 13037064,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Light.ttf",
+      "size": 13040032,
       "names": {
         "family": "Sarasa Ui PD K Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Light",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -69019,18 +69019,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-LightItalic.ttf",
-      "size": 13825000,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-LightItalic.ttf",
+      "size": 13827964,
       "names": {
         "family": "Sarasa Ui PD K Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Light-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -69553,18 +69553,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-Regular.ttf",
-      "size": 12914708,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-Regular.ttf",
+      "size": 12917676,
       "names": {
         "family": "Sarasa Ui PD K",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-Regular",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -70088,18 +70088,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBold.ttf",
-      "size": 12823716,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-SemiBold.ttf",
+      "size": 12826684,
       "names": {
         "family": "Sarasa Ui PD K SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD K SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-SemiBold",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48482,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -70623,18 +70623,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
-      "size": 13611528,
+      "file": "fonts/static/SarasaUiPropDigitsK-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsK-SemiBoldItalic.ttf",
+      "size": 13614492,
       "names": {
         "family": "Sarasa Ui PD K SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD K SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansK + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansK + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-K-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD K",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48443,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -71157,18 +71157,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Bold.ttf",
-      "size": 12833568,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Bold.ttf",
+      "size": 12836440,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD SC Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Bold",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -71692,18 +71692,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-BoldItalic.ttf",
-      "size": 13613768,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-BoldItalic.ttf",
+      "size": 13616640,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD SC Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Bold-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -72226,18 +72226,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLight.ttf",
-      "size": 13219876,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-ExtraLight.ttf",
+      "size": 13222748,
       "names": {
         "family": "Sarasa Ui PD SC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-ExtraLight",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -72761,18 +72761,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
-      "size": 14001644,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-ExtraLightItalic.ttf",
+      "size": 14004516,
       "names": {
         "family": "Sarasa Ui PD SC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -73295,18 +73295,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Heavy.ttf",
-      "size": 12738180,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Heavy.ttf",
+      "size": 12741052,
       "names": {
         "family": "Sarasa Ui PD SC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Heavy",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -73830,18 +73830,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-HeavyItalic.ttf",
-      "size": 13523268,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-HeavyItalic.ttf",
+      "size": 13526140,
       "names": {
         "family": "Sarasa Ui PD SC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -74364,18 +74364,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Italic.ttf",
-      "size": 13815016,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Italic.ttf",
+      "size": 13817888,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -74898,18 +74898,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Light.ttf",
-      "size": 13158444,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Light.ttf",
+      "size": 13161316,
       "names": {
         "family": "Sarasa Ui PD SC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Light",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -75433,18 +75433,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-LightItalic.ttf",
-      "size": 13938956,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-LightItalic.ttf",
+      "size": 13941828,
       "names": {
         "family": "Sarasa Ui PD SC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Light-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -75967,18 +75967,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-Regular.ttf",
-      "size": 13035496,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-Regular.ttf",
+      "size": 13038368,
       "names": {
         "family": "Sarasa Ui PD SC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-Regular",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -76502,18 +76502,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBold.ttf",
-      "size": 12941600,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-SemiBold.ttf",
+      "size": 12944472,
       "names": {
         "family": "Sarasa Ui PD SC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD SC SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-SemiBold",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48711,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -77037,18 +77037,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
-      "size": 13722132,
+      "file": "fonts/static/SarasaUiPropDigitsSC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsSC-SemiBoldItalic.ttf",
+      "size": 13725004,
       "names": {
         "family": "Sarasa Ui PD SC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD SC SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansSC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansSC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-SC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD SC",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48672,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -77571,18 +77571,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Bold.ttf",
-      "size": 12947960,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Bold.ttf",
+      "size": 12950832,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Bold",
         "full": "Sarasa Ui PD TC Bold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Bold",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Bold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -78106,18 +78106,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-BoldItalic.ttf",
-      "size": 13734084,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-BoldItalic.ttf",
+      "size": 13736952,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Bold Italic",
         "full": "Sarasa Ui PD TC Bold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Bold-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Bold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 92,
@@ -78640,18 +78640,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLight.ttf",
-      "size": 13334064,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-ExtraLight.ttf",
+      "size": 13336936,
       "names": {
         "family": "Sarasa Ui PD TC ExtraLight",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC ExtraLight",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-ExtraLight",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "ExtraLight"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -79175,18 +79175,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
-      "size": 14120088,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-ExtraLightItalic.ttf",
+      "size": 14122956,
       "names": {
         "family": "Sarasa Ui PD TC ExtraLight",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC ExtraLight Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-ExtraLight-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "ExtraLight Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 37,
@@ -79709,18 +79709,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Heavy.ttf",
-      "size": 12846092,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Heavy.ttf",
+      "size": 12848964,
       "names": {
         "family": "Sarasa Ui PD TC Heavy",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC Heavy",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Heavy",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Heavy"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -80244,18 +80244,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-HeavyItalic.ttf",
-      "size": 13637136,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-HeavyItalic.ttf",
+      "size": 13640004,
       "names": {
         "family": "Sarasa Ui PD TC Heavy",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC Heavy Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Heavy-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Heavy Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 113,
@@ -80778,18 +80778,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Italic.ttf",
-      "size": 13934380,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Italic.ttf",
+      "size": 13937248,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -81312,18 +81312,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Light.ttf",
-      "size": 13272896,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Light.ttf",
+      "size": 13275768,
       "names": {
         "family": "Sarasa Ui PD TC Light",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC Light",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Light",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Light"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -81847,18 +81847,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-LightItalic.ttf",
-      "size": 14057984,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-LightItalic.ttf",
+      "size": 14060852,
       "names": {
         "family": "Sarasa Ui PD TC Light",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC Light Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Light-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Light Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 53,
@@ -82381,18 +82381,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-Regular.ttf",
-      "size": 13149860,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-Regular.ttf",
+      "size": 13152732,
       "names": {
         "family": "Sarasa Ui PD TC",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-Regular",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "Regular"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 68,
@@ -82916,18 +82916,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBold.ttf",
-      "size": 13056928,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-SemiBold.ttf",
+      "size": 13059800,
       "names": {
         "family": "Sarasa Ui PD TC SemiBold",
         "subfamily": "Regular",
         "full": "Sarasa Ui PD TC SemiBold",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-SemiBold",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "SemiBold"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48759,
       "post_format": 3.0,
       "underline_thickness": 84,
@@ -83451,18 +83451,18 @@
       "codepage_range_2": 0
     },
     {
-      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.1/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
-      "size": 13842864,
+      "file": "fonts/static/SarasaUiPropDigitsTC-TTF-Unhinted-1.0.43.2/SarasaUiPropDigitsTC-SemiBoldItalic.ttf",
+      "size": 13845732,
       "names": {
         "family": "Sarasa Ui PD TC SemiBold",
         "subfamily": "Italic",
         "full": "Sarasa Ui PD TC SemiBold Italic",
-        "version": "Version 1.0431; project 1.0.43.1; static SourceHanSansTC + static Inter; PD; unhinted",
+        "version": "Version 1.0432; project 1.0.43.2; static SourceHanSansTC + static Inter; PD; unhinted",
         "postscript": "Sarasa-Ui-PD-TC-SemiBold-Italic",
         "typographic_family": "Sarasa Ui PD TC",
         "typographic_subfamily": "SemiBold Italic"
       },
-      "head_font_revision": 1.0431060791015625,
+      "head_font_revision": 1.0431976318359375,
       "glyph_count": 48720,
       "post_format": 3.0,
       "underline_thickness": 84,

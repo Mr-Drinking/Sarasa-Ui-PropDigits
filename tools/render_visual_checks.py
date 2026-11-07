@@ -225,7 +225,7 @@ def detail_sheet(region: str) -> dict:
 
 def main() -> None:
     global LABEL_FONT
-    parser = argparse.ArgumentParser(description="用实际成品生成字体视觉样张；生成结果须人工查看，不自动声明通过。")
+    parser = argparse.ArgumentParser(description="用实际成品生成字体视觉样张和候选报告 reports/visual-candidates.json；审阅者（人或模型，写进报告）须逐图查看后另写 reports/visual-audit.json，生成结果本身不声明通过。")
     parser.add_argument("--regions", default=",".join(build.REGION_ORDER))
     parser.add_argument("--label-font", type=Path, help="样张标签使用的 TTF/OTF/TTC；默认使用本项目 SC Regular unhinted 字体。")
     args = parser.parse_args()

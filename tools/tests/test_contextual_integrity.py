@@ -16,6 +16,7 @@ from font_audit import contract, products, raster
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables.ttProgram import Program
 from test_runtime_regressions import fixture_font
+from release_fonts import require_release_fonts
 import uharfbuzz as hb
 
 
@@ -23,8 +24,9 @@ class ContextualIntegrity(unittest.TestCase):
     def font(self):
         path = contract.static_path("SC", "Regular", False, False)
         native_inter = b.SARASA_SOURCE_DIR / "sources" / "Inter" / "Inter-Regular.ttf"
-        if not path.exists() or not b.INTER_UPRIGHT.exists() or not native_inter.exists():
-            self.skipTest("需要固定来源及已构建的 SC 字体夹具")
+        if not b.INTER_UPRIGHT.exists() or not native_inter.exists():
+            self.skipTest("需要固定 Inter 来源")
+        require_release_fonts(self, path)
         font = TTFont(path, recalcTimestamp=False)
         b.apply_static_propdigits(font)
         b.add_digit_colon_feature(font)
@@ -126,8 +128,9 @@ class ContextualIntegrity(unittest.TestCase):
         self.assertEqual(products.static_inter_style(900, True), "BlackItalic")
         semibold = contract.static_path("SC", "SemiBold", False, False)
         inter_semibold = contract.SARASA_SOURCE / "sources/Inter/Inter-SemiBold.ttf"
-        if not semibold.exists() or not inter_semibold.exists():
-            self.skipTest("需要已构建的 SC SemiBold 与固定 Inter SemiBold 静态来源")
+        if not inter_semibold.exists():
+            self.skipTest("需要固定 Inter SemiBold 静态来源")
+        require_release_fonts(self, semibold)
         styles, original = [], products.source_inter
         def recording(italic, static_style=None, **options):
             styles.append(static_style)

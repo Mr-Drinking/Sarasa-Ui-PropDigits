@@ -75,7 +75,23 @@
     {
       "id": "cyrillic-greek-default-routing",
       "scripts": ["cyrl", "grek"],
-      "oracle": "西里尔、希腊文字的默认语言系统共用 DFLT/dflt 的特性（tnum、zero、frac、ccmp、mark、mkmk 等），同名特性取 lookup 并集，vert/vrt2 保留各自路由；上游 Sarasa Ui 在此只有 kern 等少数特性，Inter 自身的 cyrl/grek GPOS 也只有 kern。静态字体对照按此规则改写路由后的固定 Sarasa Ui 成品排版；VF 与静态字体在每个语言系统的特性及其分组必须一致；Inter 来源在西里尔、希腊上下文按 DFLT 路由排版作为期望值；这两种文字默认语言下的竖排西文标点（省略号、破折号）与 DFLT 相同，按固定 Source Han 的 DFLT 运行时对照（v1.0.43 已是如此）。"
+      "oracle": "西里尔、希腊文字的默认语言系统共用 DFLT/dflt 的特性（tnum、zero、frac、ccmp、mark、mkmk 等），同名特性取 lookup 并集，vert/vrt2 保留各自路由；上游 Sarasa Ui 在此缺少这些特性（GSUB 只有 calt、ccmp、hist、vert、vrt2，GPOS 只有 halt、kern、palt 与竖排定位），Inter 自身的 cyrl/grek GPOS 也只有 kern。静态字体对照按此规则改写路由后的固定 Sarasa Ui 成品排版；VF 与静态字体在每个语言系统的特性及其分组必须一致；Inter 来源在西里尔、希腊上下文按 DFLT 路由排版作为期望值；这两种文字默认语言下的竖排西文标点（省略号、破折号）与 DFLT 相同，按固定 Source Han 的 DFLT 运行时对照（v1.0.43 已是如此）。"
+    },
+    {
+      "id": "hangul-ccmp-guards",
+      "formats": ["static"],
+      "oracle": "固定 Source Han 的 ccmp 在 134 组古韩文 L+V 连字之前，各有一条同一对 L、V 后接收音（T 字母）时不替换的链式规则，好让 ljmo/vjmo/tjmo 合成整个音节；上游 Sarasa 的静态流程丢了这些规则，Sarasa Ui 把 U+1100 U+1188 U+11A8 等组合拆成两格（每个地区 366 组 L·V·T），Source Han 与 VF 合成一格。本项目静态字体补回这些规则。静态字体对照的上游成品按同一规则改写：规则从同地区、同字重的固定 Source Han 静态来源读取，经 cmap 映射后放在承载 L+V 连字的 ccmp lookup 之前，改写后的上游成品在每组 L+V 与 L+V+T 上必须与 Source Han 的字形数一致；VF 与静态字体照常逐项一致。"
+    },
+    {
+      "id": "vertical-western-punctuation",
+      "codepoints": [8212, 8230, 11834, 11835],
+      "direction": "ttb",
+      "oracle": "拉丁、西里尔、希腊文字竖排时（HarfBuzz 按 ttb 直立排），省略号用 CJK 竖排形，两个破折号用连续的 1em 竖排片段，与汉字里相同；Source Han 与 Noto CJK 在这些文字里保持横排形，上游 Sarasa Ui 的省略号始终是 Inter 的横排形，破折号换成竖排形而两段不连。v1.0.43 起如此，2026-11-03 决定保持（微软雅黑、正黑、宋体、黑体与本项目相同，其他字体没有统一做法）。VF 与静态字体逐项一致；西里尔、希腊默认语言下按固定 Source Han 的 DFLT 运行时对照，竖排分段另按 vertical-dash-segments 逐边核验。Unicode 的竖排方向数据把 U+2026 与 U+2014 定为旋转，只有应用把它们直立竖排时才用到这些形。"
+    },
+    {
+      "id": "superscript-parentheses",
+      "feature": "sups",
+      "oracle": "H(H) 同时开 sups 或 subs 时，本项目给上标、下标括号；Inter 先由 calt 换成 .case 括号再上标，结果仍是 .case 括号；上游 Sarasa Ui 给普通括号。差异来自 lookup 的先后，v1.0.43 起如此，2026-11-03 决定保持（Calibri、Noto Sans、Sitka 与本项目相同，样本中只有 Inter 给大写形括号）。VF 与静态字体必须选同样的字形、放在同样的位置，每个字形再分别对照两份 Inter 来源里同一字符单独排版的轮廓与步进。"
     }
   ]
 }

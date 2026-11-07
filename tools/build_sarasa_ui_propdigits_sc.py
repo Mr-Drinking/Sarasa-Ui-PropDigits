@@ -174,9 +174,23 @@ def log_step(message: str) -> None:
 
 
 SARASA_VERSION = "1.0.43"
-VERSION = "1.0.43.1"
-# head.fontRevision and the nameID 5 prefix: 1.0.43 is written 1.043, 1.0.43.1 1.0431.
-OPENTYPE_VERSION = "1." + "".join(VERSION.split(".")[1:])
+VERSION = "1.0.43.2"
+# The interpreter CI and the release environment use (3.13.18 ships no Windows installer).
+PINNED_PYTHON = (3, 13, 17)
+def opentype_version(version: str) -> str:
+    """head.fontRevision and the nameID 5 prefix: 1.0.43 is written 1.043, 1.0.43.1 1.0431.
+
+    The digits stay unambiguous only while the upstream component has two
+    digits and the revision one: 1.0.43.10 would also read as 1.0431.
+    """
+    parts = version.split(".")
+    if (len(parts) not in (3, 4) or parts[:2] != ["1", "0"] or len(parts[2]) != 2 or not parts[2].isdigit()
+            or (len(parts) == 4 and not (len(parts[3]) == 1 and "1" <= parts[3] <= "9"))):
+        raise ValueError(f"版本号 {version} 无法无歧义地写成 head.fontRevision")
+    return "1." + "".join(parts[1:])
+
+
+OPENTYPE_VERSION = opentype_version(VERSION)
 FONT_REVISION = float(OPENTYPE_VERSION)
 VISUAL_VERTICAL_RUN_TEXTS = ("甲……乙——丙⸺丁", "甲……乙———丙⸻丁",
                            "甲————乙⸺⸻丁", "甲————————————————乙")
@@ -441,7 +455,7 @@ SARASA_HINT_CONFIGS = {
 }
 CHLOROPHYTUM_HINT_STORE_ORDER = "numeric-gid-hcfg-shared-v3"
 STATIC_HINT_WORK_VERSION = 6
-STATIC_POSTPROCESS_VERSION = 19
+STATIC_POSTPROCESS_VERSION = 20
 STATIC_HINT_RECIPE = {
     "version": STATIC_HINT_WORK_VERSION,
     "fragments": "sarasa-pass1-kanji-hangul",
@@ -1993,7 +2007,16 @@ def rebuild_gdef_from_reference(font: TTFont, reference: TTFont) -> dict[str, in
     }
 
 
-def rebuild_vorg_from_reference(font: TTFont, reference: TTFont) -> dict[str, int]:
+def rebuild_vorg_from_reference(font: TTFont, reference: TTFont, *, same_pipeline: bool) -> dict[str, int]:
+    """VORG records from the reference glyph each glyph stands for.
+
+    cmap glyphs and their vert/vrt2 forms pair directly. A native static is
+    the reference pipeline's own output, so its other glyphs pair by name.
+    The VF's names are positions in another glyph order (glyph12345 is a
+    different glyph in each font): its unencoded glyphs pair only through
+    single substitutions both fonts make under the same feature from an
+    already paired glyph, and an unpaired glyph keeps the default origin.
+    """
     if "VORG" not in reference:
         return {"vorg_records": 0}
     reference_vorg = reference["VORG"]
@@ -2013,16 +2036,37 @@ def rebuild_vorg_from_reference(font: TTFont, reference: TTFont) -> dict[str, in
             and current_vertical_glyph in font.getGlyphOrder()
         ):
             records[current_vertical_glyph] = reference_vorg.VOriginRecords[ref_vertical_glyph]
-    for glyph_name in font.getGlyphOrder():
-        if glyph_name not in records and glyph_name in reference_vorg.VOriginRecords:
-            records[glyph_name] = reference_vorg.VOriginRecords[glyph_name]
+    closure_pairs = 0
+    if same_pipeline:
+        for glyph_name in font.getGlyphOrder():
+            if glyph_name not in records and glyph_name in reference_vorg.VOriginRecords:
+                records[glyph_name] = reference_vorg.VOriginRecords[glyph_name]
+    else:
+        paired = {glyph_name for codepoint, glyph_name in current_cmap.items() if codepoint in reference_cmap}
+        current_maps = feature_single_substitution_maps(font)
+        reference_maps = feature_single_substitution_maps(reference)
+        frontier = [(glyph_name, reference_cmap[codepoint]) for codepoint, glyph_name in sorted(current_cmap.items())
+                    if codepoint in reference_cmap]
+        while frontier:
+            found = []
+            for glyph_name, ref_glyph in frontier:
+                for tag, current_map in sorted(current_maps.items()):
+                    target, ref_target = current_map.get(glyph_name), reference_maps.get(tag, {}).get(ref_glyph)
+                    if target is None or ref_target is None or target in paired:
+                        continue
+                    paired.add(target)
+                    found.append((target, ref_target))
+                    if target not in records and ref_target in reference_vorg.VOriginRecords:
+                        records[target] = reference_vorg.VOriginRecords[ref_target]
+            closure_pairs += len(found)
+            frontier = found
     vorg = newTable("VORG")
     vorg.majorVersion = 1
     vorg.minorVersion = 0
     vorg.defaultVertOriginY = reference_vorg.defaultVertOriginY
     vorg.VOriginRecords = records
     font["VORG"] = vorg
-    return {"vorg_records": len(records)}
+    return {"vorg_records": len(records), "vorg_substitution_pairs": closure_pairs}
 
 
 def align_reference_vmtx(font: TTFont, reference: TTFont, skip_codepoints: set[int]) -> dict[str, int]:
@@ -3575,6 +3619,192 @@ def final_cmap_inter_outline_correction_pairs(
     return pairs
 
 
+def feature_single_substitution_maps(font: TTFont) -> dict[str, dict[str, str | None]]:
+    """Feature tag to its single substitutions, nested contextual lookups included.
+
+    An input the feature's lookups send to different glyphs maps to None.
+    """
+    if "GSUB" not in font:
+        return {}
+    gsub = font["GSUB"].table
+    if not gsub.FeatureList or not gsub.LookupList:
+        return {}
+    lookups = gsub.LookupList.Lookup
+    maps: dict[str, dict[str, str | None]] = {}
+    for record in gsub.FeatureList.FeatureRecord:
+        mapping = maps.setdefault(record.FeatureTag, {})
+        seen: set[int] = set()
+        pending = list(record.Feature.LookupListIndex)
+        while pending:
+            index = pending.pop()
+            if index in seen or not 0 <= index < len(lookups):
+                continue
+            seen.add(index)
+            for subtable in lookups[index].SubTable:
+                part = getattr(subtable, "ExtSubTable", subtable)
+                pending.extend(item.LookupListIndex for item in chain_substitution_records(part))
+            for subtable in single_substitution_subtables(lookups[index]):
+                for source, target in (getattr(subtable, "mapping", None) or {}).items():
+                    if source not in mapping:
+                        mapping[source] = target
+                    elif mapping[source] != target:
+                        mapping[source] = None
+    return maps
+
+
+def final_inter_outline_correction_pairs(
+    font: TTFont,
+    inter: TTFont,
+) -> list[tuple[str, str]]:
+    """cmap pairs, then the unencoded Inter glyphs both fonts reach from them.
+
+    An alternate only salt reaches (Ἱ's uni1F39.1, a composite of I.1 and
+    uni1FFE) has no cmap entry: paired by cmap alone, the last rounds left it
+    off Inter's curve by up to 6 units while its components were corrected.
+    A pair follows a substitution both fonts make under the same feature tag
+    from an already paired glyph; an ambiguous or already taken glyph on
+    either side is left out.
+    """
+    pairs = final_cmap_inter_outline_correction_pairs(font, inter)
+    source_maps = feature_single_substitution_maps(inter)
+    target_maps = feature_single_substitution_maps(font)
+    paired_sources = {source for source, _target in pairs}
+    paired_targets = {target for _source, target in pairs}
+    frontier = list(pairs)
+    while frontier:
+        found = []
+        for source_name, target_name in frontier:
+            for tag in sorted(INTER_GSUB_FEATURES):
+                source_output = source_maps.get(tag, {}).get(source_name)
+                target_output = target_maps.get(tag, {}).get(target_name)
+                if (source_output is None or target_output is None
+                        or source_output in paired_sources or target_output in paired_targets):
+                    continue
+                # The product's features also hold CJK lookups. A glyph they
+                # reach is Inter's only if it is drawn the same way.
+                structure = inter_correction_structure(inter, source_output)
+                if structure is None or structure != inter_correction_structure(font, target_output):
+                    continue
+                paired_sources.add(source_output)
+                paired_targets.add(target_output)
+                found.append((source_output, target_output))
+        pairs.extend(found)
+        frontier = found
+    return pairs
+
+
+def unencoded_inter_ink_misses(font: TTFont, inter: TTFont, weights: list[int]) -> dict[int, dict[str, float]]:
+    """At each weight, how far each unencoded Inter alternate's ink xMin sits
+    from Inter's original curve (positive: the product is left of it)."""
+    pairs = final_inter_outline_correction_pairs(font, inter)
+    unencoded = pairs[len(final_cmap_inter_outline_correction_pairs(font, inter)):]
+    path = getattr(inter, "_sarasa_exact_source", None)
+    if path is None:
+        raise ValueError("Inter 原始曲线来源未知，无法核对无编码替代字形的位置")
+    original = TTFont(path)
+    try:
+        fixed = {tag: value for tag, value in INTER_AXIS_LIMIT.items() if not isinstance(value, tuple)}
+        scale = 1000 / original["head"].unitsPerEm
+        misses: dict[int, dict[str, float]] = {}
+        for weight in weights:
+            product = font.getGlyphSet(location={"wght": weight})
+            exact = original.getGlyphSet(location={**fixed, "wght": weight})
+            row = {}
+            for source_name, target_name in unencoded:
+                left, right = BoundsPen(product), BoundsPen(exact)
+                product[target_name].draw(left)
+                exact[source_name].draw(right)
+                if left.bounds is not None and right.bounds is not None:
+                    row[target_name] = right.bounds[0] * scale - left.bounds[0]
+            misses[weight] = row
+        return misses
+    finally:
+        original.close()
+
+
+def align_unencoded_inter_ink(font: TTFont, inter: TTFont) -> dict[str, Any]:
+    """Unencoded Inter alternates keep Inter's ink position at the control weights.
+
+    A cmap glyph is placed by the static reference's metrics; an alternate
+    only a feature reaches has no static counterpart and follows Inter's
+    curve. Its components move with the encoded glyphs they share, and the
+    composite rounds keep a glyph's ink bounds, so ţ's and ṭ's salt forms sat
+    2.2 and 2.7 units left of Inter at 300 italic. Each such glyph gets a
+    whole-glyph x translation on a tent bounded by the neighbouring control
+    weights (the default outline stays as it is). The translation moves that
+    glyph alone: Inter builds υ on u.1 and Ɩ on l.ss02, and moving u.1 put υ
+    and 19 other encoded glyphs 1.1 units off the static metrics at 700. So
+    every composite that uses a translated glyph takes the opposite component
+    offset on the same tent; an encoded glyph keeps its static metrics, and a
+    composite alternate is measured and translated on its own.
+    """
+    if "gvar" not in font or "fvar" not in font:
+        return {"unencoded_inter_ink_translations": 0}
+    glyf = font["glyf"]
+    users: dict[str, list[tuple[str, int]]] = {}
+    for name in font.getGlyphOrder():
+        glyph = glyf[name]
+        if glyph.isComposite():
+            for index, component in enumerate(glyph.components):
+                users.setdefault(component.glyphName, []).append((name, index))
+    variations = font["gvar"].variations
+    default = int(weight_axis(font).defaultValue)
+    weights = [weight for weight in INTER_OUTLINE_CORRECTION_WEIGHTS if weight != default]
+    supports = advance_supports(font, weights)
+    translations = compensations = 0
+    largest = 0.0
+    for weight in weights:
+        region = {"wght": supports[weight]}
+        for _attempt in range(4):
+            misses = unencoded_inter_ink_misses(font, inter, [weight])[weight]
+            moved = 0
+            for glyph_name, miss in misses.items():
+                largest = max(largest, abs(miss))
+                if abs(miss) <= 0.5:
+                    continue
+                shift = otRound(miss)
+                count = gvar_coordinate_count(font, glyph_name)
+                glyph = glyf[glyph_name]
+                points = len(glyph.components) if glyph.isComposite() else count - 4
+                coordinates: list[Any] = [(shift, 0)] * points + [(0, 0)] * 4
+                if len(coordinates) != count:
+                    raise ValueError(f"无编码替代字形的平移点数无效：{glyph_name}")
+                variations.setdefault(glyph_name, []).append(TupleVariation(region, coordinates))
+                for user, index in users.get(glyph_name, []):
+                    if component_transform(glyf[user].components[index])[:4] != (1.0, 0.0, 0.0, 1.0):
+                        raise ValueError(f"带变换的组件无法抵消无编码替代字形的平移：{user} 引用 {glyph_name}")
+                    offsets: list[Any] = [(0, 0)] * gvar_coordinate_count(font, user)
+                    offsets[index] = (-shift, 0)
+                    variations.setdefault(user, []).append(TupleVariation(region, offsets))
+                    compensations += 1
+                moved += 1
+            translations += moved
+            if not moved:
+                break
+        else:
+            raise RuntimeError(f"无编码替代字形在 {weight} 的位置校正没有收敛")
+    default_misses = unencoded_inter_ink_misses(font, inter, [default])[default]
+    return {"unencoded_inter_ink_translations": translations,
+            "unencoded_inter_ink_compensated_components": compensations,
+            "unencoded_inter_ink_largest_miss_before": round(largest, 3),
+            "unencoded_inter_ink_largest_default_miss": round(max(map(abs, default_misses.values()), default=0.0), 3)}
+
+
+def inter_correction_structure(font: TTFont, glyph_name: str) -> tuple[Any, ...] | None:
+    """Contour ends of a simple glyph, or the component count of a composite
+    whose components are all untransformed: what the final rounds can correct."""
+    if "glyf" not in font or glyph_name not in font["glyf"].glyphs:
+        return None
+    glyph = font["glyf"][glyph_name]
+    if glyph.isComposite():
+        if any(component_transform(component)[:4] != (1.0, 0.0, 0.0, 1.0) for component in glyph.components):
+            return None
+        return ("composite", len(glyph.components))
+    if glyph.numberOfContours <= 0:
+        return None
+    return ("simple", tuple(glyph.endPtsOfContours))
+
+
 def add_inter_outline_correction_variations(
     font: TTFont,
     inter: TTFont,
@@ -3584,7 +3814,7 @@ def add_inter_outline_correction_variations(
     if "gvar" not in font or "glyf" not in font or "fvar" not in font or "glyf" not in inter or "fvar" not in inter:
         return {"inter_outline_correction_variations_added": 0, "inter_outline_correction_glyphs": 0}
     pairs = (
-        final_cmap_inter_outline_correction_pairs(font, inter)
+        final_inter_outline_correction_pairs(font, inter)
         if final_cmap
         else inter_outline_correction_pairs(font, inter)
     )
@@ -3892,7 +4122,7 @@ def add_translation_invariant_inter_composite_corrections(
     if "gvar" not in font or "glyf" not in font or "fvar" not in font:
         raise ValueError("Inter composite correction requires glyf/gvar/fvar")
 
-    pairs = final_cmap_inter_outline_correction_pairs(font, inter)
+    pairs = final_inter_outline_correction_pairs(font, inter)
     default_weight = int(weight_axis(font).defaultValue)
     if default_weight not in INTER_COMPOSITE_CONTROL_WEIGHTS:
         raise ValueError(f"unsupported Inter composite default weight: {default_weight}")
@@ -4320,7 +4550,7 @@ def align_inter_composite_harfbuzz_metrics(
 
 
 def inter_outline_control_status(font: TTFont, inter: TTFont) -> dict[str, Any]:
-    pairs = final_cmap_inter_outline_correction_pairs(font, inter)
+    pairs = final_inter_outline_correction_pairs(font, inter)
     mismatches_by_weight: dict[int, int] = {}
     maximum_residual_by_weight: dict[int, float] = {}
     samples: list[dict[str, Any]] = []
@@ -4362,11 +4592,21 @@ def inter_outline_control_status(font: TTFont, inter: TTFont) -> dict[str, Any]:
             source.close()
         mismatches_by_weight[weight_value] = mismatches
         maximum_residual_by_weight[weight_value] = maximum_residual
+    # The residual allows translation; an unencoded alternate has no static
+    # counterpart to place it, so its ink must also sit on Inter's curve.
+    ink = unencoded_inter_ink_misses(font, inter, list(INTER_OUTLINE_AUDIT_WEIGHTS))
+    ink_mismatches = {weight: sum(abs(miss) > 1 for miss in row.values()) for weight, row in ink.items()}
+    for weight, row in ink.items():
+        for glyph_name, miss in row.items():
+            if abs(miss) > 1 and len(samples) < 24:
+                samples.append({"weight": weight, "target_glyph": glyph_name, "reason": "unencoded_ink_position",
+                                "residual": round(miss, 3)})
     return {
-        "ok": bool(pairs) and not any(mismatches_by_weight.values()),
+        "ok": bool(pairs) and not any(mismatches_by_weight.values()) and not any(ink_mismatches.values()),
         "control_weights": list(INTER_OUTLINE_AUDIT_WEIGHTS),
         "pairs_checked_per_weight": len(pairs),
         "mismatches_by_weight": mismatches_by_weight,
+        "unencoded_ink_mismatches_by_weight": ink_mismatches,
         "maximum_translation_invariant_residual_by_weight": (
             maximum_residual_by_weight
         ),
@@ -5588,13 +5828,55 @@ def load_base(region: str, italic: bool, inter_unicodes: set[int]) -> tuple[TTFo
 def load_inter(italic: bool) -> TTFont:
     path = INTER_ITALIC if italic else INTER_UPRIGHT
     inter = TTFont(path)
+    original_positioning = capture_original_inter_positioning(inter)
     inter = instantiateVariableFont(inter, INTER_AXIS_LIMIT, inplace=False, optimize=True)
+    inter._sarasa_original_gpos_variations = original_positioning
     scale_inter_upem(inter)
     apply_inter_ui_recipe(inter)
     # Instancing and scale_upem round the default and every delta. Variable
     # controls follow the original curve; the rounded copy is only the default.
     inter._sarasa_exact_source = path
     return inter
+
+
+def capture_original_inter_positioning(inter: TTFont) -> tuple[Any, list[Any], dict[float, float], int] | None:
+    """Inter's positioning variations as shipped, before the axis is limited.
+
+    Limiting wght to 200-900 re-rounds every delta in 2048 units and
+    renumbers the store, so a curve sampled from the limited copy is not the
+    original below 400: at 200, 51 of 479 kerned letter pairs came out one
+    unit off the original curve rounded once. Each device keeps its original
+    variation index through the instancer's copy.
+    """
+    store = getattr(inter["GDEF"].table, "VarStore", None) if "GDEF" in inter and "GPOS" in inter else None
+    if store is None:
+        return None
+    for device in collect_ot_variation_devices(inter["GPOS"].table):
+        device._sarasa_original_varidx = (device.StartSize << 16) | device.EndSize
+    segments = dict(inter["avar"].segments.get("wght", {})) if "avar" in inter else {}
+    return copy.deepcopy(store), copy.deepcopy(inter["fvar"].axes), segments, int(inter["head"].unitsPerEm)
+
+
+def original_inter_instancers(inter: TTFont, weights: list[float]) -> list[Any] | None:
+    """Instancers of the original Inter store at each public weight (opsz at its default)."""
+    original = getattr(inter, "_sarasa_original_gpos_variations", None)
+    if original is None:
+        return None
+    store, axes, segments, _upem = original
+    instancers = []
+    for weight in weights:
+        location = {}
+        for axis in axes:
+            if axis.axisTag == "wght":
+                value = normalizeValue(weight, (axis.minValue, axis.defaultValue, axis.maxValue))
+                location["wght"] = piecewiseLinearMap(value, segments) if segments else value
+            else:
+                fixed = INTER_AXIS_LIMIT.get(axis.axisTag, axis.defaultValue)
+                if isinstance(fixed, tuple):
+                    raise ValueError(f"Inter 原始定位曲线只能固定 {axis.axisTag}")
+                location[axis.axisTag] = normalizeValue(fixed, (axis.minValue, axis.defaultValue, axis.maxValue))
+        instancers.append(VarStoreInstancer(store, axes, location))
+    return instancers
 
 
 def scale_inter_upem(inter: TTFont) -> None:
@@ -5706,6 +5988,37 @@ def bake_inter_ui_tnum_defaults(font: TTFont) -> int:
                 cmap_table.cmap[codepoint] = target
                 touched += 1
     return touched
+
+
+def adopt_reference_notdef(base: TTFont, reference: TTFont) -> dict[str, int]:
+    """Give the VF the static release's .notdef: Inter's 656-unit box.
+
+    The VF is built on Source Han, whose GID 0 is a 1000-unit box. Every
+    missing character (U+0149, U+01C4) took 344 units more in the VF than in
+    the static of the same weight up to v1.0.43.1. Sarasa's own .notdef is
+    Inter's and does not vary with weight, so one outline serves the axis.
+    """
+    source = reference["glyf"][".notdef"]
+    source.expand(reference["glyf"])
+    if source.isComposite():
+        raise ValueError("参考字体的 .notdef 不能是复合字形")
+    glyph = copy.deepcopy(source)
+    # The reference may be the hinted release; the VF has no glyph programs.
+    glyph.program = Program()
+    glyph.program.fromBytecode(b"")
+    base["glyf"].glyphs[".notdef"] = glyph
+    glyph.recalcBounds(base["glyf"])
+    advance, lsb = reference["hmtx"].metrics[".notdef"]
+    if lsb != glyph.xMin:
+        raise ValueError(f"参考字体 .notdef 的 lsb {lsb} 不等于 xMin {glyph.xMin}")
+    base["hmtx"].metrics[".notdef"] = (advance, lsb)
+    if "vmtx" in base:
+        if "vmtx" not in reference:
+            raise ValueError("参考字体缺少 vmtx，不能确定 .notdef 的竖排度量")
+        base["vmtx"].metrics[".notdef"] = tuple(reference["vmtx"].metrics[".notdef"])
+    if "gvar" in base:
+        base["gvar"].variations.pop(".notdef", None)
+    return {"notdef_advance": int(advance), "notdef_contours": int(glyph.numberOfContours)}
 
 
 def append_inter_glyphs(base: TTFont, inter: TTFont, allowed_unicodes: set[int]) -> dict[str, Any]:
@@ -5982,6 +6295,17 @@ def import_inter_gpos_variations(base: TTFont, inter: TTFont) -> dict[int, int]:
     # Sample the store before scale_upem rounded each delta to 1000 UPM.
     master_store, scale = getattr(inter, "_sarasa_unscaled_gpos_store", None) or (store, 1.0)
     instancers = [VarStoreInstancer(master_store, inter["fvar"].axes, {"wght": vf_mapped_normalized_weight(inter, weight)}) for weight in weights]
+    original_instancers = original_inter_instancers(inter, weights)
+    original_scale = (1000 / inter._sarasa_original_gpos_variations[3]) if original_instancers is not None else scale
+
+    def curve(device: Any, index: int) -> list[float]:
+        # Inter as shipped, not the axis-limited copy whose deltas were
+        # rounded again in 2048 units (one unit off at 200 for 51 of 479
+        # kerned letter pairs).
+        original_index = getattr(device, "_sarasa_original_varidx", None)
+        if original_instancers is not None and original_index is not None:
+            return [instancer[original_index] * original_scale for instancer in original_instancers]
+        return [instancer[index] * scale for instancer in instancers]
     builder = OnlineVarStoreBuilder(["wght"])
     builder.setModel(model)
     remap = {}
@@ -6013,7 +6337,7 @@ def import_inter_gpos_variations(base: TTFont, inter: TTFont) -> dict[int, int]:
             index = (device.StartSize << 16) | device.EndSize
             if index == 0xFFFFFFFF:
                 continue
-            values = [otRound(fraction + instancer[index] * scale) for instancer in instancers]
+            values = [otRound(fraction + delta) for delta in curve(device, index)]
             deltas = [values[master] for master in master_indices]
             if not any(deltas):
                 setattr(anchor, field, None)
@@ -6033,7 +6357,7 @@ def import_inter_gpos_variations(base: TTFont, inter: TTFont) -> dict[int, int]:
         index = (device.StartSize << 16) | device.EndSize
         if index == 0xFFFFFFFF:
             continue
-        values = [otRound(entry[1] + instancer[index] * scale) for instancer in instancers]
+        values = [otRound(entry[1] + delta) for delta in curve(device, index)]
         deltas = [values[master] for master in master_indices]
         if not any(deltas):
             setattr(record, device_field, None)
@@ -10654,6 +10978,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
             )
         log_step(f"variable {style_label}: merge outlines and layout")
         merge_report = append_inter_glyphs(base, inter, unicodes)
+        merge_report.update(adopt_reference_notdef(base, reference_fonts[400]))
         remove_metric_variation_maps(base)
         feature_drop_report = drop_sarasa_width_features(base)
         locl_report = prune_locl_like_reference(base, region)
@@ -10703,7 +11028,7 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
         empty_feature_report = ensure_empty_gsub_features(base, empty_gsub_features_for_style(italic))
         layout_template_report = align_variable_layout_to_reference(base, reference)
         gdef_report = rebuild_gdef_from_reference(base, reference)
-        vorg_report = rebuild_vorg_from_reference(base, reference)
+        vorg_report = rebuild_vorg_from_reference(base, reference, same_pipeline=False)
         metadata_report = sync_sarasa_metadata_from_reference(base, reference)
     finally:
         for reference_font in reference_fonts.values():
@@ -10894,6 +11219,11 @@ def build_one_variable(region: str, italic: bool) -> dict[str, Any]:
     vorgless_report.update(align_source_punctuation_advances(base, region))
     vorgless_report.update(align_inter_attachment_origins(base, italic))
     vorgless_report.update(align_tabular_alternate_advances(base))
+    position_inter = load_inter(italic)
+    try:
+        vorgless_report.update(align_unencoded_inter_ink(base, position_inter))
+    finally:
+        position_inter.close()
     vorgless_report.update(sync_gvar_advances_to_hvar(base))
     log_step(f"variable {style_label}: materialize and validate final gvar")
     gvar_finalization_report = materialize_gvar_variations(base)
@@ -11518,16 +11848,34 @@ def npm_dependency_snapshot(root: Path) -> dict[str, dict[str, str]]:
 
 def ensure_locked_npm_dependencies(lock_sha256: str) -> None:
     root = SARASA_SOURCE_DIR / "node_modules"
-    receipt = BUILD_CACHE_DIR / "npm-verification" / f"{SARASA_COMMIT}-{lock_sha256}.json"
+    node_archive = NODE_ARCHIVE_SHA256[node_platform_archive()]
+    # The record is per Node runtime: a Node upgrade, a cache shared across
+    # platforms or a removed node_modules reinstalls instead of failing on a
+    # record that can never match again.
+    receipt = BUILD_CACHE_DIR / "npm-verification" / f"{SARASA_COMMIT}-{lock_sha256}-{node_archive[:16]}.json"
     expected_identity = {"source_commit": SARASA_COMMIT, "lock_sha256": lock_sha256,
-                         "node_archive_sha256": NODE_ARCHIVE_SHA256[node_platform_archive()]}
+                         "node_archive_sha256": node_archive}
+    legacy = BUILD_CACHE_DIR / "npm-verification" / f"{SARASA_COMMIT}-{lock_sha256}.json"
+    if not receipt.is_file() and legacy.is_file():
+        # A record from before the per-runtime name still attests the tree
+        # when its identity and every file match.
+        try:
+            recorded = json.loads(legacy.read_text(encoding="utf-8"))
+        except ValueError:
+            recorded = {}
+        if (recorded.get("identity") == expected_identity and recorded.get("files")
+                and npm_dependency_snapshot(root) == recorded["files"]):
+            write_json_atomic(receipt, recorded)
+            return
     if receipt.is_file():
-        recorded = json.loads(receipt.read_text(encoding="utf-8"))
-        if recorded.get("identity") != expected_identity or not recorded.get("files"):
-            raise RuntimeError("npm 校验记录与固定来源不一致")
-        if npm_dependency_snapshot(root) != recorded["files"]:
-            raise RuntimeError("node_modules 内容已改变，拒绝复用未通过校验的依赖")
-        return
+        try:
+            recorded = json.loads(receipt.read_text(encoding="utf-8"))
+        except ValueError:
+            recorded = {}
+        if (recorded.get("identity") == expected_identity and recorded.get("files")
+                and npm_dependency_snapshot(root) == recorded["files"]):
+            return
+        log_step("node_modules 与 npm 校验记录不符（Node、依赖或文件已变）：重新执行 npm ci 并重写记录")
     # npm ci checks every package's lockfile integrity; the pinned Node archive
     # supplies npm. No dependency in this lock has an install script, and the
     # project's script only checks executable presence, handled explicitly here.
@@ -11576,8 +11924,12 @@ def verify_git_source_bytes(directory: Path, expected_commit: str) -> dict[str, 
     if len(hashes) != len(records):
         raise RuntimeError("上游源码内容校验覆盖不完整")
     changed = [name.decode("utf-8") for (name, expected), actual in zip(records, hashes) if expected != actual]
-    if changed or git("ls-files", "--others", "--exclude-standard", "-z"):
-        raise RuntimeError(f"上游源码字节与固定提交不符或含额外文件：{changed[:8]}")
+    # Ignored files are extra files too (--exclude-standard hid them); only
+    # node_modules, verified file by file against its own record, may exist.
+    extra = [item.decode("utf-8") for item in git("ls-files", "--others", "--directory", "-z").split(b"\0")
+             if item and item != b"node_modules/"]
+    if changed or extra:
+        raise RuntimeError(f"上游源码字节与固定提交不符或含额外文件：{(changed + extra)[:8]}")
     git("diff-index", "--cached", "--quiet", "HEAD", "--")
     return {"commit": expected_commit, "tracked_files_verified": len(records), "raw_git_object_bytes": True}
 
@@ -11645,9 +11997,21 @@ def ensure_sarasa_source_tree() -> None:
                     verify_or_write_source(SARASA_SOURCE_DIR / relative, archive.read(member))
 
     ensure_locked_npm_dependencies(lock_sha256)
+def reject_retired_switches() -> None:
+    """Switches that once bypassed verification are refused, not ignored.
+
+    SARASA_SKIP_SOURCE_BOOTSTRAP skipped every source check while the fonts
+    still received validation records; SARASA_SKIP_PYTHON_DEPS skipped the
+    lockfile and RECORD checks. Unhinted products have their own entry.
+    """
+    for name in ("SARASA_SKIP_SOURCE_BOOTSTRAP", "SARASA_SKIP_PYTHON_DEPS", "SARASA_SKIP_TTFAUTOHINT",
+                 "SARASA_SKIP_CHLOROPHYTUM"):
+        if os.environ.get(name, "0") not in ("", "0"):
+            raise RuntimeError(f"{name} 已停用：构建不能跳过来源、依赖或 hint 的核验；无 hint 成品请使用 --unhinted-only")
+
+
 def ensure_build_sources(static_only: bool, regions: list[str], *, full_hint_group: bool = True) -> None:
-    if os.environ.get("SARASA_SKIP_SOURCE_BOOTSTRAP") == "1":
-        return
+    reject_retired_switches()
     ensure_reference_sarasa(regions)
     ensure_sarasa_source_tree()
     # Even a single-region hinted build analyzes the same full hint group.
@@ -11657,17 +12021,23 @@ def ensure_build_sources(static_only: bool, regions: list[str], *, full_hint_gro
 
 
 def selected_ttfautohint() -> tuple[Path, str]:
+    """The locked ttfautohint-py executable, or an explicit TTFAUTOHINT override.
+
+    A ttfautohint on PATH is never picked up silently: it used to win over the
+    locked package, so the same commit could hint differently per machine.
+    An override is recorded by digest and version in the cache keys and the
+    build report.
+    """
     requested = os.environ.get("TTFAUTOHINT")
-    executable = requested or shutil.which("ttfautohint")
-    if executable:
-        path = Path(shutil.which(executable) or executable).resolve()
+    if requested:
+        path = Path(shutil.which(requested) or requested).resolve()
         if not path.is_file():
             raise FileNotFoundError(f"指定的 ttfautohint 不存在：{path}")
         return path, "external"
     try:
         import ttfautohint
     except ImportError:
-        raise FileNotFoundError("ttfautohint executable or Python module is required")
+        raise FileNotFoundError("缺少锁定的 ttfautohint-py；也可用 TTFAUTOHINT 明确指定执行文件")
     return Path(ttfautohint._executable_path()).resolve(), "ttfautohint-py"
 
 
@@ -11738,10 +12108,20 @@ def static_hint_recipe_fingerprint(weight_name: str | None = None) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+# Chlorophytum runs on Node, so another runtime is another tool. The hint
+# group caches made before Node entered this identity all came from this
+# pinned runtime (re-hinting the full group takes about 11 hours); for it the
+# identity keeps that earlier form, any other version or archive is part of it.
+HINT_CACHE_NODE_BASELINE = ("v26.12.1", "b3efd5c70cba3308ed46e7e699a9b8aac075bbc6b027fcb39c84c31acc25e2b4")
+
+
 def chlorophytum_package_id() -> dict[str, Any]:
     package_dir = SARASA_SOURCE_DIR / "node_modules" / "@chlorophytum" / "cli"
     package_json = package_dir / "package.json"
+    runtime = (NODE_VERSION, NODE_ARCHIVE_SHA256[node_platform_archive()])
+    node = {} if runtime == HINT_CACHE_NODE_BASELINE else {"node": runtime[0], "node_archive_sha256": runtime[1]}
     return {
+        **node,
         "startup": optional_file_sha256(SARASA_CHLOROPHYTUM),
         "package": optional_file_sha256(package_json),
         "locked_dependency_files": hashlib.sha256(json.dumps(
@@ -12127,6 +12507,10 @@ def write_json_atomic(path: Path, value: Any) -> None:
 def require_chlorophytum() -> None:
     if os.environ.get("SARASA_SKIP_CHLOROPHYTUM") == "1":
         raise RuntimeError("hinted 构建不能跳过 Chlorophytum；无 hint 成品请使用 --unhinted-only")
+    # Only the copy npm ci installed from the pinned lock is verified.
+    modules = (SARASA_SOURCE_DIR / "node_modules").resolve()
+    if not SARASA_CHLOROPHYTUM.resolve().is_relative_to(modules):
+        raise RuntimeError("SARASA_CHLOROPHYTUM 必须指向已核验的 node_modules 中的 Chlorophytum")
     if not SARASA_CHLOROPHYTUM.is_file():
         raise FileNotFoundError("缺少 Chlorophytum，不能生成完整 hinted 字体")
 
@@ -13016,7 +13400,26 @@ def output_validation_contract(hinted: bool) -> dict[str, Any]:
             "ttfautohint": ttfautohint_identity() if hinted else None}
 
 
-def record_verified_output(path: Path, region: str, italic: bool, weight_name: str | None = None, hinted: bool = False) -> None:
+def record_verified_output(path: Path, region: str, italic: bool, weight_name: str | None = None, hinted: bool = False,
+                           *, refreshed_by: str | None = None, refreshed_from: Path | None = None) -> None:
+    """Attest the output's bytes under the current contract, saying what made them.
+
+    A refresh entry transforms bytes an earlier contract attested and signs
+    the result under the current one; its record keeps the record it started
+    from, so a later --resume-* and the build report can tell such bytes
+    from a full build of the current code.
+    """
+    record_path = output_validation_record_path(path)
+    if refreshed_by is None:
+        provenance: dict[str, Any] = {"entry": "build"}
+        if hinted:
+            provenance["chlorophytum"] = chlorophytum_package_id()
+    else:
+        try:
+            previous = json.loads(output_validation_record_path(refreshed_from or path).read_text(encoding="utf-8"))
+        except (OSError, ValueError) as error:
+            raise ValueError(f"刷新入口找不到原有校验记录：{path.name}") from error
+        provenance = {"entry": refreshed_by, "source_record": previous}
     with TTFont(path, recalcTimestamp=False) as font:
         identity = output_identity_status(font, region, italic, weight_name, hinted)
         layout = contextual_case_structure_status(font)
@@ -13027,10 +13430,29 @@ def record_verified_output(path: Path, region: str, italic: bool, weight_name: s
         execution = native_hint_execution_status(path, full_ppems=())
         if not execution["ok"]:
             raise RuntimeError(f"不能记录指令执行失败的增量成品：{path.name}；{execution}")
-    write_json_atomic(output_validation_record_path(path), {
+    write_json_atomic(record_path, {
         "file": path.name, "region": region, "italic": italic, "weight": weight_name,
         "hinted": hinted, "sha256": file_sha256(path), "contract": output_validation_contract(hinted),
+        "provenance": provenance,
     })
+
+
+def output_record_provenance(path: Path) -> dict[str, Any]:
+    """What produced an output's bytes, from its record: the build, or a chain of refreshes."""
+    try:
+        record = json.loads(output_validation_record_path(path).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {"entry": "unrecorded"}
+    chain = []
+    while isinstance(record, dict):
+        provenance = record.get("provenance") or {"entry": "unrecorded (record predates provenance)"}
+        contract = record.get("contract") or {}
+        chain.append({"entry": provenance.get("entry"), "builder_sha256": contract.get("builder_sha256"),
+                      **({"chlorophytum": provenance["chlorophytum"]} if "chlorophytum" in provenance else {}),
+                      **({"ttfautohint": contract["ttfautohint"]} if contract.get("ttfautohint") else {})})
+        record = provenance.get("source_record")
+    return {"entry": chain[0]["entry"], "chain": chain,
+            "built_by_current_code": chain[0]["entry"] == "build"}
 
 
 def verified_output_record_status(path: Path, region: str, italic: bool, weight_name: str | None = None, hinted: bool = False) -> tuple[bool, str]:
@@ -13043,7 +13465,9 @@ def verified_output_record_status(path: Path, region: str, italic: bool, weight_
         return False, "invalid validated output record"
     expected = {"file": path.name, "region": region, "italic": italic, "weight": weight_name,
                 "hinted": hinted, "sha256": file_sha256(path), "contract": output_validation_contract(hinted)}
-    return (True, "") if record == expected else (False, "output bytes, style or build/tool contract changed")
+    # The provenance says what made the bytes; it is reported, not compared.
+    attested = {key: value for key, value in record.items() if key != "provenance"}
+    return (True, "") if attested == expected else (False, "output bytes, style or build/tool contract changed")
 
 
 def require_validated_input(path: Path, region: str, italic: bool,
@@ -13356,7 +13780,7 @@ def refresh_static_finalization_font(
                 + "; ".join(layout_after["reasons"])
             )
         tmp_path.replace(path)
-        record_verified_output(path, region, italic, weight_name, hinted)
+        record_verified_output(path, region, italic, weight_name, hinted, refreshed_by="refresh-static-finalization")
     except Exception:
         tmp_path.unlink(missing_ok=True)
         raise
@@ -13621,6 +14045,11 @@ def _refresh_variable_finalization_outputs(regions: list[str], italic_styles: tu
                     for reference in references.values():
                         reference.close()
                 report.update(align_source_punctuation_advances(font, region))
+                position_inter = load_inter(italic)
+                try:
+                    report.update(align_unencoded_inter_ink(font, position_inter))
+                finally:
+                    position_inter.close()
                 report.update(sync_gvar_advances_to_hvar(font))
                 update_vf_names(font, region, italic)
                 update_os2_sarasa_metadata(font, region)
@@ -13641,10 +14070,19 @@ def _refresh_variable_finalization_outputs(regions: list[str], italic_styles: tu
                 if sfnt_table_hashes(pending, allowed) != before:
                     raise RuntimeError("VF 最终化改变了受保护的轮廓、定位或度量表")
                 pending.replace(path)
-                record_verified_output(path, region, italic)
+                # The refresh rewrites gvar, HVAR and the metric tables, so its
+                # record attests what a build's does: the full final validation.
+                # Signed after the light checks alone, the first v1.0.43.2
+                # refresh passed six VFs whose υ sat 1.1 units off the static.
+                validated, validation = variable_output_resume_status(region, italic, verify_record=False)
+                if not validated:
+                    raise RuntimeError(f"刷新后的 VF 未通过完整核验：{path.name}；"
+                                       + "; ".join(validation.get("resume_rebuild_reasons", [])))
+                record_verified_output(path, region, italic, refreshed_by="refresh-variable-finalization")
             finally:
                 pending.unlink(missing_ok=True)
-            outputs.append({"file": portable_report_path(path), "region": region, "italic": italic, "protected_tables": sorted(before), **report})
+            outputs.append({"file": portable_report_path(path), "region": region, "italic": italic, "protected_tables": sorted(before),
+                            "final_validation": validation, **report})
     return outputs
 
 
@@ -13760,7 +14198,7 @@ def refresh_layout_outputs(regions: list[str]) -> dict[str, Any]:
                     if not status["ok"]:
                         raise RuntimeError(f"连续竖排连接没有通过运行时校验：{original_path.name}；{status['samples'][:2]}")
                 pending.replace(path)
-                record_verified_output(path, region, italic, weight, hinted)
+                record_verified_output(path, region, italic, weight, hinted, refreshed_by="refresh-layout")
                 updated[portable_report_path(path)] = {
                     **details, "layout_only_refresh": True, "hint_rerun": False,
                     "previous_sha256": verified[original_path], "sha256": file_sha256(path),
@@ -13783,6 +14221,211 @@ def refresh_layout_outputs(regions: list[str]) -> dict[str, Any]:
     return report
 
 
+def source_han_hangul_ccmp_guards(source: TTFont) -> list[tuple[int, int, tuple[int, ...]]]:
+    """Source Han's ccmp guards as (L, V, trailing consonants) codepoints.
+
+    Source Han's ccmp ligates old-Hangul L+V pairs, and before each such
+    rule it has a chained rule with no substitution that leaves the pair
+    alone when a trailing consonant (T jamo) follows, so ljmo/vjmo/tjmo can
+    compose the whole syllable.
+    """
+    if "GSUB" not in source:
+        return []
+    gsub = source["GSUB"].table
+    reverse: dict[str, int] = {}
+    for codepoint, name in sorted(source.getBestCmap().items()):
+        reverse.setdefault(name, codepoint)
+    indices = sorted({index for record in gsub.FeatureList.FeatureRecord if record.FeatureTag == "ccmp"
+                      for index in record.Feature.LookupListIndex})
+    guards = []
+    for index in indices:
+        lookup = gsub.LookupList.Lookup[index]
+        for subtable in lookup.SubTable:
+            part = getattr(subtable, "ExtSubTable", subtable)
+            if (getattr(part, "LookupType", lookup.LookupType) != 6 or part.Format != 3 or part.SubstLookupRecord
+                    or part.BacktrackGlyphCount or part.InputGlyphCount != 2 or part.LookAheadGlyphCount != 1):
+                continue
+            inputs = [coverage.glyphs for coverage in part.InputCoverage]
+            following = part.LookAheadCoverage[0].glyphs
+            if any(len(glyphs) != 1 for glyphs in inputs):
+                continue
+            codepoints = [reverse.get(glyphs[0]) for glyphs in inputs]
+            trailing = sorted(reverse[name] for name in following if name in reverse)
+            if (None in codepoints or len(trailing) != len(following)
+                    or not all(0x1100 <= cp <= 0x115F or 0xA960 <= cp <= 0xA97F for cp in codepoints[:1])
+                    or not all(0x1160 <= cp <= 0x11A7 or 0xD7B0 <= cp <= 0xD7C6 for cp in codepoints[1:])
+                    or not all(0x11A8 <= cp <= 0x11FF or 0xD7CB <= cp <= 0xD7FB for cp in trailing)):
+                continue
+            guards.append((codepoints[0], codepoints[1], tuple(trailing)))
+    return guards
+
+
+def context_rule_substitutes(part: Any, first: str, second: str) -> bool:
+    """Whether a context or chained context subtable substitutes exactly first+second,
+    with no backtrack or lookahead."""
+    if part.Format == 3:
+        coverages = part.InputCoverage if hasattr(part, "InputCoverage") else part.Coverage
+        return (len(coverages) == 2 and first in coverages[0].glyphs and second in coverages[1].glyphs
+                and not getattr(part, "BacktrackGlyphCount", 0) and not getattr(part, "LookAheadGlyphCount", 0)
+                and bool(part.SubstLookupRecord))
+    if first not in part.Coverage.glyphs:
+        return False
+    if part.Format == 2:
+        chained = hasattr(part, "ChainSubClassSet")
+        class_def = part.InputClassDef if chained else part.ClassDef
+        classes = class_def.classDefs if class_def else {}
+        sets = (part.ChainSubClassSet if chained else part.SubClassSet) or []
+        index = classes.get(first, 0)
+        rule_set = sets[index] if index < len(sets) else None
+        rules = (rule_set.ChainSubClassRule if chained else rule_set.SubClassRule) if rule_set else []
+        wanted = [classes.get(second, 0)]
+        return any(list(rule.Input if chained else rule.Class) == wanted and rule.SubstLookupRecord
+                   and not getattr(rule, "Backtrack", None) and not getattr(rule, "LookAhead", None)
+                   for rule in rules or [])
+    if part.Format == 1:
+        chained = hasattr(part, "ChainSubRuleSet")
+        sets = (part.ChainSubRuleSet if chained else part.SubRuleSet) or []
+        position = part.Coverage.glyphs.index(first)
+        rule_set = sets[position] if position < len(sets) else None
+        rules = (rule_set.ChainSubRule if chained else rule_set.SubRule) if rule_set else []
+        return any(list(rule.Input) == [second] and rule.SubstLookupRecord
+                   and not getattr(rule, "Backtrack", None) and not getattr(rule, "LookAhead", None)
+                   for rule in rules or [])
+    return False
+
+
+def chained_context_subtable(part: Any) -> Any:
+    """The same rules as a chained context subtable (lookup type 6)."""
+    if hasattr(part, "BacktrackGlyphCount") or hasattr(part, "ChainSubClassSet") or hasattr(part, "ChainSubRuleSet"):
+        return part
+    chained = ot.ChainContextSubst()
+    chained.Format = part.Format
+    if part.Format == 3:
+        chained.BacktrackGlyphCount, chained.BacktrackCoverage = 0, []
+        chained.InputGlyphCount, chained.InputCoverage = len(part.Coverage), list(part.Coverage)
+        chained.LookAheadGlyphCount, chained.LookAheadCoverage = 0, []
+        chained.SubstCount, chained.SubstLookupRecord = len(part.SubstLookupRecord), list(part.SubstLookupRecord)
+        return chained
+    chained.Coverage = part.Coverage
+    if part.Format == 2:
+        empty = ot.ClassDef(); empty.classDefs = {}
+        chained.BacktrackClassDef, chained.InputClassDef = empty, part.ClassDef
+        chained.LookAheadClassDef = copy.deepcopy(empty)
+        chained.ChainSubClassSet = []
+        for rule_set in part.SubClassSet:
+            if rule_set is None:
+                chained.ChainSubClassSet.append(None)
+                continue
+            target = ot.ChainSubClassSet(); target.ChainSubClassRule = []
+            for rule in rule_set.SubClassRule:
+                item = ot.ChainSubClassRule()
+                item.BacktrackGlyphCount, item.Backtrack = 0, []
+                item.InputGlyphCount, item.Input = rule.GlyphCount, list(rule.Class)
+                item.LookAheadGlyphCount, item.LookAhead = 0, []
+                item.SubstCount, item.SubstLookupRecord = rule.SubstCount, list(rule.SubstLookupRecord)
+                target.ChainSubClassRule.append(item)
+            target.ChainSubClassRuleCount = len(target.ChainSubClassRule)
+            chained.ChainSubClassSet.append(target)
+        chained.ChainSubClassSetCount = len(chained.ChainSubClassSet)
+        return chained
+    chained.ChainSubRuleSet = []
+    for rule_set in part.SubRuleSet:
+        if rule_set is None:
+            chained.ChainSubRuleSet.append(None)
+            continue
+        target = ot.ChainSubRuleSet(); target.ChainSubRule = []
+        for rule in rule_set.SubRule:
+            item = ot.ChainSubRule()
+            item.BacktrackGlyphCount, item.Backtrack = 0, []
+            item.InputGlyphCount, item.Input = rule.GlyphCount, list(rule.Input)
+            item.LookAheadGlyphCount, item.LookAhead = 0, []
+            item.SubstCount, item.SubstLookupRecord = rule.SubstCount, list(rule.SubstLookupRecord)
+            target.ChainSubRule.append(item)
+        target.ChainSubRuleCount = len(target.ChainSubRule)
+        chained.ChainSubRuleSet.append(target)
+    chained.ChainSubRuleSetCount = len(chained.ChainSubRuleSet)
+    return chained
+
+
+def restore_source_han_hangul_ccmp_guards(font: TTFont, source: TTFont) -> dict[str, int]:
+    """Put Source Han's old-Hangul ccmp guards back into a native static font.
+
+    Sarasa's static pipeline rewrites Source Han's ccmp lookup as a plain
+    context lookup and loses the 134 guards: U+1100 U+1188 U+11A8 split into
+    two cells in Sarasa Ui and in the static release up to v1.0.43.1 (366
+    L·V·T samples per region), while Source Han and the VF compose one.
+    The guards go in front of the lookup's own rules, mapped through cmap.
+    """
+    guards = source_han_hangul_ccmp_guards(source)
+    if not guards:
+        raise ValueError("固定 Source Han 静态来源中没有古韩文 ccmp 保护规则")
+    cmap = font.getBestCmap()
+    mapped = [(cmap.get(first), cmap.get(second), sorted({cmap[cp] for cp in trailing if cp in cmap}, key=font.getGlyphID))
+              for first, second, trailing in guards]
+    mapped = [(first, second, trailing) for first, second, trailing in mapped if first and second and trailing]
+    if not mapped:
+        return {"hangul_ccmp_guards_restored": 0, "hangul_ccmp_guard_pairs": 0}
+    gsub = font["GSUB"].table
+    candidates = sorted({index for record in gsub.FeatureList.FeatureRecord if record.FeatureTag == "ccmp"
+                         for index in record.Feature.LookupListIndex})
+    owners = []
+    for index in candidates:
+        lookup = gsub.LookupList.Lookup[index]
+        if lookup.LookupType not in (5, 6):
+            continue
+        if all(any(context_rule_substitutes(part, first, second) for part in lookup.SubTable) for first, second, _t in mapped):
+            owners.append(index)
+    if len(owners) != 1:
+        raise ValueError(f"静态字体中承载古韩文 L+V 连字的 ccmp lookup 不唯一：{owners}")
+    lookup = gsub.LookupList.Lookup[owners[0]]
+    existing = {(part.InputCoverage[0].glyphs[0], part.InputCoverage[1].glyphs[0])
+                for part in lookup.SubTable if lookup.LookupType == 6 and part.Format == 3 and not part.SubstLookupRecord
+                and part.InputGlyphCount == 2 and part.LookAheadGlyphCount == 1}
+    restored = []
+    for first, second, trailing in mapped:
+        if (first, second) in existing:
+            continue
+        guard = ot.ChainContextSubst()
+        guard.Format = 3
+        guard.BacktrackGlyphCount, guard.BacktrackCoverage = 0, []
+        guard.InputGlyphCount = 2
+        guard.InputCoverage = []
+        for name in (first, second):
+            coverage = ot.Coverage(); coverage.glyphs = [name]
+            guard.InputCoverage.append(coverage)
+        following = ot.Coverage(); following.glyphs = list(trailing)
+        guard.LookAheadGlyphCount, guard.LookAheadCoverage = 1, [following]
+        guard.SubstCount, guard.SubstLookupRecord = 0, []
+        restored.append(guard)
+    lookup.SubTable = restored + [chained_context_subtable(part) for part in lookup.SubTable]
+    lookup.SubTableCount = len(lookup.SubTable)
+    lookup.LookupType = 6
+    return {"hangul_ccmp_guards_restored": len(restored), "hangul_ccmp_guard_pairs": len(mapped)}
+
+
+def hangul_ccmp_guard_runtime_status(path: Path, source_path: Path) -> dict[str, Any]:
+    """Each guarded L+V composes like Source Han, with and without a trailing consonant."""
+    with TTFont(source_path, lazy=True) as source:
+        guards = source_han_hangul_ccmp_guards(source)
+    faces = [hb.Font(hb.Face(Path(item).read_bytes())) for item in (path, source_path)]
+    cases = failures = 0
+    samples: list[dict[str, Any]] = []
+    for first, second, trailing in guards:
+        for text in (chr(first) + chr(second), chr(first) + chr(second) + chr(trailing[0]),
+                     chr(first) + chr(second) + chr(trailing[-1])):
+            counts = []
+            for face in faces:
+                buffer = hb.Buffer(); buffer.add_str(text); buffer.guess_segment_properties(); buffer.language = "ko"
+                hb.shape(face, buffer, {})
+                counts.append(len(buffer.glyph_infos))
+            cases += 1
+            if counts[0] != counts[1]:
+                failures += 1
+                if len(samples) < 16:
+                    samples.append({"text": " ".join(f"U+{ord(char):04X}" for char in text), "glyphs": counts[0], "source_glyphs": counts[1]})
+    return {"ok": bool(guards) and not failures, "cases": cases, "failures": failures, "samples": samples}
+
+
 def postprocess_static_font(
     path: Path,
     region: str,
@@ -13791,6 +14434,7 @@ def postprocess_static_font(
     italic: bool,
     hinted: bool,
     dash_source_path: Path,
+    hangul_source_path: Path,
 ) -> dict[str, Any]:
     font = TTFont(path, recalcBBoxes=False, recalcTimestamp=False)
     font.recalcBBoxes = False
@@ -13853,7 +14497,7 @@ def postprocess_static_font(
                     )
                 report.update(rebuild_gdef_from_reference(font, reference))
                 if uses_official_glyph_baseline:
-                    report.update(rebuild_vorg_from_reference(font, reference))
+                    report.update(rebuild_vorg_from_reference(font, reference, same_pipeline=True))
                 else:
                     report["extension_source_vorg_preserved"] = True
                 report.update(sync_sarasa_metadata_from_reference(font, reference))
@@ -13970,6 +14614,8 @@ def postprocess_static_font(
         report.update(remove_mac_name_records(font))
         report.update(normalize_static_vertical_origin(font))
         report.update(apply_default_regional_punctuation(font, region))
+        with TTFont(hangul_source_path, lazy=True, recalcTimestamp=False) as hangul_source:
+            report.update(restore_source_han_hangul_ccmp_guards(font, hangul_source))
         report.update(add_digit_colon_feature(font))
         report.update(recalculate_head_bounds(font))
         report.update(recalculate_derived_vertical_extremes(font, weight_name))
@@ -13983,6 +14629,10 @@ def postprocess_static_font(
         if post_layout_reference is not None:
             post_layout_reference.close()
         font.close()
+    guards = hangul_ccmp_guard_runtime_status(path, hangul_source_path)
+    report["hangul_ccmp_guard_runtime"] = {key: guards[key] for key in ("ok", "cases", "failures")}
+    if not guards["ok"]:
+        raise RuntimeError("静态字体的古韩文 L+V+T 排版与固定 Source Han 不一致：" + repr(guards["samples"][:8]))
     return report
 
 
@@ -14072,6 +14722,7 @@ def prepare_static_style(
                 italic,
                 False,
                 Path(fragments["dash_source_path"]),
+                Path(fragments["western_dash_source_path"]),
             )
             unhinted_report["cache_binding"] = {
                 **cache_binding,
@@ -14333,6 +14984,7 @@ def build_static_weight_group(
             italic,
             True,
             Path(context["fragments"]["dash_source_path"]),
+            Path(context["fragments"]["western_dash_source_path"]),
         )
         shutil.copy2(context["hinted_tmp"], context["hinted_path"])
         record_verified_output(Path(context["hinted_path"]), region, italic, weight_name, True)
@@ -14711,7 +15363,9 @@ CL 的公开 cmap/layout 限于 Sarasa Ui CL 边界。
 37 个数字、空格、标点和运算符默认使用 Inter 比例形态；tnum 恢复 tabular，pnum 不改变默认宽度。
 冒号复用 Inter 的上下文规则，在 tnum 之前执行；1:2、1:、:2 上浮，
 1:a、a:2、a:b 保持原位。tnum 与 zero 可同时启用。
-西里尔、希腊文字的默认语言系统也带这些特性和附加符号定位（上游 Sarasa Ui 在此只有 kern）。{default}
+西里尔、希腊文字的默认语言系统也带这些特性和附加符号定位（上游 Sarasa Ui 在此缺少 tnum、zero、frac 等
+特性，也没有 mark/mkmk 附加符号定位）。{default}
+古韩文 L+V+T 按 Source Han 合成一个音节（上游 Sarasa Ui 的静态字体把其中部分组合拆成两格）。
 破折号、省略号和竖排沿用对应 Source Han/Shanggu 字形，保持
 ccmp → locl → vert/vrt2 顺序。中文双省略号为两个居中 glyph，共 2em；
 中文双连、三连破折号分别为 2em、3em；竖排拆为连续的 1em 片段，墨迹不越出各自 advance。
@@ -14746,10 +15400,21 @@ def canonical_output_path(path: Path) -> Path:
 
 
 def portable_report_path(path: Path) -> str:
-    try:
-        return Path(os.path.relpath(canonical_output_path(path), ROOT)).as_posix()
-    except ValueError:
-        return f"<external>/{path.name}"
+    """A path inside the repository, or under a named root; never ../ beyond it.
+
+    A relative path out of the repository spells the local layout
+    (../../Users/<name>/...), which the portability check rejects only when
+    the finished build writes its report.
+    """
+    resolved = canonical_output_path(path)
+    for base, label in ((ROOT, None), (WORK_ROOT, "<work>"), (BUILD_CACHE_DIR, "<cache>"),
+                        (Path.home(), "~")):
+        try:
+            relative = resolved.relative_to(base.resolve())
+        except ValueError:
+            continue
+        return relative.as_posix() if label is None else f"{label}/{relative.as_posix()}"
+    return f"<external>/{path.name}"
 
 
 def sanitize_report_data(value: Any) -> Any:
@@ -14849,6 +15514,11 @@ def production_intentional_differences() -> list[str]:
 
 def write_reports(build_report: dict[str, Any]) -> None:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
+    # A resumed output reports what made its bytes, not only that it was kept.
+    for field in ("static_outputs", "variable_outputs"):
+        for item in build_report.get(field, []):
+            if isinstance(item, dict) and "file" in item:
+                item["provenance"] = output_record_provenance(ROOT / item["file"])
     declared = {item["file"] for field in ("static_outputs", "variable_outputs") for item in build_report.get(field, [])}
     expected = {f"fonts/variable/{variable_output_name(region, italic)}"
                 for region in REGION_ORDER for italic in (False, True)}
@@ -14863,7 +15533,13 @@ def write_reports(build_report: dict[str, Any]) -> None:
     report = sanitize_report_data(report)
     assert_portable_report_text(json.dumps(report, ensure_ascii=False))
     write_json_atomic(REPORT_DIR / f"Sarasa-Ui-PropDigits-report{suffix}.json", report)
-    font_paths = (sorted(VARIABLE_DIR.glob("*.ttf"))
+    variable_paths = sorted(VARIABLE_DIR.glob("*.ttf"))
+    # A static-only build declares the published VFs whose records are current
+    # (existing_variable_outputs) but stages none; inspect those where they are.
+    staged_names = {path.name for path in variable_paths}
+    variable_paths += sorted(path for path in canonical_output_path(VARIABLE_DIR).glob("*.ttf")
+                             if path.name not in staged_names)
+    font_paths = (variable_paths
                   + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-{VERSION}/*.ttf"))
                   + sorted(STATIC_ROOT.glob(f"SarasaUiPropDigits*-TTF-Unhinted-{VERSION}/*.ttf")))
     inspected = [path for path in font_paths if portable_report_path(path) in declared]
@@ -14879,10 +15555,26 @@ def write_reports(build_report: dict[str, Any]) -> None:
 
 
 def existing_variable_outputs() -> list[dict[str, Any]]:
-    return [
-        {"file": portable_report_path(path), "rebuilt": False}
-        for path in sorted(VARIABLE_DIR.glob("*.ttf"))
-    ]
+    """The published VFs a static-only build leaves in place, if still attested.
+
+    In a build transaction VARIABLE_DIR is the stage, which a static-only or
+    unhinted-only build never fills: listing it left every such report
+    partial. A VF counts only while its record matches the current contract.
+    """
+    published = canonical_output_path(VARIABLE_DIR)
+    outputs = []
+    for region in REGION_ORDER:
+        for italic in (False, True):
+            path = published / variable_output_name(region, italic)
+            if not path.is_file():
+                continue
+            valid, reason = verified_output_record_status(path, region, italic)
+            if not valid:
+                log_step(f"variable {region} {'italic' if italic else 'upright'}: kept out of the report: {reason}")
+                continue
+            outputs.append({"file": portable_report_path(path), "region": region, "italic": italic,
+                            "rebuilt": False, "validation_record_current": True})
+    return outputs
 
 
 def variable_two_em_dash_axis_status(
@@ -15386,6 +16078,7 @@ def variable_output_resume_status(region: str, italic: bool, *, verify_record: b
             reasons.append(
                 "Inter outline controls are not source-aligned: "
                 + repr(inter_controls["mismatches_by_weight"])
+                + "; unencoded ink: " + repr(inter_controls["unencoded_ink_mismatches_by_weight"])
             )
 
         engine_metrics = harfbuzz_named_metric_status(path, region, italic)
@@ -15522,6 +16215,8 @@ def _build_all_in_workspace(
             "fonttools": importlib.metadata.version("fonttools"),
             "uharfbuzz": importlib.metadata.version("uharfbuzz"),
             "ttfautohint_py": importlib.metadata.version("ttfautohint-py"),
+            # The executable actually run (an explicit TTFAUTOHINT override shows here).
+            "ttfautohint": ttfautohint_identity(),
             "py7zr": importlib.metadata.version("py7zr"),
             "afdko": importlib.metadata.version("afdko"),
             "chws_tool": importlib.metadata.version("chws-tool"),
@@ -15811,7 +16506,8 @@ def refresh_version_metadata_outputs(source_version: str) -> dict[str, Any]:
                 item["file"] = portable_report_path(destination)
                 item["head_font_revision"] = FONT_REVISION
                 item["rebuilt"] = False
-                record_verified_output(destination, region, italic, weight, hinted)
+                record_verified_output(destination, region, italic, weight, hinted, refreshed_by="refresh-version",
+                                       refreshed_from=source)
         for region in REGION_ORDER:
             for hinted in (False, True):
                 shutil.copy2(ROOT / "LICENSE", static_dir(region, hinted) / "LICENSE-Sarasa-Gothic.txt")
@@ -15833,7 +16529,7 @@ def main() -> None:
         action="store_true",
         help="只刷新现有静态 TTF 的最终 GSUB、命名、法律信息与 unhinted 栅格表；除明确白名单表外逐表保护，不重新 hint。",
     )
-    parser.add_argument("--refresh-variable-finalization-only", action="store_true", help="刷新现有 VF 的 GSUB、数字等宽、标点宽度、跨引擎度量及四个竖排片段的原生静态控制点；保护 GPOS 等表，并核对 13 点运行时边界与度量。")
+    parser.add_argument("--refresh-variable-finalization-only", action="store_true", help="刷新现有 VF 的 GSUB、数字等宽、标点宽度、跨引擎度量及四个竖排片段的原生静态控制点；GPOS 只允许新增竖排连接所需的定位，原有定位规则与其他非白名单表逐表保护，并核对 13 点运行时边界与度量；写校验记录前跑与构建相同的完整核验。")
     parser.add_argument(
         "--regions",
         default=",".join(REGION_ORDER),
@@ -15855,9 +16551,16 @@ def main() -> None:
         help="与 --resume-static 配合，逗号分隔并强制重建指定静态字重；其他完整字重继续跳过。",
     )
     args = parser.parse_args()
+    if tuple(sys.version_info[:3]) != PINNED_PYTHON:
+        parser.error(f"构建固定使用 Python {'.'.join(map(str, PINNED_PYTHON))}，当前为 {platform.python_version()}")
     force_static_weights = parse_static_weights(args.force_static_weights)
     if force_static_weights and not args.resume_static:
         parser.error("--force-static-weights requires --resume-static")
+    # Options a mode would silently ignore are refused.
+    if (args.static_only or args.unhinted_only) and args.resume_variable:
+        parser.error("--static-only/--unhinted-only 不构建 VF，不能与 --resume-variable 组合")
+    if (args.variable_only or args.unhinted_only) and (args.resume_static or force_static_weights):
+        parser.error("--variable-only/--unhinted-only 只准备 unhinted 参考，不能与 --resume-static 或 --force-static-weights 组合")
     if args.refresh_layout_only:
         if args.refresh_version_from or args.refresh_static_finalization_only or args.refresh_variable_finalization_only or args.resume_static or args.resume_variable or force_static_weights:
             parser.error("布局刷新不能与其他构建模式组合")

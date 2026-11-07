@@ -34,11 +34,13 @@ class PackageReadOnlyTests(unittest.TestCase):
             sums = root / 'SHA256SUMS.txt'; sums.write_bytes(b'existing checksums')
             with patch.object(package, 'release_packages', return_value=[spec]), \
                  patch.object(package, 'validate_release_audits'), \
+                 patch.object(package, 'verify_release_manifest') as verify_manifest, \
                  patch.object(package, 'write_checksums') as write_sums, \
                  patch.object(package, 'write_release_manifest') as write_manifest, \
                  patch.object(sys, 'argv', ['package', '--verify-only', '--output-dir', str(root)]):
                 package.main()
                 write_sums.assert_not_called(); write_manifest.assert_not_called()
+                verify_manifest.assert_called_once()
             self.assertEqual(sums.read_bytes(), b'existing checksums')
 
     def test_visual_observations_must_be_a_list(self):

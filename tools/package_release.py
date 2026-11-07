@@ -311,6 +311,22 @@ def validate_fontbakery_universal(report: dict) -> None:
             item.get("result") != "FAIL" or item.get("counterpart_result") != "FAIL"
             or item.get("check") not in external.APPROVED_UPSTREAM_FAILURES for item in approvals or []):
         raise ValueError("FontBakery 批准的 FAIL 必须在显式清单中，且固定上游同项也是 FAIL")
+    # Each approval names the pinned font it was reproduced on: the product
+    # font's own counterpart (Heavy: Bold), or the release batch for a family
+    # check. Up to v1.0.43.1 every counterpart was null and any FAIL of the
+    # same check in the batch stood in for it.
+    for item in approvals or []:
+        region = item.get("region")
+        if region not in build.REGION_ORDER:
+            raise ValueError("FontBakery 批准记录的地区无效")
+        pairs = {audit.display_path(audit.vf_path(region, italic) if weight is None
+                                    else audit.static_path(region, weight, italic, True)):
+                 audit.display_path(audit.reference_path(region, release_weight, release_italic, True))
+                 for weight, italic, release_weight, release_italic in external.UNIVERSAL_SAMPLES}
+        family = "family:" + ",".join(sorted(set(pairs.values())))
+        wanted = family if item.get("font") is None else pairs.get(item.get("font"))
+        if wanted is None or item.get("counterpart") != wanted:
+            raise ValueError(f"FontBakery 批准记录没有对照对应的固定上游字体：{item.get('check')} {item.get('font')}")
 
 
 def validate_license_documentation(main_report: dict) -> None:
@@ -393,6 +409,33 @@ def validate_release_audits(packages: list[Package]) -> None:
     if environment.get("require_hashes") is not True or environment.get("lockfile_sha256") != package_sha256(ROOT / "requirements-fontbakery.lock"):
         raise ValueError("FontBakery 完整依赖锁或哈希验证不匹配")
     validate_visual_report(reports["visual-audit"], manifest)
+
+
+def verify_release_manifest(packages: list[Package], results: list[dict[str, object]]) -> None:
+    """The archives verified are the ones the release manifest names, byte for byte.
+
+    --verify-only once checked only that each ZIP matched the current files;
+    a published release is the manifest's archives, so their names, sizes and
+    SHA-256 must be the recorded ones, with the same fonts, documents and
+    audit reports behind them.
+    """
+    manifest = json.loads((ROOT / "reports" / "release-packages.json").read_text(encoding="utf-8"))
+    if manifest.get("version") != build.VERSION:
+        raise ValueError(f"发布清单属于 {manifest.get('version')}，不是 {build.VERSION}")
+    recorded = {item["file"]: item for item in manifest.get("packages", [])}
+    actual = {str(item["file"]): item for item in results}
+    differing = sorted(name for name in set(recorded) | set(actual) if recorded.get(name) != actual.get(name))
+    if differing:
+        raise ValueError(f"ZIP 与发布清单记录的名称、大小或 SHA-256 不符：{differing[:4]}")
+    fonts = {source for package in packages for source, _name in package.files if source.suffix.lower() == ".ttf"}
+    if manifest.get("font_sha256") != {build.portable_report_path(source): package_sha256(source) for source in sorted(fonts)}:
+        raise ValueError("字体的 SHA-256 与发布清单不符")
+    if manifest.get("documentation_sha256") != {name: package_sha256(source) for source, name in documentation_files()}:
+        raise ValueError("README、NOTICE 或许可证与发布清单不符")
+    audits = {name: package_sha256(ROOT / "reports" / name) for name in (
+        "release-audit.json", "ots-audit.json", "fontbakery-audit.json", "visual-audit.json")}
+    if manifest.get("audit_report_sha256") != audits:
+        raise ValueError("审计报告与发布清单不符")
 
 
 def write_package(package: Package, output_dir: Path) -> dict[str, object]:
@@ -488,7 +531,8 @@ def main() -> None:
     parser.add_argument(
         "--verify-only",
         action="store_true",
-        help="只核验输出目录中已有的 21 个 ZIP。",
+        help="只核验输出目录中已有的 21 个 ZIP，并逐项对照 reports/release-packages.json；"
+             "复核已发布版本时先用 fetch_release_fonts.py --all-packages --downloads <该目录> 取回。",
     )
     args = parser.parse_args()
     packages = release_packages()
@@ -520,7 +564,8 @@ def main() -> None:
     # file changed while the packages were being compressed.
     validate_release_audits(packages)
     if args.verify_only:
-        print("[package] 全部 ZIP 核验通过；未改写校验和或发布清单。", flush=True)
+        verify_release_manifest(packages, results)
+        print("[package] 全部 ZIP 与发布清单逐项一致；未改写校验和或发布清单。", flush=True)
     else:
         checksums = write_checksums(args.output_dir, results)
         write_release_manifest(packages, results)

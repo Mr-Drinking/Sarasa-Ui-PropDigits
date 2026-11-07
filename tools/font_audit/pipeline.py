@@ -13,7 +13,8 @@ from fontTools.ttLib import TTFont
 from . import contract as c
 from . import geometry, metadata, metrics, native, products, provenance, raster
 from .comparison import Sources
-from .differential import compare_pair, context_texts, default_contexts, paired_contexts, source_sequences
+from .differential import (compare_pair, context_texts, default_contexts, notdef_parity, paired_contexts,
+                           source_sequences, static_contexts)
 from .outlines import compare_outlines
 from .oracles import IDEOGRAPH_RANGES, in_ranges, cjk_weight
 from .gate import SECTIONS, digest, summarize
@@ -87,7 +88,7 @@ def plan(regions=c.REGIONS):
                     regressions = len({font.getGlyphID(font.getBestCmap()[ord(char)]) for char in raster.REGRESSION_TEXT
                                        if ord(char) in font.getBestCmap()})
                     result['hint_execution'][case.key] = (count * 2 + regressions * 193) * len(raster.MODES)
-    contexts, paired = default_contexts(), paired_contexts()
+    contexts, paired, statics = default_contexts(), paired_contexts(), static_contexts()
     for region in regions:
         for italic in (False, True):
             path = c.reference_path(region, 'Regular', italic)
@@ -100,7 +101,7 @@ def plan(regions=c.REGIONS):
                     if all(path.is_file() for path in probes) else ['?'])
             # Each context measures its own probes (Cyrillic and Greek ones only
             # the western repertoire), so cases are counted context by context.
-            texts = {context: context_texts(context, sorted(repertoire), runs) for context in paired}
+            texts = {context: context_texts(context, sorted(repertoire), runs) for context in (*paired, *statics)}
 
             def counted(selection, keep=lambda context: True, sequences=False):
                 return sum(sum(not sequences or len(text) > 1 for text in texts[context])
@@ -122,8 +123,9 @@ def plan(regions=c.REGIONS):
             for weight_name in c.WEIGHTS:
                 for hinted in (False, True):
                     path = c.static_path(region, weight_name, italic, hinted)
-                    result['static_outlines'][c.display_path(path)] = counted(contexts) + (
-                        len(repertoire) if weight_name == 'Heavy' else 0)
+                    # Heavy has no release to compare: its positioning runs the default contexts.
+                    result['static_outlines'][c.display_path(path)] = (counted(contexts) + len(repertoire)
+                                                                        if weight_name == 'Heavy' else counted(statics))
                     result['raster'][c.display_path(path)] = len(repertoire) * len(raster.RASTER_PPEMS)
             if region == 'CL':
                 with TTFont(c.SOURCE_ROOT / 'shanggu-1.028/ShangguSansTC-VF.ttf', lazy=True) as shanggu:
@@ -279,6 +281,7 @@ def shaping_unit(region, italic, weight_name):
     finally:
         source.close()
     spacing = products.spacing_parity(variable, static, weight)
+    notdef = notdef_parity(variable, static, weight=weight)
     groups = {
         'shaping_default': [row for row in measured['contexts'] if row['feature'] == 'default' and row['language'] == 'und'],
         'shaping_languages': [row for row in measured['contexts'] if row['feature'] == 'default' and row['language'] != 'und'],
@@ -302,6 +305,11 @@ def shaping_unit(region, italic, weight_name):
             record['failures'] += spacing['failures']
             samples = samples + spacing['samples']
             record['contextual_spacing'] = {k: v for k, v in spacing.items() if k != 'samples'}
+        if section == 'shaping_default':
+            record['cases'] += notdef['cases']
+            record['failures'] += notdef['failures']
+            samples = samples + notdef['samples']
+            record['notdef'] = {k: v for k, v in notdef.items() if k != 'samples'}
         record['samples'] = samples[:24] if record['failures'] else []
         records[section] = record
     return records
@@ -315,7 +323,23 @@ def metrics_unit(region, italic, weight_name):
 
 def static_outline_unit(case):
     if case.weight == 'Heavy':
-        return native.heavy_sources(case.path, case.region, case.italic)
+        report = native.heavy_sources(case.path, case.region, case.italic)
+        # Its advances and side bearings follow its own sources by the rule
+        # the release applies at the other weights.
+        metrics_report = native.heavy_metrics(case.path, case.region, case.italic)
+        report['cases'] += metrics_report['cases']
+        report['failures'] += metrics_report['failures']
+        report['samples'] = (report['samples'] + metrics_report['samples'])[:24]
+        report['metrics'] = {k: v for k, v in metrics_report.items() if k != 'samples'}
+        # Sarasa's .notdef is the same box at every weight: Heavy must equal
+        # it at each pinned weight, not at Bold alone.
+        rows = [notdef_parity(case.path, c.reference_path(case.region, weight, case.italic, case.hinted))
+                for weight in c.WEIGHTS if weight != 'Heavy']
+        report['cases'] += sum(row['cases'] for row in rows)
+        report['failures'] += sum(row['failures'] for row in rows)
+        report['samples'] = (report['samples'] + [sample for row in rows for sample in row['samples']])[:24]
+        report['notdef'] = {'cases': sum(row['cases'] for row in rows), 'failures': sum(row['failures'] for row in rows)}
+        return report
     reference = c.reference_path(case.region, case.weight, case.italic, case.hinted)
     if not reference.is_file():
         return {'cases': 0, 'failures': 1, 'samples': [{'reason': '缺少固定静态来源'}]}
@@ -323,12 +347,15 @@ def static_outline_unit(case):
     try:
         # Probe sequences come from the release itself; positions from the
         # release as the project routes it (native.project_reference).
-        report = compare_pair(case.path, native.project_reference(reference), outlines=True, explanation=source.explains,
+        report = compare_pair(case.path, native.project_reference(reference, case.region, case.weight), outlines=True,
+                              explanation=source.explains, contexts=static_contexts(),
                               probe_sources=(reference, c.cjk_path(case.region), c.inter_path(case.italic)), sample_limit=12)
     finally:
         source.close()
-    return {'cases': report['cases'], 'failures': report['failures'],
-            'samples': [sample for row in report['contexts'] for sample in row['samples']][:24],
+    notdef = notdef_parity(case.path, reference)
+    return {'cases': report['cases'] + notdef['cases'], 'failures': report['failures'] + notdef['failures'],
+            'samples': ([sample for row in report['contexts'] for sample in row['samples']] + notdef['samples'])[:24],
+            'notdef': {k: v for k, v in notdef.items() if k != 'samples'},
             'codepoints': report['codepoints'], 'sequences': report['sequences'],
             'contexts': [{k: v for k, v in row.items() if k != 'samples'} for row in report['contexts']]}
 
@@ -401,7 +428,10 @@ def run(*, regions=c.REGIONS, selected=None, jobs=None, checkpoint_dir=None, log
     identity_digest = digest(identity)
     full_plan = plan(regions)
     records = {name: [] for name in SECTIONS}
-    executed = set(selected)
+    # A section with no applicable case in this scope (classical_outlines
+    # without CL) is skipped, not executed: the gate rejects an executed
+    # section with an empty plan, after every unit had already run.
+    executed = {name for name in selected if full_plan[name]}
     if 'inventory' in selected:
         for case in fonts(regions):
             records['inventory'].append({'id': case.key, 'cases': 1, 'failures': int(not case.path.is_file()),

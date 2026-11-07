@@ -5,6 +5,7 @@ import io
 import sys
 import tempfile
 import unittest
+from release_fonts import require_release_fonts
 from unittest.mock import patch
 from pathlib import Path
 
@@ -188,8 +189,7 @@ class VerticalSegmentTests(unittest.TestCase):
 
     def test_lazy_variable_store_preservation_compares_records_not_container_identity(self):
         path = contract.vf_path('CL', False)
-        if not path.is_file():
-            self.skipTest('需要已构建的 CL VF 夹具')
+        require_release_fonts(self, path)
         with b.TTFont(path, lazy=True, recalcBBoxes=False, recalcTimestamp=False) as font:
             result = b.install_continuous_vertical_dash_layout(font)
             self.assertTrue(result['existing_layout_variations_preserved'])

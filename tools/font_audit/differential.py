@@ -23,6 +23,15 @@ def western(codepoint: int) -> bool:
     return any(start <= codepoint <= end for start, end in WESTERN_RANGES)
 
 
+# CJK ideographs, as Sarasa's make/helpers/unicode-kind.mjs isIdeograph.
+IDEOGRAPHS = ((0x2E80, 0x2FFF), (0x3192, 0x319F), (0x31C0, 0x31EF), (0x3400, 0x4DBF),
+              (0x4E00, 0x9FFF), (0xF900, 0xFA6F), (0x20000, 0x3FFFF))
+
+
+def ideograph(codepoint: int) -> bool:
+    return any(start <= codepoint <= end for start, end in IDEOGRAPHS)
+
+
 @dataclass(frozen=True)
 class Context:
     script: str | None = None
@@ -30,7 +39,8 @@ class Context:
     direction: str = "ltr"
     feature: str = "default"
     # "western" limits a context to the text a Latin, Cyrillic or Greek
-    # language system actually shapes, instead of all ~45,000 probes.
+    # language system actually shapes, instead of all ~45,000 probes;
+    # "ideographs" to the ideographs an optional CJK feature reaches.
     repertoire: str = "all"
 
     def arguments(self) -> dict:
@@ -39,6 +49,8 @@ class Context:
                 "features": {} if self.feature == "default" else {self.feature: True}}
 
     def admits(self, text: str) -> bool:
+        if self.repertoire == "ideographs":
+            return all(ideograph(ord(char)) for char in text)
         return self.repertoire == "all" or all(western(ord(char)) for char in text)
 
 
@@ -57,17 +69,28 @@ RUNS = (
     # marks exercise mark/mkmk and the soft-dotted rules per language.
     "->", "<-", "<->", "=>", "<=>", "-->",
     "\u0438\u0301", "\u0456\u0301", "\u0457\u0301", "\u0430\u0300\u0301", "\u0393\u0301", "\u03c9\u0342",
+    # Old Hangul L+V pairs Source Han's ccmp ligates unless a trailing
+    # consonant follows (Sarasa Ui's static drops that guard and splits
+    # U+1100 U+1188 U+11A8 into two cells); with and without the T jamo.
+    "\u1100\u1188", "\u1100\u1188\u11a8", "\u1100\u1188\u11f0", "\u1100\u1188\ud7cb",
+    "\u112d\u119e\u11a8", "\u1132\u119e\u11f0", "\u112f\u11a1\ud7cb", "\u1140\u1175\u11a8",
+    "\u1120\u1161\u11f0", "\u1121\u1169\ud7cb", "\u1127\u1165\u11a8", "\u1122\u1173\u11f0",
+    "\u112d\u119e", "\u1140\u1175",
+    # Shanggu's own dlig ligatures (era names, 株式会社), which the full
+    # Shanggu brought into v1.0.43's CL static and Sarasa Ui CL lacks.
+    "\u660e\u6cbb", "\u5927\u6b63", "\u662d\u548c", "\u5e73\u6210", "\u4ee4\u548c", "\u682a\u5f0f\u4f1a\u793e",
 )
 WESTERN_LANGUAGES = ("en", "ro", "mo", "lt", "ca")
 CJK_LANGUAGES = ("zh-Hans", "zh-Hant", "zh-HK", "ja", "ko")
 LANGUAGES = ("und", *WESTERN_LANGUAGES, *CJK_LANGUAGES)
 # Optional features VF and static must apply alike (single-glyph alternates
 # that no default context reaches). Sarasa Ui keeps Inter's ss01-ss08 and
-# cv01-cv14 records but drops their alternates, so those shape as default.
-# salt is left out as a known defect (README): the VF never calibrates its
-# unencoded salt alternates to Inter's curve (Ἱ.salt is 6 units wide of it at
-# 900 italic, as in v1.0.43), so VF and static part by up to that much.
-OPTIONAL_FEATURES = ("case", "frac", "numr", "dnom", "sups", "subs", "sinf", "ordn", "zero", "tnum", "dlig")
+# cv01-cv13 records with their alternates dropped, so those shape as
+# default; cv14 still swaps ẞ (U+1E9E) for its alternate, and salt reaches
+# unencoded alternates such as Ἱ's (6 units off Inter's curve at 900 italic
+# in the VF up to v1.0.43.1).
+OPTIONAL_FEATURES = ("case", "frac", "numr", "dnom", "sups", "subs", "sinf", "ordn", "zero", "tnum", "dlig",
+                     "salt", "cv14")
 
 
 def default_contexts() -> tuple[Context, ...]:
@@ -87,6 +110,18 @@ def default_contexts() -> tuple[Context, ...]:
                                                 ("ttb", ("vpal", "vhal", "vert", "vrt2")))
                     for feature in features)
     return tuple(contexts)
+
+
+def static_contexts() -> tuple[Context, ...]:
+    """Static against the release: also the optional CJK features on ideographs.
+
+    CL's full Shanggu brought its own dlig (era names, 株式会社) and aalt into
+    v1.0.43's static; the static keeps only what Sarasa Ui CL's features
+    reach. The VF carries no CJK source's dlig or aalt (README), so these are
+    not paired against it.
+    """
+    return default_contexts() + tuple(Context(script="Hani", feature=feature, repertoire="ideographs")
+                                      for feature in ("dlig", "aalt"))
 
 
 def paired_contexts() -> tuple[Context, ...]:
@@ -111,6 +146,47 @@ def _source_sequences(inputs: tuple[tuple[Path, str], ...]) -> tuple[str, ...]:
         with TTFont(path, lazy=True) as font:
             texts.update(text for text in reverse_texts(font).values() if len(text) > 1)
     return tuple(sorted(texts))
+
+
+# Characters Sarasa Ui does not encode: each shapes as the missing-glyph box.
+MISSING_PROBES = (0x0149, 0x01C4, 0x0378, 0x03A2)
+
+
+def notdef_parity(actual_path: Path, expected_path: Path, *, weight: int | None = None,
+                  reference_weight: int | None = None) -> dict:
+    """The .notdef box every unmapped character shows, horizontally and vertically.
+
+    No cmap probe reaches GID 0: up to v1.0.43.1 the VF kept Source Han's
+    1000-unit box while the static and Sarasa Ui use Inter's 656-unit one.
+    """
+    with TTFont(actual_path, lazy=True) as left_font, TTFont(expected_path, lazy=True) as right_font:
+        mapped = set(left_font.getBestCmap()) | set(right_font.getBestCmap())
+    absent = [cp for cp in MISSING_PROBES if cp not in mapped]
+    if not absent:
+        return {"cases": 1, "failures": 1, "samples": [{"reason": "没有两边都不编码的探测码位"}]}
+    actual, expected = Face(actual_path), Face(expected_path)
+    actual.set_weight(weight)
+    expected.set_weight(reference_weight)
+    cases = failures = 0
+    samples = []
+    # Inside a run too; only the box itself is compared (the letters around
+    # it differ between VF and static, and between weights, by design).
+    for text in (chr(absent[0]), "A" + chr(absent[0]) + "B"):
+        for direction in ("ltr", "ttb"):
+            left = tuple(g for g in actual.shape(text, direction=direction) if g.gid == 0)
+            right = tuple(g for g in expected.shape(text, direction=direction) if g.gid == 0)
+            if not left or not right:
+                delta = {"notdef": "unmapped probe did not reach GID 0"}
+            else:
+                delta = geometry_delta(left, right)
+                if actual.outline_key(0) != expected.outline_key(0):
+                    delta["outline"] = True
+            cases += 1
+            if delta:
+                failures += 1
+                samples.append({"text": " ".join(f"U+{ord(char):04X}" for char in text), "direction": direction,
+                                "difference": delta})
+    return {"cases": cases, "failures": failures, "samples": samples}
 
 
 def compare_pair(actual_path: Path, expected_path: Path, *, weight: int | None = None,
