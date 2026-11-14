@@ -50,7 +50,8 @@ class AnchorOriginTests(unittest.TestCase):
     def test_origin_change_is_measured_against_the_exact_source(self):
         # The product's anchors and outlines follow Inter's original curve.
         # The 1000-UPM copy rounds U+0304 off it (a unit in HarfBuzz extents
-        # at 700); measured against that copy, a mark that never moved shifts.
+        # at 700); measured against such a copy, a mark that never moved
+        # shifts (two units here, past the rounding threshold).
         exact = variable_fixture()
         addOpenTypeFeaturesFromString(exact, '''
             languagesystem DFLT dflt;
@@ -58,9 +59,9 @@ class AnchorOriginTests(unittest.TestCase):
             feature mark { pos base G <anchor 300 700> mark @TOP; } mark;
         ''')
         rounded = copy.deepcopy(exact)
-        build.shift_glyph_x(rounded, 'acutecomb', 1)
+        build.shift_glyph_x(rounded, 'acutecomb', 2)
         advance, lsb = rounded['hmtx'].metrics['acutecomb']
-        rounded['hmtx'].metrics['acutecomb'] = (advance, lsb + 1)
+        rounded['hmtx'].metrics['acutecomb'] = (advance, lsb + 2)
         target, measured_against_copy = copy.deepcopy(exact), copy.deepcopy(exact)
         before = attached_ink(target)
         result = font_anchor_origins.align(target, rounded, {'G': 'G', 'acutecomb': 'acutecomb'},
@@ -108,6 +109,9 @@ class AnchorOriginTests(unittest.TestCase):
             return round(move, 3), mark.XCoordinate, getattr(mark, 'XDeviceTable', None)
 
         self.assertEqual(aligned(-1, 1024), (-0.527, 500, None))
+        # 1.5 units is still rounding: the native static's ink and the VF's
+        # own metric alignment add up to 1.4 (v1.0.43.2: ṱ̣ at 300 italic).
+        self.assertEqual(aligned(-2, 1024), (-1.527, 500, None))
         self.assertEqual(aligned(-3, 549), (-2.527, 266, None))
 
     def test_variable_anchors_round_once_at_every_sampled_weight(self):

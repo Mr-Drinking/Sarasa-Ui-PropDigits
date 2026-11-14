@@ -183,8 +183,12 @@ def bytecode(font: TTFont, gid: int) -> bytes:
 
 
 def ttfautohint_executable() -> Path:
-    """The same documented selection as the build: override, PATH, then ttfautohint-py."""
-    requested = os.environ.get("TTFAUTOHINT") or shutil.which("ttfautohint")
+    """The build's selection: an explicit TTFAUTOHINT, else the locked ttfautohint-py.
+
+    A ttfautohint on PATH is never taken: the build stopped doing so, and the
+    audit's reference hinting must come from the same tool.
+    """
+    requested = os.environ.get("TTFAUTOHINT")
     if requested:
         path = Path(shutil.which(requested) or requested).resolve()
         if not path.is_file():

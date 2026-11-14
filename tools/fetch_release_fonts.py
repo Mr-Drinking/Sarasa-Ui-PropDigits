@@ -176,12 +176,21 @@ def verify_package_members(archive: Path, name: str, version: str, manifest: dic
         if bundle.testzip() is not None:
             raise SystemExit(f"{name} 的 CRC 校验失败")
         for member in names:
-            digest = hashlib.sha256(bundle.read(member)).hexdigest()
+            digest = member_sha256(bundle, member)
             wanted = expected[member]
             if isinstance(wanted, tuple):
                 wanted = documents.setdefault(wanted, digest)
             if digest != wanted:
                 raise SystemExit(f"{name} 中 {member} 的 SHA-256 与发布清单或其他包中的同一文件不一致")
+
+
+def member_sha256(bundle: zipfile.ZipFile, member: zipfile.ZipInfo) -> str:
+    """SHA-256 of a ZIP member, read in chunks."""
+    hasher = hashlib.sha256()
+    with bundle.open(member) as stream:
+        while chunk := stream.read(1 << 20):
+            hasher.update(chunk)
+    return hasher.hexdigest()
 
 
 def main() -> None:
@@ -224,41 +233,51 @@ def main() -> None:
         print(f"[fetch] 21 个包的成员与发布清单逐项一致", flush=True)
     written = unchanged = 0
     found: set[str] = set()
-    pending: list[tuple[bytes, Path]] = []
+    # Members are read in chunks, twice: every one is verified before any is
+    # written, and checked again while it is written. Holding them all in
+    # memory between the two steps took 3.3 GB for the three packages.
+    pending: list[tuple[str, str, str, Path]] = []
     for name in aggregate_packages(version):
         with zipfile.ZipFile(downloads / name) as bundle:
             for member in bundle.infolist():
                 relative = PurePosixPath(member.filename)
                 if member.is_dir() or relative.is_absolute() or ".." in relative.parts:
                     continue
+                digest = member_sha256(bundle, member)
                 if relative.suffix == ".ttf":
                     repository_path = (f"fonts/variable/{relative.name}" if len(relative.parts) == 1
                                        else f"fonts/static/{relative.as_posix()}")
                     expected = fonts.get(repository_path)
                     if expected is None:
                         raise SystemExit(f"{name} 含发布清单未列出的字体：{member.filename}")
-                    data = bundle.read(member)
-                    if hashlib.sha256(data).hexdigest() != expected:
+                    if digest != expected:
                         raise SystemExit(f"{repository_path} 的 SHA-256 与发布清单不符")
                     found.add(repository_path)
                 elif len(relative.parts) == 2 and relative.name in STATIC_DOCUMENTS:
-                    repository_path, data = f"fonts/static/{relative.as_posix()}", bundle.read(member)
+                    repository_path = f"fonts/static/{relative.as_posix()}"
                 else:
                     continue
                 target = root / repository_path
-                if target.exists() and (not target.is_file() or sha256(target) != hashlib.sha256(data).hexdigest()):
+                if target.exists() and (not target.is_file() or sha256(target) != digest):
                     raise SystemExit(f"{target.relative_to(root).as_posix()} 已存在且内容不同；不覆盖现有文件")
-                pending.append((data, target))
+                pending.append((name, member.filename, digest, target))
     missing = sorted(set(fonts) - found)
     if missing:
         raise SystemExit(f"Release 包缺少 {len(missing)} 个字体，例如 {missing[:3]}")
-    for data, target in pending:
+    for name, member_name, digest, target in pending:
         if target.exists():
             unchanged += 1
             continue
         target.parent.mkdir(parents=True, exist_ok=True)
         temporary = target.with_name(target.name + ".fetch.tmp")
-        temporary.write_bytes(data)
+        with zipfile.ZipFile(downloads / name) as bundle, bundle.open(member_name) as source, temporary.open("wb") as output:
+            hasher = hashlib.sha256()
+            while chunk := source.read(1 << 20):
+                hasher.update(chunk)
+                output.write(chunk)
+        if hasher.hexdigest() != digest:
+            temporary.unlink(missing_ok=True)
+            raise SystemExit(f"{target.relative_to(root).as_posix()} 写入时内容与核验时不同")
         temporary.replace(target)
         written += 1
     print(f"[fetch] v{version}：{len(found)} 个字体与发布清单一致；新写入 {written} 个文件，已有且相同 {unchanged} 个")

@@ -10,7 +10,7 @@ from fontTools.ttLib import TTFont
 
 from . import contract as c
 from .oracles import CjkUiOracle, inter_owned, in_ranges, IDEOGRAPH_RANGES, HANGUL_RANGES
-from .products import InterUiOracle
+from .products import InterUiOracle, joined_segment_run_reasons
 from .shaping import Glyph, Face
 from .outlines import quadratic_source_outline, residual, segment_recording
 
@@ -324,12 +324,22 @@ class Sources:
                         product_kerning(actual_face, actual), product_kerning(reference_face, reference),
                         variable_curve, static_curve)):
                 return False
-        for left, right, source_left, source_right in zip(ink(actual), ink(reference), ink(expected), ink(static_expected)):
+        for index, (left, right, source_left, source_right) in enumerate(
+                zip(ink(actual), ink(reference), ink(expected), ink(static_expected))):
             if (left is None) != (right is None) or (source_left is None) != (source_right is None):
                 return False
-            if left is not None and source_left is not None and not near(
-                    (left[0] - right[0], left[1] - right[1]),
-                    (source_left[0] - source_right[0], source_left[1] - source_right[1]), 2):
+            if left is None or source_left is None:
+                continue
+            if index and actual[index].advance == reference[index].advance == (0, 0):
+                # An attached mark: each side places it from its own Inter
+                # source, rounding the base and the mark anchor once each, so
+                # each side stays within 2 units of its source (as the
+                # inter_positioning section requires of the VF) while the two
+                # may round apart (r̈ at 700 italic: VF -0.8, static +1.2).
+                if not (near(left[:2], source_left[:2], 2) and near(right[:2], source_right[:2], 2)):
+                    return False
+            elif not near((left[0] - right[0], left[1] - right[1]),
+                          (source_left[0] - source_right[0], source_left[1] - source_right[1]), 2):
                 return False
         return True
 
@@ -434,6 +444,45 @@ class Sources:
                 and all(near(a.advance, s.advance, 0) and near(a.offset, s.offset, offset_tolerance)
                         for a, s in zip(reference, expected)))
 
+    def static_feature_effect_reproduces(self, text, context, reference, reference_face, disabled):
+        """The static side has its own oracle for the feature's value: Source
+        Han's static source within 1 unit, or else exactly the effect the
+        pinned Sarasa Ui release of the same weight gives (Bold for Heavy):
+        Sarasa keeps some values Source Han's static lacks, such as vpal on 一,
+        and the static/release section holds the static to that release."""
+        if self.cjk_static is None or self.is_inter(text):
+            return True
+        arguments = {**context.arguments(), 'features': disabled}
+        baseline = reference_face.shape(text, **arguments)
+        face = self.classical_static if self.classical_static and self.source(text) is self.classical else self.cjk_static
+        expected = self.shape(text, context, face=face)
+        expected_baseline = self.shape(text, context, face=face, feature_overrides=disabled)
+        if (len(reference) == len(baseline) == len(expected) == len(expected_baseline)
+                and all(near(tuple(x - y for x, y in zip((*r.advance, *r.offset), (*r0.advance, *r0.offset))),
+                             tuple(x - y for x, y in zip((*s.advance, *s.offset), (*s0.advance, *s0.offset))), 1)
+                        for r, r0, s, s0 in zip(reference, baseline, expected, expected_baseline))):
+            return True
+        release = self.release_face()
+        if release is None:
+            return False
+        # The release's own effect of the feature, glyph for glyph and exact.
+        released = release.shape(text, **context.arguments())
+        released_baseline = release.shape(text, **arguments)
+        return (len(released) == len(released_baseline) == len(reference) == len(baseline)
+                and [tuple(x - y for x, y in zip((*r.advance, *r.offset), (*r0.advance, *r0.offset)))
+                     for r, r0 in zip(reference, baseline)]
+                == [tuple(x - y for x, y in zip((*r.advance, *r.offset), (*r0.advance, *r0.offset)))
+                    for r, r0 in zip(released, released_baseline)])
+
+    def release_face(self):
+        """The pinned Sarasa Ui release of this weight; Heavy, which has none,
+        takes the Bold release's routing as the README's Heavy rule does."""
+        if not hasattr(self, '_release'):
+            name = next((name for name, value in c.WEIGHTS.items() if value == self.weight), None)
+            path = c.reference_path(self.region, 'Bold' if name == 'Heavy' else name, self.italic) if name else None
+            self._release = Face(path) if path is not None and path.is_file() else None
+        return self._release
+
     def explains(self, text, context, actual, reference, actual_face, reference_face):
         """Return an explicit oracle identifier, or None for an unexplained bug.
 
@@ -451,10 +500,17 @@ class Sources:
                 allowed |= c.CLASSICAL_SPACING_BASES
             if not any(ord(char) in allowed for char in text):
                 return None
-        if context.direction == 'ttb' and all(ord(char) in c.VERTICAL_DASH_SEGMENTS for char in text):
+        if (context.direction == 'ttb' and not context.feature.startswith('-')
+                and all(ord(char) in c.VERTICAL_DASH_SEGMENTS for char in text)):
             count = sum(c.VERTICAL_DASH_SEGMENTS[ord(char)] for char in text)
-            if count > 1 and len(actual) == count and all(g.advance == (0, -1000) for g in actual):
-                return '另行逐边核验的 1em 竖排片段'
+            # Segment count and advance alone let wrong glyphs or broken
+            # joins pass: the run's own geometry is checked here, on both
+            # sides of a VF/static pair (Sarasa Ui itself has no segments).
+            strict = text in {'——', '———', '⸺', '⸻'}
+            runs = [(actual, actual_face)] + ([(reference, reference_face)] if self.variable else [])
+            if count > 1 and not any(joined_segment_run_reasons(face, run, count, italic=self.italic, strict=strict)
+                                     for run, face in runs):
+                return '逐边核验的 1em 竖排片段'
         # Checked before the run-level source comparison, whose glyphs this
         # case does not share (each glyph is compared on its own below).
         if self.variable and self.inter_static is not None and self.is_inter(text) and self.inter_glyph_difference(
@@ -513,7 +569,7 @@ class Sources:
         if not all((a.bounds is None and b.bounds is None) or (a.bounds is not None and b.bounds is not None
                     and near(a.bounds[2:], b.bounds[2:], 2)) for a, b in zip(actual, expected)):
             return None
-        if context.feature != 'default':
+        if context.feature != 'default' and not context.feature.startswith('-'):
             disabled = {context.feature: False}
             arguments = {**context.arguments(), 'features': disabled}
             baseline_actual = actual_face.shape(text, **arguments)
@@ -525,6 +581,10 @@ class Sources:
                             tuple(x - y for x, y in zip((*s.advance, *s.offset), (*s0.advance, *s0.offset))), 1)
                        for a, a0, s, s0 in zip(actual, baseline_actual, expected, baseline_source)]
             if all(sourced):
+                # The static side must take its own source's value too: only
+                # the VF's effect against the variable source was checked.
+                if self.variable and not self.static_feature_effect_reproduces(text, context, reference, reference_face, disabled):
+                    return None
                 return '固定 CJK 可变来源的实际特性取值'
             # vert/vrt2 select a form whose vertical metrics the product
             # calibrates to the native static, not to the Source Han VF, and

@@ -43,7 +43,6 @@ def dash_fixture(italic=False, continuous=True):
     if italic:
         b.shear_font(font, 9.4)
     roles = b.upstream_dash_roles(font)
-    b.ensure_vertical_presentation_dash_ligatures(font, roles)
     b.create_vertical_dash_segments(font, roles, italic)
     if continuous:
         b.install_continuous_vertical_dash_layout(font)
@@ -128,10 +127,52 @@ class VerticalSegmentTests(unittest.TestCase):
                 path = Path(directory) / f'{italic}.ttf'; font.save(path)
                 status = products.vertical_segment_runtime_status(path)
                 self.assertTrue(status['ok'], status)
-                self.assertEqual(status['cases'], 4200)
+                self.assertEqual(status['cases'], products.VERTICAL_SEGMENT_CASES)
+                self.assertEqual(status['cases'], 6440)
                 self.assertEqual(font['head'].yMax, 880)
                 self.assertEqual(font['head'].yMin, -120)
                 self.assertTrue(audit_metadata.head_bounds_status(font)['ok'])
+
+    def test_presentation_form_runs_keep_their_glyphs_without_vertical_features(self):
+        # v1.0.43.2: a ccmp ligature of U+FE31 runs made `——` one glyph with
+        # vert off and two U+FE31 one glyph horizontally.
+        font = dash_fixture()
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'unjoined.ttf'; font.save(path)
+            runtime = hb.Font(hb.Face(path.read_bytes()))
+            for direction, text, features, expected in (
+                    ('ltr', '︱︱', {}, 2), ('ltr', '︱︱︱', {}, 3),
+                    ('ttb', '——', {'vert': False}, 2), ('ttb', '———', {'vert': False}, 3),
+                    ('ttb', '——', {'vert': False, 'vrt2': True}, 2), ('ttb', '︱︱︱', {}, 3)):
+                buf = hb.Buffer(); buf.add_str(text); buf.direction = direction; buf.script = 'Hani'
+                hb.shape(runtime, buf, features)
+                self.assertEqual(len(buf.glyph_infos), expected, (direction, text, features))
+            self.assertTrue(products.vertical_segment_runtime_status(path)['ok'])
+            # The old ligature fails both the horizontal and the unjoined checks.
+            roles = b.upstream_dash_roles(font)
+            lookup = b.make_ligature_substitution_lookup({roles['vertical_single']: [
+                ([roles['vertical_single'], roles['vertical_single']], roles['vertical_three']),
+                ([roles['vertical_single']], roles['vertical_two'])]})
+            b.link_lookup_to_all_gsub_features(font, 'ccmp', b.append_gsub_lookup(font, lookup))
+            merged = Path(directory) / 'merged.ttf'; font.save(merged)
+            reasons = {reason for row in products.vertical_segment_runtime_status(merged)['samples']
+                       for reason in row['reasons']}
+            self.assertIn('horizontal presentation run lost glyphs', reasons)
+
+    def test_segments_run_clockwise_and_a_reversed_one_fails(self):
+        font = dash_fixture()
+        segments = b.vertical_dash_segments(font, b.upstream_dash_roles(font))
+        for name in segments.values():
+            self.assertTrue(products.clockwise(list(font['glyf'][name].coordinates)), name)
+        glyph = font['glyf'][segments['middle']]
+        reversed_glyph = b.make_polygon_glyph(list(reversed(list(glyph.coordinates))))
+        reversed_glyph.recalcBounds(font['glyf'])
+        font['glyf'].glyphs[segments['middle']] = reversed_glyph
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'reversed.ttf'; font.save(path)
+            status = products.vertical_segment_runtime_status(path)
+        self.assertFalse(status['ok'])
+        self.assertTrue(any('segment outline is counter-clockwise' in row['reasons'] for row in status['samples']))
 
     def test_runtime_rejects_an_actual_vertical_origin_error(self):
         font = dash_fixture()
@@ -171,8 +212,13 @@ class VerticalSegmentTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / 'old.ttf'
             dash_fixture(continuous=False).save(path)
-            with patch.object(products, 'VERTICAL_DASH_RUN_TEXTS', ('——', '———')):
+            # Without the contextual joins only vert reaches the segments:
+            # under vrt2 alone HarfBuzz hands over U+FE31 runs, which only
+            # the joins turn into segments.
+            with patch.object(products, 'VERTICAL_DASH_RUN_TEXTS', ('——', '———')),                     patch.object(products, 'JOINING_FEATURES', ({}, {'vert': True, 'vrt2': False})):
                 self.assertTrue(products.vertical_segment_runtime_status(path)['ok'])
+            with patch.object(products, 'VERTICAL_DASH_RUN_TEXTS', ('——',)):
+                self.assertFalse(products.vertical_segment_runtime_status(path)['ok'])
             with patch.object(products, 'VERTICAL_DASH_RUN_TEXTS', ('————',)):
                 self.assertFalse(products.vertical_segment_runtime_status(path)['ok'])
 

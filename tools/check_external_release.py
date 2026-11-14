@@ -235,6 +235,10 @@ def run_fontbakery_universal(python: Path, directory: Path) -> dict:
         reported = {row["font"] for row in rows if row["font"]}
         if reported != set(by_name.values()):
             raise RuntimeError(f"FontBakery universal {region} {kind} 的结果没有覆盖本批次全部字体")
+        # Messages name the fonts by their real paths (single_directory and
+        # underline_thickness list every file). This loop sat under the raise
+        # above and never ran until v1.0.43.3.
+        for row in rows:
             for old, new in sorted(portable.items(), key=lambda item: -len(item[0])):
                 row["messages"] = [message.replace(old, new) for message in row["messages"]]
         return {"exit_code": process.returncode, "rows": rows}

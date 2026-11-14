@@ -83,7 +83,8 @@ def route_structure_differences(font: TTFont, native: TTFont, own_routes=("vert"
 
     Each language system carries the same tags; per tag the language systems
     share or separate lookups as in the static. Vertical substitutions may
-    share one VF route where the static repeats equal ones per language.
+    share one VF route where the static repeats equal ones per language;
+    every GPOS feature, vert included, keeps the static's grouping.
     """
     problems = []
     for tag in ("GSUB", "GPOS"):
@@ -91,7 +92,8 @@ def route_structure_differences(font: TTFont, native: TTFont, own_routes=("vert"
         for key in sorted(set(actual) | set(expected)):
             if set(actual.get(key, {})) != set(expected.get(key, {})) or (key in actual) != (key in expected):
                 problems.append(f"{tag} {'/'.join(key)}: {sorted(set(actual.get(key, {})) ^ set(expected.get(key, {})))}")
-        for feature in sorted({name for features in expected.values() for name in features} - set(own_routes)):
+        excluded = set(own_routes) if tag == "GSUB" else set()
+        for feature in sorted({name for features in expected.values() for name in features} - excluded):
             def groups(routes):
                 shared = {}
                 for key, features in routes.items():
@@ -141,6 +143,56 @@ def gvar_hvar_advance_mismatches(font: TTFont) -> list:
             if otRound(phantom) != target:
                 mismatches.append((name, weight, target, phantom))
     return mismatches
+
+
+def hvar_side_bearing_mismatches(path) -> list:
+    """Glyphs whose HVAR LSB or RSB row disagrees with the outline at an axis point.
+
+    HarfBuzz and FreeType take side bearings from the outline; a tool that
+    reads HVAR's rows got another position (about 200 glyphs 1 to 3 units
+    off in v1.0.43.2). The outline value is HarfBuzz's extents, rounded once.
+    """
+    import uharfbuzz as hb
+    from fontTools.misc.fixedTools import floatToFixedToFloat, otRound
+    from fontTools.varLib.models import normalizeValue, piecewiseLinearMap
+    from fontTools.varLib.varStore import VarStoreInstancer
+    data = open(path, "rb").read()
+    runtime = hb.Font(hb.Face(data))
+    with TTFont(path, lazy=True) as font:
+        hvar = font["HVAR"].table
+        if hvar.LsbMap is None or hvar.RsbMap is None:
+            return ["HVAR 缺少侧边距映射"]
+        runtime.scale = (font["head"].unitsPerEm,) * 2
+        axis = font["fvar"].axes[0]
+        segments = font["avar"].segments.get(axis.axisTag) if "avar" in font else None
+        order = font.getGlyphOrder()
+        metrics = {name: font["hmtx"][name] for name in order}
+        right = {}
+        for gid, name in enumerate(order):
+            extents = runtime.get_glyph_extents(gid)
+            if extents is not None and (extents.width or extents.height):
+                right[name] = metrics[name][0] - (extents.x_bearing + extents.width)
+        advance_map = hvar.AdvWidthMap.mapping if hvar.AdvWidthMap else None
+        mismatches = []
+        for weight in c.AXIS_POINTS:
+            value = normalizeValue(weight, (axis.minValue, axis.defaultValue, axis.maxValue))
+            value = floatToFixedToFloat(piecewiseLinearMap(value, segments) if segments else value, 14)
+            if not value:
+                continue
+            instancer = VarStoreInstancer(hvar.VarStore, font["fvar"].axes, {axis.axisTag: value})
+            runtime.set_variations({axis.axisTag: weight})
+            for gid, name in enumerate(order):
+                if name not in right:
+                    continue
+                extents = runtime.get_glyph_extents(gid)
+                if extents is None:
+                    continue
+                lsb = metrics[name][1] + otRound(instancer[hvar.LsbMap.mapping[name]])
+                rsb = right[name] + otRound(instancer[hvar.RsbMap.mapping[name]])
+                drawn_right = runtime.get_glyph_h_advance(gid) - (extents.x_bearing + extents.width)
+                if lsb != extents.x_bearing or rsb != drawn_right:
+                    mismatches.append((name, weight, lsb, extents.x_bearing, rsb, drawn_right))
+        return mismatches
 
 
 def expected_names(region: str, italic: bool, weight: str | None, hinted: bool) -> dict[int, str]:
@@ -243,6 +295,7 @@ def check_font(path, region: str, italic: bool, weight: str | None, hinted: bool
             checks["variation_metrics"] = all(tag in font for tag in ("gvar", "HVAR", "MVAR")) and "VVAR" not in font and "VORG" not in font
             checks["strikeout_variation"] = "strs" in {record.ValueTag for record in font["MVAR"].table.ValueRecord}
             checks["gvar_hvar_advances"] = checks["variation_metrics"] and not gvar_hvar_advance_mismatches(font)
+            checks["hvar_side_bearings"] = checks["variation_metrics"] and not hvar_side_bearing_mismatches(path)
             native_path = c.static_path(region, "Regular", italic, False)
             if native_path.is_file():
                 with TTFont(native_path, lazy=True) as native:

@@ -15,6 +15,16 @@ from fontTools.varLib.varStore import VarStoreInstancer
 from font_variations import coordinate, curve_grid, weight_at, adjacent_supports
 
 
+# A move of the ink by less than this is rounding, not a translation. The
+# target's ink sits on the native static's metrics, which round the source in
+# their own way: against the source curve the sum reached 1.4 units in the
+# v1.0.43.2 SC base glyphs (the static's ink 0.73 off, the VF 0.5 off the
+# static, the two Inter sources 0.16 apart). Following that, as the old
+# one-unit threshold did, put ṱ̣ at 300 italic and ṷ̣ at 600 italic 2.1 to 2.3
+# units off the static, whose anchors stay put. No base glyph moved further.
+FOLLOW_THRESHOLD = 2
+
+
 def anchor_slots(font):
     if 'GPOS' not in font:
         return
@@ -102,12 +112,13 @@ def align(target, source, glyph_map, weights, merge_store, exact=None):
     copy scaled and rounded to 1000 UPM puts U+0304 0.4 units off at 700,
     and its integer extents then a whole unit off.
 
-    Only a translation moves an anchor. Ink within a unit of the source is
-    the native static's rounding, whose own anchors stay put: following it
-    put U+030C on ê more than two units off the SemiBold static. A larger
-    move is followed and rounds once, from the source anchor that the target
-    anchor rounds at the given weights; rounding the move on its own and
-    adding it to the already rounded anchor drifts a further unit.
+    Only a translation moves an anchor. Ink within FOLLOW_THRESHOLD of the
+    source is the native static's rounding (with the target's own on top),
+    whose own anchors stay put: following it put U+030C on ê more than two
+    units off the SemiBold static. A larger move is followed and rounds once,
+    from the source anchor that the target anchor rounds at the given
+    weights; rounding the move on its own and adding it to the already
+    rounded anchor drifts a further unit.
     """
     pairs = {target_name: source_name for source_name, target_name in glyph_map.items()}
     slots = [entry for entry in anchor_slots(target) if entry[0] in pairs]
@@ -169,7 +180,7 @@ def align(target, source, glyph_map, weights, merge_store, exact=None):
         for i in range(len(weights)):
             shift = []
             for axis in (0, 1):
-                if abs(move[i][axis]) < 1:
+                if abs(move[i][axis]) < FOLLOW_THRESHOLD:
                     shift.append(0)
                 elif matched:
                     shift.append(otRound(curve[i][axis] + move[i][axis] - here[i][axis]))

@@ -328,7 +328,74 @@ def spacing_parity(variable_path: Path, static_path: Path, weight: int) -> dict:
 
 VERTICAL_DASH_RUN_TEXTS = tuple("—" * count for count in (*range(2, 17), 32, 64, 257)) + (
     "⸺", "⸻", "⸺⸺", "⸺—", "—⸻", "⸻⸺—", "⸺⸻⸺",
+    # The em dash's vertical form joins like the em dash itself.
+    "︱︱", "︱" * 4, "—︱⸺",
 )
+JOINING_FEATURES = ({}, {"vert": True, "vrt2": False}, {"vert": False, "vrt2": True})
+# With vert and vrt2 both off HarfBuzz replaces U+2014 by the presentation
+# form U+FE31 itself and nothing joins or merges: every character keeps its
+# own glyph, as in Source Han. Up to v1.0.43.2 a ccmp ligature of U+FE31 runs
+# left `——` one 1em glyph there, and horizontal U+FE31 runs one glyph.
+UNJOINED_FEATURES = {"vert": False, "vrt2": False}
+HORIZONTAL_PRESENTATION_RUNS = ("\ufe31\ufe31", "\ufe31\ufe31\ufe31", "\ufe31" * 4)
+
+
+# Seven scripts by eight languages: every joining and the unjoined feature
+# set over each run, and the horizontal presentation runs.
+VERTICAL_SEGMENT_CASES = 7 * 8 * ((len(JOINING_FEATURES) + 1) * len(VERTICAL_DASH_RUN_TEXTS)
+                                  + len(HORIZONTAL_PRESENTATION_RUNS))
+
+
+def clockwise(points) -> bool:
+    """A TrueType outer contour runs clockwise: negative area with y up."""
+    area = sum(x0 * y1 - x1 * y0 for (x0, y0), (x1, y1) in zip(points, points[1:] + points[:1]))
+    return area < 0
+
+
+def joined_segment_run_reasons(face, run, count: int, *, italic: bool, strict: bool) -> list[str]:
+    """Why a measured vertical dash run is not `count` joined 1em segments.
+
+    The geometry vertical_segment_runtime_status requires, for a run the
+    differential comparison shaped (audit Face, 1000 units): one 1em advance
+    each, a clockwise quadrilateral inside its own cell, and each top edge on
+    the previous bottom edge (italic long runs: the same left edge and
+    overlapping cross-sections). Count and advance alone let any glyphs pass.
+    """
+    em = 1000
+    if len(run) != count:
+        return ["wrong segment count"]
+    reasons: list[str] = []
+    previous_bottom = None
+    for index, glyph in enumerate(run):
+        if tuple(glyph.advance) != (0, -em):
+            reasons.append("segment advance is not 1em")
+        points = [point for operation, args in face.outline(glyph.gid) if operation in {"moveTo", "lineTo"}
+                  for point in args]
+        if len(points) > 1 and points[0] == points[-1]:
+            points.pop()
+        if len(points) != 4:
+            reasons.append("segment is not the required quadrilateral")
+            previous_bottom = None
+            continue
+        if not clockwise(points):
+            reasons.append("segment outline is counter-clockwise")
+        if max(y for _x, y in points) + glyph.offset[1] > 0.5 or min(y for _x, y in points) + glyph.offset[1] < -em - 0.5:
+            reasons.append("ink exceeds its own vertical cell")
+        placed = [(x + glyph.offset[0], y + glyph.offset[1] - index * em) for x, y in points]
+        high, low = max(y for _x, y in placed), min(y for _x, y in placed)
+        top = sorted((x, y) for x, y in placed if abs(y - high) < 1e-6)
+        bottom = sorted((x, y) for x, y in placed if abs(y - low) < 1e-6)
+        if previous_bottom is not None:
+            if not italic or strict:
+                if top != previous_bottom:
+                    reasons.append("adjacent ink edges do not meet exactly")
+            elif (len(top) != 2 or len(previous_bottom) != 2 or top[0] != previous_bottom[0]
+                  or min(top[1][0], previous_bottom[1][0]) <= top[0][0]
+                  or abs(top[1][0] - previous_bottom[1][0]) > 1):
+                reasons.append("continuous run has an ink gap or unexpected edge-width change")
+        previous_bottom = bottom
+    return sorted(set(reasons))
+
 
 def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | None = None) -> dict[str, Any]:
     data = path.read_bytes()
@@ -340,13 +407,29 @@ def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | N
         point_cache = {}
         for script in ("Latn", "Cyrl", "Grek", "Hani", "Kana", "Hang", "Bopo"):
             for language in (None, "en", "de", "zh-Hans", "zh-Hant", "zh-HK", "ja", "ko"):
-                for features in ({}, {"vert": True, "vrt2": False}, {"vert": False, "vrt2": True}):
+                for text in HORIZONTAL_PRESENTATION_RUNS:
+                    buf = hb.Buffer(); buf.add_str(text); buf.script = script; buf.direction = "ltr"
+                    buf.language = language or "und"
+                    hb.shape(runtime, buf, {})
+                    cases += 1
+                    if len(buf.glyph_infos) != len(text):
+                        failures.append({"script": script, "language": language, "features": {}, "direction": "ltr",
+                                         "text": text, "reasons": ["horizontal presentation run lost glyphs"]})
+                for features in (*JOINING_FEATURES, UNJOINED_FEATURES):
                     for text in VERTICAL_DASH_RUN_TEXTS:
                         count = sum(c.VERTICAL_DASH_SEGMENTS[ord(character)] for character in text)
                         buf = hb.Buffer(); buf.add_str(text); buf.script = script; buf.direction = "ttb"
                         buf.language = language or "und"
                         hb.shape(runtime, buf, features)
                         reasons = []
+                        if features is UNJOINED_FEATURES:
+                            if len(buf.glyph_infos) != len(text):
+                                reasons.append("unjoined run lost glyphs")
+                            cases += 1
+                            if reasons:
+                                failures.append({"script": script, "language": language, "features": features,
+                                                 "text": text, "reasons": reasons})
+                            continue
                         if len(buf.glyph_infos) != count:
                             reasons.append("wrong segment count")
                         previous_bottom = None
@@ -367,11 +450,18 @@ def vertical_segment_runtime_status(path: Path, variations: dict[str, float] | N
                             if len(points) != 4:
                                 reasons.append("segment is not the required quadrilateral")
                                 continue
+                            if not clockwise(points):
+                                reasons.append("segment outline is counter-clockwise")
                             high = max(y for x, y in points); low = min(y for x, y in points)
                             top = sorted((x, y) for x, y in points if abs(y - high) < 1e-6)
                             bottom = sorted((x, y) for x, y in points if abs(y - low) < 1e-6)
                             if previous_bottom is not None:
-                                if not font["post"].italicAngle or text in {"——", "———", "⸺", "⸻"}:
+                                # The 2em/3em paths meet exactly. Under vrt2
+                                # alone HarfBuzz hands U+2014 over as U+FE31,
+                                # so `——` and `———` join by context like long runs.
+                                multiple_path = text in {"⸺", "⸻"} or (
+                                    text in {"——", "———"} and features.get("vert", True) is not False)
+                                if not font["post"].italicAngle or multiple_path:
                                     if top != previous_bottom:
                                         reasons.append("adjacent ink edges do not meet exactly")
                                 elif (len(top) != 2 or len(previous_bottom) != 2

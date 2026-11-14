@@ -4,6 +4,7 @@ from __future__ import annotations
 import concurrent.futures
 import json
 import os
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -71,11 +72,11 @@ def plan(regions=c.REGIONS):
         result[name] = dict(variable)
     result['hint_execution'] = {case.key: 1 for case in cases if case.hinted}
     for case in cases:
-        result['metadata'][case.key] = 25 if case.weight is None else 20 + (case.weight == 'Regular')
+        result['metadata'][case.key] = 26 if case.weight is None else 20 + (case.weight == 'Regular')
         result['digit_features'][case.key] = products.WIDTH_CASES * len(case.weights)
         result['colon_context'][case.key] = len(products.COLON_TEXTS) * 2 * len(products.WIDTH_FEATURES) * len(case.weights)
         result['inter_positioning'][case.key] = products.POSITIONING_CASES * len(case.weights)
-        result['vertical_joining'][case.key] = 7 * 8 * 3 * len(products.VERTICAL_DASH_RUN_TEXTS) * len(case.weights)
+        result['vertical_joining'][case.key] = products.VERTICAL_SEGMENT_CASES * len(case.weights)
         if case.path.is_file():
             with TTFont(case.path, lazy=True) as font:
                 count = font['maxp'].numGlyphs
@@ -348,6 +349,7 @@ def static_outline_unit(case):
         # Probe sequences come from the release itself; positions from the
         # release as the project routes it (native.project_reference).
         report = compare_pair(case.path, native.project_reference(reference, case.region, case.weight), outlines=True,
+                              drawn_positions=True,
                               explanation=source.explains, contexts=static_contexts(),
                               probe_sources=(reference, c.cjk_path(case.region), c.inter_path(case.italic)), sample_limit=12)
     finally:
@@ -383,13 +385,36 @@ def unit_key(unit: Unit, measurement_contract: str, provenance_digest: str) -> s
                    'contract': measurement_contract, 'provenance': provenance_digest})
 
 
+def portable_error(error: BaseException) -> str:
+    """The error of a crashed unit without workstation paths.
+
+    A message naming a local file (FileNotFoundError, a TTLibError on a
+    source) made the report itself unwritable, losing every other result.
+    """
+    text = f'{type(error).__name__}: {error}'
+    roots = (('', c.ROOT), ('$WORK/', c.WORK), ('$SOURCES/', c.SOURCE_ROOT),
+             ('$REFERENCES/', c.REFERENCE_ROOT), ('$FONTS/', c.FONT_ROOT), ('$SARASA/', c.SARASA_SOURCE))
+    # Longest roots first: the work directory lies inside the repository.
+    forms = sorted(((form, prefix) for prefix, root in roots
+                    for form in {str(root), str(root.resolve()), root.resolve().as_posix()}),
+                   key=lambda item: -len(item[0]))
+    for form, prefix in forms:
+        for variant in (form, form.replace('\\', '\\\\')):
+            for separator in ('\\\\', '\\', '/'):
+                text = text.replace(variant + separator, prefix)
+            text = text.replace(variant, prefix.rstrip('/') or '.')
+    # Whatever absolute path remains (a temporary file, a home directory).
+    text = re.sub(r'(?:[A-Za-z]:[\\/]|/(?:home|Users|tmp|var|mnt|private)/)[^\s\'"]*', '<path>', text)
+    return text[:500]
+
+
 def _run_unit(unit: Unit) -> tuple[dict, float]:
     started = time.monotonic()
     try:
         value = execute(unit)
     except Exception as error:  # noqa: BLE001 - a crashed measurement is a failure, not a pass
         value = {section: {'cases': 0, 'failures': 1, 'error': True,
-                           'samples': [{'error': f'{type(error).__name__}: {error}'[:500]}]}
+                           'samples': [{'error': portable_error(error)}]}
                  for section in unit.sections}
     return value, time.monotonic() - started
 

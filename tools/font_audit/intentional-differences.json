@@ -19,9 +19,9 @@
     },
     {
       "id": "vertical-dash-segments",
-      "codepoints": [8212, 11834, 11835],
+      "codepoints": [8212, 11834, 11835, 65073],
       "direction": "ttb",
-      "oracle": "每段步进恰为 1em，墨迹不越出单元；正体连接边完全一致，斜体仅允许原始整数轮廓的 1 单位边宽差，连接截面不得有空隙。"
+      "oracle": "开 vert 或只开 vrt2 时，U+2014、U+2E3A、U+2E3B 与 U+FE31 的连续串展开为依次连接的 1em 片段（只开 vrt2 时 HarfBuzz 先把 U+2014 换成 U+FE31，连接规则因此也接 U+FE31 串）。每段步进恰为 1em，墨迹不越出单元，轮廓为顺时针；正体连接边完全一致，斜体仅允许原始整数轮廓的 1 单位边宽差，连接截面不得有空隙。vert 与 vrt2 都关时不连接，横排的 U+FE31 串也不连接：每个字符各保留自己的字形，与 Source Han 和 Sarasa Ui 相同（v1.0.43 至 v1.0.43.2 曾把这两种情况合成一个字形）。"
     },
     {
       "id": "classical-overrides",

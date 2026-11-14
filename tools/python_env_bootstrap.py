@@ -7,6 +7,7 @@ import base64
 import hashlib
 import json
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -16,6 +17,29 @@ from typing import Mapping
 
 
 Dependency = tuple[str, str, str]
+
+# The interpreter of every formal entry and of the shared environment.
+PINNED_PYTHON = (3, 13, 17)
+
+
+def pinned_python_text() -> str:
+    return ".".join(map(str, PINNED_PYTHON))
+
+
+def venv_python_version(venv_dir: Path) -> tuple[int, ...] | None:
+    """The Python version an existing environment was created with (pyvenv.cfg)."""
+    try:
+        text = (venv_dir / "pyvenv.cfg").read_text(encoding="utf-8")
+    except OSError:
+        return None
+    for line in text.splitlines():
+        key, _sep, value = line.partition("=")
+        if key.strip() in ("version", "version_info"):
+            try:
+                return tuple(int(part) for part in value.strip().split(".")[:3])
+            except ValueError:
+                return None
+    return None
 
 BUILD_DEPENDENCIES = {
     "fontTools": ("fonttools", "fonttools[woff]==4.67.0", "4.67.0"),
@@ -158,11 +182,25 @@ def ensure_project_python(
     # Symlinked venv executables can resolve to the same base Python. The
     # environment prefix, not the executable or an inherited marker, owns pip.
     active = Path(sys.prefix).resolve() == venv_dir
+    # The pin is checked before the environment exists: the build checked it
+    # only after entering the environment, so one first created by another
+    # Python failed every later build until it was deleted by hand.
+    if tuple(sys.version_info[:3]) != PINNED_PYTHON:
+        raise RuntimeError(f"项目固定使用 Python {pinned_python_text()}，当前为 {platform.python_version()}"
+                           + ("" if active else "；未创建或进入项目环境"))
     if not active:
         attempted = os.environ.get("SARASA_PYTHON_REEXEC_TARGET")
         if attempted and Path(attempted).resolve() == venv_dir:
             raise RuntimeError("目标虚拟环境未提供正确的 sys.prefix；停止重复启动，请修复该环境")
-        if not python.exists():
+        if python.exists():
+            created = venv_python_version(venv_dir)
+            # An environment pyvenv.cfg dates is checked; one without it is
+            # not a venv module environment and fails on its own below.
+            if created is not None and created != PINNED_PYTHON:
+                found = ".".join(map(str, created))
+                raise RuntimeError(f"项目环境 {venv_dir} 由 Python {found} 创建，不是固定的 {pinned_python_text()}；"
+                                   "请移走该目录（或用 SARASA_PYTHON_VENV 指向别处）后重跑，入口会用固定版本重建")
+        else:
             print(f"[{label}] create project Python environment: {venv_dir}", flush=True)
             venv.EnvBuilder(with_pip=True, clear=False).create(venv_dir)
         env = dict(os.environ)

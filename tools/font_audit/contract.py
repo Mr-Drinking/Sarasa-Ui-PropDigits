@@ -10,7 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 WORK = Path(os.environ.get("SARASA_WORK_ROOT", ROOT / ".build-cache/work"))
 FONT_ROOT = Path(os.environ.get("SARASA_AUDIT_FONT_ROOT", ROOT / "fonts"))
 SOURCE_ROOT = Path(os.environ.get("VF_SOURCE_DIR", WORK / "vf-sources"))
-VERSION = "1.0.43.2"
+VERSION = "1.0.43.3"
 # A project revision keeps the pinned upstream release.
 SARASA_VERSION = "1.0.43"
 # head.fontRevision and the nameID 5 prefix: 1.0.43 is written 1.043, 1.0.43.1 1.0431.
@@ -39,7 +39,9 @@ REGIONAL_PUNCTUATION = declared_codepoints("regional-punctuation")
 # CL ideographs whose GDEF marking the project corrects to spacing bases.
 CLASSICAL_SPACING_BASES = declared_codepoints("classical-spacing-bases")
 # Dashes whose vertical runs become joined 1em segments: segments per character.
-VERTICAL_DASH_SEGMENTS = {0x2014: 1, 0x2E3A: 2, 0x2E3B: 3}
+# U+FE31 is the em dash's vertical form; HarfBuzz hands it over for U+2014
+# when only vrt2 is on, and its runs join the same way.
+VERTICAL_DASH_SEGMENTS = {0x2014: 1, 0x2E3A: 2, 0x2E3B: 3, 0xFE31: 1}
 if set(VERTICAL_DASH_SEGMENTS) != declared_codepoints("vertical-dash-segments"):
     raise ValueError("竖排分段的码位与有意差异清单不一致")
 

@@ -1,6 +1,7 @@
 """Independent runtime comparisons. No build module or build verdict is used."""
 from __future__ import annotations
 
+import unicodedata
 from collections import Counter
 from dataclasses import dataclass, asdict
 from pathlib import Path
@@ -10,6 +11,7 @@ from functools import lru_cache
 from fontTools.ttLib import TTFont
 
 from .shaping import Face, geometry_delta, reverse_texts
+from . import contract as c
 from .contract import sha256
 
 
@@ -32,25 +34,55 @@ def ideograph(codepoint: int) -> bool:
     return any(start <= codepoint <= end for start, end in IDEOGRAPHS)
 
 
+def _vertical_form_repertoire() -> frozenset[int]:
+    """Unicode's vertical presentation forms and the characters they stand for.
+
+    Without vert, HarfBuzz itself replaces these characters by their
+    presentation forms (U+2014 by U+FE31) before any lookup runs; the
+    fullwidth forms of the ASCII sources are mapped the same way.
+    """
+    result = {0x2E3A, 0x2E3B}
+    for codepoint in (*range(0xFE10, 0xFE1A), *range(0xFE30, 0xFE50)):
+        decomposition = unicodedata.decomposition(chr(codepoint))
+        if decomposition.startswith("<vertical>"):
+            source = int(decomposition.split()[1], 16)
+            result.update({codepoint, source})
+            if 0x21 <= source <= 0x7E:
+                result.add(source + 0xFEE0)
+    return frozenset(result)
+
+
+VERTICAL_FORM_REPERTOIRE = _vertical_form_repertoire()
+
+
 @dataclass(frozen=True)
 class Context:
     script: str | None = None
     language: str = "und"
     direction: str = "ltr"
+    # A feature tag turned on, or "-tag" for one a context turns off.
     feature: str = "default"
     # "western" limits a context to the text a Latin, Cyrillic or Greek
     # language system actually shapes, instead of all ~45,000 probes;
-    # "ideographs" to the ideographs an optional CJK feature reaches.
+    # "ideographs" to the ideographs an optional CJK feature reaches;
+    # "vertical-forms" to the characters with a vertical presentation form.
     repertoire: str = "all"
 
     def arguments(self) -> dict:
+        if self.feature == "default":
+            features = {}
+        elif self.feature.startswith("-"):
+            features = {self.feature[1:]: False}
+        else:
+            features = {self.feature: True}
         return {"script": self.script, "language": self.language,
-                "direction": self.direction,
-                "features": {} if self.feature == "default" else {self.feature: True}}
+                "direction": self.direction, "features": features}
 
     def admits(self, text: str) -> bool:
         if self.repertoire == "ideographs":
             return all(ideograph(ord(char)) for char in text)
+        if self.repertoire == "vertical-forms":
+            return all(ord(char) in VERTICAL_FORM_REPERTOIRE for char in text)
         return self.repertoire == "all" or all(western(ord(char)) for char in text)
 
 
@@ -79,6 +111,12 @@ RUNS = (
     # Shanggu's own dlig ligatures (era names, 株式会社), which the full
     # Shanggu brought into v1.0.43's CL static and Sarasa Ui CL lacks.
     "\u660e\u6cbb", "\u5927\u6b63", "\u662d\u548c", "\u5e73\u6210", "\u4ee4\u548c", "\u682a\u5f0f\u4f1a\u793e",
+    # Dash runs, the presentation form U+FE31 among them: up to v1.0.43.2 a
+    # ccmp ligature merged two U+FE31 into one glyph, horizontally and in
+    # vertical text without vert (where HarfBuzz turns U+2014 into U+FE31).
+    "\u2014\u2014", "\u2014\u2014\u2014", "\ufe31\ufe31", "\ufe31\ufe31\ufe31", "\u2e3a\u2e3a", "\u2e3a\u2014",
+    # frac and ordn reach nothing in a single character or the runs above.
+    "1/2", "3/4", "10/31", "1a", "2o", "No",
 )
 WESTERN_LANGUAGES = ("en", "ro", "mo", "lt", "ca")
 CJK_LANGUAGES = ("zh-Hans", "zh-Hant", "zh-HK", "ja", "ko")
@@ -95,6 +133,11 @@ OPTIONAL_FEATURES = ("case", "frac", "numr", "dnom", "sups", "subs", "sinf", "or
 
 def default_contexts() -> tuple[Context, ...]:
     contexts = [Context(direction=direction) for direction in ("ltr", "ttb")]
+    # Vertical text with vert off: HarfBuzz's own presentation forms must
+    # stay one glyph each, as in Source Han and Sarasa Ui.
+    contexts.extend(Context(script=script, language=language, direction="ttb", feature="-vert",
+                            repertoire="vertical-forms")
+                    for script, language in ((None, "und"), ("Hani", "zh-Hans")))
     contexts.extend(Context(script="Hani", language=language, direction=direction)
                     for language in CJK_LANGUAGES for direction in ("ltr", "ttb"))
     contexts.extend(Context(script="Latn", language=language)
@@ -136,15 +179,49 @@ def context_texts(context: Context, codepoints, runs) -> list[str]:
 
 
 def source_sequences(paths: tuple[Path, ...]) -> tuple[str, ...]:
-    return _source_sequences(tuple((path, sha256(path)) for path in paths))
+    inter = tuple(c.inter_path(italic) for italic in (False, True))
+    return _source_sequences(tuple((path, sha256(path)) for path in paths),
+                             tuple((path, sha256(path)) for path in inter))
+
+
+# Marks above and below a base an optional Inter feature replaces: such an
+# alternate carries its own anchors (up to v1.0.43.2 the VF's salt forms of
+# U+1E6D and U+0163 took their marks 3 units off the static at 300 italic).
+MARK_PROBES = ("\u0301", "\u0308", "\u0323")
+
+
+def optional_feature_bases(font: TTFont) -> set[int]:
+    """Encoded letters a single substitution of an optional feature replaces."""
+    reverse: dict[str, int] = {}
+    for codepoint, name in sorted(font.getBestCmap().items()):
+        reverse.setdefault(name, codepoint)
+    result: set[int] = set()
+    if "GSUB" not in font:
+        return result
+    table = font["GSUB"].table
+    for record in table.FeatureList.FeatureRecord:
+        if record.FeatureTag not in OPTIONAL_FEATURES:
+            continue
+        for index in record.Feature.LookupListIndex:
+            for subtable in table.LookupList.Lookup[index].SubTable:
+                part = getattr(subtable, "ExtSubTable", subtable)
+                for source in getattr(part, "mapping", None) or {}:
+                    codepoint = reverse.get(source)
+                    if (codepoint is not None and western(codepoint)
+                            and unicodedata.category(chr(codepoint)).startswith("L")):
+                        result.add(codepoint)
+    return result
 
 
 @lru_cache(maxsize=32)
-def _source_sequences(inputs: tuple[tuple[Path, str], ...]) -> tuple[str, ...]:
+def _source_sequences(inputs: tuple[tuple[Path, str], ...], inter: tuple[tuple[Path, str], ...]) -> tuple[str, ...]:
     texts = set(RUNS)
     for path, _digest in inputs:
         with TTFont(path, lazy=True) as font:
             texts.update(text for text in reverse_texts(font).values() if len(text) > 1)
+    for path, _digest in inter:
+        with TTFont(path, lazy=True) as font:
+            texts.update(chr(codepoint) + mark for codepoint in optional_feature_bases(font) for mark in MARK_PROBES)
     return tuple(sorted(texts))
 
 
@@ -193,11 +270,18 @@ def compare_pair(actual_path: Path, expected_path: Path, *, weight: int | None =
                  reference_weight: int | None = None, contexts: Iterable[Context] | None = None,
                  codepoints: Iterable[int] | None = None, sample_limit: int = 32,
                  collect_differences: list | None = None, outlines: bool = False,
-                 explanation=None, probe_sources: tuple[Path, ...] | None = None) -> dict:
+                 explanation=None, probe_sources: tuple[Path, ...] | None = None,
+                 drawn_positions: bool = False) -> dict:
     """Measure both fonts in HarfBuzz, including runtime vertical origins.
 
     No discrepancy is waived here. An explicit policy may classify the returned
     differences, but must also verify its replacement oracle.
+
+    drawn_positions also compares where each glyph's outline is drawn. A
+    static font's HarfBuzz extents come from hmtx and the stored glyph box
+    and the outline comparison ignores translation, so an outline moved as
+    a whole under unchanged stored bounds went unnoticed (a rasterizer draws
+    it moved).
     """
     with TTFont(actual_path, lazy=True) as actual_font, TTFont(expected_path, lazy=True) as reference_font:
         left_cmap, right_cmap = actual_font.getBestCmap(), reference_font.getBestCmap()
@@ -220,6 +304,13 @@ def compare_pair(actual_path: Path, expected_path: Path, *, weight: int | None =
             if outlines and len(left) == len(right):
                 if [actual.outline_key(g.gid) for g in left] != [expected.outline_key(g.gid) for g in right]:
                     delta['outline'] = True
+            if drawn_positions and len(left) == len(right):
+                for a, b in zip(left, right):
+                    ink_a, ink_b = actual.ink(a.gid), expected.ink(b.gid)
+                    if (ink_a is None) != (ink_b is None) or (ink_a is not None and any(
+                            abs(x - y) > 0.5 for x, y in zip(ink_a[:2], ink_b[:2]))):
+                        delta['drawn_position'] = True
+                        break
             total += 1
             if delta:
                 count += 1

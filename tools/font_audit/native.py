@@ -8,11 +8,13 @@ import tempfile
 from pathlib import Path
 
 import uharfbuzz as hb
+from fontTools.pens.boundsPen import BoundsPen
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import otTables as ot
 
 from . import contract as c
 from .comparison import Sources
+from .products import joined_segment_run_reasons
 from .differential import Context, context_texts, default_contexts, source_sequences
 from .outlines import quadratic_source_outline, residual, segment_recording
 from .oracles import IDEOGRAPH_RANGES, in_ranges
@@ -368,9 +370,11 @@ def heavy_metrics(path, region, italic):
     the ink), or uses one width at every weight (Sarasa's half-width
     symbols). Heavy must apply that rule to Source Han Heavy, Inter Black
     and Shanggu Heavy (CL ideographs keep Shanggu's own position). The
-    declared differences are checked by their own oracles. Italic ink is
-    left to the shear checks: a source's control-point box is not its ink on
-    a sheared curve.
+    declared differences are checked by their own oracles. On a sheared
+    curve a source's control-point box is not its ink, so italic positions
+    compare the drawn ink of each source as the static build receives it
+    (CJK sources sheared about em/3, Inter's own italic): the outline check
+    allows any translation and left italic positions unchecked until v1.0.43.3.
     """
     declared = set(c.INTENTIONAL_CPS) | set(c.REGIONAL_PUNCTUATION) | (set(c.CLASSICAL_SPACING_BASES) if region == 'CL' else set())
     releases = {weight: Face(c.reference_path(region, weight, italic)) for weight in ('Regular', 'Bold')}
@@ -384,6 +388,20 @@ def heavy_metrics(path, region, italic):
             return None
         ink = face.ink(run[0].gid) if face is not None else run[0].bounds
         return run[0].advance[0], None if ink is None else ink[0]
+
+    def sheared_source(sources, text, value):
+        """An italic source run's advance with its drawn, sheared ink left edge."""
+        if value is None or not italic:
+            return value
+        run = sources.shape(text, Context())
+        face = sources.source(text)
+        if face is sources.inter:
+            ink = face.ink(run[0].gid)
+            return value[0], None if ink is None else ink[0]
+        pen = BoundsPen(None)
+        for operation, points in quadratic_source_outline(face, run[0].gid, italic=True):
+            getattr(pen, operation)(*points)
+        return value[0], None if pen.bounds is None else pen.bounds[0]
     try:
         with TTFont(path, lazy=True) as font:
             repertoire = sorted(cp for cp in font.getBestCmap() if cp not in declared)
@@ -391,7 +409,8 @@ def heavy_metrics(path, region, italic):
             text = chr(cp)
             released = single(releases['Bold'].shape(text, language='und'), releases['Bold'])
             regular = single(releases['Regular'].shape(text, language='und'))
-            bold_source, heavy_source = single(bold.shape(text, Context())), single(heavy.shape(text, Context()))
+            bold_source = sheared_source(bold, text, single(bold.shape(text, Context())))
+            heavy_source = sheared_source(heavy, text, single(heavy.shape(text, Context())))
             actual = single(product.shape(text, language='und'), product)
             if None in (released, regular, bold_source, heavy_source, actual):
                 # A combining mark shaped alone gains a dotted circle (U+302E
@@ -424,7 +443,7 @@ def heavy_metrics(path, region, italic):
             rules[rule] = rules.get(rule, 0) + 1
             result.check(actual[0] == expected, {'cp': f'U+{cp:04X}', 'check': 'heavy_advance', 'rule': rule,
                                                  'actual': actual[0], 'expected': expected})
-            if not italic and shift is not None and actual[1] is not None and heavy_source[1] is not None:
+            if shift is not None and actual[1] is not None and heavy_source[1] is not None:
                 miss = (actual[1] - heavy_source[1]) - shift
                 result.check(abs(miss) <= 2, {'cp': f'U+{cp:04X}', 'check': 'heavy_ink_left', 'rule': rule,
                                               'miss': round(miss, 2)})
@@ -462,7 +481,7 @@ def heavy_sources(path, region, italic, *, contexts=None, codepoints=None):
     repertoire_set = set(repertoire)
     probes = (c.reference_path(region, 'Regular', italic), c.cjk_path(region), c.inter_path(italic))
     sequences = [text for text in source_sequences(probes) if all(ord(char) in repertoire_set for char in text)]
-    outlines, positioning = Result(), Result()
+    outlines, positioning, reached = Result(), Result(), Result()
     cache = {}
     bold = bold_baseline = None
     try:
@@ -489,8 +508,29 @@ def heavy_sources(path, region, italic, *, contexts=None, codepoints=None):
             for text in context_texts(context, repertoire, sequences):
                 args = context.arguments()
                 run = actual.shape(text, **args)
+                source_run = source.shape(text, context)
                 a = positioning_effect(run, unpositioned.shape(text, **args))
-                b = positioning_effect(source.shape(text, context), baseline.shape(text, context))
+                b = positioning_effect(source_run, baseline.shape(text, context))
+                # Glyphs only GSUB reaches (vertical, localized and ligature
+                # forms) had no outline comparison at all: every glyph of a
+                # run that matches its source glyph for glyph is drawn as the
+                # source draws it, like the cmap glyphs above.
+                if (len(run) == len(source_run) and all(g.gid for g in source_run)
+                        and not all(ord(char) in c.REGIONAL_PUNCTUATION for char in text)):
+                    face = source.source(text)
+                    for glyph, origin in zip(run, source_run):
+                        key = (glyph.gid, id(face), origin.gid)
+                        if key in cache:
+                            continue
+                        left = segment_recording(actual.outline(glyph.gid))
+                        right = quadratic_source_outline(face, origin.gid, italic=italic, inter=face is source.inter)
+                        cache[key] = residual(left, right, allow_translation=True)
+                        # Sarasa's punctuation modules move vertical forms;
+                        # sheared about em/3, the moved points round to half
+                        # units (CL Heavy Italic: ！：；？ 0.5 off the source).
+                        reached.check(cache[key] <= (2 if face is source.inter else 0.5 if italic else 0),
+                                      {'text': text, 'context': vars(context), 'check': 'gsub_reached_outline',
+                                       'residual': cache[key] if math.isfinite(cache[key]) else 'topology'})
                 if len(a) != len(b):
                     released = routing.shape(text, **args)
                     if [g.cluster for g in released] == [g.cluster for g in run]:
@@ -503,10 +543,15 @@ def heavy_sources(path, region, italic, *, contexts=None, codepoints=None):
                 inter = source.is_inter(text)
                 valid = len(a) == len(b) and all(effects_match(left, right, inter) for left, right in zip(a, b))
                 segments = 0
-                if context.direction == 'ttb' and all(ord(char) in c.VERTICAL_DASH_SEGMENTS for char in text):
+                if (context.direction == 'ttb' and not context.feature.startswith('-')
+                        and all(ord(char) in c.VERTICAL_DASH_SEGMENTS for char in text)):
                     segments = sum(c.VERTICAL_DASH_SEGMENTS[ord(char)] for char in text)
                     if segments > 1:
-                        valid = len(a) == segments and all(value == (0, 0, 0, 0) for value in a + b)
+                        # Italic runs joined by context take curs offsets
+                        # (one shear width per cell); the joined geometry is
+                        # what must hold, not zero positioning.
+                        valid = not joined_segment_run_reasons(actual, run, segments, italic=italic,
+                                                               strict=text in {'——', '———', '⸺', '⸻'})
                 # Joined dash segments carry no positioning, whatever the routing.
                 if not valid and len(a) == len(b) and not (segments > 1 and any(any(value) for value in a)):
                     if bold is None:
@@ -524,7 +569,9 @@ def heavy_sources(path, region, italic, *, contexts=None, codepoints=None):
         source.close()
         if bold is not None:
             bold.close()
-    return {'cases': outlines.cases + positioning.cases, 'failures': outlines.failures + positioning.failures,
-            'samples': (outlines.samples + positioning.samples)[:24],
-            'outline_comparison': outlines.report(), 'positioning_comparison': positioning.report(contexts=context_rows),
+    return {'cases': outlines.cases + reached.cases + positioning.cases,
+            'failures': outlines.failures + reached.failures + positioning.failures,
+            'samples': (outlines.samples + reached.samples + positioning.samples)[:24],
+            'outline_comparison': outlines.report(), 'gsub_reached_outlines': reached.report(),
+            'positioning_comparison': positioning.report(contexts=context_rows),
             'codepoints': len(repertoire), 'sequences': len(sequences)}

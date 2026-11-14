@@ -370,6 +370,28 @@ def validate_main_audit_report(main_report: dict) -> None:
         raise ValueError("当前构建与审计代码没有完整通过主审计")
 
 
+def validate_build_report(fonts: set[str]) -> None:
+    """Every released font was built in full by the build script of this checkout.
+
+    v1.0.43.2 shipped bytes that refresh entries had transformed from builds
+    by code no commit holds; the README's build command could not reproduce
+    them. A refreshed font, or a build record of other code, is refused.
+    """
+    report = json.loads((ROOT / "reports" / "Sarasa-Ui-PropDigits-report.json").read_text(encoding="utf-8"))
+    if report.get("version") != build.VERSION or report.get("complete_font_matrix") is not True:
+        raise ValueError("构建报告不是当前版本的完整构建")
+    items = {item.get("file"): item for field in ("static_outputs", "variable_outputs")
+             for item in report.get(field, []) if isinstance(item, dict)}
+    if set(items) != fonts:
+        raise ValueError("构建报告列出的字体与发布字体不一致")
+    stale = sorted(name for name, item in items.items()
+                   if (item.get("provenance") or {}).get("built_by_current_code") is not True
+                   or ((item.get("provenance") or {}).get("chain") or [{}])[0].get("builder_sha256") != build.BUILDER_CODE_SHA256
+                   or item.get("refreshed_by"))
+    if stale:
+        raise ValueError(f"{len(stale)} 个字体不是由当前构建脚本完整构建的，例如 {stale[:3]}；发布前须完整构建")
+
+
 def validate_release_audits(packages: list[Package]) -> None:
     from font_audit import contract as audit
 
@@ -409,6 +431,7 @@ def validate_release_audits(packages: list[Package]) -> None:
     if environment.get("require_hashes") is not True or environment.get("lockfile_sha256") != package_sha256(ROOT / "requirements-fontbakery.lock"):
         raise ValueError("FontBakery 完整依赖锁或哈希验证不匹配")
     validate_visual_report(reports["visual-audit"], manifest)
+    validate_build_report({audit.display_path(path) for path in paths})
 
 
 def verify_release_manifest(packages: list[Package], results: list[dict[str, object]]) -> None:
