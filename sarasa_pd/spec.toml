@@ -1,0 +1,366 @@
+# Sarasa Ui PropDigits 单一规格真相源
+# 构建、验证、对照与文档表格均从此文件读取，不手工分头维护。
+
+[project]
+version = "1.0.43.4"
+sarasa_version = "1.0.43"
+vendor_id = "MRDK"
+# 固定写入 head.modified 的默认时间（可用环境变量 SOURCE_DATE_EPOCH 覆盖）
+head_modified_utc = "2026-11-24T00:00:00Z"
+italic_angle = -9.4
+copyright = "Copyright (c) 2015-2025, Renzhi Li (aka. Belleve Invis, belleve@typeof.net). Portions Copyright (c) 2016 The Inter Project Authors. Portions © 2014-2025 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'. Portions Copyright (c) 2012 Google Inc."
+shanggu_copyright = "© 2022-2026 Shanggu Fonts."
+license_description = "This Font Software is licensed under the SIL Open Font License, Version 1.1."
+license_url = "https://openfontlicense.org"
+source_only_legal_name_ids = [7, 8, 9, 10, 11]
+smart_dropout_prep_hex = "b801ff85b0048d"
+gasp_range_all = 15
+
+[axes]
+source_han_limit = [250, 400, 900]
+public_limit = [200, 400, 900]
+inter_opsz = 14
+hidden_anchors = [350]
+# 公开字重 -> Source Han 内部字重映射（600 公开对应 Source Han 500 与 Inter 600）
+[axes.public_to_internal_wght]
+200 = 250
+300 = 300
+350 = 350
+400 = 400
+600 = 500
+700 = 700
+900 = 900
+
+[vertical_metrics]
+hhea_ascent = 969
+hhea_descent = -241
+hhea_line_gap = 0
+typo_ascent = 968
+typo_descent = -241
+typo_line_gap = 0
+win_ascent = 968
+win_descent = 241
+
+[[weights]]
+name = "ExtraLight"
+value = 200
+range_min = 200
+range_max = 299
+flags = 0
+underline_thickness = 37
+underline_position = -185
+strikeout_size = 37
+sarasa_ref_weight = "ExtraLight"
+hcfg = "ExtraLight"
+
+[[weights]]
+name = "Light"
+value = 300
+range_min = 300
+range_max = 399
+flags = 0
+underline_thickness = 53
+underline_position = -177
+strikeout_size = 53
+sarasa_ref_weight = "Light"
+hcfg = "Light"
+
+[[weights]]
+name = "Regular"
+value = 400
+range_min = 400
+range_max = 499
+flags = 2
+underline_thickness = 68
+underline_position = -169
+strikeout_size = 68
+sarasa_ref_weight = "Regular"
+hcfg = "Regular"
+
+[[weights]]
+name = "SemiBold"
+value = 600
+range_min = 500
+range_max = 649
+flags = 0
+underline_thickness = 84
+underline_position = -161
+strikeout_size = 84
+sarasa_ref_weight = "SemiBold"
+hcfg = "SemiBold"
+
+[[weights]]
+name = "Bold"
+value = 700
+range_min = 650
+range_max = 799
+flags = 0
+underline_thickness = 92
+underline_position = -157
+strikeout_size = 92
+sarasa_ref_weight = "Bold"
+hcfg = "Bold"
+
+[[weights]]
+name = "Heavy"
+value = 900
+range_min = 800
+range_max = 900
+flags = 0
+underline_thickness = 113
+underline_position = -147
+strikeout_size = 113
+sarasa_ref_weight = "Bold"
+hcfg = "Heavy"
+
+[regions.CL]
+order = 0
+source_han_vf = "SourceHanSansK-VF.ttf"
+classical_vf = "shanggu-1.028/ShangguSansTC-VF.ttf"
+sarasa_prefix = "SarasaUiCL"
+local_family = "更紗黑體"
+local_lang_id = 0x0404
+codepage_range1 = 0x8010019F
+classical = true
+
+[regions.SC]
+order = 1
+source_han_vf = "SourceHanSansSC-VF.ttf"
+sarasa_prefix = "SarasaUiSC"
+local_family = "更纱黑体"
+local_lang_id = 0x0804
+codepage_range1 = 0x8004019F
+classical = false
+
+[regions.TC]
+order = 2
+source_han_vf = "SourceHanSansTC-VF.ttf"
+sarasa_prefix = "SarasaUiTC"
+local_family = "更紗黑體"
+local_lang_id = 0x0404
+codepage_range1 = 0x8010019F
+classical = false
+
+[regions.HC]
+order = 3
+source_han_vf = "SourceHanSansHC-VF.ttf"
+sarasa_prefix = "SarasaUiHC"
+local_family = "更紗黑體"
+local_lang_id = 0x0C04
+codepage_range1 = 0x8010019F
+classical = false
+
+[regions.J]
+order = 4
+source_han_vf = "SourceHanSans-VF.ttf"
+sarasa_prefix = "SarasaUiJ"
+local_family = "更紗ゴシック"
+local_lang_id = 0x0411
+codepage_range1 = 0x8002019F
+classical = false
+
+[regions.K]
+order = 5
+source_han_vf = "SourceHanSansK-VF.ttf"
+sarasa_prefix = "SarasaUiK"
+local_family = "사라사 고딕"
+local_lang_id = 0x0412
+codepage_range1 = 0x8028019F
+classical = false
+
+[codepoints]
+# 37 个默认比例形态码位（开启 pnum 不再改变其默认宽度）
+propdigits = [
+  0x0020, 0x0028, 0x0029, 0x002A, 0x002B, 0x002C, 0x002E,
+  0x0030, 0x0031, 0x0032, 0x0033, 0x0034, 0x0035, 0x0036, 0x0037, 0x0038, 0x0039,
+  0x003A, 0x003B, 0x003C, 0x003D, 0x003E,
+  0x005B, 0x005D, 0x007B, 0x007D, 0x007E,
+  0x00A0, 0x00B1, 0x00D7, 0x00F7,
+  0x2008, 0x2212, 0x2248, 0x2260, 0x2264, 0x2265,
+]
+# 第 38 个受 tnum 影响变宽的码位（连字符，与 Inter / 上游一致）
+tnum_extra = [0x002D]
+tabular_space = [0x2007]
+dash_cmap = [0x2014, 0x2015, 0x2E3A, 0x2E3B, 0xFE31]
+dash_locl = [0x2014, 0x2E3A, 0x2E3B]
+ellipsis = 0x2026
+cjk_ellipsis = 0x22EF
+source_han_forced = [0x22EF]
+# CL 㪉㪘㪣㪰：修正上游 GDEF 误标为 mark 导致的零步进
+classical_spacing_bases = [0x3A89, 0x3A98, 0x3AA3, 0x3AB0]
+# CL 巅拼绿 等汉字步进非 1000 的回归监测样本
+classical_fullwidth_check = [0x5DC5, 0x62FC, 0x7EFF]
+ui_autohint_options = ["--fallback-script=none", "--fallback-scaling"]
+ui_autohint_unscaled = [0x0360, 0x22EF]
+
+[codepoints.sanitizer_pwid]
+0x00B7 = "interpunct"
+0x2018 = "ident"
+0x2019 = "ident"
+0x201C = "ident"
+0x201D = "ident"
+0x2010 = "half"
+0x2025 = "ellipsis"
+0x2026 = "ellipsis"
+0x31B4 = "half"
+0x31B5 = "half"
+0x31B6 = "half"
+0x31B7 = "half"
+0x31BB = "half"
+
+[features]
+cjk_locl_languages = ["JAN ", "KOR ", "ZHH ", "ZHS ", "ZHT "]
+width_features = ["aalt", "pwid", "fwid", "hwid", "twid", "qwid"]
+source_han_final_gsub = ["locl", "ccmp", "vert", "vrt2", "ljmo", "vjmo", "tjmo", "calt", "hist"]
+inter_gsub = [
+  "aalt", "calt", "case", "ccmp", "dlig", "dnom", "frac", "hist", "locl",
+  "numr", "ordn", "pnum", "salt", "sinf", "subs", "sups", "tnum", "zero", "cv14",
+]
+inter_gpos = ["cpsp", "kern", "mark", "mkmk"]
+upright_empty_gsub = [
+  "cv01", "cv02", "cv03", "cv04", "cv05", "cv06", "cv07", "cv08", "cv09", "cv10", "cv11", "cv12", "cv13",
+  "ss01", "ss02", "ss03", "ss04", "ss05", "ss06", "ss07", "ss08",
+]
+italic_empty_gsub = [
+  "cv01", "cv02", "cv03", "cv04", "cv05", "cv06", "cv07", "cv08", "cv09", "cv10", "cv12", "cv13",
+  "ss01", "ss02", "ss03", "ss04", "ss05", "ss06", "ss07", "ss08",
+]
+far_east_scripts = ["hani", "kana", "bopo", "hang"]
+far_east_languages = ["JAN", "KOR", "ZHS", "ZHT", "ZHH"]
+shared_default_scripts = ["cyrl", "grek"]
+own_vertical_features = ["vert", "vrt2"]
+
+[sources]
+source_han_tag = "2.005R"
+inter_tag = "v4.1"
+shanggu_tag = "1.028"
+sarasa_tag = "v1.0.43"
+node_version = "v26.12.1"
+ots_version = "9.3.0"
+
+[sources.archives.source_han_vf]
+filename = "SourceHanSans-VF-2.005R.zip"
+url = "https://github.com/adobe-fonts/source-han-sans/releases/download/2.005R/02_SourceHanSans-VF.zip"
+sha256 = "e5944ea7253878409232f1ffad464e9e93879c0207eaf2960bba327eef89ed81"
+
+[sources.archives.inter]
+filename = "Inter-4.1.zip"
+url = "https://github.com/rsms/inter/releases/download/v4.1/Inter-4.1.zip"
+sha256 = "9883fdd4a49d4fb66bd8177ba6625ef9a64aa45899767dde3d36aa425756b11e"
+
+[sources.archives.shanggu_vf]
+filename = "ShangguSansVF_TTFs-1.028.7z"
+url = "https://github.com/GuiWonder/Shanggu/releases/download/1.028/ShangguSansVF_TTFs.7z"
+sha256 = "31b207a05332196ff444114d66de1c7b622d3a7244ec15a2485e8d0844cb1984"
+
+[sources.archives.sarasa_ui_unhinted_all]
+filename = "SarasaUi-TTF-Unhinted-1.0.43.7z"
+url = "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.43/SarasaUi-TTF-Unhinted-1.0.43.7z"
+sha256 = "c17173820f91ecd774ed484eb6ea7689fc14fbef0f6740e9d7a23e265dd83354"
+
+[sources.archives.sarasa_ui_hinted_all]
+filename = "SarasaUi-TTF-1.0.43.7z"
+url = "https://github.com/be5invis/Sarasa-Gothic/releases/download/v1.0.43/SarasaUi-TTF-1.0.43.7z"
+sha256 = "980a4fc33c95f1a65494612f508d76ad1892c9d20e76078692013b22c153bf30"
+
+[sources.sarasa_ui_unhinted_sha256]
+CL = "30dbf87fe1a975c5caa2cc4ff40df01bd91eac075ee2ccaf62af871044c07aa4"
+SC = "1b55231dc382ac78933ba54fda493c1c14b7f4203d4b2df536de397e345b685d"
+TC = "10c34d46b38e18ca8afcce951f2ba84e6d72646521517315057ab13139c21cb7"
+HC = "abd648ea42ff1537d9046061bdf9c29a4b24f3f0231054793bdecc0dc8fe5ac9"
+J = "ac0594f969748d34418c0aae472f3cdb8bb002423312120a270966b6457f2e65"
+K = "e0c90a24f8a4d32345040f6721cd26748a65f30f0f746c787d3e9f34854dd360"
+
+[sources.sarasa_ui_hinted_sha256]
+CL = "2a7eb5b7422fa2a372e098d1e6e399213609cc40b9d510e1e8f8dc19667bce79"
+SC = "3dc0f534b2cfa5f98b58a574948d3e3f9eb140600bd738f259c3d077acb2de66"
+TC = "bcdea1645e70abf36215a871895e15f49064ab80d1890e28d761521e59b15ee8"
+HC = "303ba44f8a2ce221c55ebe48129ae4def010627b770c7636c16654407cde669c"
+J = "e9fc510c63d958ac8b4a25a24fd6f7d1eb18440a3b8dfb501222e99daeee2203"
+K = "017e47e1ddcf8ced80cef8d0d873371cc4a1baa09c7f45511f9928d64648770c"
+
+[sources.node_sha256]
+"win-x64-zip" = "b3efd5c70cba3308ed46e7e699a9b8aac075bbc6b027fcb39c84c31acc25e2b4"
+"win-arm64-zip" = "34567581ee63967b37afb6b7a0cc63a2d550a43d5d838adb75982d7e356f2e2c"
+"linux-x64-tar.xz" = "6170b2d474e1c626f43cff3adc118df9fe3b573258a4fc3d850c8dbc6b079bbd"
+"linux-arm64-tar.xz" = "42aa04922591ee5d4dbc7740d452621acf28508239daa512f5ee8c47ee224fdb"
+"darwin-x64-tar.xz" = "69316aaafb4dfcb25ac7b9a460f5c60928a37580284fde410144d0e6c8672d0f"
+"darwin-arm64-tar.xz" = "18830bf448fe187c650dc28c98aa8c968ed1d40b6dd032c081e70a384a1bf660"
+
+[sources.ots_sha256]
+Windows = "3e6c16678a0cb5c2401755bf13d7f7371d09e7f3348468b57da04b0ff23af01f"
+Linux = "1caab4037806688203efd124b97443694794ca69a3dddd9a42b4833a4f8c4967"
+Darwin = "b674ab7a57f54799d37c8f6d28c825f8292ec264c18b537241b367d6eef8d928"
+
+# 差异清单（单一维护处，供验证与文档引用）
+[[differences]]
+id = "proportional-defaults"
+kind = "intentional"
+title = "比例默认数字与等宽 tnum/zero"
+basis = "37 个码位默认使用 Inter 比例形态，pnum 不改变默认宽度；tnum（含 U+002D 第 38 码位）与 tnum+zero 严格等宽。"
+
+[[differences]]
+id = "inter-context"
+kind = "intentional"
+title = "保留完整 Inter 上下文规则与原生顺序"
+basis = "保留 Inter 的冒号上浮、箭头及 calt/frac/dlig 无动作保护规则，恢复 Inter 原生 lookup 顺序（Left:1 不误上浮，H(H) 开 sups/subs 与 Inter 一致）。"
+
+[[differences]]
+id = "regional-punctuation"
+kind = "intentional"
+title = "中日韩默认标点规则与 bopo 脚本"
+basis = "hani/kana/hang/bopo 未指定语言时使用本地区 CJK 标点；bopo 路由防止注音串里的省略号和破折号退回西文形。"
+
+[[differences]]
+id = "chws-vchw"
+kind = "intentional"
+title = "Noto CJK 标点挤压 chws/vchw"
+basis = "通过固定 chws_tool 注入，斜体按剪切前的正体形状判断，VF 与静态一致。"
+
+[[differences]]
+id = "cyrillic-greek-default-routing"
+kind = "intentional"
+title = "西里尔、希腊默认语言共享 DFLT 特性"
+basis = "补齐上游缺失的 tnum/zero/frac/mark/mkmk，使俄语、希腊语数字可切换等宽且组合重音正确定位。"
+
+[[differences]]
+id = "hangul-ccmp-guards"
+kind = "intentional"
+title = "古韩文 L+V+T 合成保护规则"
+basis = "直接继承 Source Han VF 的 ccmp 忽略规则，避免上游静态流程丢规则导致的拆格。"
+
+[[differences]]
+id = "upstream-pair-order"
+kind = "intentional"
+title = "GPOS PairSet 按规范排序"
+basis = "修正固定上游未排序 PairSet 导致 HarfBuzz 二分查找漏读字偶距的问题。"
+
+[[differences]]
+id = "classical-fixes"
+kind = "intentional"
+title = "CL 尚古 1.028 全字集、全宽修正与间距基字"
+basis = "CL 叠加尚古 1.028 VF；强制修正 巅/拼/绿 等非全宽汉字为 1000（A5）；修正 㪉㪘㪣㪰 GDEF 误标为 mark。"
+
+[[differences]]
+id = "os2-metadata-fixes"
+kind = "intentional"
+title = "OS/2 usMaxContext 与 ulUnicodeRange bit 57 修正"
+basis = "按实际布局重算 usMaxContext，置位辅助平面标志 bit 57。"
+
+[[differences]]
+id = "heavy-weight"
+kind = "intentional"
+title = "新增 Heavy（900）字重与独立 A1 Hinting"
+basis = "上游 Sarasa Ui 无 Heavy 字重；本项目由 VF 单真相源提供并配独立 hcfg，且按安全预算扩充 cvt 消除 A13 执行中止。"
+
+[[differences]]
+id = "vf-single-source-metrics"
+kind = "source_vf"
+title = "单真相源跟随 Source Han VF 与 Inter VF 数值"
+basis = "不再向 Sarasa 静态成品做 13 控点逐单位对齐；保留 Source Han VF 的假名+句读字偶距（A3）、逐字重插值 palt/vpal（A6/A7）与尚古 1.028 VF 原样字形（A14）。"
+
+[[differences]]
+id = "upstream-inherited"
+kind = "upstream_inherited"
+title = "继承自上游且解释得通的细节"
+basis = "包括 Ģ、加泰罗尼亚语 l·l、DFLT 无 CJK 语言系统、latn/CAT·MOL·ROM 路由、win 度量 968/241 与 hhea.ascender 969、Android includeFontPadding 上下界、U+22EF 与 OS/2 码页 bit 31。"

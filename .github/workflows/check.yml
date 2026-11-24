@@ -1,22 +1,24 @@
-name: 单元测试与快速字体审计
+name: 单元测试（sarasa_pd）
 
 on:
-  # tag 指向的提交已在推送分支时检查过；只按分支触发，发布时不再把同一提交跑两遍。
   push:
     branches: ['**']
   pull_request:
   workflow_dispatch:
 
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     env:
       PYTHONUTF8: '1'
-      SARASA_PYTHON_VENV: ${{ github.workspace }}/.ci-venv
-      SARASA_SOURCE_DIR: ${{ github.workspace }}/.build-cache/test-sources
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -24,47 +26,25 @@ jobs:
           persist-credentials: false
       - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
-          python-version: '3.13.17'
-      - name: 安装完整哈希锁定依赖
+          python-version: '3.13'
+      - name: 安装精简哈希锁定依赖
         run: |
           python -m venv .ci-venv
-          .ci-venv/bin/python -m pip install --require-hashes -r requirements-visual.lock
+          .ci-venv/bin/python -m pip install --disable-pip-version-check --no-input --require-hashes -r requirements.lock
           .ci-venv/bin/python -m pip check
-      - name: 校验并准备完整测试来源
-        run: .ci-venv/bin/python tools/tests/prepare_sources.py
-      # 字体不进 git：取回本检出发布清单对应的 Release 资产，逐包逐字体核验。
-      # 先经 GitHub API 确认 Release 已发布并核对全部资产；只有 Release 不存在或仍是草稿时返回 3，
-      # 已发布却缺包或摘要不符一律失败。发布后由 release-assets.yml 逐成员核验全部 21 个包。
-      - name: 取回本版本已发布的字体
-        id: fonts
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
+      - name: 校验环境隔离与锁文件
+        run: .ci-venv/bin/python -E -s -X utf8 -m sarasa_pd env
+      - name: 运行 sarasa_pd 单元测试
         run: |
-          set +e
-          .ci-venv/bin/python tools/fetch_release_fonts.py
-          status=$?
-          set -e
-          if [ "$status" -eq 0 ]; then echo "available=true" >> "$GITHUB_OUTPUT"
-          elif [ "$status" -eq 3 ]; then echo "available=false" >> "$GITHUB_OUTPUT"
-          else exit "$status"; fi
-      - name: 单元测试
-        env:
-          RELEASE_FONTS: ${{ steps.fonts.outputs.available }}
-        run: |
-          .ci-venv/bin/python - <<'PY'
-          import os
+          .ci-venv/bin/python -E -s -X utf8 - <<'PY'
           import unittest
-          suite = unittest.defaultTestLoader.discover('tools/tests')
+
+          MIN_TESTS = 20
+          suite = unittest.defaultTestLoader.discover('tests')
           result = unittest.TextTestRunner(verbosity=2).run(suite)
-          skipped = [(test.id(), reason) for test, reason in result.skipped]
-          if skipped and os.environ['RELEASE_FONTS'] == 'true':
-              raise SystemExit('CI 不允许缺失夹具而跳过测试：' + repr(skipped))
-          # 版本尚未发布时只缺成品字体；缺固定来源或工具的跳过仍是失败。
-          others = [item for item in skipped if not item[1].startswith('需要成品字体：')]
-          if others:
-              raise SystemExit('只允许缺成品字体的跳过：' + repr(others))
+          if result.testsRun < MIN_TESTS:
+              raise SystemExit(f'单元测试数量低于下限：{result.testsRun} < {MIN_TESTS}')
+          if result.skipped:
+              raise SystemExit('CI 不允许跳过单元测试：' + repr(result.skipped))
           raise SystemExit(0 if result.wasSuccessful() else 1)
           PY
-      - name: 快速字体审计
-        if: steps.fonts.outputs.available == 'true'
-        run: .ci-venv/bin/python tools/check_quick_audit.py
