@@ -9,7 +9,7 @@ from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables._g_l_y_f import GlyphCoordinates, USE_MY_METRICS
 from fontTools.ttLib.tables.TupleVariation import TupleVariation
 from fontTools.varLib.iup import iup_delta_optimize
-from fontTools.varLib.models import VariationModel, normalizeValue, piecewiseLinearMap, supportScalar
+from fontTools.varLib.models import normalizeValue, piecewiseLinearMap, supportScalar
 from fontTools.varLib.varStore import VarStoreInstancer
 
 
@@ -31,7 +31,7 @@ def weight_at(font: TTFont, normalized: float) -> float:
 
 
 class ExactCurve:
-    """读取未缩放未取整的原始来源 VF 浮点坐标，避免 scale_upem 二次取整累积误差。"""
+    """读取未缩放未取整的原始来源 VF 浮点坐标与步进，避免 scale_upem 二次取整累积误差。"""
 
     def __init__(self, font: TTFont, scale: float, fixed: dict[str, float] | None = None) -> None:
         self.font = font
@@ -39,6 +39,8 @@ class ExactCurve:
         self.fixed = dict(fixed or {})
         self.locations: dict[float, dict[str, float]] = {}
         self.glyphs: dict[str, tuple[GlyphCoordinates, list[tuple[dict[str, tuple[float, float, float]], GlyphCoordinates]]]] = {}
+        self.hvar = font["HVAR"].table if "HVAR" in font else None
+        self.adv_instancers: dict[float, VarStoreInstancer] = {}
 
     def location(self, weight: float) -> dict[str, float]:
         if weight not in self.locations:
@@ -76,6 +78,23 @@ class ExactCurve:
                 total += deltas * scalar
         return [(x * self.scale, y * self.scale) for x, y in list(total)[:-4]]
 
+    def advance_width(self, name: str, weight: float) -> float | None:
+        if name not in self.font["hmtx"].metrics:
+            return None
+        adv = float(self.font["hmtx"].metrics[name][0])
+        if self.hvar is not None:
+            inst = self.adv_instancers.get(weight)
+            if inst is None:
+                inst = VarStoreInstancer(self.hvar.VarStore, self.font["fvar"].axes, self.location(weight))
+                self.adv_instancers[weight] = inst
+            idx = (
+                self.hvar.AdvWidthMap.mapping[name]
+                if self.hvar.AdvWidthMap is not None
+                else self.font.getGlyphID(name)
+            )
+            adv += float(inst[idx])
+        return adv * self.scale
+
 
 def curve_grid(target: TTFont, source: TTFont) -> tuple[list[float], list[dict[str, float]]]:
     for font in (target, source):
@@ -108,9 +127,9 @@ def curve_grid(target: TTFont, source: TTFont) -> tuple[list[float], list[dict[s
 
 
 def remap_gvar(source: TTFont, target: TTFont, exact: ExactCurve | None = None) -> dict[str, Any]:
-    """将 source 的 gvar 重建到 target 的公开 wght/avar 坐标空间。"""
+    """将 source 的 gvar 重建到 target 的公开 wght/avar 坐标空间，用相邻分段线性支撑实现命名字重单次取整。"""
     weights, locations = curve_grid(target, source)
-    model = VariationModel(locations, axisOrder=["wght"])
+    supports, master_indices = adjacent_supports(locations)
     source_locations = [{"wght": axis_coordinate(source, w)} for w in weights]
     default_index = next(i for i, loc in enumerate(locations) if not loc)
     hvar = source["HVAR"].table if "HVAR" in source else None
@@ -151,16 +170,21 @@ def remap_gvar(source: TTFont, target: TTFont, exact: ExactCurve | None = None) 
             curves = [None if i == default_index else exact.points(name, w) for i, w in enumerate(weights)]
             if any(c is not None and len(c) != len(coords) - 4 for c in curves):
                 raise ValueError(f"精确来源与缩放来源的字形点数不一致：{name}")
-            for master, curve in zip(masters, curves):
+            base_adv = coords[-3][0] - coords[-4][0]
+            for i, (master, w, curve) in enumerate(zip(masters, weights, curves)):
+                if i == default_index:
+                    continue
                 for pt, (x, y) in enumerate(curve or ()):
-                    master[pt] = (x - coords[pt][0], y - coords[pt][1])
+                    master[pt] = (otRound(x) - coords[pt][0], otRound(y) - coords[pt][1])
+                exact_adv = exact.advance_width(name, w)
+                if exact_adv is not None:
+                    master[-3] = (master[-4][0] + otRound(exact_adv) - base_adv, 0)
             exact_glyphs += int(any(c is not None for c in curves))
-        deltas, supports = model.getDeltasAndSupports(masters, round=round)
-        if any(x or y for x, y in deltas[0]):
+        if any(otRound(x) or otRound(y) for x, y in masters[default_index]):
             raise ValueError("重参数化不能改变默认字形")
         variations = []
-        for delta, support in zip(deltas[1:], supports[1:]):
-            values = [(otRound(x), otRound(y)) for x, y in delta]
+        for support, m_idx in zip(supports, master_indices):
+            values = [(otRound(x), otRound(y)) for x, y in masters[m_idx]]
             if any(x or y for x, y in values):
                 variations.append(TupleVariation(support, values))
         source["gvar"].variations[name] = variations

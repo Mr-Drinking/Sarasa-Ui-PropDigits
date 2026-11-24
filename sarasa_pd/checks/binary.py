@@ -4,13 +4,16 @@ from __future__ import annotations
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 import subprocess
-from typing import Any
+from typing import Any, Sequence
 
 import freetype
 from fontTools.ttLib import TTFont
 import uharfbuzz as hb
 
 from .rules import CheckResult
+
+# 日常快速检查采样的字号列表：9–20 px 逐字号全覆 + 24–128 px 每 4 px（共 39 字号，约全量 1/3 耗时）
+FT_FAST_PPEMS: tuple[int, ...] = tuple([*range(9, 21), *range(24, 129, 4)])
 
 
 def check_ots(font_path: Path, ots_exe: Path) -> CheckResult:
@@ -47,25 +50,50 @@ def scan_freetype_pedantic(
     *,
     ppem_start: int = 9,
     ppem_end: int = 128,
+    ppems: Sequence[int] | None = None,
+    mode: str = "full",
     workers: int = 4,
 ) -> CheckResult:
-    """在灰阶严格模式下扫描全部字形 × [ppem_start, ppem_end]，要求 0 执行中止（A13）。"""
+    """在灰阶严格模式下扫描全部字形 × 目标字号集合，要求 0 执行中止（A13）。
+
+    - mode="full"：扫描 [ppem_start, ppem_end] 全部字号（默认 9–128 px，120 个字号，发版前硬门禁）；
+    - mode="fast"：扫描 FT_FAST_PPEMS（9–20 px 逐个 + 24–128 px 每 4 px，39 个字号，日常快速检查）；
+    - ppems 显式传入时优先使用该字号序列。
+    """
     res = CheckResult(ok=True)
-    ppems = list(range(ppem_start, ppem_end + 1))
+    if ppems is not None:
+        target_ppems = [int(p) for p in ppems]
+        range_label = f"custom({len(target_ppems)})"
+    elif mode == "fast":
+        target_ppems = list(FT_FAST_PPEMS)
+        range_label = "fast(9-20,24..128:4)"
+    elif mode == "full":
+        target_ppems = list(range(ppem_start, ppem_end + 1))
+        range_label = f"{ppem_start}-{ppem_end}"
+    else:
+        raise ValueError(f"未知 FreeType 扫描模式：{mode!r}（仅支持 'fast' 或 'full'）")
+
     total_fails = 0
     samples: list[dict[str, Any]] = []
-    if workers <= 1 or len(ppems) <= 4:
-        total_fails, samples = _scan_ft_chunk((str(font_path), ppems))
+    if workers <= 1 or len(target_ppems) <= 4:
+        total_fails, samples = _scan_ft_chunk((str(font_path), target_ppems))
     else:
-        chunks = [ppems[i::workers] for i in range(workers)]
-        with ProcessPoolExecutor(max_workers=workers) as ex:
+        chunks = [target_ppems[i::workers] for i in range(workers)]
+        chunks = [c for c in chunks if c]
+        with ProcessPoolExecutor(max_workers=min(workers, len(chunks))) as ex:
             for fails, chunk_samples in ex.map(_scan_ft_chunk, [(str(font_path), c) for c in chunks]):
                 total_fails += fails
                 if len(samples) < 12:
                     samples.extend(chunk_samples[: 12 - len(samples)])
-    res.metrics.update({"ppem_range": f"{ppem_start}-{ppem_end}", "fail_events": total_fails, "samples": samples})
+    res.metrics.update({
+        "ft_mode": mode,
+        "ppem_range": range_label,
+        "ppem_count": len(target_ppems),
+        "fail_events": total_fails,
+        "samples": samples,
+    })
     if total_fails > 0:
-        res.fail(f"FreeType 严格执行扫描发现 {total_fails} 次失败（{ppem_start}-{ppem_end} px），样例：{samples[:4]}")
+        res.fail(f"FreeType 严格执行扫描发现 {total_fails} 次失败（{range_label} px），样例：{samples[:4]}")
     return res
 
 

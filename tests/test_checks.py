@@ -8,16 +8,26 @@ import unittest
 from fontTools.fontBuilder import FontBuilder
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
+from fontTools.ttLib.tables import otTables as ot
 from fontTools.ttLib.tables._c_m_a_p import cmap_format_14
 from fontTools.ttLib.tables.ttProgram import Program
+import uharfbuzz as hb
 
-from sarasa_pd.checks.binary import check_hinted_unhinted_parity
+from sarasa_pd.checks.binary import (
+    FT_FAST_PPEMS,
+    check_hinted_unhinted_parity,
+    scan_freetype_pedantic,
+)
 from sarasa_pd.checks.rules import (
     CheckResult,
     _check_cmap_and_uvs,
+    _check_empty_gsub_features,
+    _check_inter_kerning_and_advances,
     _check_names_os2_and_raster,
 )
 from sarasa_pd.spec import load_spec
+from sarasa_pd.vf.layout import restore_upstream_empty_gsub_features
+from sarasa_pd.vf.layout_utils import Feature, install
 from sarasa_pd.vf.names import normalize_nonhinting_raster_metadata, update_vf_names
 
 
@@ -137,6 +147,133 @@ class ChecksCounterexampleTests(unittest.TestCase):
             res = check_hinted_unhinted_parity(p_bad, p_un)
             self.assertFalse(res.ok)
             self.assertEqual(res.metrics["outline_diffs"], 1)
+
+    def test_a9_kerning_and_unsorted_pairset_counterexamples(self) -> None:
+        spec = load_spec()
+
+        def make_kern_font(kern_val: int, unsorted: bool = False) -> Path:
+            fb = FontBuilder(1000, isTTF=True)
+            fb.setupGlyphOrder([".notdef", "uni02BC", "rho", "alpha"])
+            fb.setupCharacterMap({0x02BC: "uni02BC", 0x03C1: "rho", 0x03B1: "alpha"})
+            fb.setupGlyf({g: _rect(40, 0, 260, 700) for g in (".notdef", "uni02BC", "rho", "alpha")})
+            fb.setupHorizontalMetrics({".notdef": (600, 40), "uni02BC": (299, 40), "rho": (612, 40), "alpha": (600, 40)})
+            fb.setupHorizontalHeader(ascent=880, descent=-120)
+            fb.setupNameTable({"familyName": "KernTest", "styleName": "Regular"})
+            fb.setupOS2()
+            fb.setupPost()
+            font = fb.font
+            font["post"].formatType = 3.0
+
+            gpos = newTable("GPOS")
+            tbl = ot.GPOS()
+            tbl.Version = 0x00010000
+            sub = ot.PairPos()
+            sub.Format = 1
+            sub.ValueFormat1 = 0x0004
+            sub.ValueFormat2 = 0
+            sub.Coverage = ot.Coverage()
+            sub.Coverage.glyphs = ["uni02BC"]
+            r_rho = ot.PairValueRecord()
+            r_rho.SecondGlyph = "rho"
+            r_rho.Value1 = ot.ValueRecord()
+            r_rho.Value1.XAdvance = kern_val
+            r_alpha = ot.PairValueRecord()
+            r_alpha.SecondGlyph = "alpha"
+            r_alpha.Value1 = ot.ValueRecord()
+            r_alpha.Value1.XAdvance = -10
+            ps = ot.PairSet()
+            # alpha GID=3 > rho GID=2；unsorted=True 时故意倒序
+            ps.PairValueRecord = [r_alpha, r_rho] if unsorted else [r_rho, r_alpha]
+            ps.PairValueCount = 2
+            sub.PairSet = [ps]
+            sub.PairSetCount = 1
+            lk = ot.Lookup()
+            lk.LookupType = 2
+            lk.LookupFlag = 0
+            lk.SubTable = [sub]
+            lk.SubTableCount = 1
+            tbl.LookupList = ot.LookupList()
+            tbl.LookupList.Lookup = [lk]
+            tbl.LookupList.LookupCount = 1
+            install(tbl, {("DFLT", "dflt"): {"kern": Feature((0,))}, ("grek", "dflt"): {"kern": Feature((0,))}})
+            gpos.table = tbl
+            font["GPOS"] = gpos
+            out = tmp / f"kern_{kern_val}_{int(unsorted)}.ttf"
+            font.save(out)
+            return out
+
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            tmp = Path(raw_tmp)
+            # 1) -62 且有序 -> 通过
+            p_ok = make_kern_font(-62, unsorted=False)
+            with TTFont(p_ok) as f_ok:
+                r_ok = CheckResult(ok=True)
+                _check_inter_kerning_and_advances(f_ok, hb.Font(hb.Face(p_ok.read_bytes())), r_ok, spec, is_vf=False)
+                self.assertTrue(r_ok.ok, r_ok.errors)
+                self.assertEqual(r_ok.metrics["a9_mod_apostrophe_rho_kern"], -62)
+
+            # 2) 反例：-21（A9 退化）-> 必须失败
+            p_bad = make_kern_font(-21, unsorted=False)
+            with TTFont(p_bad) as f_bad:
+                r_bad = CheckResult(ok=True)
+                _check_inter_kerning_and_advances(f_bad, hb.Font(hb.Face(p_bad.read_bytes())), r_bad, spec, is_vf=False)
+                self.assertFalse(r_bad.ok)
+                self.assertTrue(any("A9 回归" in e for e in r_bad.errors))
+
+            # 3) 反例：PairSet 未排序 -> 必须失败
+            p_uns = make_kern_font(-62, unsorted=True)
+            with TTFont(p_uns) as f_uns:
+                r_uns = CheckResult(ok=True)
+                _check_inter_kerning_and_advances(f_uns, hb.Font(hb.Face(p_uns.read_bytes())), r_uns, spec, is_vf=False)
+                self.assertFalse(r_uns.ok)
+                self.assertTrue(any("PairSet" in e for e in r_uns.errors))
+
+    def test_empty_gsub_features_check_upright_and_italic(self) -> None:
+        spec = load_spec()
+        font = _make_static()
+        gsub = newTable("GSUB")
+        gsub.table = ot.GSUB()
+        gsub.table.Version = 0x00010000
+        gsub.table.LookupList = ot.LookupList()
+        gsub.table.LookupList.Lookup = []
+        gsub.table.LookupList.LookupCount = 0
+        install(gsub.table, {("DFLT", "dflt"): {"ccmp": Feature(())}, ("latn", "dflt"): {"ccmp": Feature(())}})
+        font["GSUB"] = gsub
+
+        # 未补空特性前必须失败
+        r_miss = CheckResult(ok=True)
+        _check_empty_gsub_features(font, r_miss, spec, italic=False)
+        self.assertFalse(r_miss.ok)
+
+        # 斜体补齐（20 个，不含 cv11）-> 斜体检查通过、正体检查报缺 cv11
+        restore_upstream_empty_gsub_features(font, spec, italic=True)
+        r_it = CheckResult(ok=True)
+        _check_empty_gsub_features(font, r_it, spec, italic=True)
+        self.assertTrue(r_it.ok, r_it.errors)
+        r_up_fail = CheckResult(ok=True)
+        _check_empty_gsub_features(font, r_up_fail, spec, italic=False)
+        self.assertFalse(r_up_fail.ok)
+        self.assertTrue(any("cv11" in e for e in r_up_fail.errors))
+
+        # 正体补齐（含 cv11）-> 正体检查通过
+        restore_upstream_empty_gsub_features(font, spec, italic=False)
+        r_up = CheckResult(ok=True)
+        _check_empty_gsub_features(font, r_up, spec, italic=False)
+        self.assertTrue(r_up.ok, r_up.errors)
+
+    def test_ft_fast_ppems_and_scan_mode(self) -> None:
+        self.assertEqual(len(FT_FAST_PPEMS), 39)
+        self.assertEqual(FT_FAST_PPEMS[:12], tuple(range(9, 21)))
+        self.assertEqual(FT_FAST_PPEMS[-1], 128)
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            p = Path(raw_tmp) / "static.ttf"
+            _make_static().save(p)
+            res = scan_freetype_pedantic(p, mode="fast", workers=1)
+            self.assertTrue(res.ok, res.errors)
+            self.assertEqual(res.metrics["ppem_count"], 39)
+            self.assertEqual(res.metrics["ft_mode"], "fast")
+            with self.assertRaises(ValueError):
+                scan_freetype_pedantic(p, mode="invalid", workers=1)
 
 
 if __name__ == "__main__":

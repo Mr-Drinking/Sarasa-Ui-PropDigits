@@ -63,8 +63,9 @@ python -E -s -X utf8 -m sarasa_pd build --stage vf --regions SC,CL --out .build-
 python -E -s -X utf8 -m sarasa_pd build --stage unhinted --regions SC --out .build-cache/runs/dev
 python -E -s -X utf8 -m sarasa_pd build --stage hinted --regions SC --weights Regular --out .build-cache/runs/dev
 
-# 产品规则、OTS 与 FreeType 9–128 px 严格检查
-python -E -s -X utf8 -m sarasa_pd check --stage all --root fonts
+# 产品规则、OTS 与 FreeType 严格检查（日常快检 --ft-mode fast，发版全量 --ft-mode full）
+python -E -s -X utf8 -m sarasa_pd check --stage all --root fonts --ft-mode fast
+python -E -s -X utf8 -m sarasa_pd check --stage all --root fonts --ft-mode full
 
 # 与上游或前版对照（输出对比表与明细 JSON）
 python -E -s -X utf8 -m sarasa_pd compare --baseline upstream --cand-root fonts --out .build-cache/compare/upstream

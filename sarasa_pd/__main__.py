@@ -81,6 +81,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_check.add_argument("--root", type=Path, default=None, help="待检查字体根目录（默认 fonts/）")
     p_check.add_argument("--stage", choices=("vf", "unhinted", "hinted", "all"), default="all")
     p_check.add_argument("--jobs", type=int, default=4, help="FreeType 扫描并发进程数（默认 4）")
+    p_check.add_argument(
+        "--ft-mode",
+        choices=("fast", "full"),
+        default="fast",
+        help="hinted FreeType 严格扫描档位：fast 为日常采样（9–20 逐个 + 24–128 每 4 px），full 为发版全量（9–128 逐字号）",
+    )
     p_check.add_argument("--skip-ots", action="store_true", help="跳过 OTS 检查（默认启用）")
 
     p_pkg = sub.add_parser("package", allow_abbrev=False, help="生成 21 个发布 ZIP 与 SHA256SUMS.txt")
@@ -259,6 +265,8 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
         ref_path = store.sarasa_ref_path(region, "Regular", False, hinted=False)
         for style in styles:
             italic = style == "italic"
+            inter_vf_path = store.vf_dir / ("InterVariable-Italic.ttf" if italic else "InterVariable.ttf")
+            inter_ref = inter_vf_path if inter_vf_path.is_file() else None
             vf_path = font_root / "variable" / spec.variable_filename(region, italic)
             if "vf" in stages:
                 if not vf_path.is_file():
@@ -271,6 +279,7 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                         italic=italic,
                         is_vf=True,
                         reference_path=ref_path if ref_path.is_file() else None,
+                        inter_vf_path=inter_ref,
                         subset_mode=args.subset,
                         spec=spec,
                     )
@@ -280,7 +289,7 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                         o = check_ots(vf_path, ots_exe)
                         if not o.ok:
                             failures.extend(f"[VF {vf_path.name}] {e}" for e in o.errors)
-                    print(f"[check] {vf_path.name}: {'PASS' if r.ok else 'FAIL'} (cps={r.metrics.get('codepoints')}, uvs={r.metrics.get('uvs_entries')})", flush=True)
+                    print(f"[check] {vf_path.name}: {'PASS' if r.ok else 'FAIL'} (cps={r.metrics.get('codepoints')}, uvs={r.metrics.get('uvs_entries')}, a9={r.metrics.get('a9_mod_apostrophe_rho_kern')})", flush=True)
 
             for w_name in weights:
                 w = spec.weight(w_name)
@@ -299,6 +308,7 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                             is_vf=False,
                             hinted=False,
                             reference_path=ref_path if ref_path.is_file() else None,
+                            inter_vf_path=inter_ref,
                             subset_mode=args.subset,
                             spec=spec,
                         )
@@ -325,12 +335,13 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                             is_vf=False,
                             hinted=True,
                             reference_path=ref_path if ref_path.is_file() else None,
+                            inter_vf_path=inter_ref,
                             subset_mode=args.subset,
                             spec=spec,
                         )
                         if not r.ok:
                             failures.extend(f"[hinted {hi_path.name}] {e}" for e in r.errors)
-                        ft = scan_freetype_pedantic(hi_path, ppem_start=9, ppem_end=128, workers=max(1, args.jobs))
+                        ft = scan_freetype_pedantic(hi_path, mode=args.ft_mode, workers=max(1, args.jobs))
                         if not ft.ok:
                             failures.extend(f"[FT {hi_path.name}] {e}" for e in ft.errors)
                         if un_path.is_file():
@@ -341,6 +352,8 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                             o = check_ots(hi_path, ots_exe)
                             if not o.ok:
                                 failures.extend(f"[hinted {hi_path.name}] {e}" for e in o.errors)
+                        ok_hi = r.ok and ft.ok
+                        print(f"[check-hi] {hi_path.name}: {'PASS' if ok_hi else 'FAIL'} (ft={ft.metrics.get('ppem_range')} fails={ft.metrics.get('fail_events')})", flush=True)
 
     if failures:
         print(f"CHECK FAILED: 检查 {checked} 个字体，发现 {len(failures)} 项错误：", file=sys.stderr)

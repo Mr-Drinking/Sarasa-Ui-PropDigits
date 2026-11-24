@@ -279,6 +279,82 @@ def bake_inter_ui_recipe(font: TTFont, spec: Spec) -> dict[str, int]:
     }
 
 
+def repair_inter_ss03_kerning(inter: TTFont) -> int:
+    """修复 Inter 4.1 VF 中 (quoteright.ss03, rho) 被 L1 S1 类值冲掉的问题（A9）。
+
+    Inter 4.1 的 Inter-Regular/Inter-Black/InterDisplay-Regular 以及 InterVariable 的
+    (quoteright, rho) 均为 -128（1000 UPM 为 -62），无变体偏差；仅因 InterDisplay-Black
+    漏掉该例外，varLib 把 (quoteright.ss03, rho) 挪进 S1 并覆写成类值 -43（-21）。
+    本函数在缩放到 1000 UPM 前把 (quoteright.ss03, rho) 恢复为同表 (quoteright, rho) 的值。
+    """
+    if "GPOS" not in inter or not inter["GPOS"].table.LookupList:
+        return 0
+    gpos = inter["GPOS"].table
+    kern_lks = _feature_lookup_indices(inter, "GPOS", {"kern"})
+    gid_map = {name: i for i, name in enumerate(inter.getGlyphOrder())}
+    fixed = 0
+    for idx in sorted(kern_lks):
+        lk = gpos.LookupList.Lookup[idx]
+        fmt1_subs = [
+            st
+            for raw in lk.SubTable
+            if isinstance((st := getattr(raw, "ExtSubTable", raw)), ot.PairPos) and st.Format == 1
+        ]
+        if not fmt1_subs:
+            continue
+        ref_sub = None
+        ref_rec = None
+        for st in fmt1_subs:
+            if "quoteright" not in st.Coverage.glyphs:
+                continue
+            ps = st.PairSet[st.Coverage.glyphs.index("quoteright")]
+            hit = next((r for r in ps.PairValueRecord if r.SecondGlyph == "rho"), None)
+            if hit is not None:
+                ref_sub, ref_rec = st, hit
+                break
+        if ref_rec is None:
+            continue
+
+        updated = False
+        for st in fmt1_subs:
+            if "quoteright.ss03" not in st.Coverage.glyphs:
+                continue
+            ps = st.PairSet[st.Coverage.glyphs.index("quoteright.ss03")]
+            hit = next((r for r in ps.PairValueRecord if r.SecondGlyph == "rho"), None)
+            if hit is not None:
+                hit.Value1 = copy.deepcopy(getattr(ref_rec, "Value1", None))
+                ref_v2 = getattr(ref_rec, "Value2", None)
+                if ref_v2 is not None or hasattr(hit, "Value2"):
+                    hit.Value2 = copy.deepcopy(ref_v2)
+                updated = True
+                fixed += 1
+                break
+        if not updated and ref_sub is not None and "quoteright.ss03" in gid_map and "rho" in gid_map:
+            new_rec = ot.PairValueRecord()
+            new_rec.SecondGlyph = "rho"
+            new_rec.Value1 = copy.deepcopy(getattr(ref_rec, "Value1", None))
+            ref_v2 = getattr(ref_rec, "Value2", None)
+            if ref_v2 is not None:
+                new_rec.Value2 = copy.deepcopy(ref_v2)
+            if "quoteright.ss03" in ref_sub.Coverage.glyphs:
+                ps = ref_sub.PairSet[ref_sub.Coverage.glyphs.index("quoteright.ss03")]
+                ps.PairValueRecord.append(new_rec)
+                ps.PairValueRecord.sort(key=lambda r: gid_map.get(r.SecondGlyph, 1 << 30))
+                ps.PairValueCount = len(ps.PairValueRecord)
+            else:
+                new_ps = ot.PairSet()
+                new_ps.PairValueRecord = [new_rec]
+                new_ps.PairValueCount = 1
+                pairs = list(zip(ref_sub.Coverage.glyphs, ref_sub.PairSet))
+                pairs.append(("quoteright.ss03", new_ps))
+                pairs.sort(key=lambda item: gid_map.get(item[0], 1 << 30))
+                ref_sub.Coverage.glyphs = [g for g, _ in pairs]
+                ref_sub.PairSet = [p for _, p in pairs]
+                ref_sub.PairSetCount = len(ref_sub.PairSet)
+            fixed += 1
+    return fixed
+
+
 def load_inter(inter_vf: Path, spec: Spec | None = None) -> LoadedInter:
     spec = spec or load_spec()
     with TTFont(inter_vf) as raw:
@@ -289,6 +365,7 @@ def load_inter(inter_vf: Path, spec: Spec | None = None) -> LoadedInter:
             inplace=False,
             optimize=True,
         )
+    repair_inter_ss03_kerning(inter)
     unscaled_store = (
         copy.deepcopy(inter["GDEF"].table.VarStore)
         if "GDEF" in inter and getattr(inter["GDEF"].table, "VarStore", None) is not None

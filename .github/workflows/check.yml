@@ -39,7 +39,7 @@ jobs:
           .ci-venv/bin/python -E -s -X utf8 - <<'PY'
           import unittest
 
-          MIN_TESTS = 45
+          MIN_TESTS = 50
           suite = unittest.defaultTestLoader.discover('tests')
           result = unittest.TextTestRunner(verbosity=2).run(suite)
           if result.testsRun < MIN_TESTS:

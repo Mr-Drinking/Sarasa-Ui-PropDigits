@@ -127,7 +127,7 @@ def _stage_merge_layout(ctx: VFBuildContext) -> None:
     rep.update(drop_sarasa_width_features(ctx.font, ctx.spec))
     rep.update(prune_locl_to_reference(ctx.font, ctx.reference, ctx.spec))
     rep["source_han_nonfinal_gsub_dropped"] = drop_nonfinal_source_han_gsub(ctx.font, ctx.spec)
-    rep.update(import_inter_layout(ctx.font, ctx.loaded_inter, ctx.spec))
+    rep.update(import_inter_layout(ctx.font, ctx.loaded_inter, ctx.spec, italic=ctx.italic))
     ctx.report["layout"] = rep
     # Inter 已完全并入，提前释放内存
     ctx.loaded_inter.close()

@@ -5,10 +5,16 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from fontTools.misc.fixedTools import otRound
 from fontTools.ttLib import TTFont
+from fontTools.ttLib.tables import otTables as ot
+from fontTools.varLib.models import normalizeValue, piecewiseLinearMap
+from fontTools.varLib.varStore import VarStoreInstancer
 import uharfbuzz as hb
 
-from ..spec import Spec, is_ideograph, load_spec
+from ..spec import Spec, is_ideograph, load_spec, use_inter_codepoint
+from ..vf.base import _single_sub_mapping
+from ..vf.layout_utils import routes
 
 
 @dataclass
@@ -324,6 +330,342 @@ def _check_names_os2_and_raster(
             res.fail(f"VF/unhinted 存在 {inst_cnt} 个带字形指令的字形")
 
 
+def _check_empty_gsub_features(font: TTFont, res: CheckResult, spec: Spec, *, italic: bool) -> None:
+    """确认按上游 Sarasa Ui 保留的空 GSUB 特性记录（ss01–ss08、cv01–cv13，斜体不含 cv11）仍在位。"""
+    if "GSUB" not in font or not font["GSUB"].table.ScriptList:
+        res.fail("缺少 GSUB 表，无法校验上游空特性记录")
+        return
+    expected = set(spec.features["italic_empty_gsub" if italic else "upright_empty_gsub"])
+    r = routes(font["GSUB"].table)
+    for key in (("DFLT", "dflt"), ("latn", "dflt")):
+        feats = r.get(key)
+        if feats is None:
+            continue
+        missing = sorted(expected - set(feats))
+        if missing:
+            res.fail(f"GSUB {key[0]}/{key[1]} 缺少上游保留空特性 {len(missing)} 个：{missing[:6]}")
+
+
+def _eval_value_xadv(vrec: Any, inst: VarStoreInstancer | None) -> float:
+    if vrec is None:
+        return 0.0
+    x = float(getattr(vrec, "XAdvance", 0) or 0)
+    dev = getattr(vrec, "XAdvDevice", None)
+    if dev is not None and inst is not None and getattr(dev, "DeltaFormat", None) == 0x8000:
+        x += float(inst[(dev.StartSize << 16) | dev.EndSize])
+    return x
+
+
+def _make_var_instancer(font: TTFont, weight: float, opsz: float | None = None) -> VarStoreInstancer | None:
+    if "GDEF" not in font or getattr(font["GDEF"].table, "VarStore", None) is None or "fvar" not in font:
+        return None
+    loc: dict[str, float] = {}
+    avar_segs = font["avar"].segments if "avar" in font else {}
+    for axis in font["fvar"].axes:
+        if axis.axisTag == "wght":
+            n = normalizeValue(weight, (axis.minValue, axis.defaultValue, axis.maxValue))
+            seg = avar_segs.get("wght")
+            loc["wght"] = piecewiseLinearMap(n, seg) if seg else n
+        elif axis.axisTag == "opsz" and opsz is not None:
+            n = normalizeValue(opsz, (axis.minValue, axis.defaultValue, axis.maxValue))
+            seg = avar_segs.get("opsz")
+            loc["opsz"] = piecewiseLinearMap(n, seg) if seg else n
+        else:
+            loc[axis.axisTag] = 0.0
+    return VarStoreInstancer(font["GDEF"].table.VarStore, font["fvar"].axes, loc)
+
+
+def _extract_kern_tables(
+    font: TTFont,
+    *,
+    weight: float | None = None,
+    opsz: float | None = None,
+    a9_repair: bool = False,
+) -> list[list[tuple[Any, ...]]]:
+    if "GPOS" not in font or not font["GPOS"].table.FeatureList or not font["GPOS"].table.LookupList:
+        return []
+    gpos = font["GPOS"].table
+    kern_lks = sorted({
+        int(idx)
+        for rec in gpos.FeatureList.FeatureRecord
+        if rec.FeatureTag == "kern"
+        for idx in (rec.Feature.LookupListIndex or [])
+    })
+    inst = _make_var_instancer(font, weight, opsz) if weight is not None else None
+    lookups: list[list[tuple[Any, ...]]] = []
+    for li in kern_lks:
+        lk = gpos.LookupList.Lookup[li]
+        subs: list[tuple[Any, ...]] = []
+        ref_quoteright_rho: float | None = None
+        for raw in lk.SubTable:
+            p = getattr(raw, "ExtSubTable", raw)
+            if not isinstance(p, ot.PairPos):
+                continue
+            if p.Format == 1:
+                m: dict[str, dict[str, float]] = {}
+                for g1, ps in zip(p.Coverage.glyphs, p.PairSet):
+                    row = {r.SecondGlyph: _eval_value_xadv(r.Value1, inst) for r in ps.PairValueRecord}
+                    m[g1] = row
+                if a9_repair and ref_quoteright_rho is None and "quoteright" in m and "rho" in m["quoteright"]:
+                    ref_quoteright_rho = m["quoteright"]["rho"]
+                subs.append((1, m))
+            elif p.Format == 2:
+                cov = set(p.Coverage.glyphs)
+                c1d = dict(p.ClassDef1.classDefs)
+                c2d = dict(p.ClassDef2.classDefs)
+                mat = [[_eval_value_xadv(r2.Value1, inst) for r2 in r1.Class2Record] for r1 in p.Class1Record]
+                subs.append((2, cov, c1d, c2d, mat))
+        if a9_repair and ref_quoteright_rho is not None:
+            patched = False
+            for sub in subs:
+                if sub[0] == 1 and "quoteright.ss03" in sub[1] and "rho" in sub[1]["quoteright.ss03"]:
+                    sub[1]["quoteright.ss03"]["rho"] = ref_quoteright_rho
+                    patched = True
+                    break
+            if not patched:
+                for sub in subs:
+                    if sub[0] == 1:
+                        sub[1].setdefault("quoteright.ss03", {})["rho"] = ref_quoteright_rho
+                        break
+        lookups.append(subs)
+    return lookups
+
+
+def _eval_kern(lookups: list[list[tuple[Any, ...]]], g1: str, g2: str) -> float:
+    total = 0.0
+    for subs in lookups:
+        for sub in subs:
+            if sub[0] == 1:
+                row = sub[1].get(g1)
+                if row is not None and g2 in row:
+                    total += row[g2]
+                    break
+            else:
+                _fmt, cov, c1d, c2d, mat = sub
+                if g1 in cov:
+                    total += mat[c1d.get(g1, 0)][c2d.get(g2, 0)]
+                    break
+    return total
+
+
+_INTER_REF_CACHE: dict[tuple[str, float], dict[str, Any]] = {}
+
+
+def _load_inter_ref(inter_vf_path: Path, spec: Spec) -> dict[str, Any]:
+    key = (str(inter_vf_path.resolve()), float(spec.inter_opsz))
+    cached = _INTER_REF_CACHE.get(key)
+    if cached is not None:
+        return cached
+    with TTFont(inter_vf_path) as inter:
+        scale = 1000.0 / float(inter["head"].unitsPerEm)
+        cm = dict(inter.getBestCmap() or {})
+        tnum = _single_sub_mapping(inter, "tnum")
+        ss03 = _single_sub_mapping(inter, "ss03")
+        cv10 = _single_sub_mapping(inter, "cv10")
+        pnum = _single_sub_mapping(inter, "pnum")
+        eff_cmap: dict[int, str] = {}
+        for cp, g in cm.items():
+            if cp != 0x2D and g in tnum:
+                g = tnum[g]
+            g = ss03.get(g, g)
+            g = cv10.get(g, g)
+            if cp in spec.propdigits_codepoints and g in pnum:
+                g = pnum[g]
+            eff_cmap[cp] = g
+
+        hvar = inter["HVAR"].table if "HVAR" in inter else None
+        axes = inter["fvar"].axes
+        avar_segs = inter["avar"].segments if "avar" in inter else {}
+        hmtx = {g: float(m[0]) for g, m in inter["hmtx"].metrics.items()}
+        glyph_ids = {g: i for i, g in enumerate(inter.getGlyphOrder())}
+
+        kern_by_w: dict[int, list[list[tuple[Any, ...]]]] = {}
+        adv_by_w: dict[int, dict[str, float]] = {}
+        for wspec in spec.weights:
+            wv = wspec.value
+            kern_by_w[wv] = _extract_kern_tables(inter, weight=float(wv), opsz=spec.inter_opsz, a9_repair=True)
+            adv_map: dict[str, float] = {}
+            if hvar is not None:
+                loc: dict[str, float] = {}
+                for ax in axes:
+                    if ax.axisTag == "wght":
+                        n = normalizeValue(float(wv), (ax.minValue, ax.defaultValue, ax.maxValue))
+                        seg = avar_segs.get("wght")
+                        loc["wght"] = piecewiseLinearMap(n, seg) if seg else n
+                    elif ax.axisTag == "opsz":
+                        n = normalizeValue(spec.inter_opsz, (ax.minValue, ax.defaultValue, ax.maxValue))
+                        seg = avar_segs.get("opsz")
+                        loc["opsz"] = piecewiseLinearMap(n, seg) if seg else n
+                    else:
+                        loc[ax.axisTag] = 0.0
+                inst = VarStoreInstancer(hvar.VarStore, axes, loc)
+                for g in set(eff_cmap.values()):
+                    idx = hvar.AdvWidthMap.mapping[g] if hvar.AdvWidthMap is not None else glyph_ids[g]
+                    adv_map[g] = (hmtx[g] + float(inst[idx])) * scale
+            else:
+                for g in set(eff_cmap.values()):
+                    adv_map[g] = hmtx[g] * scale
+            adv_by_w[wv] = adv_map
+
+    data = {"scale": scale, "eff_cmap": eff_cmap, "kern_by_w": kern_by_w, "adv_by_w": adv_by_w}
+    _INTER_REF_CACHE[key] = data
+    return data
+
+
+def _check_inter_kerning_and_advances(
+    font: TTFont,
+    hb_font: hb.Font,
+    res: CheckResult,
+    spec: Spec,
+    *,
+    is_vf: bool,
+    inter_vf_path: Path | None = None,
+) -> None:
+    """检查 GPOS PairSet 排序、A9（ʼρ=-62）以及全量 Inter 字形对字偶距与单次取整步进一致性。"""
+    cmap = font.getBestCmap() or {}
+    weights = [w.value for w in spec.weights] if is_vf else [int(font["OS/2"].usWeightClass)]
+
+    # 1) 所有 GPOS Format 1 PairSet 必须按第二字形 GID 严格升序（防 HarfBuzz 二分漏读）
+    if "GPOS" in font and font["GPOS"].table.LookupList:
+        unsorted_sets = 0
+        for lk in font["GPOS"].table.LookupList.Lookup:
+            for raw in lk.SubTable:
+                st = getattr(raw, "ExtSubTable", raw)
+                if not isinstance(st, ot.PairPos) or st.Format != 1:
+                    continue
+                for ps in st.PairSet:
+                    gids = [font.getGlyphID(r.SecondGlyph) for r in ps.PairValueRecord]
+                    if any(a >= b for a, b in zip(gids, gids[1:])):
+                        unsorted_sets += 1
+        if unsorted_sets:
+            res.fail(f"GPOS 存在 {unsorted_sets} 个未按 GID 严格升序排列的 Format 1 PairSet")
+
+    # 2) A9 专项回归：ʼρ (U+02BC U+03C1) 字偶距必须为 -62（容差 1 unit），严禁退化为 -21
+    if 0x02BC in cmap and 0x03C1 in cmap:
+        for w in weights:
+            if is_vf:
+                hb_font.set_variations({"wght": float(w)})
+            base_adv = _shape(hb_font, "\u02bc")[0][1]
+            for sc in (None, "grek"):
+                paired_adv = _shape(hb_font, "\u02bc\u03c1", script=sc)[0][1]
+                kern = paired_adv - base_adv
+                if w == 400 or not is_vf:
+                    res.metrics["a9_mod_apostrophe_rho_kern"] = kern
+                if abs(kern - (-62)) > 1:
+                    res.fail(f"A9 回归：wght={w} script={sc or 'auto'} ʼρ 字偶距为 {kern}（期望 -62 ±1）")
+                    break
+        if is_vf:
+            hb_font.set_variations({"wght": 400.0})
+
+    # 3) 推广检查：全部 Inter-Inter 字形对字偶距与 Inter 一致（容差 1 unit），且命名字重步进为单次取整
+    if inter_vf_path is None or not inter_vf_path.is_file():
+        return
+    ref = _load_inter_ref(inter_vf_path, spec)
+    eff_cmap: dict[int, str] = ref["eff_cmap"]
+    scale: float = ref["scale"]
+    forced = spec.source_han_forced_codepoints
+
+    inter_to_prod: dict[str, str] = {}
+    prod_to_inter: dict[str, str] = {}
+    inter_cps: list[int] = []
+    for cp in sorted(cmap):
+        if cp in eff_cmap and use_inter_codepoint(cp, forced):
+            ig, pg = eff_cmap[cp], cmap[cp]
+            inter_to_prod.setdefault(ig, pg)
+            prod_to_inter.setdefault(pg, ig)
+            inter_cps.append(cp)
+
+    kern_failed = False
+    adv_failed = False
+    for w in weights:
+        if w not in ref["kern_by_w"]:
+            continue
+        if not kern_failed:
+            inter_lks = ref["kern_by_w"][w]
+            prod_lks = _extract_kern_tables(font, weight=float(w) if is_vf else None)
+
+            # 收集待测对集合：双方所有 Format 1 对 + 双方所有 Format 2 (class1, class2) 代表对
+            candidate_pairs: set[tuple[str, str]] = set()
+            for subs in inter_lks:
+                for sub in subs:
+                    if sub[0] == 1:
+                        for ig1, row in sub[1].items():
+                            if ig1 in inter_to_prod:
+                                for ig2 in row:
+                                    if ig2 in inter_to_prod:
+                                        candidate_pairs.add((ig1, ig2))
+                    else:
+                        _fmt, cov, c1d, c2d, _mat = sub
+                        c1_rep: dict[int, str] = {}
+                        c2_rep: dict[int, str] = {}
+                        for ig in inter_to_prod:
+                            if ig in cov:
+                                c1_rep.setdefault(c1d.get(ig, 0), ig)
+                            c2_rep.setdefault(c2d.get(ig, 0), ig)
+                        for ig1 in c1_rep.values():
+                            for ig2 in c2_rep.values():
+                                candidate_pairs.add((ig1, ig2))
+            for subs in prod_lks:
+                for sub in subs:
+                    if sub[0] == 1:
+                        for pg1, row in sub[1].items():
+                            if pg1 in prod_to_inter:
+                                ig1 = prod_to_inter[pg1]
+                                for pg2 in row:
+                                    if pg2 in prod_to_inter:
+                                        candidate_pairs.add((ig1, prod_to_inter[pg2]))
+                    else:
+                        _fmt, cov, c1d, c2d, _mat = sub
+                        c1_rep = {}
+                        c2_rep = {}
+                        for pg, ig in prod_to_inter.items():
+                            if pg in cov:
+                                c1_rep.setdefault(c1d.get(pg, 0), ig)
+                            c2_rep.setdefault(c2d.get(pg, 0), ig)
+                        for ig1 in c1_rep.values():
+                            for ig2 in c2_rep.values():
+                                candidate_pairs.add((ig1, ig2))
+
+            bad_pairs: list[tuple[str, str, float, float]] = []
+            for ig1, ig2 in sorted(candidate_pairs):
+                pg1, pg2 = inter_to_prod[ig1], inter_to_prod[ig2]
+                exp_k = _eval_kern(inter_lks, ig1, ig2) * scale
+                act_k = _eval_kern(prod_lks, pg1, pg2)
+                if abs(act_k - exp_k) > 1.01:
+                    bad_pairs.append((ig1, ig2, round(exp_k, 2), round(act_k, 2)))
+            if bad_pairs:
+                res.fail(
+                    f"wght={w}: {len(bad_pairs)} 对 Inter 字形字偶距偏离 Inter 超过 1 unit，样例：{bad_pairs[:5]}"
+                )
+                kern_failed = True
+
+        # 单次取整步进校验：每个 Inter 编码字形在命名字重下与未缩放精确步进偏差不得超过 1.0 unit
+        if not adv_failed:
+            adv_map = ref["adv_by_w"][w]
+            if is_vf:
+                hb_font.set_variations({"wght": float(w)})
+            bad_advs: list[tuple[str, str, int, float]] = []
+            for cp in inter_cps:
+                ig, pg = eff_cmap[cp], cmap[cp]
+                exact_adv = adv_map[ig]
+                prod_adv = (
+                    hb_font.get_glyph_h_advance(font.getGlyphID(pg))
+                    if is_vf
+                    else font["hmtx"].metrics[pg][0]
+                )
+                if abs(prod_adv - exact_adv) > 1.0:
+                    bad_advs.append((hex(cp), ig, prod_adv, round(exact_adv, 3)))
+            if bad_advs:
+                res.fail(
+                    f"wght={w}: {len(bad_advs)} 个 Inter 字形步进出现二次取整偏差（>1.0 unit），样例：{bad_advs[:5]}"
+                )
+                adv_failed = True
+        if kern_failed and adv_failed:
+            break
+    if is_vf:
+        hb_font.set_variations({"wght": 400.0})
+
+
 def check_font_rules(
     font_path: Path,
     *,
@@ -332,6 +674,7 @@ def check_font_rules(
     is_vf: bool,
     hinted: bool = False,
     reference_path: Path | None = None,
+    inter_vf_path: Path | None = None,
     subset_mode: str = "full",
     spec: Spec | None = None,
 ) -> CheckResult:
@@ -353,5 +696,9 @@ def check_font_rules(
         _check_propdigits_and_tnum(font, hb_font, res, spec, is_vf)
         _check_inter_calt_and_guards(font, hb_font, res)
         _check_chws_and_punctuation(font, hb_font, res, region)
+        _check_empty_gsub_features(font, res, spec, italic=italic)
+        _check_inter_kerning_and_advances(
+            font, hb_font, res, spec, is_vf=is_vf, inter_vf_path=inter_vf_path
+        )
         _check_names_os2_and_raster(font, res, spec, region=region, italic=italic, is_vf=is_vf, hinted=hinted)
     return res

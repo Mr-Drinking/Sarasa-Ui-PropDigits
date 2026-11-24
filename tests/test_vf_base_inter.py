@@ -4,12 +4,16 @@ from __future__ import annotations
 import unittest
 
 from fontTools.fontBuilder import FontBuilder
+from fontTools.misc.fixedTools import floatToFixedToFloat, otRound
 from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
+from fontTools.ttLib.scaleUpem import scale_upem
 from fontTools.ttLib.tables import otTables as ot
 from fontTools.ttLib.tables.TupleVariation import TupleVariation
 from fontTools.ttLib.tables._c_m_a_p import cmap_format_14
 from fontTools.ttLib.tables._f_v_a_r import Axis
+from fontTools.varLib.hvar import add_HVAR
+from fontTools.varLib.models import supportScalar
 
 from sarasa_pd.spec import load_spec
 from sarasa_pd.vf.base import (
@@ -25,7 +29,11 @@ from sarasa_pd.vf.inter import (
     LoadedInter,
     append_inter_glyphs,
     bake_inter_ui_recipe,
+    repair_inter_ss03_kerning,
 )
+from sarasa_pd.vf.layout import restore_upstream_empty_gsub_features
+from sarasa_pd.vf.layout_utils import Feature, install, routes
+from sarasa_pd.vf.variations import ExactCurve, axis_coordinate, remap_gvar
 
 
 def _rect(x0: int, y0: int, x1: int, y1: int):
@@ -330,6 +338,159 @@ class VfBaseInterTests(unittest.TestCase):
         sub14 = [t for t in base["cmap"].tables if t.format == 14]
         self.assertEqual(len(sub14), 1)
         self.assertEqual(sub14[0].uvsDict, {0xE0100: [(0x4E00, "uni4E00.alt")]})
+
+    def test_repair_inter_ss03_kerning_restores_rho_pair(self) -> None:
+        inter = _make_vf(
+            [".notdef", "quoteright", "quoteright.ss03", "rho"],
+            {0x02BC: "quoteright", 0x03C1: "rho"},
+            {".notdef": 600, "quoteright": 534, "quoteright.ss03": 612, "rho": 1254},
+            axis_range=(200.0, 400.0, 900.0),
+        )
+        gpos = newTable("GPOS")
+        tbl = ot.GPOS()
+        tbl.Version = 0x00010000
+        # SubTable 0: (quoteright, rho) = -128（无 Device）
+        s0 = ot.PairPos()
+        s0.Format = 1
+        s0.ValueFormat1 = 0x0004
+        s0.ValueFormat2 = 0
+        s0.Coverage = ot.Coverage()
+        s0.Coverage.glyphs = ["quoteright"]
+        r0 = ot.PairValueRecord()
+        r0.SecondGlyph = "rho"
+        r0.Value1 = ot.ValueRecord()
+        r0.Value1.XAdvance = -128
+        ps0 = ot.PairSet()
+        ps0.PairValueRecord = [r0]
+        ps0.PairValueCount = 1
+        s0.PairSet = [ps0]
+        s0.PairSetCount = 1
+
+        # SubTable 1: 模拟 InterVariable 4.1 覆盖成 -43 + VarDevice
+        s1 = ot.PairPos()
+        s1.Format = 1
+        s1.ValueFormat1 = 0x0044
+        s1.ValueFormat2 = 0
+        s1.Coverage = ot.Coverage()
+        s1.Coverage.glyphs = ["quoteright.ss03"]
+        r1 = ot.PairValueRecord()
+        r1.SecondGlyph = "rho"
+        r1.Value1 = ot.ValueRecord()
+        r1.Value1.XAdvance = -43
+        dev = ot.Device()
+        dev.DeltaFormat = 0x8000
+        dev.StartSize = 1
+        dev.EndSize = 2
+        r1.Value1.XAdvDevice = dev
+        ps1 = ot.PairSet()
+        ps1.PairValueRecord = [r1]
+        ps1.PairValueCount = 1
+        s1.PairSet = [ps1]
+        s1.PairSetCount = 1
+
+        lk = ot.Lookup()
+        lk.LookupType = 2
+        lk.LookupFlag = 0
+        lk.SubTable = [s0, s1]
+        lk.SubTableCount = 2
+        tbl.LookupList = ot.LookupList()
+        tbl.LookupList.Lookup = [lk]
+        tbl.LookupList.LookupCount = 1
+        install(tbl, {("DFLT", "dflt"): {"kern": Feature((0,))}})
+        gpos.table = tbl
+        inter["GPOS"] = gpos
+
+        fixed = repair_inter_ss03_kerning(inter)
+        self.assertEqual(fixed, 1)
+        self.assertEqual(r1.Value1.XAdvance, -128)
+        self.assertIsNone(getattr(r1.Value1, "XAdvDevice", None))
+
+    def test_remap_gvar_single_rounding_advance_width(self) -> None:
+        spec = load_spec()
+        # 复现 SemiBold U+0254：2048 UPM 下 base=1111 (542.480), delta@900=+113 (+55.176)，
+        # 在 avar(0.4 -> 0.36) 即 wght=600 时精确步进 = (1111 + 113*0.36)*1000/2048 = 562.342 -> 单次取整应为 562
+        fb = FontBuilder(2048, isTTF=True)
+        fb.setupGlyphOrder([".notdef", "uni0254"])
+        fb.setupCharacterMap({0x0254: "uni0254"})
+        fb.setupGlyf({".notdef": _rect(0, 0, 800, 1400), "uni0254": _rect(100, 0, 1000, 1200)})
+        fb.setupHorizontalMetrics({".notdef": (1000, 0), "uni0254": (1111, 100)})
+        fb.setupHorizontalHeader(ascent=1800, descent=-400)
+        fb.setupNameTable({"familyName": "InterSyn", "styleName": "Regular"})
+        fb.setupOS2()
+        fb.setupPost()
+        orig = fb.font
+        fvar = newTable("fvar")
+        ax = Axis()
+        ax.axisTag = "wght"
+        ax.minValue, ax.defaultValue, ax.maxValue = (200.0, 400.0, 900.0)
+        ax.axisNameID = 256
+        fvar.axes = [ax]
+        fvar.instances = []
+        orig["fvar"] = fvar
+        avar = newTable("avar")
+        avar.segments = {"wght": {-1.0: -1.0, 0.0: 0.0, 0.4: 0.36, 1.0: 1.0}}
+        orig["avar"] = avar
+        gvar = newTable("gvar")
+        gvar.version = 1
+        gvar.reserved = 0
+        gvar.variations = {
+            ".notdef": [],
+            "uni0254": [
+                TupleVariation({"wght": (0.0, 1.0, 1.0)}, [(0, 0)] * 4 + [(0, 0), (113, 0), (0, 0), (0, 0)])
+            ],
+        }
+        orig["gvar"] = gvar
+        add_HVAR(orig)
+
+        import io as _io
+        buf = _io.BytesIO()
+        orig.save(buf)
+        buf.seek(0)
+        orig = TTFont(buf)
+        buf.seek(0)
+        scaled = TTFont(buf)
+        scale_upem(scaled, 1000)
+
+        base = _make_vf([".notdef", "han"], {0x4E00: "han"}, {".notdef": 1000, "han": 1000})
+        apply_public_weight_axis(base, spec)
+
+        exact = ExactCurve(orig, 1000 / 2048)
+        remap_gvar(scaled, base, exact=exact)
+
+        # 在公开 wght=600 处重建步进：必须精确等于 otRound(562.342) = 562，不得二次取整落到 561
+        loc600 = {"wght": floatToFixedToFloat(axis_coordinate(base, 600.0), 14)}
+        delta_adv = sum(
+            v.coordinates[-3][0] * supportScalar(loc600, v.axes)
+            for v in scaled["gvar"].variations["uni0254"]
+        )
+        adv600 = scaled["hmtx"]["uni0254"][0] + otRound(delta_adv)
+        self.assertEqual(adv600, 562)
+
+    def test_restore_upstream_empty_gsub_features_propagates_routes(self) -> None:
+        spec = load_spec()
+        font = _make_vf([".notdef", "A"], {0x41: "A"}, {".notdef": 500, "A": 600})
+        gsub = newTable("GSUB")
+        gsub.table = ot.GSUB()
+        gsub.table.Version = 0x00010000
+        gsub.table.LookupList = ot.LookupList()
+        gsub.table.LookupList.Lookup = []
+        gsub.table.LookupList.LookupCount = 0
+        install(
+            gsub.table,
+            {
+                ("DFLT", "dflt"): {"ccmp": Feature(())},
+                ("latn", "dflt"): {"ccmp": Feature(())},
+                ("latn", "ROM "): {"locl": Feature(())},
+                ("hani", "dflt"): {"locl": Feature(())},
+            },
+        )
+        font["GSUB"] = gsub
+        added = restore_upstream_empty_gsub_features(font, spec, italic=False)
+        self.assertEqual(added, 21 * 3)
+        r = routes(font["GSUB"].table)
+        self.assertIn("cv11", r[("DFLT", "dflt")])
+        self.assertIn("ss08", r[("latn", "ROM ")])
+        self.assertIn("cv01", r[("hani", "dflt")])
 
 
 if __name__ == "__main__":

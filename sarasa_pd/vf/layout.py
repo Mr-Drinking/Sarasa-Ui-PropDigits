@@ -528,12 +528,38 @@ def enable_features_for_all_scripts(font: TTFont, table_tag: str, tags: set[str]
     install(tbl, current)
 
 
-def import_inter_layout(base: TTFont, loaded: LoadedInter, spec: Spec) -> dict[str, int]:
+def restore_upstream_empty_gsub_features(font: TTFont, spec: Spec, *, italic: bool) -> int:
+    """按上游 Sarasa Ui 保留无 lookup 的 ss01–ss08、cv01–cv13（斜体不含 cv11）空特性记录。"""
+    if "GSUB" not in font or not font["GSUB"].table.ScriptList:
+        return 0
+    tags = spec.features["italic_empty_gsub" if italic else "upright_empty_gsub"]
+    if not tags:
+        return 0
+    gsub = font["GSUB"].table
+    current = routes(gsub)
+    incoming: dict[tuple[str, str], dict[str, Feature]] = {}
+    added = 0
+    for key in current:
+        if key == ("DFLT", "dflt") or key[0] == "latn":
+            slot: dict[str, Feature] = {}
+            for tag in tags:
+                if tag not in current[key]:
+                    slot[tag] = Feature((), None, False)
+                    added += 1
+            if slot:
+                incoming[key] = slot
+    if incoming:
+        merge_routes(gsub, incoming)
+    return added
+
+
+def import_inter_layout(base: TTFont, loaded: LoadedInter, spec: Spec, *, italic: bool = False) -> dict[str, int]:
     mark_map = import_inter_gdef(base, loaded.font)
     rep: dict[str, int] = {"inter_gdef_mark_sets": len(mark_map)}
     rep.update(import_inter_layout_table(base, loaded, "GSUB", set(spec.features["inter_gsub"]), mark_map, spec))
     rep.update(import_inter_layout_table(base, loaded, "GPOS", set(spec.features["inter_gpos"]), mark_map, spec))
     enable_features_for_all_scripts(base, "GSUB", {"tnum", "pnum", "calt"})
+    rep["upstream_empty_gsub_added"] = restore_upstream_empty_gsub_features(base, spec, italic=italic)
     return rep
 
 
