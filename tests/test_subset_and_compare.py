@@ -87,6 +87,20 @@ class SubsetCompareCliTests(unittest.TestCase):
                 self.assertIn((0x2018, "quoteleft.full"), f14[0].uvsDict[0xFE01])
                 self.assertIn((0x4FAE, "uniFA30"), f14[0].uvsDict[0xFE00])
 
+    def test_subset_uvs_target_does_not_leak_unrequested_codepoint_to_cmap(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            src = _build_synthetic_font(Path(tmp) / "src.ttf", with_uvs=True)
+            # 模拟 Source Han：U+02BB 与 U+2018+FE01 共享同一字形 quoteleft.full
+            with TTFont(src) as font:
+                for t in font["cmap"].tables:
+                    if t.format != 14 and t.isUnicode():
+                        t.cmap[0x02BB] = "quoteleft.full"
+                subset_font_preserving_uvs(font, {0x0030, 0x2018})
+                self.assertIn("quoteleft.full", font.getGlyphOrder())
+                self.assertNotIn(0x02BB, font.getBestCmap())
+                f14 = [t for t in font["cmap"].tables if t.format == 14]
+                self.assertIn((0x2018, "quoteleft.full"), f14[0].uvsDict[0xFE01])
+
     def test_compare_detects_missing_uvs_and_advance_diff(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             cand = _build_synthetic_font(Path(tmp) / "cand.ttf", with_uvs=False, zero_width=630)

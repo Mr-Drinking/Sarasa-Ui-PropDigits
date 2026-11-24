@@ -21,7 +21,7 @@ SMOKE_TEXTS: tuple[str, ...] = (
     "ƒƠơƯưǍǎǏǐǑǒǓǔǦǧǴǵȘșȚțȷẞṱṭṷḷḠḁê̌Ê̌ʼρ±−≈≠≤≥‰′″‵‴‶‷·‣⁃‘’“”–—―…⋯⸺⸻︱",
     # 西里尔与希腊（含组合重音与俄/希界面）
     "АБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯабвгдеёжзийклмнопрстуфхцчшщъыьэюяВремя",
-    "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψωἹи́а̀Γ́",
+    "ΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡΣΤΥΦΧΨΩαβγδεζηθικλμνξοπρςστυφχψωΏἹи́а̀Γ́",
     # 中文标点、全角符号与常用界面汉字
     "，。、；：？！「」『』（）【】《》〈〉—…　",
     "一二三四五六七八九十百千万亿零中文简体繁体香港台湾日本韩国排版测试",
@@ -96,6 +96,15 @@ def uvs_selectors_for_codepoints(font: TTFont, unicodes: set[int]) -> tuple[set[
     return selectors, glyphs
 
 
+def ensure_gvar_keys(font: TTFont) -> None:
+    if "gvar" not in font:
+        return
+    variations = font["gvar"].variations
+    for gname in font.getGlyphOrder():
+        if gname not in variations:
+            variations[gname] = []
+
+
 def subset_font_preserving_uvs(
     font: TTFont,
     unicodes: Iterable[int],
@@ -105,6 +114,7 @@ def subset_font_preserving_uvs(
     drop_hints: bool = False,
 ) -> TTFont:
     """按给定码位子集化字体，显式保留 cmap format 14 的 SVS/IVS 与变体字形（修 A1）。"""
+    ensure_gvar_keys(font)
     keep_cps = set(unicodes)
     uvs_selectors, uvs_glyphs = uvs_selectors_for_codepoints(font, keep_cps)
 
@@ -128,4 +138,11 @@ def subset_font_preserving_uvs(
         glyphs=set(extra_glyphs) | uvs_glyphs,
     )
     subsetter.subset(font)
+    # 防止 fontTools.subset 把 uvs_glyphs / extra_glyphs 原本绑定的码位（如 U+02BB 共享 U+2018+FE00）泄漏进普通 cmap
+    if "cmap" in font:
+        for tbl in font["cmap"].tables:
+            if tbl.format != 14 and tbl.isUnicode():
+                for cp in list(tbl.cmap):
+                    if cp not in keep_cps:
+                        del tbl.cmap[cp]
     return font

@@ -220,7 +220,7 @@ class SourceStore:
             inter_zip, "InterVariable.ttf", self.vf_dir / "InterVariable.ttf"
         )
         paths["inter_italic"] = extract_zip_member(
-            inter_zip, "InterVariable-Italic.woff2", self.vf_dir / "InterVariable-Italic.woff2"
+            inter_zip, "InterVariable-Italic.ttf", self.vf_dir / "InterVariable-Italic.ttf"
         )
 
         need_classical = False

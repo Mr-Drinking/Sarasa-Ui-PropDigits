@@ -1,0 +1,14 @@
+{
+  "name": "sarasa-pd-hint",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Standalone Chlorophytum hinting dependencies for Sarasa Ui PropDigits",
+  "dependencies": {
+    "@chlorophytum/cli": "0.50.0",
+    "@chlorophytum/font-format-ttf": "0.50.0",
+    "@chlorophytum/hint-store-provider-file": "0.50.0",
+    "@chlorophytum/hm-combine": "0.50.0",
+    "@chlorophytum/hm-ideograph": "0.50.1",
+    "@chlorophytum/hm-select-glyphs": "0.50.0"
+  }
+}

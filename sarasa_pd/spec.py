@@ -162,10 +162,13 @@ class Spec:
         style = "Italic" if (w == "Regular" and italic) else f"{w}{'Italic' if italic else ''}"
         return f"SarasaUiPropDigits{code}-{style}.ttf"
 
-    def static_dirname(self, region: str, hinted: bool) -> str:
+    def static_dirname(self, region: str, hinted: bool, version: str | None = None) -> str:
         code = self.region(region).code
         variant = "TTF" if hinted else "TTF-Unhinted"
-        return f"SarasaUiPropDigits{code}-{variant}-{self.version}"
+        return f"SarasaUiPropDigits{code}-{variant}-{version or self.version}"
+
+    def static_dir(self, root: Path, region: str, hinted: bool, version: str | None = None) -> Path:
+        return root / "static" / self.static_dirname(region, hinted=hinted, version=version)
 
     def sarasa_ref_filename(self, region: str, weight_name: str, italic: bool) -> str:
         r = self.region(region)

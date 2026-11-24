@@ -1,1 +1,5 @@
-"""静态实例化与 A1 Hinting 子包（阶段 3–4 填入实现）。"""
+"""静态字体管线：由 VF 实例化 unhinted 静态，以及方案 A1（ttfautohint + Chlorophytum）hinted 静态。"""
+from .hint import build_hinted_statics
+from .instance import build_unhinted_statics, instantiate_static_from_vf
+
+__all__ = ["build_hinted_statics", "build_unhinted_statics", "instantiate_static_from_vf"]

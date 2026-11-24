@@ -70,18 +70,30 @@ def build_parser() -> argparse.ArgumentParser:
     p_cmp.add_argument("--jobs", type=int, default=4, help="并行进程数（默认 4）")
     p_cmp.add_argument("--out", type=Path, default=None, help="输出目录（默认 .build-cache/compare/latest）")
 
-    p_build = sub.add_parser("build", allow_abbrev=False, help="构建 VF、unhinted 静态与 A1 hinted 静态（阶段 2–4 实现）")
+    p_build = sub.add_parser("build", allow_abbrev=False, help="构建 VF、unhinted 静态与 A1 hinted 静态")
     _add_selection_args(p_build)
     p_build.add_argument("--stage", choices=("vf", "unhinted", "hinted", "all"), default="all")
-    p_build.add_argument("--out", type=Path, default=None)
+    p_build.add_argument("--jobs", type=int, default=2, help="并行进程数（默认 2）")
+    p_build.add_argument("--out", type=Path, default=None, help="输出目录（默认 .build-cache/runs/<时间戳>）")
 
-    p_check = sub.add_parser("check", allow_abbrev=False, help="运行产品规则检查、OTS 与 FreeType 严格执行扫描（阶段 2–4 实现）")
+    p_check = sub.add_parser("check", allow_abbrev=False, help="运行产品规则检查、OTS 与 FreeType 严格执行扫描")
     _add_selection_args(p_check)
-    p_check.add_argument("--root", type=Path, default=None)
+    p_check.add_argument("--root", type=Path, default=None, help="待检查字体根目录（默认 fonts/）")
+    p_check.add_argument("--stage", choices=("vf", "unhinted", "hinted", "all"), default="all")
+    p_check.add_argument("--jobs", type=int, default=4, help="FreeType 扫描并发进程数（默认 4）")
+    p_check.add_argument("--skip-ots", action="store_true", help="跳过 OTS 检查（默认启用）")
 
-    p_pkg = sub.add_parser("package", allow_abbrev=False, help="生成 21 个发布 ZIP 与 SHA256SUMS.txt（阶段 5 实现）")
-    p_pkg.add_argument("--root", type=Path, default=None)
-    p_pkg.add_argument("--dist", type=Path, default=None)
+    p_pkg = sub.add_parser("package", allow_abbrev=False, help="生成 21 个发布 ZIP 与 SHA256SUMS.txt")
+    p_pkg.add_argument("--root", type=Path, default=None, help="已检查通过的字体根目录（默认 fonts/）")
+    p_pkg.add_argument("--dist", type=Path, default=None, help="发布包输出目录（默认 dist/v<version>）")
+
+    p_smp = sub.add_parser("samples", allow_abbrev=False, help="生成多地区 FreeType 与 Windows 96 DPI GDI/DirectWrite 对比样张")
+    _add_selection_args(p_smp)
+    p_smp.add_argument("--cand-root", type=Path, required=True, help="新构建字体根目录")
+    p_smp.add_argument("--ref-root", type=Path, default=None, help="对照基准字体根目录（默认 fonts/）")
+    p_smp.add_argument("--ref-version", default="1.0.43.3", help="基准静态目录版本号（默认 1.0.43.3）")
+    p_smp.add_argument("--out", type=Path, default=None, help="样张输出目录（默认 .build-cache/samples）")
+    p_smp.add_argument("--windows-only", action="store_true", help="仅生成 Windows GDI 与 DirectWrite 对比样张")
 
     return parser
 
@@ -170,6 +182,252 @@ def _cmd_compare(args: argparse.Namespace, spec: Spec) -> int:
     return 0
 
 
+def _cmd_build(args: argparse.Namespace, spec: Spec) -> int:
+    import time
+    from .static.hint import build_hinted_statics
+    from .static.instance import build_unhinted_statics
+    from .vf.build import build_vfs
+
+    regions = _parse_csv(args.regions, spec.region_order, flag="--regions")
+    styles = _parse_csv(args.styles, ("upright", "italic"), flag="--styles")
+    weights = _parse_csv(args.weights, [w.name for w in spec.weights], flag="--weights")
+    out_root = args.out or (repo_root() / ".build-cache" / "runs" / time.strftime("%Y%m%d-%H%M%S"))
+    stages = ("vf", "unhinted", "hinted") if args.stage == "all" else (args.stage,)
+    if "vf" in stages:
+        summary = build_vfs(
+            regions,
+            styles,
+            out_root,
+            subset_mode=args.subset,
+            jobs=max(1, args.jobs),
+            spec=spec,
+        )
+        print(f"已完成 {summary['count']} 个 VF 构建，耗时 {summary['elapsed_sec']} 秒，输出：{out_root}")
+    if "unhinted" in stages:
+        summary = build_unhinted_statics(
+            out_root,
+            out_root,
+            regions,
+            styles,
+            weights,
+            jobs=max(1, args.jobs),
+            spec=spec,
+        )
+        print(f"已完成 {summary['count']} 个 unhinted 静态构建，耗时 {summary['elapsed_sec']} 秒，输出：{out_root}")
+    if "hinted" in stages:
+        summary = build_hinted_statics(
+            out_root,
+            out_root,
+            regions,
+            styles,
+            weights,
+            jobs=max(1, args.jobs),
+            spec=spec,
+        )
+        print(f"已完成 {summary['count']} 个 hinted 静态构建，耗时 {summary['elapsed_sec']} 秒，输出：{out_root}")
+    return 0
+
+
+def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
+    from .checks import (
+        check_font_rules,
+        check_hinted_unhinted_parity,
+        check_ots,
+        check_vf_static_parity,
+        scan_freetype_pedantic,
+    )
+    from .sources import SourceStore
+
+    root = repo_root()
+    font_root = (args.root or (root / "fonts")).resolve()
+    regions = _parse_csv(args.regions, spec.region_order, flag="--regions")
+    styles = _parse_csv(args.styles, ("upright", "italic"), flag="--styles")
+    weights = _parse_csv(args.weights, [w.name for w in spec.weights], flag="--weights")
+
+    store = SourceStore(root / ".build-cache" / "work", spec)
+    ots_exe: Path | None = None
+    if not args.skip_ots:
+        ots_exe = next((root / ".build-cache").rglob("ots-sanitize.exe" if sys.platform == "win32" else "ots-sanitize"), None)
+        if ots_exe is None:
+            ots_exe = store.ensure_ots(root / ".build-cache" / "external")
+
+    failures: list[str] = []
+    checked = 0
+    stages = ("vf", "unhinted", "hinted") if args.stage == "all" else (args.stage,)
+
+    for region in regions:
+        ref_path = store.sarasa_ref_path(region, "Regular", False, hinted=False)
+        for style in styles:
+            italic = style == "italic"
+            vf_path = font_root / "variable" / spec.variable_filename(region, italic)
+            if "vf" in stages:
+                if not vf_path.is_file():
+                    failures.append(f"缺少 VF：{vf_path}")
+                else:
+                    checked += 1
+                    r = check_font_rules(
+                        vf_path,
+                        region=region,
+                        italic=italic,
+                        is_vf=True,
+                        reference_path=ref_path if ref_path.is_file() else None,
+                        subset_mode=args.subset,
+                        spec=spec,
+                    )
+                    if not r.ok:
+                        failures.extend(f"[VF {vf_path.name}] {e}" for e in r.errors)
+                    if ots_exe is not None:
+                        o = check_ots(vf_path, ots_exe)
+                        if not o.ok:
+                            failures.extend(f"[VF {vf_path.name}] {e}" for e in o.errors)
+                    print(f"[check] {vf_path.name}: {'PASS' if r.ok else 'FAIL'} (cps={r.metrics.get('codepoints')}, uvs={r.metrics.get('uvs_entries')})", flush=True)
+
+            for w_name in weights:
+                w = spec.weight(w_name)
+                un_path = spec.static_dir(font_root, region, hinted=False) / spec.static_filename(region, w.name, italic)
+                hi_path = spec.static_dir(font_root, region, hinted=True) / spec.static_filename(region, w.name, italic)
+
+                if "unhinted" in stages:
+                    if not un_path.is_file():
+                        failures.append(f"缺少 unhinted 静态：{un_path}")
+                    else:
+                        checked += 1
+                        r = check_font_rules(
+                            un_path,
+                            region=region,
+                            italic=italic,
+                            is_vf=False,
+                            hinted=False,
+                            reference_path=ref_path if ref_path.is_file() else None,
+                            subset_mode=args.subset,
+                            spec=spec,
+                        )
+                        if not r.ok:
+                            failures.extend(f"[unhinted {un_path.name}] {e}" for e in r.errors)
+                        if vf_path.is_file():
+                            p = check_vf_static_parity(vf_path, un_path, w.value)
+                            if not p.ok:
+                                failures.extend(f"[vf-vs-static {un_path.name}] {e}" for e in p.errors)
+                        if ots_exe is not None:
+                            o = check_ots(un_path, ots_exe)
+                            if not o.ok:
+                                failures.extend(f"[unhinted {un_path.name}] {e}" for e in o.errors)
+
+                if "hinted" in stages:
+                    if not hi_path.is_file():
+                        failures.append(f"缺少 hinted 静态：{hi_path}")
+                    else:
+                        checked += 1
+                        r = check_font_rules(
+                            hi_path,
+                            region=region,
+                            italic=italic,
+                            is_vf=False,
+                            hinted=True,
+                            reference_path=ref_path if ref_path.is_file() else None,
+                            subset_mode=args.subset,
+                            spec=spec,
+                        )
+                        if not r.ok:
+                            failures.extend(f"[hinted {hi_path.name}] {e}" for e in r.errors)
+                        ft = scan_freetype_pedantic(hi_path, ppem_start=9, ppem_end=128, workers=max(1, args.jobs))
+                        if not ft.ok:
+                            failures.extend(f"[FT {hi_path.name}] {e}" for e in ft.errors)
+                        if un_path.is_file():
+                            par = check_hinted_unhinted_parity(hi_path, un_path)
+                            if not par.ok:
+                                failures.extend(f"[parity {hi_path.name}] {e}" for e in par.errors)
+                        if ots_exe is not None:
+                            o = check_ots(hi_path, ots_exe)
+                            if not o.ok:
+                                failures.extend(f"[hinted {hi_path.name}] {e}" for e in o.errors)
+
+    if failures:
+        print(f"CHECK FAILED: 检查 {checked} 个字体，发现 {len(failures)} 项错误：", file=sys.stderr)
+        for msg in failures[:40]:
+            print("  -", msg, file=sys.stderr)
+        return 1
+    print(f"CHECK PASSED: 共 {checked} 个字体全部通过产品规则与二进制检查。")
+    return 0
+
+
+def _cmd_package(args: argparse.Namespace, spec: Spec) -> int:
+    from .package import package_release
+
+    root = repo_root()
+    font_root = (args.root or (root / "fonts")).resolve()
+    dist_dir = (args.dist or (root / "dist" / f"v{spec.version}")).resolve()
+    manifest = package_release(font_root, dist_dir, project_root=root, spec=spec)
+    print(f"已打包并核验 {manifest['package_count']} 个发布 ZIP（耗时 {manifest['elapsed_sec']}s），输出：{dist_dir}")
+    return 0
+
+
+def _cmd_samples(args: argparse.Namespace, spec: Spec) -> int:
+    import os
+    from .samples import (
+        render_region_comparison_sheet,
+        render_windows_dwrite_comparison,
+        render_windows_gdi_comparison,
+    )
+
+    root = repo_root()
+    cand_root = args.cand_root.resolve()
+    ref_root = (args.ref_root or (root / "fonts")).resolve()
+    out_dir = (args.out or (root / ".build-cache" / "samples")).resolve()
+    out_dir.mkdir(parents=True, exist_ok=True)
+    regions = _parse_csv(args.regions, spec.region_order, flag="--regions")
+    weights = _parse_csv(args.weights, [w.name for w in spec.weights], flag="--weights")
+
+    def _ref_static(region: str, weight_name: str, italic: bool, hinted: bool) -> Path:
+        d = spec.static_dir(ref_root, region, hinted=hinted, version=args.ref_version)
+        return d / spec.static_filename(region, weight_name, italic)
+
+    def _cand_static(region: str, weight_name: str, italic: bool, hinted: bool) -> Path:
+        d = spec.static_dir(cand_root, region, hinted=hinted)
+        return d / spec.static_filename(region, weight_name, italic)
+
+    generated: list[Path] = []
+    if not args.windows_only:
+        for region in regions:
+            for w_name in weights:
+                rows: list[tuple[str, Path, bool]] = []
+                c_hi = _cand_static(region, w_name, False, hinted=True)
+                c_un = _cand_static(region, w_name, False, hinted=False)
+                r_hi = _ref_static(region, w_name, False, hinted=True)
+                if c_hi.is_file():
+                    rows.append((f"New-{region}-{w_name}(hi)", c_hi, True))
+                if r_hi.is_file():
+                    rows.append((f"v{args.ref_version}-{region}-{w_name}(hi)", r_hi, True))
+                if c_un.is_file():
+                    rows.append((f"New-{region}-{w_name}(un)", c_un, False))
+                if rows:
+                    out = out_dir / f"ft-{region}-{w_name}.png"
+                    render_region_comparison_sheet(out, region=region, rows=rows)
+                    generated.append(out)
+
+    if os.name == "nt":
+        win_pairs: list[tuple[str, Path, int, bool]] = []
+        for w_name, italic in (("Regular", False), ("Regular", True), ("Bold", False), ("Heavy", False)):
+            w = spec.weight(w_name)
+            c_hi = _cand_static("SC", w_name, italic, hinted=True)
+            c_un = _cand_static("SC", w_name, italic, hinted=False)
+            r_hi = _ref_static("SC", w_name, italic, hinted=True)
+            c_path = c_hi if c_hi.is_file() else c_un
+            tag = "It" if italic else w_name
+            if c_path.is_file():
+                win_pairs.append((f"New-SC-{tag}", c_path, w.value, italic))
+            if r_hi.is_file():
+                win_pairs.append((f"v{args.ref_version}-SC-{tag}", r_hi, w.value, italic))
+        if win_pairs:
+            generated.append(render_windows_gdi_comparison(out_dir / "win-gdi-96dpi-SC.png", win_pairs))
+            generated.append(render_windows_dwrite_comparison(out_dir / "win-dwrite-96dpi-SC.png", win_pairs))
+
+    print(f"已生成 {len(generated)} 张验收样张：{out_dir}")
+    for p in generated:
+        print("  -", p.name)
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     try:
@@ -185,7 +443,24 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _cmd_compare(args, spec)
         except argparse.ArgumentTypeError as err:
             parser.error(str(err))
-    raise SystemExit(f"子命令 {args.command!r} 尚未实现（将在后续阶段接入）")
+    if args.command == "build":
+        try:
+            return _cmd_build(args, spec)
+        except argparse.ArgumentTypeError as err:
+            parser.error(str(err))
+    if args.command == "check":
+        try:
+            return _cmd_check(args, spec)
+        except argparse.ArgumentTypeError as err:
+            parser.error(str(err))
+    if args.command == "package":
+        return _cmd_package(args, spec)
+    if args.command == "samples":
+        try:
+            return _cmd_samples(args, spec)
+        except argparse.ArgumentTypeError as err:
+            parser.error(str(err))
+    raise SystemExit(f"未知子命令：{args.command!r}")
 
 
 if __name__ == "__main__":
