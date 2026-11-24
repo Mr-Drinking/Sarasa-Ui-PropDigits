@@ -135,6 +135,15 @@ class PunctuationAndDocsTests(unittest.TestCase):
             p.write_text(synced.replace("Heavy.json", "Bold.json"), encoding="utf-8")
             self.assertEqual(check_doc_files([p], spec), ["spec.md"])
 
+    def test_repo_docs_are_synced_with_spec(self) -> None:
+        from sarasa_pd.env import repo_root
+
+        root = repo_root()
+        spec = load_spec()
+        docs = [root / "README.md", *sorted((root / "docs").glob("*.md"))]
+        self.assertGreaterEqual(len(docs), 6)
+        self.assertEqual(check_doc_files(docs, spec), [])
+
 
 if __name__ == "__main__":
     unittest.main()
