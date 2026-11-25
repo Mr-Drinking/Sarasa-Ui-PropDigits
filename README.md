@@ -10,9 +10,9 @@
 
 ## 为什么要制作它？
 
-曾几何时，我试图使用[更纱黑体（Sarasa Gothic）](https://github.com/be5invis/sarasa-gothic)作为 Android 手机的默认字体（因为个人更喜欢 [SF Pro](https://developer.apple.com/cn/fonts/) / [Inter](https://rsms.me/inter/) 而非 [Roboto](https://fonts.google.com/specimen/Roboto)），但由于修改软件只支持一个字体，我需要一个可变字体。但可惜的是，[原版更纱并不支持](https://github.com/be5invis/Sarasa-Gothic/issues/314)，我只好自己动手，用 Codex 中的 GPT-6 Astra 制作了本字体的可变版本；静态版本以及比例宽数字则是源于我对其成为 [Unigram](https://github.com/unigramdev/unigram) / Windows 默认字体的需要。
+曾几何时，我试图使用[更纱黑体（Sarasa Gothic）](https://github.com/be5invis/sarasa-gothic)作为 Android 手机的默认字体（因为个人更喜欢 [SF Pro](https://developer.apple.com/cn/fonts/) / [Inter](https://rsms.me/inter/) 而非 [Roboto](https://fonts.google.com/specimen/Roboto)），但由于修改软件只支持一个字体，我需要一个可变字体。但可惜的是，[原版更纱并不支持](https://github.com/be5invis/Sarasa-Gothic/issues/314)，我只好自己动手，用 Codex 中的 GPT-5.5 制作了本字体的最初的可变版本；静态版本以及比例宽数字则是源于我对其成为 [Unigram](https://github.com/unigramdev/unigram) / Windows 默认字体的需要。
 
-而到了 2026 年 8 月，随着上游、各个工具链（如 Node 版本）及我自身需求的更新，我用 GPT-6 Astra 将版本号刷到了 1.0.40（上游更新的是 Mono 版本，与本项目没有直接关系），同时添加了 `chws` / `vchw` 这两个 OpenType 特性，以方便在不能使用 CSS 的 `text-spacing-trim` 的情况下启用标点挤压。
+随后，上游版本号与 GPT 都不断更新——v1.0.40 起，我换用了 GPT-5.6 Sol；v1.0.40.4 起，我换用了 GPT-6 Astra——过度审计、黑话、防御性编程就是这个时期出现的问题。后来，自 v1.0.43 起，我转投了 Claude 的怀抱（把原先用的 GPT Pro 5x 换成了 Plus，因此额度不够用 Astra 了），改用了 Opus 5.5 来干活。不得不说，Claude 确实比较聪明，并能理解我的意图，同时重做了屎山般的审计代码。最后，也就到了现在，在 Fable 5.2 (Max Ultracode) 审计结果的刺激之下，我重新回头审视了 Vibe Coding 的这段经历，决心彻底地重构了本项目，并让 Gemini 4 Neon 来实操这一过程。不得不说，Gemini 确实更会「说人话」（或许应该让它来当 Sub-Agent 的工头），就是 Antigravity 不太好用，上下文给我限制在了 512K。
 
 ## 简介
 
@@ -86,8 +86,7 @@ python -E -s -X utf8 -m unittest discover -s tests
 
 ## 详细文档
 
-- [docs/规格.md](docs/规格.md)：地区来源、字重与轴映射、比例数字与 `tnum`、标点与语言路由、竖排、`chws` 与度量
-- [docs/与上游的差异.md](docs/与上游的差异.md)：有意差异、跟随 VF 单真相源带来的差异统计、继承上游的行为与已知限制
-- [docs/构建与hint.md](docs/构建与hint.md)：单一真相源管线、固定来源、依赖环境、A1 静态 Hinting 方案与缓存机制
-- [docs/验证与发布.md](docs/验证与发布.md)：产品规则检查、OTS/FreeType 扫描、对照报告、Windows/FreeType 样张与发布流程
-- [docs/Android验收.md](docs/Android验收.md)：Android 实机验收清单与记录模板
+- [规格](docs/规格.md)：地区来源、字重与轴映射、比例数字与 `tnum`、标点与语言路由、竖排、`chws` 与度量
+- [与上游的差异](docs/与上游的差异.md)：有意差异、跟随 VF 单真相源带来的差异统计、继承上游的行为与已知限制
+- [构建与 Hint](docs/构建.md)：单一真相源管线、固定来源、依赖环境、A1 静态 Hinting 方案与缓存机制
+- [验证与发布.md](docs/验证与发布.md)：产品规则检查、OTS/FreeType 扫描、对照报告、Windows/FreeType 样张与发布流程
