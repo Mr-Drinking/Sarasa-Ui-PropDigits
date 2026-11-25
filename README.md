@@ -30,9 +30,25 @@ Sarasa Ui PropDigits 是面向中西文混排的更纱黑体 Ui 衍生字体（�
 字体菜单中的家族名缩写为 **Sarasa Ui PD \<地区\>**，可变系列为 **Sarasa Ui VF PD \<地区\>**（本地化家族名同样带 `PD`）；文件名与发布包名保留 `PropDigits`。全系列共 6 地区、12 个 VF、72 个 hinted 静态、72 个 unhinted 静态，合 156 个 TTF / 21 个发布 ZIP（每地区 3 包 + 3 个全地区合集包，不提供 TTC/SuperTTC）。
 
 <!-- BEGIN SPEC:regions -->
+| 地区 | CJK 字形来源 | 本地化家族名 | OS/2 码页范围 1 |
+| --- | --- | --- | --- |
+| CL | SourceHanSansK-VF 基底，叠加 ShangguSansTC-VF（传统旧字形与 CJK 全宽破折号） | `更紗黑體 Ui PD CL` | `0x8010019F` |
+| SC | SourceHanSansSC-VF | `更纱黑体 Ui PD SC` | `0x8004019F` |
+| TC | SourceHanSansTC-VF | `更紗黑體 Ui PD TC` | `0x8010019F` |
+| HC | SourceHanSansHC-VF | `更紗黑體 Ui PD HC` | `0x8010019F` |
+| J | SourceHanSans-VF | `更紗ゴシック Ui PD J` | `0x8002019F` |
+| K | SourceHanSansK-VF | `사라사 고딕 Ui PD K` | `0x8028019F` |
 <!-- END SPEC:regions -->
 
 <!-- BEGIN SPEC:weights -->
+| 公开坐标 | 样式 | Source Han 内部坐标 | Inter 坐标 | 下划线粗/位 | 删除线粗 | hcfg 配置 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 200 | ExtraLight | 250 | 200 | 37 / -185 | 37 | `ExtraLight.json` |
+| 300 | Light | 300 | 300 | 53 / -177 | 53 | `Light.json` |
+| 400 | Regular | 400 | 400 | 68 / -169 | 68 | `Regular.json` |
+| 600 | SemiBold | 500 | 600 | 84 / -161 | 84 | `SemiBold.json` |
+| 700 | Bold | 700 | 700 | 92 / -157 | 92 | `Bold.json` |
+| 900 | Heavy | 900 | 900 | 113 / -147 | 113 | `Heavy.json` |
 <!-- END SPEC:weights -->
 
 以 `SC` 为例，单地区下载包为：
@@ -73,6 +89,9 @@ python -E -s -X utf8 -m sarasa_pd compare --baseline upstream --cand-root fonts 
 # 打包全部 21 个确定性 ZIP 并执行只读核验
 python -E -s -X utf8 -m sarasa_pd package --root fonts --dist dist/v1.0.43.4
 
+# 按 spec.toml 同步 README 与 docs/ 中的规格表格（加 --check 只核对）
+python -E -s -X utf8 -m sarasa_pd docs
+
 # 运行单元测试
 python -E -s -X utf8 -m unittest discover -s tests
 ```
@@ -80,6 +99,12 @@ python -E -s -X utf8 -m unittest discover -s tests
 ## 上游来源与许可证
 
 <!-- BEGIN SPEC:sources -->
+| 来源 | 归档文件 | SHA-256（前 16 位） |
+| --- | --- | --- |
+| `source_han_vf` | `SourceHanSans-VF-2.005R.zip` | `e5944ea725387840…` |
+| `inter` | `Inter-4.1.zip` | `9883fdd4a49d4fb6…` |
+| `shanggu_vf` | `ShangguSansVF_TTFs-1.028.7z` | `31b207a05332196f…` |
+| `sarasa_ui_unhinted_all` | `SarasaUi-TTF-Unhinted-1.0.43.7z` | `c17173820f91ecd7…` |
 <!-- END SPEC:sources -->
 
 字体按 SIL Open Font License 1.1 分发，完整许可证与版权声明见 [LICENSE](LICENSE) 与 [NOTICE.md](NOTICE.md)。
@@ -89,4 +114,4 @@ python -E -s -X utf8 -m unittest discover -s tests
 - [规格](docs/规格.md)：地区来源、字重与轴映射、比例数字与 `tnum`、标点与语言路由、竖排、`chws` 与度量
 - [与上游的差异](docs/与上游的差异.md)：有意差异、跟随 VF 单真相源带来的差异统计、继承上游的行为与已知限制
 - [构建与 Hint](docs/构建.md)：单一真相源管线、固定来源、依赖环境、A1 静态 Hinting 方案与缓存机制
-- [验证与发布.md](docs/验证与发布.md)：产品规则检查、OTS/FreeType 扫描、对照报告、Windows/FreeType 样张与发布流程
+- [验证与发布](docs/验证与发布.md)：产品规则检查、OTS/FreeType 扫描、对照报告、Windows/FreeType 样张与发布流程

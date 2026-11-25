@@ -101,6 +101,9 @@ def build_parser() -> argparse.ArgumentParser:
     p_smp.add_argument("--out", type=Path, default=None, help="样张输出目录（默认 .build-cache/samples）")
     p_smp.add_argument("--windows-only", action="store_true", help="仅生成 Windows GDI 与 DirectWrite 对比样张")
 
+    p_docs = sub.add_parser("docs", allow_abbrev=False, help="按 spec.toml 同步 README 与 docs/ 中的规格表格")
+    p_docs.add_argument("--check", action="store_true", help="只核对、不写入，有不一致时返回 1")
+
     return parser
 
 
@@ -441,6 +444,30 @@ def _cmd_samples(args: argparse.Namespace, spec: Spec) -> int:
     return 0
 
 
+def _cmd_docs(args: argparse.Namespace, spec: Spec) -> int:
+    from .docs_gen import check_doc_files, doc_paths, sync_doc_files
+
+    paths = doc_paths(repo_root())
+    if args.check:
+        problems = check_doc_files(paths, spec)
+        for msg in problems:
+            print(f"ERROR: {msg}", file=sys.stderr)
+        if problems:
+            return 1
+        print(f"OK: {len(paths)} 份文档中的规格表与 spec.toml 一致。")
+        return 0
+    try:
+        changed = sync_doc_files(paths, spec)
+    except ValueError as err:
+        print(f"ERROR: {err}", file=sys.stderr)
+        return 1
+    if changed:
+        print("已同步：" + "、".join(p.name for p in changed))
+    else:
+        print("规格表已是最新，没有改动。")
+    return 0
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     try:
@@ -473,6 +500,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return _cmd_samples(args, spec)
         except argparse.ArgumentTypeError as err:
             parser.error(str(err))
+    if args.command == "docs":
+        return _cmd_docs(args, spec)
     raise SystemExit(f"未知子命令：{args.command!r}")
 
 

@@ -10,7 +10,7 @@ from fontTools.pens.ttGlyphPen import TTGlyphPen
 from fontTools.ttLib import TTFont, newTable
 from fontTools.ttLib.tables import otTables as ot
 
-from sarasa_pd.docs_gen import check_doc_files, sync_doc_text
+from sarasa_pd.docs_gen import check_doc_files, doc_paths, render_spec_block, sync_doc_files, sync_doc_text
 from sarasa_pd.spec import load_spec
 from sarasa_pd.vf.layout_utils import Feature, install, routes
 from sarasa_pd.vf.punctuation import apply_source_han_punctuation_layout
@@ -124,25 +124,62 @@ class PunctuationAndDocsTests(unittest.TestCase):
 
     def test_docs_gen_sync_and_drift_detection(self) -> None:
         spec = load_spec()
-        template = "# 规格\n\n<!-- BEGIN SPEC:regions -->\n旧表\n<!-- END SPEC:regions -->\n\n<!-- BEGIN SPEC:weights -->\n旧表\n<!-- END SPEC:weights -->\n"
+        # weights 是 BEGIN 紧跟 END 的空块（表格尚未生成），也必须被识别并填上
+        template = "# 规格\n\n<!-- BEGIN SPEC:regions -->\n旧表\n<!-- END SPEC:regions -->\n\n<!-- BEGIN SPEC:weights -->\n<!-- END SPEC:weights -->\n"
         synced = sync_doc_text(template, spec)
         self.assertIn("ShangguSansTC-VF", synced)
         self.assertIn("Heavy.json", synced)
+        self.assertEqual(sync_doc_text(synced, spec), synced)
         with tempfile.TemporaryDirectory() as raw_tmp:
             p = Path(raw_tmp) / "spec.md"
-            p.write_text(synced, encoding="utf-8")
+            p.write_bytes(synced.encode("utf-8"))
             self.assertEqual(check_doc_files([p], spec), [])
-            p.write_text(synced.replace("Heavy.json", "Bold.json"), encoding="utf-8")
-            self.assertEqual(check_doc_files([p], spec), ["spec.md"])
+            p.write_bytes(synced.replace("Heavy.json", "Bold.json").encode("utf-8"))
+            problems = check_doc_files([p], spec)
+            self.assertEqual(len(problems), 1)
+            self.assertIn("（weights）", problems[0])
+            # 未生成的空块与过期的表一样要报出来，不能当作一致放过
+            p.write_bytes(template.encode("utf-8"))
+            self.assertIn("（regions、weights）", check_doc_files([p], spec)[0])
+            # 缺 END、名称不配对、标记不在行首、未知名称：核对报错，同步拒绝改写
+            for bad in (
+                "<!-- BEGIN SPEC:regions -->\n旧表\n",
+                "<!-- BEGIN SPEC:regions -->\n<!-- END SPEC:weights -->\n",
+                " <!-- BEGIN SPEC:regions -->\n<!-- END SPEC:regions -->\n",
+                "<!-- BEGIN SPEC:nope -->\n<!-- END SPEC:nope -->\n",
+            ):
+                p.write_bytes(bad.encode("utf-8"))
+                self.assertEqual(len(check_doc_files([p], spec)), 1, bad)
+                with self.assertRaises(ValueError, msg=bad):
+                    sync_doc_text(bad, spec)
+            self.assertEqual(check_doc_files([Path(raw_tmp) / "missing.md"], spec), ["missing.md：文件不存在"])
+
+    def test_sync_doc_files_writes_lf_and_refuses_bad_markers(self) -> None:
+        spec = load_spec()
+        with tempfile.TemporaryDirectory() as raw_tmp:
+            good = Path(raw_tmp) / "good.md"
+            plain = Path(raw_tmp) / "plain.md"
+            good.write_bytes("# 文档\n\n<!-- BEGIN SPEC:sources -->\n<!-- END SPEC:sources -->\n".encode("utf-8"))
+            plain.write_bytes("# 没有表格\n".encode("utf-8"))
+            self.assertEqual(sync_doc_files([good, plain], spec), [good])
+            raw = good.read_bytes()
+            self.assertNotIn(b"\r", raw)
+            self.assertIn(render_spec_block("sources", spec), raw.decode("utf-8"))
+            self.assertEqual(check_doc_files([good, plain], spec), [])
+            self.assertEqual(sync_doc_files([good, plain], spec), [])
+            # 任一文件标记有误时整批都不写
+            bad = Path(raw_tmp) / "bad.md"
+            bad.write_bytes("<!-- BEGIN SPEC:regions -->\n".encode("utf-8"))
+            plain.write_bytes("# 没有表格\n\n<!-- BEGIN SPEC:regions -->\n<!-- END SPEC:regions -->\n".encode("utf-8"))
+            with self.assertRaises(ValueError):
+                sync_doc_files([plain, bad], spec)
+            self.assertNotIn(render_spec_block("regions", spec), plain.read_text(encoding="utf-8"))
 
     def test_repo_docs_are_synced_with_spec(self) -> None:
         from sarasa_pd.env import repo_root
 
-        root = repo_root()
-        spec = load_spec()
-        docs = [root / "README.md", *sorted((root / "docs").glob("*.md"))]
-        self.assertGreaterEqual(len(docs), 6)
-        self.assertEqual(check_doc_files(docs, spec), [])
+        # 只要求 README 在、规格表与 spec.toml 一致；docs/ 下有几份、叫什么都不限。
+        self.assertEqual(check_doc_files(doc_paths(repo_root()), load_spec()), [])
 
 
 if __name__ == "__main__":
