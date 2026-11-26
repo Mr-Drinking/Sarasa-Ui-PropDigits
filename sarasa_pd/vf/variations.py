@@ -211,7 +211,7 @@ def adjacent_supports(locations: list[dict[str, float]], peak_order: list[float]
 
 
 def merge_same_support_gvar_tuples(font: TTFont) -> dict[str, int]:
-    """无损合并 gvar 中同一支撑的多个 TupleVariation 并移除全零元组（审计第 6 节第 1 项）。"""
+    """无损合并 gvar 中同一支撑的多个 TupleVariation 并移除全零元组。"""
     if "gvar" not in font or "glyf" not in font:
         return {"tuples_before": 0, "tuples_after": 0, "zero_tuples_dropped": 0}
     glyf = font["glyf"]
@@ -267,7 +267,7 @@ def merge_same_support_gvar_tuples(font: TTFont) -> dict[str, int]:
 
 
 def reoptimize_gvar_iup(font: TTFont, *, tolerance: float = 0.0) -> dict[str, int]:
-    """对简单字形的 gvar 元组做 IUP 压缩（审计第 6 节第 2 项，斜体容差 0 可省 ~11.5% 体积）。"""
+    """对简单字形的 gvar 元组做 IUP 压缩（斜体容差 0 可显著减小体积）。"""
     if "gvar" not in font or "glyf" not in font:
         return {"glyphs_optimized": 0, "tuples_optimized": 0}
     glyf = font["glyf"]

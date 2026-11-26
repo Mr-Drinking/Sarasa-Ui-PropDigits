@@ -123,6 +123,37 @@ def validate_zip_archive(zf: zipfile.ZipFile, destination: Path) -> None:
             raise RuntimeError(f"ZIP 不允许软链接成员：{info.filename!r}")
 
 
+def validate_7z_archive(zf: object, destination: Path) -> list[str]:
+    names = list(zf.getnames())  # type: ignore[attr-defined]
+    validate_member_paths(names, destination)
+    for info in zf.list():  # type: ignore[attr-defined]
+        st_mode = getattr(info, "st_mode", 0) or 0
+        if getattr(info, "is_symlink", False) or stat.S_IFMT(st_mode) == stat.S_IFLNK:
+            raise RuntimeError(f"7z 不允许软链接成员：{getattr(info, 'filename', info)!r}")
+    return names
+
+
+def validate_tar_archive(members: list[tarfile.TarInfo], destination: Path) -> None:
+    validate_member_paths([m.name for m in members], destination)
+    root = destination.resolve()
+    for m in members:
+        if m.islnk() or m.isdev() or m.isfifo():
+            raise RuntimeError(f"TAR 不允许硬链接或特殊设备成员：{m.name!r}")
+        if m.issym():
+            raw_target = m.linkname or ""
+            norm_target = raw_target.replace("\\", "/")
+            posix_target = PurePosixPath(norm_target)
+            win_target = PureWindowsPath(raw_target)
+            if not norm_target or posix_target.is_absolute() or win_target.is_absolute() or bool(win_target.drive):
+                raise RuntimeError(f"TAR 软链接目标必须为相对路径：{m.name!r} -> {raw_target!r}")
+            member_path = root.joinpath(*PurePosixPath(m.name.replace("\\", "/")).parts)
+            resolved_target = (member_path.parent / norm_target).resolve()
+            try:
+                resolved_target.relative_to(root)
+            except ValueError as err:
+                raise RuntimeError(f"TAR 软链接目标越界：{m.name!r} -> {raw_target!r}") from err
+
+
 def verify_or_write_bytes(path: Path, payload: bytes) -> None:
     expected = hashlib.sha256(payload).hexdigest()
     if path.is_file():
@@ -152,8 +183,7 @@ def extract_7z_member(archive: Path, basename: str, out_path: Path) -> Path:
     with tempfile.TemporaryDirectory(prefix="sarasa-7z-") as tmp_raw:
         tmp_dir = Path(tmp_raw)
         with py7zr.SevenZipFile(archive) as zf:
-            names = zf.getnames()
-            validate_member_paths(names, tmp_dir)
+            names = validate_7z_archive(zf, tmp_dir)
             matches = [name for name in names if Path(name).name == basename]
             if not matches:
                 raise FileNotFoundError(f"归档 {archive.name} 中找不到 {basename}")
@@ -173,7 +203,7 @@ def extract_7z_ttf_prefix(archive: Path, out_dir: Path, prefix: str) -> list[Pat
     with tempfile.TemporaryDirectory(prefix="sarasa-7z-") as tmp_raw:
         tmp_dir = Path(tmp_raw)
         with py7zr.SevenZipFile(archive) as zf:
-            validate_member_paths(zf.getnames(), tmp_dir)
+            validate_7z_archive(zf, tmp_dir)
             zf.extractall(tmp_dir)
         for path in sorted(tmp_dir.rglob(f"{prefix}*.ttf")):
             dest = out_dir / path.name
@@ -184,15 +214,33 @@ def extract_7z_ttf_prefix(archive: Path, out_dir: Path, prefix: str) -> list[Pat
 
 def safe_extract_tar_xz(archive: Path, out_dir: Path) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
+    out_root = out_dir.resolve()
     with tempfile.TemporaryDirectory(prefix="sarasa-tar-") as tmp_raw:
         staging = Path(tmp_raw)
         with tarfile.open(archive, "r:xz") as tf:
             members = tf.getmembers()
-            validate_member_paths([m.name for m in members], staging)
+            validate_tar_archive(members, staging)
             tf.extractall(staging, members=members, filter="data")
-        for member in staging.rglob("*"):
+        for member in sorted(staging.rglob("*"), key=lambda p: (len(p.parts), str(p))):
             dest = out_dir / member.relative_to(staging)
-            if member.is_file():
+            if member.is_symlink():
+                link_target = os.readlink(member)
+                resolved_target = (dest.parent / link_target).resolve()
+                try:
+                    resolved_target.relative_to(out_root)
+                except ValueError as err:
+                    raise RuntimeError(f"TAR 软链接目标越界：{dest.name!r} -> {link_target!r}") from err
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                if dest.is_symlink():
+                    if os.readlink(dest) == link_target:
+                        continue
+                    dest.unlink()
+                elif dest.exists():
+                    dest.unlink()
+                dest.symlink_to(link_target)
+            elif member.is_file():
+                if dest.is_symlink():
+                    dest.unlink()
                 verify_or_write_bytes(dest, member.read_bytes())
                 dest.chmod(member.stat().st_mode)
 
@@ -295,7 +343,12 @@ class SourceStore:
         key = f"{os_key}-{arch}-{ext}"
         folder = f"node-{self.spec.node_version}-{os_key}-{arch}"
         exe = self.node_dir / folder / ("node.exe" if os_key == "win" else "bin/node")
-        if exe.is_file():
+        if os_key == "win":
+            npm_ok = (exe.parent / "npm.cmd").is_file()
+        else:
+            npm_link = exe.parent / "npm"
+            npm_ok = npm_link.is_symlink() and npm_link.resolve().is_file()
+        if exe.is_file() and npm_ok:
             return exe
         archive_name = f"{folder}.{ext}"
         url = f"https://nodejs.org/dist/{self.spec.node_version}/{archive_name}"

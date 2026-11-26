@@ -14,7 +14,7 @@ class Probe:
     features: tuple[tuple[str, int], ...] = ()
 
 
-# 覆盖产品核心规则与第四份外部审计关键发现的真实语料
+# 覆盖产品核心规则与排版回归的真实语料
 DEFAULT_PROBES: tuple[Probe, ...] = (
     Probe("digits_default", "0123456789 09:41 1,234.56 (10-20)", "Latn", "en"),
     Probe("digits_pnum", "0123456789 09:41 1,234.56", "Latn", "en", features=(("pnum", 1),)),

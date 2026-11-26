@@ -47,7 +47,10 @@ def rebuild_vf_mvar(font: TTFont, spec: Spec | None = None) -> dict[str, Any]:
         raise ValueError("构建 MVAR 需要 fvar 与 post 表")
 
     weights = [w.value for w in spec.weights]
-    expected_map = {w.value: (w.underline_thickness, w.underline_position) for w in spec.weights}
+    expected_map = {
+        w.value: (w.underline_thickness, w.underline_position, w.strikeout_size)
+        for w in spec.weights
+    }
     controls = {w: list(expected_map[w]) for w in weights}
 
     def norm_loc(w: int) -> dict[str, float]:
@@ -60,7 +63,11 @@ def rebuild_vf_mvar(font: TTFont, spec: Spec | None = None) -> dict[str, Any]:
         builder.setModel(model)
         records = []
         bases: dict[str, int] = {}
-        for tag, idx, attr in (("unds", 0, "underlineThickness"), ("undo", 1, "underlinePosition")):
+        for tag, idx, attr in (
+            ("unds", 0, "underlineThickness"),
+            ("undo", 1, "underlinePosition"),
+            ("strs", 2, "yStrikeoutSize"),
+        ):
             vals = [controls[w][idx] for w in weights]
             base_val, var_idx = builder.storeMasters(vals)
             bases[attr] = base_val
@@ -82,33 +89,30 @@ def rebuild_vf_mvar(font: TTFont, spec: Spec | None = None) -> dict[str, Any]:
     while True:
         store, records, bases = build_once()
         by_tag = {r.ValueTag: r for r in records}
-        errs: dict[int, tuple[int, int]] = {}
+        errs: dict[int, tuple[int, int, int]] = {}
         for w in weights:
             inst = VarStoreInstancer(store, font["fvar"].axes, norm_loc(w))
             actual = (
                 bases["underlineThickness"] + otRound(inst[by_tag["unds"].VarIdx]),
                 bases["underlinePosition"] + otRound(inst[by_tag["undo"].VarIdx]),
+                bases["yStrikeoutSize"] + otRound(inst[by_tag["strs"].VarIdx]),
             )
             exp = expected_map[w]
             if actual != exp:
-                errs[w] = (exp[0] - actual[0], exp[1] - actual[1])
+                errs[w] = (exp[0] - actual[0], exp[1] - actual[1], exp[2] - actual[2])
         if not errs:
             break
         rounds += 1
         if rounds > 8:
             raise RuntimeError(f"MVAR 校准未收敛：{errs}")
-        for w, (dt, dp) in errs.items():
+        for w, (dt, dp, ds) in errs.items():
             controls[w][0] += dt
             controls[w][1] += dp
+            controls[w][2] += ds
 
     font["post"].underlineThickness = bases["underlineThickness"]
     font["post"].underlinePosition = bases["underlinePosition"]
-    font["OS/2"].yStrikeoutSize = bases["underlineThickness"]
-
-    strikeout = ot.MetricsValueRecord()
-    strikeout.ValueTag = "strs"
-    strikeout.VarIdx = next(r.VarIdx for r in records if r.ValueTag == "unds")
-    records.append(strikeout)
+    font["OS/2"].yStrikeoutSize = bases["yStrikeoutSize"]
 
     tbl = font["MVAR"] = newTable("MVAR")
     mvar = tbl.table = ot.MVAR()
@@ -123,6 +127,7 @@ def rebuild_vf_mvar(font: TTFont, spec: Spec | None = None) -> dict[str, Any]:
         "mvar_calibration_rounds": rounds,
         "underline_thickness_default": bases["underlineThickness"],
         "underline_position_default": bases["underlinePosition"],
+        "strikeout_size_default": bases["yStrikeoutSize"],
     }
 
 

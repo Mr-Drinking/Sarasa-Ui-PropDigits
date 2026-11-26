@@ -1,5 +1,7 @@
-"""Sarasa Ui PropDigits 重构构建与验证包。"""
+"""Sarasa Ui PropDigits 构建与验证包。"""
 from __future__ import annotations
 
+from .spec import load_spec
+
 __all__ = ["__version__"]
-__version__ = "1.0.43.4"
+__version__ = load_spec().version

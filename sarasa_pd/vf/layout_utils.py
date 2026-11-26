@@ -11,10 +11,7 @@ from fontTools import subset as _ft_subset  # noqa: F401  # 注册 lookup 闭包
 from fontTools.ttLib import TTFont
 from fontTools.ttLib.tables import otTables as ot
 
-FAR_EAST_SCRIPTS = frozenset({"hani", "kana", "bopo", "hang"})
-FAR_EAST_LANGUAGES = frozenset({"JAN", "KOR", "ZHS", "ZHT", "ZHH"})
-SHARED_DEFAULT_SCRIPTS = frozenset({"cyrl", "grek"})
-OWN_VERTICAL_FEATURES = frozenset({"vert", "vrt2"})
+from ..spec import Spec, load_spec
 
 ALIGNED_COVERAGES = {
     "Coverage": [
@@ -141,14 +138,18 @@ def install(table: Any, mapping: dict[tuple[str, str], dict[str, Feature]]) -> N
     table.ScriptList.ScriptCount = len(table.ScriptList.ScriptRecord)
 
 
-def far_east_receives_default(script: str, language: str) -> bool:
+def far_east_receives_default(script: str, language: str, spec: Spec | None = None) -> bool:
+    s = spec or load_spec()
+    fe_scripts = s.features["far_east_scripts"]
+    fe_langs = s.features["far_east_languages"]
     if language == "dflt":
-        return script in FAR_EAST_SCRIPTS
-    return script in FAR_EAST_SCRIPTS or language.strip() in FAR_EAST_LANGUAGES
+        return script in fe_scripts
+    return script in fe_scripts or language.strip() in fe_langs
 
 
-def shared_default_receives(script: str, language: str) -> bool:
-    return script in SHARED_DEFAULT_SCRIPTS and language == "dflt"
+def shared_default_receives(script: str, language: str, spec: Spec | None = None) -> bool:
+    s = spec or load_spec()
+    return script in s.features["shared_default_scripts"] and language == "dflt"
 
 
 def share_default(mapping: dict[tuple[str, str], dict[str, Feature]], receives: Any, keep: frozenset[str] = frozenset()) -> int:
@@ -174,8 +175,9 @@ def share_default(mapping: dict[tuple[str, str], dict[str, Feature]], receives: 
     return changed
 
 
-def merge_routes(table: Any, incoming: dict[tuple[str, str], dict[str, Feature]]) -> None:
+def merge_routes(table: Any, incoming: dict[tuple[str, str], dict[str, Feature]], spec: Spec | None = None) -> None:
     """按 Sarasa 语义精确合并语言系统，并把 DFLT/dflt 特性共享给远东脚本/语言。"""
+    s = spec or load_spec()
     current = routes(table)
     merged: dict[tuple[str, str], dict[str, Feature]] = {}
     for key in set(current) | set(incoming):
@@ -183,18 +185,20 @@ def merge_routes(table: Any, incoming: dict[tuple[str, str], dict[str, Feature]]
         for tag, feat in incoming.get(key, {}).items():
             features[tag] = combine(features[tag], feat) if tag in features else copy.deepcopy(feat)
         merged[key] = features
-    share_default(merged, far_east_receives_default)
+    share_default(merged, lambda sc, lang: far_east_receives_default(sc, lang, s))
     install(table, merged)
 
 
-def share_default_with_cyrl_grek(font: TTFont) -> dict[str, int]:
+def share_default_with_cyrl_grek(font: TTFont, spec: Spec | None = None) -> dict[str, int]:
+    s = spec or load_spec()
+    keep_vert = s.features["own_vertical_features"]
     report: dict[str, int] = {}
     for tag in ("GSUB", "GPOS"):
         if tag not in font:
             continue
         table = font[tag].table
         mapping = routes(table)
-        changed = share_default(mapping, shared_default_receives, OWN_VERTICAL_FEATURES)
+        changed = share_default(mapping, lambda sc, lang: shared_default_receives(sc, lang, s), keep_vert)
         if changed:
             install(table, mapping)
         report[f"{tag.lower()}_cyrl_grek_shared"] = changed
@@ -202,7 +206,7 @@ def share_default_with_cyrl_grek(font: TTFont) -> dict[str, int]:
 
 
 def uvs_target_glyphs(font: TTFont) -> set[str]:
-    """收集 cmap format 14 引用的全部非默认变体字形名（修 A1/C23）。"""
+    """收集 cmap format 14 引用的全部非默认变体字形名。"""
     glyphs: set[str] = set()
     if "cmap" not in font:
         return glyphs
@@ -364,7 +368,7 @@ def sort_pair_sets(font: TTFont) -> int:
 
 
 def inherit_glyph_aliases(font: TTFont, aliases: dict[str, set[str]]) -> None:
-    """拆分 cmap 别名后，同步继承 GSUB/GPOS/GDEF 中的布局输入与记录（带 C23.7 守卫）。"""
+    """拆分 cmap 别名后，同步继承 GSUB/GPOS/GDEF 中的布局输入与记录。"""
     order = {name: i for i, name in enumerate(font.getGlyphOrder())}
     expanded = {src: set(dsts) for src, dsts in aliases.items()}
     while True:
@@ -395,7 +399,7 @@ def inherit_glyph_aliases(font: TTFont, aliases: dict[str, set[str]]) -> None:
         added = {new: i for i, old in enumerate(original) for new in aliases.get(old, ()) if new not in original}
         if not added:
             return
-        # 若多个子表共享同一 Coverage，先独立深拷贝再修改，避免平行数组失配（C23.7）
+        # 若多个子表共享同一 Coverage，先独立深拷贝再修改，避免平行数组失配
         cov = copy.deepcopy(cov)
         setattr(owner, field, cov)
         indices = {name: i for i, name in enumerate(original)} | added
@@ -428,7 +432,7 @@ def inherit_glyph_aliases(font: TTFont, aliases: dict[str, set[str]]) -> None:
                 for old, val in list(mapping.items()):
                     for new in aliases.get(old, ()):
                         if new in mapping:
-                            continue  # 不覆盖别名已有规则（C23.7）
+                            continue  # 不覆盖别名已有规则
                         if isinstance(val, list):
                             mapping[new] = [new if item == old else item for item in val]
                         else:

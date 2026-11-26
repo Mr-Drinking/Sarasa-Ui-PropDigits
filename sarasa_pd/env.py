@@ -23,6 +23,7 @@ CORE_MODULES: dict[str, str] = {
     "chws_tool": "chws-tool",
     "east_asian_spacing": "east-asian-spacing",
     "PIL": "pillow",
+    "pathops": "skia-pathops",
 }
 
 

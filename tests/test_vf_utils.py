@@ -160,7 +160,7 @@ class VfUtilsTests(unittest.TestCase):
         gsub.table.ScriptList = ot.ScriptList(); gsub.table.ScriptList.ScriptRecord = []; gsub.table.ScriptList.ScriptCount = 0
         font["GSUB"] = gsub
         inherit_glyph_aliases(font, {"A": {"A.alias"}})
-        # 不得覆盖 A.alias 已有规则（C23.7）
+        # 不得覆盖 A.alias 已有规则
         self.assertEqual(s1.mapping["A.alias"], "A.alias")
         # remove_empty_lookups 无崩
         self.assertEqual(remove_empty_lookups(font), 0)

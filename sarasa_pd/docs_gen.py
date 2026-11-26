@@ -72,12 +72,30 @@ def render_differences_table(spec: Spec, *, kind: str | None = None) -> str:
 
 def render_sources_table(spec: Spec) -> str:
     lines = [
-        "| 来源 | 归档文件 | SHA-256（前 16 位） |",
-        "| --- | --- | --- |",
+        "| 来源 | 用途 | 归档文件 | SHA-256（前 16 位） |",
+        "| --- | --- | --- | --- |",
     ]
-    for key in ("source_han_vf", "inter", "shanggu_vf", "sarasa_ui_unhinted_all"):
+    vf_roles = (
+        ("source_han_vf", "CJK 可变字体基底"),
+        ("inter", "西文与数字可变字体"),
+        ("shanggu_vf", "CL 传统旧字形覆盖"),
+    )
+    for key, role in vf_roles:
         pin = spec.archives[key]
-        lines.append(f"| `{key}` | `{pin.filename}` | `{pin.sha256[:16]}…` |")
+        lines.append(f"| `{key}` | {role} | `{pin.filename}` | `{pin.sha256[:16]}…` |")
+    for code in spec.region_order:
+        r = spec.region(code)
+        fname = f"{r.sarasa_prefix}-TTF-Unhinted-{spec.sarasa_version}.7z"
+        sha = spec.sarasa_ui_unhinted_sha256[code]
+        lines.append(f"| `sarasa_ui_{code.lower()}` | {code} 只读参照（默认按需下载） | `{fname}` | `{sha[:16]}…` |")
+    agg = spec.archives["sarasa_ui_unhinted_all"]
+    lines.append(
+        f"| `sarasa_ui_unhinted_all` | 全地区只读参照（本地已有时优先复用） | `{agg.filename}` | `{agg.sha256[:16]}…` |"
+    )
+    agg_hi = spec.archives["sarasa_ui_hinted_all"]
+    lines.append(
+        f"| `sarasa_ui_hinted_all` | 全地区 hinted 参照（hint 位移门对照，各地区亦可按需单独下载） | `{agg_hi.filename}` | `{agg_hi.sha256[:16]}…` |"
+    )
     return "\n".join(lines)
 
 

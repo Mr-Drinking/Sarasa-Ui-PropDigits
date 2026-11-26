@@ -154,7 +154,7 @@ def copy_external_glyph_data(target: TTFont, dst_name: str, source: TTFont, src_
 
 
 def assert_compatible_axis_space(base: TTFont, override: TTFont) -> None:
-    """校验尚古 VF 与基底 Source Han K VF 具有相同轴范围与 avar 映射（修 C23.5）。"""
+    """校验尚古 VF 与基底 Source Han K VF 具有相同轴范围与 avar 映射。"""
     ba, oa = weight_axis(base), weight_axis(override)
     if (ba.minValue, ba.defaultValue, ba.maxValue) != (oa.minValue, oa.defaultValue, oa.maxValue):
         raise ValueError(
@@ -226,6 +226,27 @@ def _dash_cjk_roles(font: TTFont) -> dict[str, str]:
     }
 
 
+def _same_glyph_outline(f1: TTFont, g1: str, f2: TTFont, g2: str) -> bool:
+    if g1 not in f1["glyf"].glyphs or g2 not in f2["glyf"].glyphs:
+        return False
+    a, b = f1["glyf"][g1], f2["glyf"][g2]
+    a.expand(f1["glyf"])
+    b.expand(f2["glyf"])
+    if a.numberOfContours != b.numberOfContours:
+        return False
+    if a.isComposite():
+        ca = [(c.glyphName, c.x, c.y, getattr(c, "transform", None)) for c in a.components]
+        cb = [(c.glyphName, c.x, c.y, getattr(c, "transform", None)) for c in b.components]
+        return ca == cb
+    if a.numberOfContours <= 0:
+        return True
+    return (
+        list(a.coordinates) == list(b.coordinates)
+        and list(a.endPtsOfContours) == list(b.endPtsOfContours)
+        and [f & 1 for f in a.flags] == [f & 1 for f in b.flags]
+    )
+
+
 def apply_classical_override(base: TTFont, override: TTFont, allowed_cps: set[int]) -> dict[str, int]:
     assert_compatible_axis_space(base, override)
     base_cmap = base.getBestCmap() or {}
@@ -236,11 +257,37 @@ def apply_classical_override(base: TTFont, override: TTFont, allowed_cps: set[in
         if is_ideograph(cp):
             groups.setdefault(base_cmap[cp], {}).setdefault(src_cmap[cp], set()).add(cp)
 
+    uvs_tables = [t for t in base["cmap"].tables if t.format == 14]
+    uvs_nondefault_glyphs = {
+        g for t in uvs_tables for entries in t.uvsDict.values() for _cp, g in entries if g is not None
+    }
+    default_uvs_cps = {
+        cp for t in uvs_tables for entries in t.uvsDict.values() for cp, g in entries if g is None
+    }
+
     pending_aliases: dict[str, set[str]] = {}
-    changed_cps = changed_glyphs = 0
+    changed_cps = changed_glyphs = uvs_preserved = 0
     for original, replacements in groups.items():
         replaced = set().union(*replacements.values())
-        keep_original = not (all_users[original] - replaced)
+        # 仅当尚古替换字形的轮廓实际不同于原基底字形时，才固化 cmap format 14 的默认变体 (cp, None)，
+        # 既保护全部兼容汉字标准化变体序列（SVS），又不克隆轮廓完全相同的冗余字形。
+        pin_cps: set[int] = set()
+        for src_name, users in replacements.items():
+            cand = users & default_uvs_cps
+            if cand and not _same_glyph_outline(base, original, override, src_name):
+                pin_cps.update(cand)
+        if pin_cps:
+            for uvs_tbl in uvs_tables:
+                for _sel, entries in uvs_tbl.uvsDict.items():
+                    for idx, (base_cp, vglyph) in enumerate(entries):
+                        if base_cp in pin_cps and vglyph is None:
+                            entries[idx] = (base_cp, original)
+                            uvs_preserved += 1
+        keep_original = (
+            not (all_users[original] - replaced)
+            and not pin_cps
+            and original not in uvs_nondefault_glyphs
+        )
         for src_name, users in sorted(replacements.items(), key=lambda item: min(item[1])):
             dst_name = original if keep_original else clone_glyph(
                 base, original, f"{original}.cl.u{min(users):04X}", pending_aliases
@@ -260,7 +307,11 @@ def apply_classical_override(base: TTFont, override: TTFont, allowed_cps: set[in
     ov_dash = _dash_cjk_roles(override)
     for role in ("fullwidth", "fullwidth_two", "fullwidth_three", "vertical_single", "vertical_two", "vertical_three"):
         copy_external_glyph_data(base, base_dash[role], override, ov_dash[role])
-    return {"classical_codepoints": changed_cps, "classical_glyphs": changed_glyphs}
+    return {
+        "classical_codepoints": changed_cps,
+        "classical_glyphs": changed_glyphs,
+        "classical_default_uvs_pinned": uvs_preserved,
+    }
 
 
 def shift_glyph_x(font: TTFont, glyph_name: str, dx: float) -> None:

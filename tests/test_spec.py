@@ -18,7 +18,12 @@ class SpecTests(unittest.TestCase):
         self.spec = load_spec()
 
     def test_regions_and_weights_matrix(self) -> None:
+        import sarasa_pd
+
+        self.assertEqual(sarasa_pd.__version__, self.spec.version)
         self.assertEqual(self.spec.region_order, ("CL", "SC", "TC", "HC", "J", "K"))
+        self.assertEqual(self.spec.region("SC").default_ot_lang, "ZHS ")
+        self.assertEqual(self.spec.region("K").default_ot_lang, "KOR ")
         self.assertEqual([w.value for w in self.spec.weights], [200, 300, 400, 600, 700, 900])
         self.assertEqual([w.name for w in self.spec.weights], ["ExtraLight", "Light", "Regular", "SemiBold", "Bold", "Heavy"])
         self.assertEqual(self.spec.public_to_internal_wght[200], 250)

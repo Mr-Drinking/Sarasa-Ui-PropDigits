@@ -2,11 +2,12 @@
 # 构建、验证、对照与文档表格均从此文件读取，不手工分头维护。
 
 [project]
-version = "1.0.43.4"
+version = "1.0.43.5"
+previous_version = "1.0.43.4"
 sarasa_version = "1.0.43"
 vendor_id = "MRDK"
 # 固定写入 head.modified 的默认时间（可用环境变量 SOURCE_DATE_EPOCH 覆盖）
-head_modified_utc = "2026-11-24T00:00:00Z"
+head_modified_utc = "2026-11-25T00:00:00Z"
 italic_angle = -9.4
 copyright = "Copyright (c) 2015-2025, Renzhi Li (aka. Belleve Invis, belleve@typeof.net). Portions Copyright (c) 2016 The Inter Project Authors. Portions © 2014-2025 Adobe (http://www.adobe.com/), with Reserved Font Name 'Source'. Portions Copyright (c) 2012 Google Inc."
 shanggu_copyright = "© 2022-2026 Shanggu Fonts."
@@ -15,13 +16,13 @@ license_url = "https://openfontlicense.org"
 source_only_legal_name_ids = [7, 8, 9, 10, 11]
 smart_dropout_prep_hex = "b801ff85b0048d"
 gasp_range_all = 15
+lowest_rec_ppem = 3
 
 [axes]
 source_han_limit = [250, 400, 900]
 public_limit = [200, 400, 900]
 inter_opsz = 14
-hidden_anchors = [350]
-# 公开字重 -> Source Han 内部字重映射（600 公开对应 Source Han 500 与 Inter 600）
+# 公开字重 -> Source Han 内部字重映射（350 为隐藏 avar 锚点；600 公开对应 Source Han 500 与 Inter 600）
 [axes.public_to_internal_wght]
 200 = 250
 300 = 300
@@ -50,6 +51,8 @@ flags = 0
 underline_thickness = 37
 underline_position = -185
 strikeout_size = 37
+x_avg_char_width_upright = 618
+x_avg_char_width_italic = 619
 sarasa_ref_weight = "ExtraLight"
 hcfg = "ExtraLight"
 
@@ -62,6 +65,8 @@ flags = 0
 underline_thickness = 53
 underline_position = -177
 strikeout_size = 53
+x_avg_char_width_upright = 629
+x_avg_char_width_italic = 630
 sarasa_ref_weight = "Light"
 hcfg = "Light"
 
@@ -74,6 +79,8 @@ flags = 2
 underline_thickness = 68
 underline_position = -169
 strikeout_size = 68
+x_avg_char_width_upright = 640
+x_avg_char_width_italic = 641
 sarasa_ref_weight = "Regular"
 hcfg = "Regular"
 
@@ -86,6 +93,8 @@ flags = 0
 underline_thickness = 84
 underline_position = -161
 strikeout_size = 84
+x_avg_char_width_upright = 652
+x_avg_char_width_italic = 653
 sarasa_ref_weight = "SemiBold"
 hcfg = "SemiBold"
 
@@ -98,6 +107,8 @@ flags = 0
 underline_thickness = 92
 underline_position = -157
 strikeout_size = 92
+x_avg_char_width_upright = 661
+x_avg_char_width_italic = 663
 sarasa_ref_weight = "Bold"
 hcfg = "Bold"
 
@@ -110,6 +121,8 @@ flags = 0
 underline_thickness = 113
 underline_position = -147
 strikeout_size = 113
+x_avg_char_width_upright = 684
+x_avg_char_width_italic = 686
 sarasa_ref_weight = "Bold"
 hcfg = "Heavy"
 
@@ -120,6 +133,7 @@ classical_vf = "shanggu-1.028/ShangguSansTC-VF.ttf"
 sarasa_prefix = "SarasaUiCL"
 local_family = "更紗黑體"
 local_lang_id = 0x0404
+default_ot_lang = "ZHT "
 codepage_range1 = 0x8010019F
 classical = true
 
@@ -129,6 +143,7 @@ source_han_vf = "SourceHanSansSC-VF.ttf"
 sarasa_prefix = "SarasaUiSC"
 local_family = "更纱黑体"
 local_lang_id = 0x0804
+default_ot_lang = "ZHS "
 codepage_range1 = 0x8004019F
 classical = false
 
@@ -138,6 +153,7 @@ source_han_vf = "SourceHanSansTC-VF.ttf"
 sarasa_prefix = "SarasaUiTC"
 local_family = "更紗黑體"
 local_lang_id = 0x0404
+default_ot_lang = "ZHT "
 codepage_range1 = 0x8010019F
 classical = false
 
@@ -147,6 +163,7 @@ source_han_vf = "SourceHanSansHC-VF.ttf"
 sarasa_prefix = "SarasaUiHC"
 local_family = "更紗黑體"
 local_lang_id = 0x0C04
+default_ot_lang = "ZHH "
 codepage_range1 = 0x8010019F
 classical = false
 
@@ -156,6 +173,7 @@ source_han_vf = "SourceHanSans-VF.ttf"
 sarasa_prefix = "SarasaUiJ"
 local_family = "更紗ゴシック"
 local_lang_id = 0x0411
+default_ot_lang = "JAN "
 codepage_range1 = 0x8002019F
 classical = false
 
@@ -165,6 +183,7 @@ source_han_vf = "SourceHanSansK-VF.ttf"
 sarasa_prefix = "SarasaUiK"
 local_family = "사라사 고딕"
 local_lang_id = 0x0412
+default_ot_lang = "KOR "
 codepage_range1 = 0x8028019F
 classical = false
 
@@ -336,31 +355,49 @@ title = "GPOS PairSet 按规范排序"
 basis = "修正固定上游未排序 PairSet 导致 HarfBuzz 二分查找漏读字偶距的问题。"
 
 [[differences]]
+id = "inter-ss03-kerning-fix"
+kind = "intentional"
+title = "修复 Inter VF 4.1 中 ʼρ 字偶距退化"
+basis = "InterVariable 4.1 将 (quoteright.ss03, rho) 覆写为类字偶距 -43（1000 UPM 为 -21）；载入 Inter 时恢复为与 (quoteright, rho) 一致的 -128（-62）。"
+
+[[differences]]
+id = "vertical-3em-dash-segments"
+kind = "intentional"
+title = "竖排 3em 破折号切分为三段 1em 无缝字形"
+basis = "vert/vrt2 中将 3em 破折号（———、⸻）通过 MultipleSubst 替换为由原生 3em 竖排字形在 y=880 与 y=-120 处切出的三段 1em 字形 [top, middle, bottom]（切口各延伸 16 unit 重叠，tsb 分别为 72/-16/-16 使竖排原点恒为 880，斜体沿 9.4° 边切分且 gvar 切点按 Δx=Δx_edge-Δy_edge·tanθ、Δy=0 固定切线），移除原 3em 竖排单字形，使 head 包围盒维持 1323 / -549、vhea.advanceHeightMax 回到 2000，且正斜体全字重无缝连接。"
+
+[[differences]]
+id = "nonhinting-head-flags"
+kind = "intentional"
+title = "unhinted 静态与 VF 清除 head.flags bit 2/3"
+basis = "OpenType 规范仅对 hinted 字体强烈建议置位 head.flags bit 3（强制 ppem 取整），故 hinted 静态与上游一致设为 15；unhinted 静态与 VF 无逐字形指令，清除 bit 2 与 bit 3（head.flags = 3），使分数字号不再按取整后的 ppem 缩放。"
+
+[[differences]]
 id = "classical-fixes"
 kind = "intentional"
-title = "CL 尚古 1.028 全字集、全宽修正与间距基字"
-basis = "CL 叠加尚古 1.028 VF；强制修正 巅/拼/绿 等非全宽汉字为 1000（A5）；修正 㪉㪘㪣㪰 GDEF 误标为 mark。"
+title = "CL 尚古 1.028 替换、全宽修正与间距基字"
+basis = "CL 使用完整 ShangguSansTC-VF 1.028 文件替换基底中共有传统旧字形汉字（码位集合仍以上游 Sarasa Ui CL 为界）；强制修正 巅/拼/绿 等非全宽汉字为 1000；修正 㪉㪘㪣㪰 GDEF 误标为 mark。"
 
 [[differences]]
 id = "os2-metadata-fixes"
 kind = "intentional"
-title = "OS/2 usMaxContext 与 ulUnicodeRange bit 57 修正"
-basis = "按实际布局重算 usMaxContext，置位辅助平面标志 bit 57。"
+title = "表级元数据、命名记录键与 STAT 修正"
+basis = "写入项目 achVendID（MRDK）、按实际布局重算 OS/2.usMaxContext、确保 OS/2 ulUnicodeRange bit 57（辅助平面）置位；写入 STAT 表及英文 nameID 13/14（OFL 许可证），仅在英文 0x0409 写 nameID 3 唯一标识（不重复本地化 nameID 3），并为全部 6 地区统一提供本地化 nameID 1/2/4/16/17（补齐上游 K 缺失的韩语 0x0412 记录）；VF 额外含 nameID 25。"
 
 [[differences]]
 id = "heavy-weight"
 kind = "intentional"
-title = "新增 Heavy（900）字重与独立 A1 Hinting"
-basis = "上游 Sarasa Ui 无 Heavy 字重；本项目由 VF 单真相源提供并配独立 hcfg，且按安全预算扩充 cvt 消除 A13 执行中止。"
+title = "新增 Heavy（900）字重与独立混合 Hinting"
+basis = "上游 Sarasa Ui 无 Heavy 字重；本项目由 VF 单真相源提供并配独立 hcfg，且补足 cvt 表以消除 FreeType 严格模式下的执行预算中止。"
 
 [[differences]]
 id = "vf-single-source-metrics"
 kind = "source_vf"
 title = "单真相源跟随 Source Han VF 与 Inter VF 数值"
-basis = "不再向 Sarasa 静态成品做 13 控点逐单位对齐；保留 Source Han VF 的假名+句读字偶距（A3）、逐字重插值 palt/vpal（A6/A7）与尚古 1.028 VF 原样字形（A14）。"
+basis = "不再向 Sarasa 静态成品做 13 控点逐单位对齐；保留 Source Han VF 的假名+句读字偶距、逐字重插值 palt/vpal 与尚古 1.028 VF 原样字形。"
 
 [[differences]]
 id = "upstream-inherited"
 kind = "upstream_inherited"
 title = "继承自上游且解释得通的细节"
-basis = "包括 Ģ、加泰罗尼亚语 l·l、DFLT 无 CJK 语言系统、latn/CAT·MOL·ROM 路由、win 度量 968/241 与 hhea.ascender 969、Android includeFontPadding 上下界、U+22EF 与 OS/2 码页 bit 31。"
+basis = "包括 Ģ、加泰罗尼亚语 l·l、DFLT 无 CJK 语言系统、latn/CAT·MOL·ROM 路由、win 度量 968/241 与 hhea.ascender 969、由 〱〲 决定的 head 上下界（1323 / -549）、U+22EF 与 OS/2 码页 bit 31。"

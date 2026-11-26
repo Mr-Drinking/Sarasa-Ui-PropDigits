@@ -114,19 +114,19 @@ def _make_sample_vf(with_sip: bool = True) -> TTFont:
 
 
 class VfFixesMetricsNamesTests(unittest.TestCase):
-    def test_a5_gdef_bit57_and_unreachable_uvs_protection(self) -> None:
+    def test_cl_fullwidth_gdef_bit57_and_unreachable_uvs_protection(self) -> None:
         font = _make_sample_vf(with_sip=True)
 
-        # 非 CL 不动 A5
-        self.assertEqual(fix_classical_ideograph_fullwidth(font, "SC")["a5_cl_ideographs_fixed"], 0)
+        # 非 CL 不动汉字全宽修正
+        self.assertEqual(fix_classical_ideograph_fullwidth(font, "SC")["cl_ideographs_fixed"], 0)
         self.assertEqual(font["hmtx"]["han_narrow"][0], 920)
 
-        # CL 修正 A5 且幂等
+        # CL 修正汉字全宽且幂等
         r1 = fix_classical_ideograph_fullwidth(font, "CL")
-        self.assertGreaterEqual(r1["a5_cl_ideographs_fixed"], 1)
+        self.assertGreaterEqual(r1["cl_ideographs_fixed"], 1)
         self.assertEqual(font["hmtx"]["han_narrow"][0], 1000)
         self.assertEqual(font["gvar"].variations["han_narrow"][0].coordinates[-3], (0, 0))
-        self.assertEqual(fix_classical_ideograph_fullwidth(font, "CL")["a5_cl_ideographs_fixed"], 0)
+        self.assertEqual(fix_classical_ideograph_fullwidth(font, "CL")["cl_ideographs_fixed"], 0)
 
         # GDEF 汉字误标为 mark -> base 且幂等
         self.assertEqual(fix_ideograph_gdef_classes(font)["ideograph_gdef_marks_fixed"], 1)
@@ -163,6 +163,21 @@ class VfFixesMetricsNamesTests(unittest.TestCase):
             inst = VarStoreInstancer(store, font["fvar"].axes, loc)
             self.assertEqual(font["post"].underlineThickness + round(inst[by_tag["unds"]]), w.underline_thickness)
             self.assertEqual(font["post"].underlinePosition + round(inst[by_tag["undo"]]), w.underline_position)
+            self.assertEqual(font["OS/2"].yStrikeoutSize + round(inst[by_tag["strs"]]), w.strikeout_size)
+
+        # 独立验证 strikeout_size != underline_thickness 时 strs 独立遵循 spec.strikeout_size
+        from dataclasses import replace
+
+        custom_weights = tuple(replace(w, strikeout_size=w.strikeout_size + 5) for w in spec.weights)
+        custom_spec = replace(spec, weights=custom_weights)
+        rebuild_vf_mvar(font, custom_spec)
+        store2 = font["MVAR"].table.VarStore
+        by_tag2 = {r.ValueTag: r.VarIdx for r in font["MVAR"].table.ValueRecord}
+        self.assertEqual(font["OS/2"].yStrikeoutSize, spec.weight("Regular").strikeout_size + 5)
+        for w in custom_weights:
+            loc = {"wght": normalized_wght(font, w.value)}
+            inst2 = VarStoreInstancer(store2, font["fvar"].axes, loc)
+            self.assertEqual(font["OS/2"].yStrikeoutSize + round(inst2[by_tag2["strs"]]), w.strikeout_size)
 
         brep = recalculate_head_bounds_and_lsb(font)
         self.assertGreater(brep["lsb_fixed"], 0)

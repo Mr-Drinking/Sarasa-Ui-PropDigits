@@ -1,4 +1,4 @@
-"""规格修正模块：每个函数对应一条明确审计条目，保持幂等且无全局状态。"""
+"""规格修正模块：每个函数对应一项明确规格修正，保持幂等且无全局状态。"""
 from __future__ import annotations
 
 from typing import Any
@@ -33,9 +33,9 @@ def _freeze_horizontal_advance_variation(font: TTFont, glyph_name: str) -> None:
 
 
 def fix_classical_ideograph_fullwidth(font: TTFont, region: str) -> dict[str, int]:
-    """修 A5：CL 地区所有编码汉字各字重步进固定为全宽 1000（upem），墨迹居中并冻结水平步进变化。"""
+    """CL 地区所有编码汉字各字重步进固定为全宽 1000（upem），墨迹居中并冻结水平步进变化。"""
     if region != "CL":
-        return {"a5_cl_ideographs_fixed": 0}
+        return {"cl_ideographs_fixed": 0}
     upem = int(font["head"].unitsPerEm)
     cmap = font.getBestCmap() or {}
     targets = sorted({gname for cp, gname in cmap.items() if is_ideograph(cp)})
@@ -49,7 +49,7 @@ def fix_classical_ideograph_fullwidth(font: TTFont, region: str) -> dict[str, in
                 set_advance_width(font, gname, upem)
             _freeze_horizontal_advance_variation(font, gname)
             fixed += 1
-    return {"a5_cl_ideographs_fixed": fixed}
+    return {"cl_ideographs_fixed": fixed}
 
 
 def fix_ideograph_gdef_classes(font: TTFont) -> dict[str, int]:
@@ -69,7 +69,7 @@ def fix_ideograph_gdef_classes(font: TTFont) -> dict[str, int]:
 
 
 def fix_os2_unicode_range_bit57(font: TTFont) -> dict[str, bool]:
-    """修 A18：当 cmap 包含非 BMP 码位（> U+FFFF）时，将 OS/2 ulUnicodeRange bit 57（Non-Plane 0）置位。"""
+    """当 cmap 包含非 BMP 码位（> U+FFFF）时，将 OS/2 ulUnicodeRange bit 57（Non-Plane 0）置位。"""
     cmap = font.getBestCmap() or {}
     has_non_bmp = any(cp > 0xFFFF for cp in cmap)
     os2 = font["OS/2"]

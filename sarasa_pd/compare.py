@@ -5,12 +5,14 @@ from collections import defaultdict
 import concurrent.futures
 import json
 from pathlib import Path
+import sys
 import time
 from typing import Any
 
 from fontTools.ttLib import TTFont
 import uharfbuzz as hb
 
+from .checks.rules import extract_table_framework
 from .probes import DEFAULT_PROBES, Probe
 from .spec import Spec, codepoint_category, load_spec
 
@@ -64,11 +66,27 @@ def _extract_routes(tt: TTFont, tag: str) -> dict[str, list[str]]:
     return out
 
 
+_HEX_OS2_FIELDS = frozenset({
+    "ulUnicodeRange1",
+    "ulUnicodeRange2",
+    "ulUnicodeRange3",
+    "ulUnicodeRange4",
+    "ulCodePageRange1",
+    "ulCodePageRange2",
+    "fsSelection",
+})
+
+
+def _fmt_meta_val(sec: str, field: str, val: Any) -> Any:
+    if val is None:
+        return None
+    if sec == "OS/2" and field in _HEX_OS2_FIELDS and isinstance(val, int):
+        return f"0x{val:08X}" if field.startswith("ul") else f"0x{val:04X}"
+    return val
+
+
 def _extract_metrics_snapshot(tt: TTFont) -> dict[str, Any]:
-    head = tt["head"]
-    hhea = tt["hhea"]
-    os2 = tt["OS/2"]
-    post = tt["post"]
+    fw = extract_table_framework(tt)
     name_tbl = tt["name"]
 
     def get_en(nid: int) -> str | None:
@@ -78,42 +96,16 @@ def _extract_metrics_snapshot(tt: TTFont) -> dict[str, Any]:
     snap: dict[str, Any] = {
         "glyph_count": len(tt.getGlyphOrder()),
         "tables": sorted(t for t in tt.keys() if t != "GlyphOrder"),
-        "head": {
-            "unitsPerEm": head.unitsPerEm,
-            "flags": head.flags,
-            "macStyle": head.macStyle,
-            "bounds": [head.xMin, head.yMin, head.xMax, head.yMax],
-        },
-        "hhea": {
-            "ascent": hhea.ascent,
-            "descent": hhea.descent,
-            "lineGap": hhea.lineGap,
-        },
-        "OS/2": {
-            "usWeightClass": os2.usWeightClass,
-            "sTypoAscender": os2.sTypoAscender,
-            "sTypoDescender": os2.sTypoDescender,
-            "sTypoLineGap": os2.sTypoLineGap,
-            "usWinAscent": os2.usWinAscent,
-            "usWinDescent": os2.usWinDescent,
-            "ulCodePageRange1": f"0x{os2.ulCodePageRange1:08X}",
-            "bit57_non_plane0": bool(os2.ulUnicodeRange2 & (1 << (57 - 32))),
-            "usMaxContext": os2.usMaxContext,
-            "achVendID": os2.achVendID,
-            "yStrikeoutSize": os2.yStrikeoutSize,
-            "bWeight": os2.panose.bWeight,
-        },
-        "post": {
-            "formatType": post.formatType,
-            "italicAngle": post.italicAngle,
-            "underlinePosition": post.underlinePosition,
-            "underlineThickness": post.underlineThickness,
-        },
+        "head": fw["head"],
+        "hhea": fw["hhea"],
+        "OS/2": {k: _fmt_meta_val("OS/2", k, v) for k, v in fw["OS/2"].items()},
+        "post": fw["post"],
+        "name_keys": [f"({p},{e},0x{l:04X},{n})" for p, e, l, n in fw["name_keys"]],
+        "has_STAT": fw["has_STAT"],
         "name_en": {str(nid): get_en(nid) for nid in (0, 1, 2, 4, 5, 6, 13, 14, 16, 17)},
     }
-    if "vhea" in tt:
-        vhea = tt["vhea"]
-        snap["vhea"] = {"ascent": vhea.ascent, "descent": vhea.descent, "lineGap": vhea.lineGap}
+    if "vhea" in fw:
+        snap["vhea"] = fw["vhea"]
     return snap
 
 
@@ -274,7 +266,7 @@ def compare_font_pair(
             route_diffs[tbl] = {"only_cand": only_a, "only_ref": only_b, "changed": changed}
 
     meta_diffs: dict[str, Any] = {}
-    for sec in ("head", "hhea", "OS/2", "post", "vhea"):
+    for sec in ("head", "hhea", "vhea", "OS/2", "post"):
         va, vb = cand_meta.get(sec), ref_meta.get(sec)
         if va != vb:
             if isinstance(va, dict) and isinstance(vb, dict):
@@ -283,6 +275,14 @@ def compare_font_pair(
                     meta_diffs[sec] = sub
             else:
                 meta_diffs[sec] = [va, vb]
+    nk_a, nk_b = set(cand_meta.get("name_keys", ())), set(ref_meta.get("name_keys", ()))
+    if nk_a != nk_b:
+        meta_diffs["name_keys"] = {
+            "added": sorted(nk_a - nk_b),
+            "removed": sorted(nk_b - nk_a),
+        }
+    if cand_meta.get("has_STAT") != ref_meta.get("has_STAT"):
+        meta_diffs["STAT"] = [cand_meta.get("has_STAT"), ref_meta.get("has_STAT")]
 
     return {
         "label": label,
@@ -367,26 +367,71 @@ def run_compare_batch(
     return summary
 
 
+def _format_meta_diff_summary(meta: dict[str, Any]) -> list[str]:
+    out: list[str] = []
+    for sec in ("head", "hhea", "vhea", "OS/2", "post"):
+        info = meta.get(sec)
+        if isinstance(info, dict) and info:
+            items = [f"`{k}`: {v[0]} vs {v[1]}" for k, v in info.items()]
+            out.append(f"**{sec}**：" + "、".join(items))
+        elif info is not None:
+            out.append(f"**{sec}**：{info[0]} vs {info[1]}")
+    nk = meta.get("name_keys")
+    if isinstance(nk, dict):
+        parts = []
+        if nk.get("added"):
+            parts.append("多出 " + ", ".join(nk["added"]))
+        if nk.get("removed"):
+            parts.append("减少 " + ", ".join(nk["removed"]))
+        if parts:
+            out.append("**name 记录键**：" + "；".join(parts))
+    if "STAT" in meta:
+        out.append(f"**STAT**：{meta['STAT'][0]} vs {meta['STAT'][1]}")
+    return out
+
+
 def render_markdown(summary: dict[str, Any]) -> str:
     lines = [
         f"# {summary['title']}",
         "",
         f"对照对数：{summary['pair_count']}，总耗时：{summary['elapsed_sec']} 秒。",
         "",
-        "| 项 | cmap 差 (+/−) | UVS 差 (候/参) | 步进差 | 墨迹>2 | 语料差 | 路由差异表 |",
-        "| --- | --- | --- | --- | --- | --- | --- |",
+        "| 项 | cmap 差 (+/−) | UVS 差 (候/参) | 步进差 | 墨迹>2 | 语料差 | 路由差异表 | 表级差异表 |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- |",
     ]
     for r in summary["results"]:
         cm = r["cmap"]
         uvs = r["uvs_format14"]
         adv_total = sum(v["count"] for v in r["advances"].values())
         routes = ",".join(sorted(r["routes"])) or "无"
+        meta_secs = ",".join(sorted(r.get("metadata", {}))) or "无"
         lines.append(
             f"| {r['label']} | +{cm['only_cand_count']}/-{cm['only_ref_count']} "
             f"| {uvs['cand_total']}/{uvs['ref_total']} "
             f"| {adv_total} | {r['ink']['gt2']['count']} "
-            f"| {r['probes']['diff_count']}/{r['probes']['total']} | {routes} |"
+            f"| {r['probes']['diff_count']}/{r['probes']['total']} | {routes} | {meta_secs} |"
         )
+
+    lines.append("")
+    lines.append("## 表级框架对照")
+    lines.append("")
+    grouped_meta: dict[str, list[str]] = {}
+    for r in summary["results"]:
+        meta = r.get("metadata", {})
+        sig = json.dumps(meta, ensure_ascii=False, sort_keys=True)
+        grouped_meta.setdefault(sig, []).append(r["label"])
+    if len(grouped_meta) == 1 and next(iter(grouped_meta)) == "{}":
+        lines.append("全部对照对的表级字段（head、hhea、vhea、OS/2 全部字段、post、name 记录键与 STAT）完全一致。")
+    else:
+        for sig, labels in grouped_meta.items():
+            meta = json.loads(sig)
+            sample_labels = ", ".join(labels[:6]) + (f" 等 {len(labels)} 项" if len(labels) > 6 else "")
+            if not meta:
+                lines.append(f"- **{sample_labels}**：表级字段完全一致。")
+            else:
+                lines.append(f"- **{sample_labels}**：")
+                for line in _format_meta_diff_summary(meta):
+                    lines.append(f"  - {line}")
 
     lines.append("")
     lines.append("## 明细摘要")
@@ -426,6 +471,8 @@ def render_markdown(summary: dict[str, Any]) -> str:
                 if info["changed"]:
                     parts.append(f"特性变更 {len(info['changed'])} 处")
                 lines.append(f"- **{tbl} 路由**：" + "，".join(parts))
+        if r.get("metadata"):
+            lines.append("- **表级框架差异**：" + "；".join(_format_meta_diff_summary(r["metadata"])))
     lines.append("")
     return "\n".join(lines)
 
@@ -446,6 +493,7 @@ def build_upstream_tasks(
     spec = spec or load_spec()
     ver = cand_version or spec.version
     tasks: list[dict[str, Any]] = []
+    skipped: list[str] = []
     for region in regions:
         r = spec.region(region)
         for style in styles:
@@ -454,6 +502,7 @@ def build_upstream_tasks(
                 w = spec.weight(weight_name)
                 ref_file = ref_root / r.code / "unhinted" / spec.sarasa_ref_filename(r.code, w.name, italic)
                 if not ref_file.is_file():
+                    skipped.append(f"{r.code}-{w.name}{'-It' if italic else ''}（缺参照 {ref_file.name}）")
                     continue
                 if include_static:
                     static_dir = cand_root / "static" / f"SarasaUiPropDigits{r.code}-TTF-Unhinted-{ver}"
@@ -464,6 +513,8 @@ def build_upstream_tasks(
                             "cand": str(cand_file),
                             "ref": str(ref_file),
                         })
+                    else:
+                        skipped.append(f"static:{r.code}-{w.name}{'-It' if italic else ''}（缺候选 {cand_file.name}）")
                 if include_vf:
                     vf_file = cand_root / "variable" / spec.variable_filename(r.code, italic)
                     if vf_file.is_file():
@@ -473,6 +524,13 @@ def build_upstream_tasks(
                             "ref": str(ref_file),
                             "cand_wght": w.value,
                         })
+                    else:
+                        skipped.append(f"vf:{r.code}@{w.value}{'-It' if italic else ''}（缺候选 {vf_file.name}）")
+    if skipped:
+        print(
+            f"[compare] 警告：跳过 {len(skipped)} 个缺少文件的对照组合，样例：{', '.join(skipped[:5])}",
+            file=sys.stderr,
+        )
     return tasks
 
 
@@ -484,17 +542,19 @@ def build_project_tasks(
     weights: list[str],
     *,
     cand_version: str | None = None,
-    ref_version: str = "1.0.43.3",
+    ref_version: str | None = None,
     include_vf: bool = True,
     include_static: bool = True,
     hinted: bool = False,
     spec: Spec | None = None,
 ) -> list[dict[str, Any]]:
-    """按本项目目录结构构造对照任务（用于新版对照 v1.0.43.3）。"""
+    """按本项目目录结构构造对照任务（默认对照上一发布版本）。"""
     spec = spec or load_spec()
     c_ver = cand_version or spec.version
+    r_ver = ref_version or spec.previous_version
     variant = "TTF" if hinted else "TTF-Unhinted"
     tasks: list[dict[str, Any]] = []
+    skipped: list[str] = []
     for region in regions:
         r = spec.region(region)
         for style in styles:
@@ -503,13 +563,15 @@ def build_project_tasks(
                 w = spec.weight(weight_name)
                 if include_static:
                     cand_file = cand_root / "static" / f"SarasaUiPropDigits{r.code}-{variant}-{c_ver}" / spec.static_filename(r.code, w.name, italic)
-                    ref_file = ref_root / "static" / f"SarasaUiPropDigits{r.code}-{variant}-{ref_version}" / spec.static_filename(r.code, w.name, italic)
+                    ref_file = ref_root / "static" / f"SarasaUiPropDigits{r.code}-{variant}-{r_ver}" / spec.static_filename(r.code, w.name, italic)
                     if cand_file.is_file() and ref_file.is_file():
                         tasks.append({
                             "label": f"static{'-hinted' if hinted else ''}:{r.code}-{w.name}{'-Italic' if italic else ''}",
                             "cand": str(cand_file),
                             "ref": str(ref_file),
                         })
+                    else:
+                        skipped.append(f"static:{r.code}-{w.name}{'-It' if italic else ''}")
                 if include_vf:
                     cand_vf = cand_root / "variable" / spec.variable_filename(r.code, italic)
                     ref_vf = ref_root / "variable" / spec.variable_filename(r.code, italic)
@@ -521,4 +583,11 @@ def build_project_tasks(
                             "cand_wght": w.value,
                             "ref_wght": w.value,
                         })
+                    else:
+                        skipped.append(f"vf:{r.code}@{w.value}{'-It' if italic else ''}")
+    if skipped:
+        print(
+            f"[compare] 警告：跳过 {len(skipped)} 个缺少文件的对照组合，样例：{', '.join(skipped[:5])}",
+            file=sys.stderr,
+        )
     return tasks

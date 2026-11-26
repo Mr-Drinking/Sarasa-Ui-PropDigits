@@ -178,11 +178,10 @@ def apply_vertical_metrics(font: TTFont, spec: Spec) -> None:
 def update_caret_slope(font: TTFont) -> None:
     hhea = font["hhea"]
     angle = float(font["post"].italicAngle)
+    hhea.caretSlopeRise = 1000
     if angle:
-        hhea.caretSlopeRise = 1000
         hhea.caretSlopeRun = otRound(math.tan(math.radians(-angle)) * hhea.caretSlopeRise)
     else:
-        hhea.caretSlopeRise = 1
         hhea.caretSlopeRun = 0
     hhea.caretOffset = 0
 
@@ -216,7 +215,7 @@ def update_vf_style_and_os2(font: TTFont, region: str, italic: bool, spec: Spec 
 
 
 def sync_sarasa_os2_fields(font: TTFont, reference: TTFont) -> None:
-    """从上游 Sarasa Ui Regular 只读参照同步固定排版比率字段（上下标、删除线位置、xHeight/CapHeight、PANOSE 基底）。"""
+    """从上游 Sarasa Ui 同风格 Regular 只读参照同步固定排版字段（ulUnicodeRange1-4、xAvgCharWidth、上下标、删除线位置、xHeight/CapHeight、PANOSE、lowestRecPPEM）。"""
     os2, ref = font["OS/2"], reference["OS/2"]
     for field in (
         "xAvgCharWidth",
@@ -232,6 +231,10 @@ def sync_sarasa_os2_fields(font: TTFont, reference: TTFont) -> None:
         "ySuperscriptYOffset",
         "yStrikeoutPosition",
         "sFamilyClass",
+        "ulUnicodeRange1",
+        "ulUnicodeRange2",
+        "ulUnicodeRange3",
+        "ulUnicodeRange4",
         "sxHeight",
         "sCapHeight",
         "usDefaultChar",
@@ -252,10 +255,12 @@ def sync_sarasa_os2_fields(font: TTFont, reference: TTFont) -> None:
             "bXHeight",
         ):
             setattr(os2.panose, pf, getattr(ref.panose, pf))
+    if "head" in font and "head" in reference:
+        font["head"].lowestRecPPEM = int(reference["head"].lowestRecPPEM)
 
 
 def normalize_nonhinting_raster_metadata(font: TTFont, spec: Spec | None = None) -> dict[str, Any]:
-    """为 VF 与 unhinted 静态设置 smart dropout gasp/prep，并复位 maxp；断言无逐字形指令。"""
+    """为 VF 与 unhinted 静态设置 smart dropout gasp/prep、head.flags=3（清除 bit 2/3）并复位 maxp；断言无逐字形指令。"""
     spec = spec or load_spec()
     for g in font["glyf"].glyphs.values():
         g.expand(font["glyf"])
@@ -270,6 +275,8 @@ def normalize_nonhinting_raster_metadata(font: TTFont, spec: Spec | None = None)
     font["prep"] = newTable("prep")
     font["prep"].program = Program()
     font["prep"].program.fromBytecode(spec.smart_dropout_prep)
+    # 无逐字形指令字体：置位 bit 0（基线 y=0）与 bit 1（lsb 在 x=0），清除 bit 2 与 bit 3（不强制 ppem 取整）
+    font["head"].flags = (int(font["head"].flags) & ~((1 << 2) | (1 << 3))) | (1 << 0) | (1 << 1)
     maxp = font["maxp"]
     maxp.maxZones = 1
     maxp.maxTwilightPoints = 0
@@ -320,12 +327,13 @@ def prune_unreferenced_variable_names(font: TTFont) -> dict[str, int]:
 
 
 def apply_deterministic_head(font: TTFont, spec: Spec | None = None) -> dict[str, Any]:
-    """设置确定性 head.fontRevision 与 head.modified（修 C12），清除 DSIG/BASE。"""
+    """设置确定性 head.fontRevision、head.lowestRecPPEM 与 head.modified，清除 DSIG/BASE。"""
     spec = spec or load_spec()
     for tag in ("DSIG", "BASE"):
         if tag in font:
             del font[tag]
     font["head"].fontRevision = spec.font_revision()
+    font["head"].lowestRecPPEM = spec.lowest_rec_ppem
     unix_ts = head_modified_timestamp(spec.head_modified_timestamp)
     # fontTools.misc.timeTools.epoch_diff 为 1904 - 1970 = -2082844800，故减之得 Mac/OpenType 时间戳
     font["head"].modified = unix_ts - epoch_diff

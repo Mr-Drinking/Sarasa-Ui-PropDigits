@@ -85,7 +85,7 @@ def _stage_load_sources(ctx: VFBuildContext) -> None:
     store = SourceStore(ctx.work_root, ctx.spec)
     ctx.source_paths = store.ensure_vf_sources([ctx.region])
     store.ensure_sarasa_reference([ctx.region], hinted=False)
-    ctx.ref_path = store.sarasa_ref_path(ctx.region, "Regular", False, hinted=False)
+    ctx.ref_path = store.sarasa_ref_path(ctx.region, "Regular", ctx.italic, hinted=False)
     ctx.reference = TTFont(ctx.ref_path, lazy=True)
     ref_cps = set((ctx.reference.getBestCmap() or {}).keys())
     if ctx.subset_mode == "smoke":
@@ -136,7 +136,7 @@ def _stage_merge_layout(ctx: VFBuildContext) -> None:
 
 def _stage_apply_punctuation(ctx: VFBuildContext) -> None:
     assert ctx.font is not None
-    rep = apply_source_han_punctuation_layout(ctx.font, ctx.region, ctx.spec)
+    rep = apply_source_han_punctuation_layout(ctx.font, ctx.region, ctx.spec, italic=ctx.italic)
     # 先移除不可达 lookup 再清理孤立字形，防止丢弃的 jp78/fwid 等旧字形叠加 Inter 后超出 65535 GID 上限
     rep["prechws_empty_lookups_removed"] = remove_empty_lookups(ctx.font)
     rep["prechws_unreferenced_lookups_removed"] = prune_unreferenced_lookups(ctx.font)
@@ -146,15 +146,15 @@ def _stage_apply_punctuation(ctx: VFBuildContext) -> None:
 
 def _stage_apply_fixes_and_metadata(ctx: VFBuildContext) -> None:
     assert ctx.font is not None and ctx.reference is not None
+    sync_sarasa_os2_fields(ctx.font, ctx.reference)
+    ctx.reference.close()
+    ctx.reference = None
+
     fixes_rep: dict[str, Any] = {}
     fixes_rep.update(fix_classical_ideograph_fullwidth(ctx.font, ctx.region))
     fixes_rep.update(fix_ideograph_gdef_classes(ctx.font))
     fixes_rep.update(fix_os2_unicode_range_bit57(ctx.font))
     ctx.report["fixes"] = fixes_rep
-
-    sync_sarasa_os2_fields(ctx.font, ctx.reference)
-    ctx.reference.close()
-    ctx.reference = None
 
     meta_rep: dict[str, Any] = {}
     meta_rep.update(update_vf_names(ctx.font, ctx.region, ctx.italic, ctx.spec))
@@ -186,7 +186,7 @@ def _stage_finalize_and_save(ctx: VFBuildContext) -> None:
     fin: dict[str, Any] = {}
     fin.update(remove_mac_name_records(ctx.font))
     fin.update(prune_unreferenced_variable_names(ctx.font))
-    fin.update(finalize_layout(ctx.font))
+    fin.update(finalize_layout(ctx.font, ctx.spec))
     fin.update(fix_ideograph_gdef_classes(ctx.font))
     fin.update(prune_unreachable_glyphs(ctx.font))
     fin.update(recalculate_head_bounds_and_lsb(ctx.font))
@@ -283,7 +283,7 @@ def build_vfs(
     jobs: int = 2,
     spec: Spec | None = None,
 ) -> dict[str, Any]:
-    """并行构建所选地区与正斜体的 VF，支持 Ctrl+C 干净终止（修 C17）。"""
+    """并行构建所选地区与正斜体的 VF，支持 Ctrl+C 干净终止。"""
     spec = spec or load_spec()
     wroot = (work_root or (repo_root() / ".build-cache" / "work")).resolve()
     vf_dir = out_root.resolve() / "variable"

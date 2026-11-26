@@ -17,6 +17,7 @@ from fontTools.varLib.models import supportScalar
 
 from sarasa_pd.spec import load_spec
 from sarasa_pd.vf.base import (
+    apply_classical_override,
     apply_public_weight_axis,
     assert_compatible_axis_space,
     bake_pwid_and_sanitize,
@@ -491,6 +492,31 @@ class VfBaseInterTests(unittest.TestCase):
         self.assertIn("cv11", r[("DFLT", "dflt")])
         self.assertIn("ss08", r[("latn", "ROM ")])
         self.assertIn("cv01", r[("hani", "dflt")])
+
+    def test_classical_override_pins_default_uvs_to_original_glyph(self) -> None:
+        dash_glyphs = ["d2014", "d2015", "d2e3a", "d2e3b", "dfe31"]
+        dash_cmap = {0x2014: "d2014", 0x2015: "d2015", 0x2E3A: "d2e3a", 0x2E3B: "d2e3b", 0xFE31: "dfe31"}
+        base = _make_vf(
+            [".notdef", "uni4FBF", *dash_glyphs],
+            {0x4FBF: "uni4FBF", **dash_cmap},
+            {".notdef": 500, "uni4FBF": 1000, **{g: 1000 for g in dash_glyphs}},
+            uvs={0xFE00: [(0x4FBF, None)]},
+        )
+        ov = _make_vf(
+            [".notdef", "sg_4FBF", *dash_glyphs],
+            {0x4FBF: "sg_4FBF", **dash_cmap},
+            {".notdef": 500, "sg_4FBF": 1000, **{g: 1000 for g in dash_glyphs}},
+        )
+        # 给尚古字形不同轮廓坐标以区分原基底与覆盖字形
+        ov["glyf"]["sg_4FBF"] = _rect(123, 0, 877, 750)
+        rep = apply_classical_override(base, ov, {0x4FBF})
+        self.assertEqual(rep["classical_default_uvs_pinned"], 1)
+        new_g = base.getBestCmap()[0x4FBF]
+        self.assertNotEqual(new_g, "uni4FBF")
+        self.assertEqual(base["glyf"][new_g].coordinates[0][0], 123)
+        self.assertEqual(base["glyf"]["uni4FBF"].coordinates[0][0], 0)
+        sub14 = [t for t in base["cmap"].tables if t.format == 14][0]
+        self.assertEqual(sub14.uvsDict[0xFE00], [(0x4FBF, "uni4FBF")])
 
 
 if __name__ == "__main__":

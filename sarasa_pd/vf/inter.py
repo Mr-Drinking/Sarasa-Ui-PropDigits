@@ -193,7 +193,7 @@ def _feature_lookup_indices(font: TTFont, table_tag: str, tags: set[str]) -> set
 
 
 def _expand_calt_coverages(font: TTFont, effective: dict[str, str]) -> int:
-    """将烘焙 ss03/cv10 产生的新字形原地补入 Inter calt 的上下文覆盖表，保持原生 lookup 顺序（修 A12.5）。"""
+    """将烘焙 ss03/cv10 产生的新字形原地补入 Inter calt 的上下文覆盖表，保持原生 lookup 顺序。"""
     if not effective or "GSUB" not in font or not font["GSUB"].table.LookupList:
         return 0
     gid_map = {name: i for i, name in enumerate(font.getGlyphOrder())}
@@ -280,7 +280,7 @@ def bake_inter_ui_recipe(font: TTFont, spec: Spec) -> dict[str, int]:
 
 
 def repair_inter_ss03_kerning(inter: TTFont) -> int:
-    """修复 Inter 4.1 VF 中 (quoteright.ss03, rho) 被 L1 S1 类值冲掉的问题（A9）。
+    """修复 Inter 4.1 VF 中 (quoteright.ss03, rho) 被类值覆写的问题。
 
     Inter 4.1 的 Inter-Regular/Inter-Black/InterDisplay-Regular 以及 InterVariable 的
     (quoteright, rho) 均为 -128（1000 UPM 为 -62），无变体偏差；仅因 InterDisplay-Black

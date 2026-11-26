@@ -10,7 +10,7 @@ from .spec import Spec, load_spec
 
 # 覆盖所有关键回归与常见界面字符的冒烟样本（约 1000 码位以内）
 SMOKE_TEXTS: tuple[str, ...] = (
-    # ASCII、数字、标点、括号、运算符与代码/日期回归（A2, A4, A12）
+    # ASCII、数字、标点、括号、运算符与代码/日期上下文回归
     " !\"#$%&'()*+,-./0123456789:;<=>?@",
     "ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~",
     "x<-1 3<-2 温度<-5℃ 2026/11/19 1/2/3 fffi -> <-> <=> 1:2 1: :2 a:2 Left:1 H(H) T+",
@@ -27,15 +27,15 @@ SMOKE_TEXTS: tuple[str, ...] = (
     "一二三四五六七八九十百千万亿零中文简体繁体香港台湾日本韩国排版测试",
     "系统设置通知消息搜索文件编辑查看窗口帮助确定取消保存关闭打开退出返回",
     "默认字体界面显示比例数字等宽标点挤压斜体粗细可变静态预览确认更新安装",
-    # CL 尚古差异、A5 全宽修正与间距基字
+    # CL 尚古差异、汉字全宽修正与间距基字
     "㓱㙦䌙巅拼绿㪉㪘㪣㪰优忧扰抚噘摁㽪团嗨㒶丸備槙醤侮",
-    # 假名＋句读（A3）与竖排常用符号
+    # 假名＋句读字偶距与竖排常用符号
     "あいうえおかきくけこさしすせそたちつてとなにぬねのはひふへほまみむめもやゆよらりるれろわをんぁぃぅぇぉっゃゅょ",
     "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンァィゥェォッャュョー・",
     "です。ます、ク、〱〲〳",
-    # 注音（A10 bopo）
+    # 注音（bopo）
     "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ",
-    # 韩文音节、A13 曾失败字形与古韩文 L+V+T
+    # 韩文音节、复杂笔画汉字与古韩文 L+V+T
     "가나다라마바사아자차카타파하한글사라사고딕설정확인취소저장닫기",
     "돌들를름뮋뢋뢧뤗릣靇矗聾釁龗龍詎詚詛",
 )
@@ -76,7 +76,7 @@ def smoke_codepoints(spec: Spec | None = None) -> set[int]:
 
 
 def uvs_selectors_for_codepoints(font: TTFont, unicodes: set[int]) -> tuple[set[int], set[str]]:
-    """收集 cmap format 14 中适用于 unicodes 的变体选择符及目标字形名（修 A1）。"""
+    """收集 cmap format 14 中适用于 unicodes 的变体选择符及目标字形名。"""
     selectors: set[int] = set()
     glyphs: set[str] = set()
     if "cmap" not in font:
@@ -113,7 +113,7 @@ def subset_font_preserving_uvs(
     retain_gids: bool = False,
     drop_hints: bool = False,
 ) -> TTFont:
-    """按给定码位子集化字体，显式保留 cmap format 14 的 SVS/IVS 与变体字形（修 A1）。"""
+    """按给定码位子集化字体，显式保留 cmap format 14 的 SVS/IVS 与变体字形。"""
     ensure_gvar_keys(font)
     keep_cps = set(unicodes)
     uvs_selectors, uvs_glyphs = uvs_selectors_for_codepoints(font, keep_cps)

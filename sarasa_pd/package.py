@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import time
 import zipfile
 from typing import Any
@@ -15,6 +16,8 @@ from .spec import Spec, load_spec
 
 ZIP_TIMESTAMP = (1980, 1, 1, 0, 0, 0)
 ZIP_EXTERNAL_ATTR = 0o100644 << 16
+CHECK_GATE_FILENAME = ".check-passed.json"
+REPO_BLOB_BASE = "https://github.com/Mr-Drinking/Sarasa-Ui-PropDigits/blob"
 ROOT_DOCUMENTS: tuple[tuple[str, str], ...] = (
     ("LICENSE", "LICENSE.txt"),
     ("NOTICE.md", "NOTICE.md"),
@@ -37,7 +40,7 @@ def sha256_file(path: Path) -> str:
 
 
 def atomic_replace_path(src: Path, dst: Path, *, retries: int = 8, base_delay: float = 0.25) -> None:
-    """带 Windows 共享冲突重试的原子切换（修 C18）。"""
+    """带 Windows 共享冲突重试的原子切换。"""
     last_err: OSError | None = None
     for attempt in range(retries):
         try:
@@ -154,12 +157,102 @@ def build_package_plans(font_root: Path, spec: Spec, project_root: Path | None =
     return plans
 
 
-def _write_deterministic_zip(plan: PackagePlan, out_path: Path) -> dict[str, Any]:
+def rewrite_readme_for_zip(text: str, version: str) -> str:
+    """将 ZIP 内 README.md 的仓库相对链接改写为包内可用路径或对应版本 tag 的 GitHub 链接。"""
+    tag_base = f"{REPO_BLOB_BASE}/v{version}"
+
+    def _repl(m: re.Match[str]) -> str:
+        label, target = m.group(1), m.group(2)
+        if target == "LICENSE":
+            return f"[{label}](LICENSE.txt)"
+        if target == "NOTICE.md":
+            return m.group(0)
+        if target.startswith(("docs/", "requirements.")) or target in {"sarasa_pd/spec.toml"}:
+            return f"[{label}]({tag_base}/{target})"
+        return m.group(0)
+
+    return re.sub(r"\[([^\]]+)\]\(([^)\s]+)\)", _repl, text)
+
+
+def _expected_release_font_files(font_root: Path, spec: Spec) -> list[Path]:
+    files: list[Path] = []
+    vf_dir = font_root / "variable"
+    for region in spec.region_order:
+        for italic in (False, True):
+            files.append(vf_dir / spec.variable_filename(region, italic))
+        for hinted in (True, False):
+            sdir = spec.static_dir(font_root, region, hinted=hinted)
+            for w in spec.weights:
+                for italic in (False, True):
+                    files.append(sdir / spec.static_filename(region, w.name, italic))
+    return files
+
+
+def write_check_gate(
+    font_root: Path,
+    spec: Spec,
+    *,
+    ft_mode: str,
+    skipped_ots: bool,
+) -> Path:
+    """全量硬门禁通过后在字体根目录写入轻量通过标记，供 package 核对。"""
+    froot = font_root.resolve()
+    files: dict[str, str] = {}
+    for p in _expected_release_font_files(froot, spec):
+        if not p.is_file():
+            raise FileNotFoundError(f"写入检查标记失败，缺少字体文件：{p}")
+        rel = p.relative_to(froot).as_posix()
+        files[rel] = sha256_file(p)
+    payload = {
+        "version": spec.version,
+        "ft_mode": ft_mode,
+        "ots_verified": not skipped_ots,
+        "file_count": len(files),
+        "files": files,
+    }
+    out = froot / CHECK_GATE_FILENAME
+    tmp = froot / f"{CHECK_GATE_FILENAME}.writing"
+    tmp.write_bytes((json.dumps(payload, ensure_ascii=False, indent=2) + "\n").encode("utf-8"))
+    atomic_replace_path(tmp, out)
+    return out
+
+
+def verify_check_gate(font_root: Path, spec: Spec) -> None:
+    """核对字体目录已通过当前版本的全量硬门禁（含 OTS 与 full FreeType 扫描）且字体未被改动。"""
+    froot = font_root.resolve()
+    gate_path = froot / CHECK_GATE_FILENAME
+    if not gate_path.is_file():
+        raise ValueError(
+            f"缺少全量检查通过标记 {gate_path}；请先运行 "
+            f"`python -E -s -X utf8 -m sarasa_pd check --stage all --root {froot} --ft-mode full`"
+        )
+    data = json.loads(gate_path.read_text(encoding="utf-8"))
+    if data.get("version") != spec.version:
+        raise ValueError(f"检查通过标记版本不匹配：标记为 {data.get('version')!r}，当前规格为 {spec.version!r}")
+    if data.get("ft_mode") != "full" or not data.get("ots_verified"):
+        raise ValueError(
+            f"打包要求全量硬门禁（ft_mode='full' 且启用 OTS），当前标记为 ft_mode={data.get('ft_mode')!r}, ots_verified={data.get('ots_verified')!r}"
+        )
+    recorded = data.get("files") or {}
+    expected = {p.relative_to(froot).as_posix(): p for p in _expected_release_font_files(froot, spec)}
+    if set(recorded) != set(expected):
+        raise ValueError("检查通过标记记录的字体列表与当前 156 个发布字体不一致")
+    for rel, path in expected.items():
+        if not path.is_file():
+            raise FileNotFoundError(f"缺少字体文件：{path}")
+        if sha256_file(path) != recorded[rel]:
+            raise ValueError(f"字体文件在通过检查后发生变化，请重新运行 check：{rel}")
+
+
+def _write_deterministic_zip(plan: PackagePlan, out_path: Path, version: str) -> dict[str, Any]:
     tmp = out_path.with_suffix(".writing.zip")
     members_meta: list[dict[str, Any]] = []
     with zipfile.ZipFile(tmp, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6) as zf:
         for src, arc_name in plan.members:
-            data = src.read_bytes()
+            if arc_name == "README.md":
+                data = rewrite_readme_for_zip(src.read_text(encoding="utf-8"), version).encode("utf-8")
+            else:
+                data = src.read_bytes()
             info = zipfile.ZipInfo(arc_name, ZIP_TIMESTAMP)
             info.create_system = 3
             info.external_attr = ZIP_EXTERNAL_ATTR
@@ -185,16 +278,19 @@ def package_release(
     dist_dir: Path,
     *,
     project_root: Path | None = None,
+    require_check_gate: bool = True,
     spec: Spec | None = None,
 ) -> dict[str, Any]:
     """打包全部 21 个发布 ZIP、SHA256SUMS.txt 与 release-manifest.json，并执行只读核验。"""
     spec = spec or load_spec()
+    if require_check_gate:
+        verify_check_gate(font_root, spec)
     plans = build_package_plans(font_root, spec, project_root=project_root)
     dist_dir = dist_dir.resolve()
     dist_dir.mkdir(parents=True, exist_ok=True)
 
     t0 = time.perf_counter()
-    pkg_records = [_write_deterministic_zip(plan, dist_dir / plan.filename) for plan in plans]
+    pkg_records = [_write_deterministic_zip(plan, dist_dir / plan.filename, spec.version) for plan in plans]
     pkg_records.sort(key=lambda r: r["filename"])
 
     sums_lines = [f"{r['sha256']}  {r['filename']}" for r in pkg_records]

@@ -1,4 +1,4 @@
-"""方案 A1 静态 Hinting：ttfautohint（西文/数字）+ 独立精简 Chlorophytum（CJK/假名/韩文）+ 按轮廓持久缓存 + 斜体复用 + cvt 扩充消除 A13。"""
+"""混合静态 Hinting：ttfautohint（西文/数字）+ 独立精简 Chlorophytum（CJK/假名/韩文）+ 确定性持久缓存 + 斜体复用 + cvt 预算扩充。"""
 from __future__ import annotations
 
 import array
@@ -19,7 +19,7 @@ from fontTools.ttLib import TTFont
 
 from ..env import repo_root, selected_ttfautohint
 from ..sources import SourceStore
-from ..spec import Spec, WeightSpec, is_ideograph, is_kana, load_spec
+from ..spec import Spec, WeightSpec, is_ideograph, is_kana, is_korean, load_spec
 from ..vf.names import apply_deterministic_head
 from .instance import update_static_names
 
@@ -96,6 +96,29 @@ def _load_gzip_json(path: Path) -> dict[str, Any]:
         return json.load(fh)
 
 
+def _hint_key_sort_key(key: str) -> tuple[int, str]:
+    if "#" in key:
+        _prefix, suffix = key.rsplit("#", 1)
+        if suffix.isdigit():
+            return (int(suffix), key)
+    return (1 << 30, key)
+
+
+def canonicalize_hint_data(data: dict[str, Any]) -> dict[str, Any]:
+    """将 .hint.gz 顶层字形与共享提示字典按固定键序重排，消除多线程冷热缓存导致的 fpgm 编号漂移。"""
+    out = dict(data)
+    if isinstance(out.get("glyphs"), dict):
+        out["glyphs"] = {k: out["glyphs"][k] for k in sorted(out["glyphs"], key=_hint_key_sort_key)}
+    if isinstance(out.get("glyphHintCacheKeys"), dict):
+        out["glyphHintCacheKeys"] = {
+            k: out["glyphHintCacheKeys"][k]
+            for k in sorted(out["glyphHintCacheKeys"], key=_hint_key_sort_key)
+        }
+    if isinstance(out.get("sharedHints"), dict):
+        out["sharedHints"] = {k: out["sharedHints"][k] for k in sorted(out["sharedHints"])}
+    return out
+
+
 def _save_gzip_json_atomic(path: Path, data: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(data, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
@@ -142,13 +165,16 @@ def run_chlorophytum_hint(
             f"Chlorophytum hint 失败（rc={proc.returncode}）：{(proc.stderr or proc.stdout).strip()[:400]}"
         )
 
-    # 增量合并回共享持久缓存，避免覆盖其他地区的缓存条目
+    # 规范化 .hint.gz 键序，确保冷缓存多线程与热缓存单序产出的 instruct 字节码逐字节一致
+    _save_gzip_json_atomic(out_hgz, canonicalize_hint_data(_load_gzip_json(out_hgz)))
+
+    # 增量合并回共享持久缓存，避免覆盖其他地区的缓存条目，并保持键序确定
     merged = _load_gzip_json(shared_cache)
     before_n = len(merged)
     new_entries = _load_gzip_json(work_cache)
     added = sum(1 for k in new_entries if k not in merged)
     merged.update(new_entries)
-    _save_gzip_json_atomic(shared_cache, merged)
+    _save_gzip_json_atomic(shared_cache, {k: merged[k] for k in sorted(merged)})
     work_cache.unlink(missing_ok=True)
     return {
         "hint_sec": sec,
@@ -159,10 +185,10 @@ def run_chlorophytum_hint(
     }
 
 
-def _outline_y_sig(font: TTFont, gname: str) -> tuple[int, tuple[int, ...], tuple[int, ...], tuple[int, ...]] | None:
+def _outline_sig(font: TTFont, gname: str) -> tuple[int, tuple[int, ...], tuple[int, ...], tuple[int, ...]] | None:
     g = font["glyf"][gname]
     g.expand(font["glyf"])
-    if g.numberOfContours <= 0:
+    if g.isComposite() or g.numberOfContours <= 0:
         return None
     ys = tuple(int(y) for _x, y in g.coordinates)
     fl = tuple(int(f) & 1 for f in g.flags)
@@ -171,7 +197,7 @@ def _outline_y_sig(font: TTFont, gname: str) -> tuple[int, tuple[int, ...], tupl
 
 
 def _shear_x_compatible(
-    fu: TTFont, un: str, fi: TTFont, iname: str, tan_slant: float, tol: float = 3.5
+    fu: TTFont, un: str, fi: TTFont, iname: str, tan_slant: float, tol: float = 2.0
 ) -> bool:
     gu, gi = fu["glyf"][un], fi["glyf"][iname]
     cu, ci = gu.coordinates, gi.coordinates
@@ -179,7 +205,7 @@ def _shear_x_compatible(
         return False
     if not cu:
         return True
-    # 兼容斜切（9.4°）以及测试中未斜切（0°）的合成字体，只要 x_i - (x_u + y*tan) 为近似常数即可
+    # 兼容斜切（9.4°）以及测试中未斜切（0°）的合成字体，要求 x_i - (x_u + y*tan) 为近似常数（otRound 误差 ≤ 1 unit）
     for tan_val in (tan_slant, 0.0):
         diffs = [float(xi) - (float(xu) + float(y) * tan_val) for (xu, y), (xi, _yi) in zip(cu, ci)]
         if max(diffs) - min(diffs) <= tol:
@@ -194,13 +220,12 @@ def remap_upright_hints_to_italic(
     italic_hgz: Path,
     *,
     slant_deg: float = 9.4,
+    allow_skipped: bool = False,
 ) -> dict[str, int]:
-    """验证正斜体 CJK/假名/韩文轮廓点数完全一致后，将正体 .hint.gz 精确重映射给斜体（含全部 SIP/UVS/未编码 GSUB 字形）。
+    """严格验证正斜体 CJK/假名/韩文轮廓拓扑与逐点 y 坐标完全一致后，将正体 .hint.gz 精确重映射给斜体。
 
-    注意：Chlorophytum（@ot-builder/ot-standard-glyph-namer）在 post format 3 下生成的键名与
-    fontTools 不同（例如 SIP 为 uni20000#gid、UVS 为 uniXXXX_YYYY#gid、未编码为 .gidN#N），
-    因此此处直接按输入键尾部的 #gid 定位正体 GID，按 cmap / UVS / (轮廓签名+斜切) 精确映射到
-    斜体 GID，并按 ot-builder 规则写出斜体键名。
+    斜体静态字形由去重叠后的正体直接按 9.4° 斜切生成（y' == y 严格成立），故此处要求零容差逐点 y 匹配，
+    不放宽任何断言；默认严禁静默跳过任何条目。
     """
     data = _load_gzip_json(upright_hgz)
     hinted_keys = set(data.get("glyphs", {}).keys()) | set(data.get("glyphHintCacheKeys", {}).keys())
@@ -219,46 +244,53 @@ def remap_upright_hints_to_italic(
 
         def get_u_sig(gid: int):
             if gid not in u_sigs:
-                u_sigs[gid] = _outline_y_sig(fu, u_order[gid])
+                u_sigs[gid] = _outline_sig(fu, u_order[gid])
             return u_sigs[gid]
 
         def get_i_sig(gid: int):
             if gid not in i_sigs:
-                i_sigs[gid] = _outline_y_sig(fi, i_order[gid])
+                i_sigs[gid] = _outline_sig(fi, i_order[gid])
             return i_sigs[gid]
+
+        def _exact_sig_compatible(ug: int, ig: int) -> bool:
+            su, si = get_u_sig(ug), get_i_sig(ig)
+            return (
+                su is not None
+                and si is not None
+                and su == si
+                and _shear_x_compatible(fu, u_order[ug], fi, i_order[ig], tan_slant)
+            )
 
         u_to_i_gid: dict[int, int] = {}
         used_i_gids: set[int] = set()
         mismatches: list[str] = []
 
-        # 1. 先按 cmap 校验并映射全部 CJK/假名/韩文（强断言点数与端点一致）及其他斜切同源码位
+        # 1. 按 cmap 严格校验并映射全部 CJK/假名/韩文（强断言轮廓数、端点、on-curve 标志、逐点 y 坐标与斜切完全一致）
         for cp in sorted(set(cu) & set(ci)):
             un, iname = cu[cp], ci[cp]
             ug, ig = u_gid_of[un], i_gid_of[iname]
-            is_cjk = is_ideograph(cp) or is_kana(cp) or (0xAC00 <= cp <= 0xD7AF)
+            is_cjk = is_ideograph(cp) or is_kana(cp) or is_korean(cp)
             if is_cjk:
                 gu, gi = fu["glyf"][un], fi["glyf"][iname]
                 gu.expand(fu["glyf"])
                 gi.expand(fi["glyf"])
-                if gu.numberOfContours != gi.numberOfContours or (
-                    gu.numberOfContours > 0
-                    and (len(gu.coordinates) != len(gi.coordinates) or list(gu.endPtsOfContours) != list(gi.endPtsOfContours))
-                ):
+                if gu.numberOfContours == 0 and gi.numberOfContours == 0:
+                    u_to_i_gid[ug] = ig
+                    used_i_gids.add(ig)
+                    continue
+                if not _exact_sig_compatible(ug, ig):
                     mismatches.append(f"U+{cp:04X}")
                     continue
                 u_to_i_gid[ug] = ig
                 used_i_gids.add(ig)
-            else:
-                su, si = get_u_sig(ug), get_i_sig(ig)
-                if su is not None and su == si and _shear_x_compatible(fu, un, fi, iname, tan_slant):
-                    if ug not in u_to_i_gid:
-                        u_to_i_gid[ug] = ig
-                        used_i_gids.add(ig)
+            elif _exact_sig_compatible(ug, ig) and ug not in u_to_i_gid:
+                u_to_i_gid[ug] = ig
+                used_i_gids.add(ig)
 
         if mismatches:
-            raise RuntimeError(f"正斜体 CJK 轮廓点数不一致，无法安全复用 hint（{len(mismatches)} 个，样例 {mismatches[:5]}）")
+            raise RuntimeError(f"正斜体 CJK 轮廓点数或纵坐标不一致，无法安全复用 hint（{len(mismatches)} 个，样例 {mismatches[:5]}）")
 
-        # 2. 按 cmap format 14 UVS 映射变体字形
+        # 2. 按 cmap format 14 UVS 严格映射变体字形
         u_uvs: dict[tuple[int, int], int] = {}
         i_uvs: dict[tuple[int, int], int] = {}
         for tbl in fu["cmap"].tables:
@@ -277,12 +309,11 @@ def remap_upright_hints_to_italic(
             ig = i_uvs.get(pair)
             if ig is None or ug in u_to_i_gid:
                 continue
-            su, si = get_u_sig(ug), get_i_sig(ig)
-            if su is not None and su == si and _shear_x_compatible(fu, u_order[ug], fi, i_order[ig], tan_slant):
+            if _exact_sig_compatible(ug, ig):
                 u_to_i_gid[ug] = ig
                 used_i_gids.add(ig)
 
-        # 3. 剩余未编码的 Chlorophytum 字形（vert/vrt2/locl/Jamo 等）：严格按 (轮廓数, 端点, on-curve, y 序列) + 斜切 x 匹配
+        # 3. 剩余未编码 Chlorophytum 字形（vert/vrt2/locl/Jamo 等）：严格要求相同拓扑、完全一致的 y 序列与斜切 x 校验
         needed_u_gids: list[int] = []
         for k in sorted(hinted_keys):
             if "#" not in k:
@@ -294,11 +325,11 @@ def remap_upright_hints_to_italic(
                     needed_u_gids.append(ug)
 
         if needed_u_gids:
-            it_by_sig: dict[tuple[int, tuple[int, ...], tuple[int, ...], tuple[int, ...]], list[int]] = {}
+            it_by_exact: dict[tuple[int, tuple[int, ...], tuple[int, ...], tuple[int, ...]], list[int]] = {}
             for ig in range(len(i_order)):
                 si = get_i_sig(ig)
                 if si is not None:
-                    it_by_sig.setdefault(si, []).append(ig)
+                    it_by_exact.setdefault(si, []).append(ig)
             for ug in needed_u_gids:
                 if ug in u_to_i_gid:
                     continue
@@ -307,7 +338,7 @@ def remap_upright_hints_to_italic(
                     continue
                 un = u_order[ug]
                 compat = [
-                    ig for ig in it_by_sig.get(su, [])
+                    ig for ig in it_by_exact.get(su, [])
                     if _shear_x_compatible(fu, un, fi, i_order[ig], tan_slant)
                 ]
                 if not compat:
@@ -336,6 +367,7 @@ def remap_upright_hints_to_italic(
         new_glyphs = {}
         new_keys = {}
         mapped = skipped = 0
+        skipped_samples: list[str] = []
         for k, v in data.get("glyphs", {}).items():
             nk = _remap_key(k)
             if nk:
@@ -343,12 +375,18 @@ def remap_upright_hints_to_italic(
                 mapped += 1
             else:
                 skipped += 1
+                if len(skipped_samples) < 8:
+                    skipped_samples.append(k)
         for k, v in data.get("glyphHintCacheKeys", {}).items():
             nk = _remap_key(k)
             if nk:
                 new_keys[nk] = v
 
-    remapped = {**data, "glyphs": new_glyphs, "glyphHintCacheKeys": new_keys}
+    if skipped and not allow_skipped:
+        raise RuntimeError(
+            f"斜体 hint 重映射存在 {skipped} 个无法精确匹配的条目，样例：{skipped_samples}"
+        )
+    remapped = canonicalize_hint_data({**data, "glyphs": new_glyphs, "glyphHintCacheKeys": new_keys})
     _save_gzip_json_atomic(italic_hgz, remapped)
     return {"italic_hints_mapped": mapped, "italic_hints_skipped": skipped}
 
@@ -383,8 +421,9 @@ def finalize_hinted_ttf(
     italic: bool,
     spec: Spec,
     cvt_min_len: int = DEFAULT_CVT_MIN_LEN,
+    unhinted_ttf: Path | None = None,
 ) -> dict[str, int]:
-    """补足 cvt 消除 A13、更新 hinted 元数据与确定性 head.modified，原子落盘。"""
+    """补足 cvt 防止 FreeType 严格执行预算中止、置位 head.flags bit 3、保真 OS/2 并写入确定性 head，原子落盘。"""
     with TTFont(in_ttf, recalcBBoxes=False, recalcTimestamp=False) as font:
         cvt_before = len(font["cvt "].values) if "cvt " in font else 0
         if "cvt " in font:
@@ -394,6 +433,37 @@ def finalize_hinted_ttf(
                 vals.extend([0] * (target - len(vals)))
                 font["cvt "].values = array.array("h", vals)
         cvt_after = len(font["cvt "].values) if "cvt " in font else 0
+
+        if unhinted_ttf is not None and unhinted_ttf.is_file():
+            with TTFont(unhinted_ttf, lazy=True) as ref_un:
+                o_dst, o_src = font["OS/2"], ref_un["OS/2"]
+                for field in (
+                    "ulUnicodeRange1",
+                    "ulUnicodeRange2",
+                    "ulUnicodeRange3",
+                    "ulUnicodeRange4",
+                    "ySubscriptXSize",
+                    "ySubscriptYSize",
+                    "ySubscriptXOffset",
+                    "ySubscriptYOffset",
+                    "ySuperscriptXSize",
+                    "ySuperscriptYSize",
+                    "ySuperscriptXOffset",
+                    "ySuperscriptYOffset",
+                    "sFamilyClass",
+                    "sxHeight",
+                    "sCapHeight",
+                    "usDefaultChar",
+                    "usBreakChar",
+                    "usWidthClass",
+                    "fsType",
+                ):
+                    if hasattr(o_src, field):
+                        setattr(o_dst, field, getattr(o_src, field))
+
+        font["OS/2"].xAvgCharWidth = weight.x_avg_char_width_italic if italic else weight.x_avg_char_width_upright
+        # OpenType 规范强烈建议 hinted 字体置位 head.flags bit 3（强制 ppem 取整），与上游 Sarasa Ui（flags=15）一致
+        font["head"].flags = (int(font["head"].flags) & ~0x000F) | 0x000F
 
         update_static_names(font, region, weight, italic, hinted=True, spec=spec)
         font["post"].formatType = 3.0
@@ -458,7 +528,14 @@ def _worker_hint_weight(
                 inst_sec = run_chlorophytum_instruct(node_exe, cli_js, hint_env_dir, up_ta, up_hgz, up_raw_out, hcfg_path)
                 out_up = spec.static_dir(out_root, region, hinted=True) / spec.static_filename(region, w.name, False)
                 fin = finalize_hinted_ttf(
-                    up_raw_out, out_up, region=region, weight=w, italic=False, spec=spec, cvt_min_len=cvt_min_len
+                    up_raw_out,
+                    out_up,
+                    region=region,
+                    weight=w,
+                    italic=False,
+                    spec=spec,
+                    cvt_min_len=cvt_min_len,
+                    unhinted_ttf=up_src,
                 )
                 results.append({
                     "region": region,
@@ -487,7 +564,14 @@ def _worker_hint_weight(
                 inst_it_sec = run_chlorophytum_instruct(node_exe, cli_js, hint_env_dir, it_ta, it_hgz, it_raw_out, hcfg_path)
                 out_it = spec.static_dir(out_root, region, hinted=True) / spec.static_filename(region, w.name, True)
                 fin_it = finalize_hinted_ttf(
-                    it_raw_out, out_it, region=region, weight=w, italic=True, spec=spec, cvt_min_len=cvt_min_len
+                    it_raw_out,
+                    out_it,
+                    region=region,
+                    weight=w,
+                    italic=True,
+                    spec=spec,
+                    cvt_min_len=cvt_min_len,
+                    unhinted_ttf=it_src,
                 )
                 results.append({
                     "region": region,
@@ -518,7 +602,7 @@ def build_hinted_statics(
     cvt_min_len: int = DEFAULT_CVT_MIN_LEN,
     spec: Spec | None = None,
 ) -> dict[str, Any]:
-    """按字重并行、字重内跨地区共享增量缓存地构建 A1 hinted 静态字体。"""
+    """按字重并行、字重内跨地区共享增量缓存地构建混合 hinted 静态字体。"""
     spec = spec or load_spec()
     root = repo_root()
     wroot = (work_root or (root / ".build-cache" / "work")).resolve()
@@ -555,7 +639,7 @@ def build_hinted_statics(
             futs = {pool.submit(_worker_hint_weight, item): item for item in tasks}
             for fut in as_completed(futs):
                 all_results.extend(fut.result())
-        except KeyboardInterrupt:
+        except BaseException:
             pool.shutdown(wait=False, cancel_futures=True)
             raise
         else:

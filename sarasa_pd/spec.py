@@ -22,6 +22,8 @@ class WeightSpec:
     underline_thickness: int
     underline_position: int
     strikeout_size: int
+    x_avg_char_width_upright: int
+    x_avg_char_width_italic: int
     sarasa_ref_weight: str
     hcfg: str
 
@@ -35,6 +37,7 @@ class RegionSpec:
     sarasa_prefix: str
     local_family: str
     local_lang_id: int
+    default_ot_lang: str
     codepage_range1: int
     classical: bool
 
@@ -58,6 +61,7 @@ class DifferenceSpec:
 @dataclass(frozen=True)
 class Spec:
     version: str
+    previous_version: str
     sarasa_version: str
     vendor_id: str
     head_modified_timestamp: int
@@ -69,11 +73,11 @@ class Spec:
     source_only_legal_name_ids: frozenset[int]
     smart_dropout_prep: bytes
     gasp_range_all: int
+    lowest_rec_ppem: int
 
     source_han_limit: tuple[int, int, int]
     public_limit: tuple[int, int, int]
     inter_opsz: int
-    hidden_anchors: tuple[int, ...]
     public_to_internal_wght: dict[int, int]
     vertical_metrics: dict[str, int]
 
@@ -221,6 +225,8 @@ def load_spec(path: Path = SPEC_PATH) -> Spec:
             underline_thickness=int(item["underline_thickness"]),
             underline_position=int(item["underline_position"]),
             strikeout_size=int(item["strikeout_size"]),
+            x_avg_char_width_upright=int(item["x_avg_char_width_upright"]),
+            x_avg_char_width_italic=int(item["x_avg_char_width_italic"]),
             sarasa_ref_weight=item["sarasa_ref_weight"],
             hcfg=item["hcfg"],
         )
@@ -237,6 +243,7 @@ def load_spec(path: Path = SPEC_PATH) -> Spec:
             sarasa_prefix=item["sarasa_prefix"],
             local_family=item["local_family"],
             local_lang_id=int(item["local_lang_id"]),
+            default_ot_lang=str(item["default_ot_lang"]),
             codepage_range1=int(item["codepage_range1"]),
             classical=bool(item["classical"]),
         )
@@ -264,6 +271,7 @@ def load_spec(path: Path = SPEC_PATH) -> Spec:
 
     return Spec(
         version=proj["version"],
+        previous_version=proj["previous_version"],
         sarasa_version=proj["sarasa_version"],
         vendor_id=proj["vendor_id"],
         head_modified_timestamp=parse_utc_timestamp(proj["head_modified_utc"]),
@@ -275,10 +283,10 @@ def load_spec(path: Path = SPEC_PATH) -> Spec:
         source_only_legal_name_ids=frozenset(int(x) for x in proj["source_only_legal_name_ids"]),
         smart_dropout_prep=bytes.fromhex(proj["smart_dropout_prep_hex"]),
         gasp_range_all=int(proj["gasp_range_all"]),
+        lowest_rec_ppem=int(proj["lowest_rec_ppem"]),
         source_han_limit=tuple(int(x) for x in axes["source_han_limit"]),
         public_limit=tuple(int(x) for x in axes["public_limit"]),
         inter_opsz=int(axes["inter_opsz"]),
-        hidden_anchors=tuple(int(x) for x in axes["hidden_anchors"]),
         public_to_internal_wght={int(k): int(v) for k, v in axes["public_to_internal_wght"].items()},
         vertical_metrics={k: int(v) for k, v in raw["vertical_metrics"].items()},
         weights=weights,

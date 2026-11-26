@@ -470,7 +470,7 @@ def import_inter_layout_table(
     dst = base[table_tag].table
     rename = {n: prefixed(n) for n in inter.getGlyphOrder() if n != ".notdef"}
 
-    # 按 Inter 原始序号收集全部可达 lookup（包括子 lookup 闭包），严格保持 Inter 原生顺序（修 A12.5）
+    # 按 Inter 原始序号收集全部可达 lookup（包括子 lookup 闭包），严格保持 Inter 原生顺序
     f_recs = [r for r in src.FeatureList.FeatureRecord if r.FeatureTag in feature_tags]
     lset = {int(i) for r in f_recs for i in (r.Feature.LookupListIndex or [])}
     pending = list(lset)
@@ -504,7 +504,7 @@ def import_inter_layout_table(
             dummy.FeatureParams = copy.deepcopy(feat.params)
             _import_feature_param_names(base, inter, dummy, name_remap)
             incoming[lang][tag] = Feature(tuple(lmap[i] for i in feat.lookups), dummy.FeatureParams, feat.required)
-    merge_routes(dst, incoming)
+    merge_routes(dst, incoming, spec=spec)
     return {f"inter_{table_tag.lower()}_lookups": len(ordered)}
 
 
@@ -549,7 +549,7 @@ def restore_upstream_empty_gsub_features(font: TTFont, spec: Spec, *, italic: bo
             if slot:
                 incoming[key] = slot
     if incoming:
-        merge_routes(gsub, incoming)
+        merge_routes(gsub, incoming, spec=spec)
     return added
 
 
@@ -563,9 +563,9 @@ def import_inter_layout(base: TTFont, loaded: LoadedInter, spec: Spec, *, italic
     return rep
 
 
-def finalize_layout(font: TTFont) -> dict[str, int]:
+def finalize_layout(font: TTFont, spec: Spec | None = None) -> dict[str, int]:
     """最终布局收尾：cyrl/grek 共享 DFLT、清零空 lookup、删不可达 lookup 并排序 PairSet（幂等）。"""
-    rep = share_default_with_cyrl_grek(font)
+    rep = share_default_with_cyrl_grek(font, spec=spec)
     rep["empty_lookups_removed"] = remove_empty_lookups(font)
     rep["unreferenced_lookups_removed"] = prune_unreferenced_lookups(font)
     rep["pair_sets_sorted"] = sort_pair_sets(font)

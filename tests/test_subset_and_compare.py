@@ -1,4 +1,4 @@
-"""子集化保留 cmap format 14 (A1)、对照工具与 CLI 参数校验测试。"""
+"""子集化保留 cmap format 14 (UVS)、对照工具与 CLI 参数校验测试。"""
 from __future__ import annotations
 
 from pathlib import Path
@@ -114,6 +114,7 @@ class SubsetCompareCliTests(unittest.TestCase):
             md = render_markdown({"title": "test", "pair_count": 1, "elapsed_sec": 0.1, "results": [res]})
             self.assertIn("0/2", md)
             self.assertIn("U+0030", md)
+            self.assertIn("## 表级框架对照", md)
 
     def test_smoke_codepoints_cover_critical_regressions(self) -> None:
         cps = smoke_codepoints()

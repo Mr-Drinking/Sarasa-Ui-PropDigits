@@ -1,4 +1,4 @@
-"""sarasa_pd 统一命令行入口：python -I -X utf8 -m sarasa_pd <子命令>。"""
+"""sarasa_pd 统一命令行入口：python -E -s -X utf8 -m sarasa_pd <子命令>。"""
 from __future__ import annotations
 
 import argparse
@@ -35,11 +35,12 @@ def _parse_csv(raw: str | None, valid: Sequence[str], *, flag: str, case_insensi
     return resolved
 
 
-def _add_selection_args(parser: argparse.ArgumentParser) -> None:
+def _add_selection_args(parser: argparse.ArgumentParser, *, include_subset: bool = True) -> None:
     parser.add_argument("--regions", default=None, help="逗号分隔地区列表，如 SC,CL（默认全部 6 地区）")
     parser.add_argument("--styles", default=None, help="upright,italic（默认两者）")
     parser.add_argument("--weights", default=None, help="逗号分隔字重列表，如 Regular,Heavy（默认全部 6 字重）")
-    parser.add_argument("--subset", choices=("full", "smoke"), default="full", help="full 全字集或 smoke 千字冒烟")
+    if include_subset:
+        parser.add_argument("--subset", choices=("full", "smoke"), default="full", help="full 全字集或 smoke 千字冒烟")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -54,12 +55,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_env.add_argument("--lock", type=Path, default=None, help="指定锁文件路径（默认仓库根目录 requirements.lock）")
 
     p_cmp = sub.add_parser("compare", allow_abbrev=False, help="对照两套字体或单个字体对，输出 Markdown 摘要与 JSON 明细")
-    _add_selection_args(p_cmp)
-    p_cmp.add_argument("--baseline", choices=("upstream", "project"), default="upstream", help="对照基准类型：upstream（上游 Sarasa）或 project（如 v1.0.43.3）")
+    _add_selection_args(p_cmp, include_subset=False)
+    p_cmp.add_argument("--baseline", choices=("upstream", "project"), default="upstream", help="对照基准类型：upstream（上游 Sarasa）或 project（历史版本）")
     p_cmp.add_argument("--cand-root", type=Path, default=None, help="候选字体根目录（默认 fonts/）")
-    p_cmp.add_argument("--cand-version", default=None, help="候选静态目录版本号（如 1.0.43.3）")
+    p_cmp.add_argument("--cand-version", default=None, help="候选静态目录版本号（默认 spec.toml 当前版本）")
     p_cmp.add_argument("--ref-root", type=Path, default=None, help="参照字体根目录")
-    p_cmp.add_argument("--ref-version", default="1.0.43.3", help="project 基准时的参照版本号（默认 1.0.43.3）")
+    p_cmp.add_argument("--ref-version", default=None, help="project 基准时的参照版本号（默认 spec.toml previous_version）")
     p_cmp.add_argument("--hinted", action="store_true", help="project 基准时比较 hinted 静态字体")
     p_cmp.add_argument("--cand-file", type=Path, default=None, help="单对比较：候选字体文件")
     p_cmp.add_argument("--ref-file", type=Path, default=None, help="单对比较：参照字体文件")
@@ -70,7 +71,7 @@ def build_parser() -> argparse.ArgumentParser:
     p_cmp.add_argument("--jobs", type=int, default=4, help="并行进程数（默认 4）")
     p_cmp.add_argument("--out", type=Path, default=None, help="输出目录（默认 .build-cache/compare/latest）")
 
-    p_build = sub.add_parser("build", allow_abbrev=False, help="构建 VF、unhinted 静态与 A1 hinted 静态")
+    p_build = sub.add_parser("build", allow_abbrev=False, help="构建 VF、unhinted 静态与混合 hinted 静态")
     _add_selection_args(p_build)
     p_build.add_argument("--stage", choices=("vf", "unhinted", "hinted", "all"), default="all")
     p_build.add_argument("--jobs", type=int, default=2, help="并行进程数（默认 2）")
@@ -92,12 +93,13 @@ def build_parser() -> argparse.ArgumentParser:
     p_pkg = sub.add_parser("package", allow_abbrev=False, help="生成 21 个发布 ZIP 与 SHA256SUMS.txt")
     p_pkg.add_argument("--root", type=Path, default=None, help="已检查通过的字体根目录（默认 fonts/）")
     p_pkg.add_argument("--dist", type=Path, default=None, help="发布包输出目录（默认 dist/v<version>）")
+    p_pkg.add_argument("--skip-check-gate", action="store_true", help="跳过全量检查通过标记核对（仅限排错）")
 
     p_smp = sub.add_parser("samples", allow_abbrev=False, help="生成多地区 FreeType 与 Windows 96 DPI GDI/DirectWrite 对比样张")
-    _add_selection_args(p_smp)
+    _add_selection_args(p_smp, include_subset=False)
     p_smp.add_argument("--cand-root", type=Path, required=True, help="新构建字体根目录")
     p_smp.add_argument("--ref-root", type=Path, default=None, help="对照基准字体根目录（默认 fonts/）")
-    p_smp.add_argument("--ref-version", default="1.0.43.3", help="基准静态目录版本号（默认 1.0.43.3）")
+    p_smp.add_argument("--ref-version", default=None, help="基准静态目录版本号（默认 spec.toml previous_version）")
     p_smp.add_argument("--out", type=Path, default=None, help="样张输出目录（默认 .build-cache/samples）")
     p_smp.add_argument("--windows-only", action="store_true", help="仅生成 Windows GDI 与 DirectWrite 对比样张")
 
@@ -148,6 +150,7 @@ def _cmd_compare(args: argparse.Namespace, spec: Spec) -> int:
     weights = _parse_csv(args.weights, weight_names, flag="--weights")
 
     cand_root = args.cand_root or (root / "fonts")
+    ref_version = args.ref_version or spec.previous_version
     if args.baseline == "project":
         ref_root = args.ref_root or (root / "fonts")
         tasks = build_project_tasks(
@@ -157,14 +160,21 @@ def _cmd_compare(args: argparse.Namespace, spec: Spec) -> int:
             styles,
             weights,
             cand_version=args.cand_version,
-            ref_version=args.ref_version,
+            ref_version=ref_version,
             include_vf=not args.no_vf,
             include_static=not args.no_static,
             hinted=args.hinted,
             spec=spec,
         )
     else:
-        ref_root = args.ref_root or (root / ".build-cache" / "work" / f"official-sarasa-ui-{spec.sarasa_version}")
+        if args.ref_root is None:
+            from .sources import SourceStore
+
+            store = SourceStore(root / ".build-cache" / "work", spec)
+            store.ensure_sarasa_reference(regions, hinted=False)
+            ref_root = store.ref_dir
+        else:
+            ref_root = args.ref_root
         tasks = build_upstream_tasks(
             cand_root,
             ref_root,
@@ -240,11 +250,13 @@ def _cmd_build(args: argparse.Namespace, spec: Spec) -> int:
 def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
     from .checks import (
         check_font_rules,
+        check_hint_displacement,
         check_hinted_unhinted_parity,
         check_ots,
         check_vf_static_parity,
         scan_freetype_pedantic,
     )
+    from .package import write_check_gate
     from .sources import SourceStore
 
     root = repo_root()
@@ -253,23 +265,27 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
     styles = _parse_csv(args.styles, ("upright", "italic"), flag="--styles")
     weights = _parse_csv(args.weights, [w.name for w in spec.weights], flag="--weights")
 
+    stages = ("vf", "unhinted", "hinted") if args.stage == "all" else (args.stage,)
     store = SourceStore(root / ".build-cache" / "work", spec)
+    # 始终准备并校验固定来源参照，绝不因缺本地参照而静默跳过 cmap/UVS、Inter 字偶距或 hint 位移门检查
+    store.ensure_sarasa_reference(regions, hinted=False)
+    if "hinted" in stages:
+        store.ensure_sarasa_reference(regions, hinted=True)
+    vf_sources = store.ensure_vf_sources(regions)
+    disp_cache_dir = store.work_root / "hint-disp-cache"
+
     ots_exe: Path | None = None
     if not args.skip_ots:
-        ots_exe = next((root / ".build-cache").rglob("ots-sanitize.exe" if sys.platform == "win32" else "ots-sanitize"), None)
-        if ots_exe is None:
-            ots_exe = store.ensure_ots(root / ".build-cache" / "external")
+        ots_exe = store.ensure_ots(root / ".build-cache" / "external")
 
     failures: list[str] = []
     checked = 0
-    stages = ("vf", "unhinted", "hinted") if args.stage == "all" else (args.stage,)
 
     for region in regions:
-        ref_path = store.sarasa_ref_path(region, "Regular", False, hinted=False)
         for style in styles:
             italic = style == "italic"
-            inter_vf_path = store.vf_dir / ("InterVariable-Italic.ttf" if italic else "InterVariable.ttf")
-            inter_ref = inter_vf_path if inter_vf_path.is_file() else None
+            vf_ref_path = store.sarasa_ref_path(region, "Regular", italic, hinted=False)
+            inter_ref = vf_sources["inter_italic" if italic else "inter_upright"]
             vf_path = font_root / "variable" / spec.variable_filename(region, italic)
             if "vf" in stages:
                 if not vf_path.is_file():
@@ -281,9 +297,10 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                         region=region,
                         italic=italic,
                         is_vf=True,
-                        reference_path=ref_path if ref_path.is_file() else None,
+                        reference_path=vf_ref_path,
                         inter_vf_path=inter_ref,
                         subset_mode=args.subset,
+                        require_references=True,
                         spec=spec,
                     )
                     if not r.ok:
@@ -292,10 +309,16 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                         o = check_ots(vf_path, ots_exe)
                         if not o.ok:
                             failures.extend(f"[VF {vf_path.name}] {e}" for e in o.errors)
-                    print(f"[check] {vf_path.name}: {'PASS' if r.ok else 'FAIL'} (cps={r.metrics.get('codepoints')}, uvs={r.metrics.get('uvs_entries')}, a9={r.metrics.get('a9_mod_apostrophe_rho_kern')})", flush=True)
+                    print(
+                        f"[check] {vf_path.name}: {'PASS' if r.ok else 'FAIL'} "
+                        f"(cps={r.metrics.get('codepoints')}, uvs={r.metrics.get('uvs_entries')}, "
+                        f"kern_rho={r.metrics.get('mod_apostrophe_rho_kern')})",
+                        flush=True,
+                    )
 
             for w_name in weights:
                 w = spec.weight(w_name)
+                st_ref_path = store.sarasa_ref_path(region, w.name, italic, hinted=False)
                 un_path = spec.static_dir(font_root, region, hinted=False) / spec.static_filename(region, w.name, italic)
                 hi_path = spec.static_dir(font_root, region, hinted=True) / spec.static_filename(region, w.name, italic)
 
@@ -310,17 +333,28 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                             italic=italic,
                             is_vf=False,
                             hinted=False,
-                            reference_path=ref_path if ref_path.is_file() else None,
+                            reference_path=st_ref_path,
                             inter_vf_path=inter_ref,
                             subset_mode=args.subset,
+                            require_references=True,
                             spec=spec,
                         )
                         if not r.ok:
                             failures.extend(f"[unhinted {un_path.name}] {e}" for e in r.errors)
                         if vf_path.is_file():
-                            p = check_vf_static_parity(vf_path, un_path, w.value)
+                            p = check_vf_static_parity(
+                                vf_path,
+                                un_path,
+                                w.value,
+                                region=region,
+                                italic=italic,
+                                spec=spec,
+                                workers=max(1, args.jobs),
+                            )
                             if not p.ok:
                                 failures.extend(f"[vf-vs-static {un_path.name}] {e}" for e in p.errors)
+                        elif args.stage == "all":
+                            failures.append(f"[vf-vs-static {un_path.name}] 缺少源 VF：{vf_path}")
                         if ots_exe is not None:
                             o = check_ots(un_path, ots_exe)
                             if not o.ok:
@@ -337,9 +371,10 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                             italic=italic,
                             is_vf=False,
                             hinted=True,
-                            reference_path=ref_path if ref_path.is_file() else None,
+                            reference_path=st_ref_path,
                             inter_vf_path=inter_ref,
                             subset_mode=args.subset,
+                            require_references=True,
                             spec=spec,
                         )
                         if not r.ok:
@@ -347,22 +382,58 @@ def _cmd_check(args: argparse.Namespace, spec: Spec) -> int:
                         ft = scan_freetype_pedantic(hi_path, mode=args.ft_mode, workers=max(1, args.jobs))
                         if not ft.ok:
                             failures.extend(f"[FT {hi_path.name}] {e}" for e in ft.errors)
+                        hi_ref_path = store.sarasa_ref_path(region, w.name, italic, hinted=True)
+                        # Heavy 上游无对应字重，优先以同地区同风格的本版 Bold 实测分布为参照（不存在时退回上游 Bold）
+                        if w.name == "Heavy":
+                            our_bold_path = spec.static_dir(font_root, region, hinted=True) / spec.static_filename(
+                                region, "Bold", italic
+                            )
+                            if our_bold_path.is_file():
+                                hi_ref_path = our_bold_path
+                        disp = check_hint_displacement(
+                            hi_path,
+                            hi_ref_path,
+                            is_heavy=(w.name == "Heavy"),
+                            cache_dir=disp_cache_dir,
+                            workers=max(1, args.jobs),
+                        )
+                        if not disp.ok:
+                            failures.extend(f"[hint-disp {hi_path.name}] {e}" for e in disp.errors)
                         if un_path.is_file():
                             par = check_hinted_unhinted_parity(hi_path, un_path)
                             if not par.ok:
                                 failures.extend(f"[parity {hi_path.name}] {e}" for e in par.errors)
+                        elif args.stage == "all":
+                            failures.append(f"[parity {hi_path.name}] 缺少 unhinted 静态：{un_path}")
                         if ots_exe is not None:
                             o = check_ots(hi_path, ots_exe)
                             if not o.ok:
                                 failures.extend(f"[hinted {hi_path.name}] {e}" for e in o.errors)
-                        ok_hi = r.ok and ft.ok
-                        print(f"[check-hi] {hi_path.name}: {'PASS' if ok_hi else 'FAIL'} (ft={ft.metrics.get('ppem_range')} fails={ft.metrics.get('fail_events')})", flush=True)
+                        ok_hi = r.ok and ft.ok and disp.ok
+                        d28 = (disp.metrics.get("hint_disp_20_28_32") or {}).get(28) or {}
+                        print(
+                            f"[check-hi] {hi_path.name}: {'PASS' if ok_hi else 'FAIL'} "
+                            f"(ft={ft.metrics.get('ppem_range')} fails={ft.metrics.get('fail_events')} "
+                            f"disp28={d28.get('cand_gt2', '-')}/{d28.get('ref_gt2', '-')})",
+                            flush=True,
+                        )
 
     if failures:
         print(f"CHECK FAILED: 检查 {checked} 个字体，发现 {len(failures)} 项错误：", file=sys.stderr)
         for msg in failures[:40]:
             print("  -", msg, file=sys.stderr)
         return 1
+
+    full_matrix = (
+        args.stage == "all"
+        and args.subset == "full"
+        and set(regions) == set(spec.region_order)
+        and set(styles) == {"upright", "italic"}
+        and set(weights) == {w.name for w in spec.weights}
+    )
+    if full_matrix:
+        gate = write_check_gate(font_root, spec, ft_mode=args.ft_mode, skipped_ots=args.skip_ots)
+        print(f"已写入检查通过标记：{gate}")
     print(f"CHECK PASSED: 共 {checked} 个字体全部通过产品规则与二进制检查。")
     return 0
 
@@ -373,7 +444,13 @@ def _cmd_package(args: argparse.Namespace, spec: Spec) -> int:
     root = repo_root()
     font_root = (args.root or (root / "fonts")).resolve()
     dist_dir = (args.dist or (root / "dist" / f"v{spec.version}")).resolve()
-    manifest = package_release(font_root, dist_dir, project_root=root, spec=spec)
+    manifest = package_release(
+        font_root,
+        dist_dir,
+        project_root=root,
+        require_check_gate=not args.skip_check_gate,
+        spec=spec,
+    )
     print(f"已打包并核验 {manifest['package_count']} 个发布 ZIP（耗时 {manifest['elapsed_sec']}s），输出：{dist_dir}")
     return 0
 
@@ -386,16 +463,22 @@ def _cmd_samples(args: argparse.Namespace, spec: Spec) -> int:
         render_windows_gdi_comparison,
     )
 
+    if args.windows_only and os.name != "nt":
+        print("ERROR: --windows-only 仅支持在 Windows 平台运行。", file=sys.stderr)
+        return 1
+
     root = repo_root()
     cand_root = args.cand_root.resolve()
     ref_root = (args.ref_root or (root / "fonts")).resolve()
+    ref_version = args.ref_version or spec.previous_version
     out_dir = (args.out or (root / ".build-cache" / "samples")).resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
     regions = _parse_csv(args.regions, spec.region_order, flag="--regions")
+    styles = _parse_csv(args.styles, ("upright", "italic"), flag="--styles")
     weights = _parse_csv(args.weights, [w.name for w in spec.weights], flag="--weights")
 
     def _ref_static(region: str, weight_name: str, italic: bool, hinted: bool) -> Path:
-        d = spec.static_dir(ref_root, region, hinted=hinted, version=args.ref_version)
+        d = spec.static_dir(ref_root, region, hinted=hinted, version=ref_version)
         return d / spec.static_filename(region, weight_name, italic)
 
     def _cand_static(region: str, weight_name: str, italic: bool, hinted: bool) -> Path:
@@ -405,21 +488,25 @@ def _cmd_samples(args: argparse.Namespace, spec: Spec) -> int:
     generated: list[Path] = []
     if not args.windows_only:
         for region in regions:
-            for w_name in weights:
-                rows: list[tuple[str, Path, bool]] = []
-                c_hi = _cand_static(region, w_name, False, hinted=True)
-                c_un = _cand_static(region, w_name, False, hinted=False)
-                r_hi = _ref_static(region, w_name, False, hinted=True)
-                if c_hi.is_file():
-                    rows.append((f"New-{region}-{w_name}(hi)", c_hi, True))
-                if r_hi.is_file():
-                    rows.append((f"v{args.ref_version}-{region}-{w_name}(hi)", r_hi, True))
-                if c_un.is_file():
-                    rows.append((f"New-{region}-{w_name}(un)", c_un, False))
-                if rows:
-                    out = out_dir / f"ft-{region}-{w_name}.png"
-                    render_region_comparison_sheet(out, region=region, rows=rows)
-                    generated.append(out)
+            for style in styles:
+                italic = style == "italic"
+                style_suf = "-Italic" if italic else ""
+                for w_name in weights:
+                    rows: list[tuple[str, Path, bool]] = []
+                    c_hi = _cand_static(region, w_name, italic, hinted=True)
+                    c_un = _cand_static(region, w_name, italic, hinted=False)
+                    r_hi = _ref_static(region, w_name, italic, hinted=True)
+                    tag = f"{region}-{w_name}{style_suf}"
+                    if c_hi.is_file():
+                        rows.append((f"New-{tag}(hi)", c_hi, True))
+                    if r_hi.is_file():
+                        rows.append((f"v{ref_version}-{tag}(hi)", r_hi, True))
+                    if c_un.is_file():
+                        rows.append((f"New-{tag}(un)", c_un, False))
+                    if rows:
+                        out = out_dir / f"ft-{tag}.png"
+                        render_region_comparison_sheet(out, region=region, rows=rows)
+                        generated.append(out)
 
     if os.name == "nt":
         win_pairs: list[tuple[str, Path, int, bool]] = []
@@ -433,7 +520,7 @@ def _cmd_samples(args: argparse.Namespace, spec: Spec) -> int:
             if c_path.is_file():
                 win_pairs.append((f"New-SC-{tag}", c_path, w.value, italic))
             if r_hi.is_file():
-                win_pairs.append((f"v{args.ref_version}-SC-{tag}", r_hi, w.value, italic))
+                win_pairs.append((f"v{ref_version}-SC-{tag}", r_hi, w.value, italic))
         if win_pairs:
             generated.append(render_windows_gdi_comparison(out_dir / "win-gdi-96dpi-SC.png", win_pairs))
             generated.append(render_windows_dwrite_comparison(out_dir / "win-dwrite-96dpi-SC.png", win_pairs))
